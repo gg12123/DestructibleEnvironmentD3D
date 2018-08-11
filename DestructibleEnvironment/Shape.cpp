@@ -78,27 +78,36 @@ Vector3 Shape::CalculateSplitPlaneNormal(const Vector3& P0, const Vector3& collN
 	return Vector3::ProjectOnPlane(Vector3(-toP0.y, -toP0.z, toP0.x), toP0);
 }
 
-bool Shape::Split(const Vector3& collPointWs, const Vector3& collNormalWs, Shape& shapeAbove, Shape& shapeBelow)
+bool Shape::Split(const Vector3& collPointWs, const Vector3& collNormalWs, Shape& shapeAbove)
 {
 	auto P0 = m_Transform.ToLocalPosition(collPointWs);
 	auto collNormalLocal = m_Transform.ToLocalDirection(collNormalWs);
 
 	auto n = CalculateSplitPlaneNormal(P0, collNormalLocal);
 
+	auto& shapeBelow = *(new Shape(*m_NewPointsGetter)); // from pool
+
 	shapeAbove.Clear();
-	shapeBelow.Clear();
 
 	if (SplitPoints(P0, n, shapeAbove, shapeBelow))
 	{
 		for (auto it = m_Edges.begin(); it != m_Edges.end(); it++)
 			(*it)->Split(P0, n, *m_NewPointsGetter, shapeAbove, shapeBelow);
 
-
 		for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
 			(*it)->Split(*m_NewPointsGetter, shapeAbove, shapeBelow);
 
+		m_Points.swap(shapeBelow.GetPoints());
+		m_Edges.swap(shapeBelow.GetEdges());
+		m_Faces.swap(shapeBelow.GetFaces());
+
+		m_CachedPoints.clear();
+		m_CachedEdgePoints.clear();
+
 		InitNewShape(shapeAbove, -n);
-		InitNewShape(shapeBelow, n);
+		InitNewShape(*this, n);
+
+		// return shape below to pool
 
 		return true;
 	}

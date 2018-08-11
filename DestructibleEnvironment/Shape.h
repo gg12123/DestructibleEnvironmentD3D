@@ -18,6 +18,11 @@ public:
 		m_NewPointsGetter = &newPoints;
 	}
 
+	std::vector<Point*>& GetPoints()
+	{
+		return m_Points;
+	}
+
 	std::vector<ShapeEdge*>& GetEdges()
 	{
 		return m_Edges;
@@ -63,7 +68,22 @@ public:
 
 	void AddPoint(Point& p);
 
-	bool Split(const Vector3& collPointWs, const Vector3& collNormalWs, Shape& shapeAbove, Shape& shapeBelow);
+	bool Split(const Vector3& collPointWs, const Vector3& collNormalWs, Shape& shapeAbove);
+
+	bool IsDirty()
+	{
+		return m_Dirty;
+	}
+
+	void SetDirty()
+	{
+		m_Dirty = true;
+	}
+
+	void ClearDirty()
+	{
+		m_Dirty = false;
+	}
 
 private:
 
@@ -87,4 +107,5 @@ private:
 	Transform m_Transform;
 
 	int m_CurrId = 0;
+	bool m_Dirty = true;
 };

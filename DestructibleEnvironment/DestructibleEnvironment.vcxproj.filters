@@ -71,6 +71,12 @@
     <Filter Include="CoreStuff">
       <UniqueIdentifier>{68330397-4ce3-427b-add9-f9032fa2d2d0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rendering">
+      <UniqueIdentifier>{777cfbbd-4aa1-4313-8e6f-98846d68aec1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Misc">
+      <UniqueIdentifier>{d5c622b3-c526-42c7-adc2-e6da648b64dd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
@@ -89,6 +95,18 @@
       <Filter>Physics</Filter>
     </ClCompile>
     <ClCompile Include="Shape.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="DynamicMesh.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="ShapeProxy.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsEngine.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -125,6 +143,39 @@
     </ClInclude>
     <ClInclude Include="Quaternion.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>CoreStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="World.h">
+      <Filter>CoreStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="DynamicMesh.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="IMeshRenderer.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Vertex.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="ShapeProxy.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsEngine.h">
+      <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
