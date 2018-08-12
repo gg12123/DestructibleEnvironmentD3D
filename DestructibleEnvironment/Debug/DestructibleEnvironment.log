@@ -1,26 +1,121 @@
-﻿  compilation object save succeeded; see C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\SamplePixelShader.cso
-  compilation object save succeeded; see C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\SampleVertexShader.cso
-  pch.cpp
-  App.cpp
-  DeviceResources.cpp
-  DestructibleEnvironmentMain.cpp
-  SampleFpsTextRenderer.cpp
-  Sample3DSceneRenderer.cpp
-  DynamicMesh.cpp
+﻿  DynamicMesh.cpp
   Face.cpp
   NewPointsGetter.cpp
-c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\newpointsgetter.cpp(45): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
-c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\dynamicmesh.cpp(19): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
-c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(115): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
   Physics.cpp
   PhysicsEngine.cpp
   Point.cpp
-c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physicsengine.cpp(34): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
-c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(46): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
+  Renderer.cpp
   Shape.cpp
+c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.14.26428\include\memory(2053): error C2027: use of undefined type 'Shape' (compiling source file PhysicsEngine.cpp)
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physicsengine.h(6): note: see declaration of 'Shape' (compiling source file PhysicsEngine.cpp)
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.14.26428\include\memory(2052): note: while compiling class template member function 'void std::default_delete<_Ty>::operator ()(_Ty *) noexcept const'
+          with
+          [
+              _Ty=Shape
+          ] (compiling source file PhysicsEngine.cpp)
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.14.26428\include\memory(2267): note: see reference to function template instantiation 'void std::default_delete<_Ty>::operator ()(_Ty *) noexcept const' being compiled
+          with
+          [
+              _Ty=Shape
+          ] (compiling source file PhysicsEngine.cpp)
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.14.26428\include\memory(2103): note: see reference to class template instantiation 'std::default_delete<_Ty>' being compiled
+          with
+          [
+              _Ty=Shape
+          ] (compiling source file PhysicsEngine.cpp)
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.14.26428\include\memory(2150): note: see reference to class template instantiation 'std::_Unique_ptr_base<_Ty,_Dx>' being compiled
+          with
+          [
+              _Ty=Shape,
+              _Dx=std::default_delete<Shape>
+          ] (compiling source file PhysicsEngine.cpp)
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physicsengine.cpp(31): note: see reference to class template instantiation 'std::unique_ptr<Shape,std::default_delete<_Ty>>' being compiled
+          with
+          [
+              _Ty=Shape
+          ]
+c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.14.26428\include\memory(2053): error C2338: can't delete an incomplete type (compiling source file PhysicsEngine.cpp)
+c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.14.26428\include\memory(2055): warning C4150: deletion of pointer to incomplete type 'Shape'; no destructor called (compiling source file PhysicsEngine.cpp)
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physicsengine.h(6): note: see declaration of 'Shape' (compiling source file PhysicsEngine.cpp)
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(10): error C2084: function 'Face::~Face(void)' already has a body
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.h(24): note: see previous definition of '{dtor}'
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(40): warning C4018: '<': signed/unsigned mismatch
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(57): error C2663: 'NewPointsGetter::GetPointAbove': 2 overloads have no legal conversion for 'this' pointer
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(58): error C2663: 'NewPointsGetter::GetPointBelow': 2 overloads have no legal conversion for 'this' pointer
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(60): error C3536: 'a': cannot be used before it is initialized
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(60): error C2664: 'void std::vector<Point *,std::allocator<_Ty>>::push_back(_Ty &&)': cannot convert argument 1 from 'int' to 'Point *const &'
+          with
+          [
+              _Ty=Point *
+          ]
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(60): note: Reason: cannot convert from 'int' to 'Point *const '
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(60): note: Conversion from integral type to pointer type requires reinterpret_cast, C-style cast or function-style cast
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(61): error C3536: 'b': cannot be used before it is initialized
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(61): error C2664: 'void std::vector<Point *,std::allocator<_Ty>>::push_back(_Ty &&)': cannot convert argument 1 from 'int' to 'Point *const &'
+          with
+          [
+              _Ty=Point *
+          ]
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(61): note: Reason: cannot convert from 'int' to 'Point *const '
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(61): note: Conversion from integral type to pointer type requires reinterpret_cast, C-style cast or function-style cast
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(63): error C2100: illegal indirection
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(64): error C2100: illegal indirection
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(19): error C2819: type 'PhysicsEngine' does not have an overloaded member 'operator ->'
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(69): error C2663: 'NewPointsGetter::GetPointAbove': 2 overloads have no legal conversion for 'this' pointer
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.h(8): note: see declaration of 'PhysicsEngine'
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(70): error C2663: 'NewPointsGetter::GetPointBelow': 2 overloads have no legal conversion for 'this' pointer
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(19): note: did you intend to use '.' instead?
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(72): error C3536: 'a': cannot be used before it is initialized
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(19): error C2232: '->PhysicsEngine::IsSafeToSync': left operand has 'class' type, use '.'
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(72): error C2664: 'void std::vector<Point *,std::allocator<_Ty>>::push_back(_Ty &&)': cannot convert argument 1 from 'int' to 'Point *const &'
+          with
+          [
+              _Ty=Point *
+          ]
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(72): note: Reason: cannot convert from 'int' to 'Point *const '
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(72): note: Conversion from integral type to pointer type requires reinterpret_cast, C-style cast or function-style cast
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(25): error C2819: type 'PhysicsEngine' does not have an overloaded member 'operator ->'
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.h(8): note: see declaration of 'PhysicsEngine'
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(73): error C3536: 'b': cannot be used before it is initialized
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(25): note: did you intend to use '.' instead?
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(73): error C2664: 'void std::vector<Point *,std::allocator<_Ty>>::push_back(_Ty &&)': cannot convert argument 1 from 'int' to 'Point *const &'
+          with
+          [
+              _Ty=Point *
+          ]
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(73): note: Reason: cannot convert from 'int' to 'Point *const '
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(73): note: Conversion from integral type to pointer type requires reinterpret_cast, C-style cast or function-style cast
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(25): error C2232: '->PhysicsEngine::GetBodiesToBeAdded': left operand has 'class' type, use '.'
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(75): error C2100: illegal indirection
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(25): error C2228: left of '.swap' must have class/struct/union
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(76): error C2100: illegal indirection
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(35): error C2819: type 'PhysicsEngine' does not have an overloaded member 'operator ->'
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.h(8): note: see declaration of 'PhysicsEngine'
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(35): note: did you intend to use '.' instead?
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(35): error C2232: '->PhysicsEngine::ClearSafeToSync': left operand has 'class' type, use '.'
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(41): error C2819: type 'PhysicsEngine' does not have an overloaded member 'operator ->'
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.h(8): note: see declaration of 'PhysicsEngine'
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(41): note: did you intend to use '.' instead?
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(41): error C2232: '->PhysicsEngine::GetBodiesAdded': left operand has 'class' type, use '.'
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(41): error C2530: 'newBodies': references must be initialized
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(42): error C3536: 'newBodies': cannot be used before it is initialized
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(42): error C2039: 'begin': is not a member of 'default::int32'
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(42): error C3536: 'it': cannot be used before it is initialized
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(42): error C2039: 'end': is not a member of 'default::int32'
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(43): error C2100: illegal indirection
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(45): error C2039: 'clear': is not a member of 'default::int32'
   ShapeEdge.cpp
-c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\shape.cpp(128): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
   ShapeProxy.cpp
-c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\point.cpp(38): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
-c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\shapeproxy.cpp(36): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
-c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\shapeedge.cpp(111): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\vector.h(77): error C4716: 'operator-': must return a value
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\vector.h(41): error C4716: 'Vector3::Dot': must return a value
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\vector.h(61): error C4716: 'Vector3::Zero': must return a value
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\vector.h(82): error C4716: 'operator/': must return a value
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\random.h(14): error C4716: 'Random::Range': must return a value
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\random.h(9): error C4716: 'Random::Range': must return a value
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\vector.h(77): error C4716: 'operator-': must return a value
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\vector.h(87): error C4716: 'operator*': must return a value
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\vector.h(66): error C4716: 'Vector3::Normalize': must return a value
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\vector.h(51): error C4716: 'Vector3::ProjectOnPlane': must return a value
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\vector.h(46): error C4716: 'Vector3::Cross': must return a value
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\vector.h(41): error C4716: 'Vector3::Dot': must return a value
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\vector.h(56): error C4716: 'Vector3::LinePlaneIntersection': must return a value

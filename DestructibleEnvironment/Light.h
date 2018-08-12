@@ -3,5 +3,6 @@
 
 class Light : public Entity
 {
-
+public:
+	Vector3 GetLightPosition();
 };

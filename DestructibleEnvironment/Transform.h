@@ -2,6 +2,7 @@
 
 #include "Vector.h"
 #include "Quaternion.h"
+#include "Matrix.h"
 
 class Transform
 {
@@ -20,4 +21,6 @@ public:
 
 	Vector3 ToWorldPosition(const Vector3& localPos);
 	Vector3 ToWorldDirection(const Vector3& localDir);
+
+	Matrix4 GetLocalToWorldMatrix() const;
 };

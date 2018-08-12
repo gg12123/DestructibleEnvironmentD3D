@@ -6,6 +6,12 @@ class Shape;
 class ShapeProxy : public DynamicMesh
 {
 public:
+	// special constructor used when a shape is added by the physics engine.
+	ShapeProxy(Shape& shape)
+	{
+		m_Shape = &shape;
+	}
+
 	void Syncronise();
 
 	virtual void FixedUpdate()

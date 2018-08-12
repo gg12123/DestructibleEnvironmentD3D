@@ -183,6 +183,15 @@
     <ClInclude Include="TwoDArray.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Matrix.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstantBufferInputTypes.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="D3DBuffers.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">

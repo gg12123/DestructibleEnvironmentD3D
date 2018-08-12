@@ -200,6 +200,8 @@
     <ClInclude Include="App.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Common\DeviceResources.h" />
+    <ClInclude Include="ConstantBufferInputTypes.h" />
+    <ClInclude Include="D3DBuffers.h" />
     <ClInclude Include="DestructibleEnvironmentMain.h" />
     <ClInclude Include="Common\DirectXHelper.h" />
     <ClInclude Include="Common\StepTimer.h" />
@@ -212,6 +214,7 @@
     <ClInclude Include="FinalFaceCreator.h" />
     <ClInclude Include="IMeshRenderer.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="Matrix.h" />
     <ClInclude Include="NewPointsGetter.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Physics.h" />

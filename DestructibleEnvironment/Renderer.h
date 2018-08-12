@@ -2,6 +2,7 @@
 #include <vector>
 #include <memory>
 #include "Common\DeviceResources.h"
+#include "ConstantBufferInputTypes.h"
 
 class IMeshRenderer;
 class Light;
@@ -11,6 +12,8 @@ class Transform;
 class Renderer
 {
 public:
+	Renderer(const std::shared_ptr<DX::DeviceResources>& deviceResources);
+
 	void Register(IMeshRenderer& toReg)
 	{
 		m_Renderers.push_back(&toReg);
@@ -34,11 +37,26 @@ public:
 	void Draw(int indexCount);
 
 private:
+	void CreateShaders();
+
+	static int constexpr PerObjectConstBufferSlot = 0;
+	static int constexpr PerSceneConstBufferSlot = 1;
+
 	std::shared_ptr<DX::DeviceResources> m_DeviceResources;
 	ID3D11DeviceContext3* m_Context;
-	std::unique_ptr<ID3D11Buffer> m_ObjectToWorldConstantBuffer;
+
+	ID3D11Buffer* m_PerObjectConstantBuffer;
+	ID3D11Buffer* m_PerSceneConstantBuffer;
+
+	PerObjectShaderConstants m_PerObjectConstants;
+	PerSceneShaderConstants m_PerSceneConstants;
 
 	std::vector<IMeshRenderer*> m_Renderers;
+
+	ID3D11VertexShader* m_VertexShader;
+	ID3D11PixelShader* m_PixelShader;
+
+	ID3D11InputLayout*	m_InputLayout;
 
 	// buffer pools here
 
