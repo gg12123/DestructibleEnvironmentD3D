@@ -1,8 +1,8 @@
 #pragma once
 #include <atomic>
 #include <vector>
+#include <memory>
 
-class Physics;
 class Shape;
 
 class PhysicsEngine
@@ -39,10 +39,13 @@ private:
 	std::atomic<bool> m_Running = true;
 	std::atomic<bool> m_SafeToSync = false;
 
-	Physics *m_PhysicsProxy;
+	// the game thread fills this during collision detection, i.e. the sync phase. The bodies
+	// are then added into main collection during updateBodies()
+	std::vector<Shape*> m_BodiesToBeAdded;
 
-	std::vector<Shape*> m_BodiesToBeAdded; // the game thread fills this during collision detection, so it is safe to access during updateBodies()
+	// this is filled with the bodies added by the physics engine (due to splits) during UpdateBodies().
+	// the game thread creates proxies and clears the list at the next sync phase
 	std::vector<Shape*> m_BodiesAdded;
 
-	std::vector<Shape*> m_Bodies;
+	std::vector<std::unique_ptr<Shape>> m_Bodies;
 };

@@ -224,6 +224,7 @@
     <ClInclude Include="ShapeEdge.h" />
     <ClInclude Include="ShapeProxy.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="TwoDArray.h" />
     <ClInclude Include="Vector.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="World.h" />
@@ -248,6 +249,7 @@
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
     <ClCompile Include="Point.cpp" />
+    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Shape.cpp" />
     <ClCompile Include="ShapeEdge.cpp" />
     <ClCompile Include="ShapeProxy.cpp" />

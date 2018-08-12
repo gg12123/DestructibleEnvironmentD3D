@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector.h"
+#include "PhysicsEngine.h"
 #include <vector>
 
 class Shape;
@@ -17,8 +18,8 @@ private:
 	void CreateShapeProxy(Shape& shape);
 	void CreateProxiesForBodiesAddedByEngine();
 
-	std::vector<Shape*> m_AddedByGameThread;
+	std::vector<Shape*> m_BodiesToBeAdded;
 	std::vector<ShapeProxy*> m_ShapeProxies;
 
-	PhysicsEngine* m_Engine; // make unique
+	PhysicsEngine m_Engine;
 };

@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Shape.h"
 #include "Point.h"
 #include "ShapeEdge.h"
@@ -47,7 +48,7 @@ bool Shape::SplitPoints(const Vector3& P0, const Vector3& n, Shape& shapeAbove, 
 	auto numInside = 0;
 
 	for (auto it = m_Points.begin(); it != m_Points.end(); it++)
-		(*it)->Split(P0, n, *m_NewPointsGetter, shapeAbove, shapeBelow, numInside);
+		(*it)->Split(P0, n, m_NewPointsGetter, shapeAbove, shapeBelow, numInside);
 
 	if (numInside >= 3)
 	{
@@ -85,17 +86,18 @@ bool Shape::Split(const Vector3& collPointWs, const Vector3& collNormalWs, Shape
 
 	auto n = CalculateSplitPlaneNormal(P0, collNormalLocal);
 
-	auto& shapeBelow = *(new Shape(*m_NewPointsGetter)); // from pool
+	auto& shapeBelow = *(new Shape()); // from pool
 
 	shapeAbove.Clear();
+	shapeBelow.Clear(); // will new clearing when it come from the pool
 
 	if (SplitPoints(P0, n, shapeAbove, shapeBelow))
 	{
 		for (auto it = m_Edges.begin(); it != m_Edges.end(); it++)
-			(*it)->Split(P0, n, *m_NewPointsGetter, shapeAbove, shapeBelow);
+			(*it)->Split(P0, n, m_NewPointsGetter, shapeAbove, shapeBelow);
 
 		for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
-			(*it)->Split(*m_NewPointsGetter, shapeAbove, shapeBelow);
+			(*it)->Split(m_NewPointsGetter, shapeAbove, shapeBelow);
 
 		m_Points.swap(shapeBelow.GetPoints());
 		m_Edges.swap(shapeBelow.GetEdges());

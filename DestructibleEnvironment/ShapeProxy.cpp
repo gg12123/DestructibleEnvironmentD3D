@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ShapeProxy.h"
 #include "Shape.h"
 #include "World.h"
@@ -17,7 +18,16 @@ void ShapeProxy::Syncronise()
 	// the body transform into this transform, and re-mesh the shape if required
 	if (m_Shape->IsDirty())
 	{
+		SetVertCount(m_Shape->GetRequiredVertexCount());
+		SetIndexCount(m_Shape->GetRequiredIndexCount());
 
+		auto verts = MapVertexBuffer();
+		auto indicies = MapIndexBuffer();
+
+		// fill the buffers
+
+		UnMapVertexBuffer();
+		UnMapIndexBuffer();
 
 		m_Shape->ClearDirty();
 	}

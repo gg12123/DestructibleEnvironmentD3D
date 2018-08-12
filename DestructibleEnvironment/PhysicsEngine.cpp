@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "PhysicsEngine.h"
 
 void PhysicsEngine::Run()
@@ -6,6 +7,7 @@ void PhysicsEngine::Run()
 	{
 		while (m_SafeToSync) // and wait for fixed time step to elapse
 		{
+			// collision detection will be expensive so execution shoulnt get to here
 		}
 
 		UpdateBodies();
@@ -26,7 +28,7 @@ void PhysicsEngine::UpdateBodies()
 void PhysicsEngine::TransferBodiesAddedByGameThread()
 {
 	for (auto it = m_BodiesToBeAdded.begin(); it != m_BodiesToBeAdded.end(); it++)
-		m_Bodies.push_back(*it);
+		m_Bodies.push_back(std::unique_ptr<Shape>(*it));
 
 	m_BodiesToBeAdded.clear();
 }

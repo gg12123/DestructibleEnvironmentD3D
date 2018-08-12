@@ -109,6 +109,9 @@
     <ClCompile Include="Physics.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -176,6 +179,9 @@
     </ClInclude>
     <ClInclude Include="PhysicsEngine.h">
       <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="TwoDArray.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

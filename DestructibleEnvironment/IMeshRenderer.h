@@ -1,7 +1,9 @@
 #pragma once
 
+class Renderer;
+
 class IMeshRenderer
 {
 public:
-	virtual void Render() = 0;
+	virtual void Render(Renderer& renderer) = 0;
 };

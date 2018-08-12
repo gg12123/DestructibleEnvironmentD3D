@@ -3,19 +3,18 @@
 #include "Vector.h"
 #include "FinalFaceCreator.h"
 #include "Transform.h"
+#include "NewPointsGetter.h"
 #include <vector>
 
 class Point;
 class ShapeEdge;
 class Face;
-class NewPointsGetter;
 
 class Shape
 {
 public:
-	Shape(NewPointsGetter& newPoints)
+	Shape()
 	{
-		m_NewPointsGetter = &newPoints;
 	}
 
 	std::vector<Point*>& GetPoints()
@@ -85,6 +84,9 @@ public:
 		m_Dirty = false;
 	}
 
+	int GetRequiredVertexCount() const;
+	int GetRequiredIndexCount() const;
+
 private:
 
 	Vector3 CalculateSplitPlaneNormal(const Vector3& P0, const Vector3& collNormal);
@@ -101,7 +103,7 @@ private:
 	std::vector<Vector3> m_CachedPoints;
 	std::vector<Vector3> m_CachedEdgePoints;
 
-	NewPointsGetter* m_NewPointsGetter;
+	static NewPointsGetter m_NewPointsGetter;
 
 	FinalFaceCreator m_FinalFaceCreator;
 	Transform m_Transform;

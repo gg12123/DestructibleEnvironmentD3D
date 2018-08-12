@@ -1,0 +1,26 @@
+﻿  compilation object save succeeded; see C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\SamplePixelShader.cso
+  compilation object save succeeded; see C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\SampleVertexShader.cso
+  pch.cpp
+  App.cpp
+  DeviceResources.cpp
+  DestructibleEnvironmentMain.cpp
+  SampleFpsTextRenderer.cpp
+  Sample3DSceneRenderer.cpp
+  DynamicMesh.cpp
+  Face.cpp
+  NewPointsGetter.cpp
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\newpointsgetter.cpp(45): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\dynamicmesh.cpp(19): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\face.cpp(115): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
+  Physics.cpp
+  PhysicsEngine.cpp
+  Point.cpp
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physicsengine.cpp(34): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(46): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
+  Shape.cpp
+  ShapeEdge.cpp
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\shape.cpp(128): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
+  ShapeProxy.cpp
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\point.cpp(38): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\shapeproxy.cpp(36): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\shapeedge.cpp(111): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?

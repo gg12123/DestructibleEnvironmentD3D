@@ -6,7 +6,7 @@
 class DynamicMesh : public Entity, IMeshRenderer
 {
 public:
-	void Render() override;
+	void Render(Renderer& renderer) override;
 
 	int GetVertCount() const
 	{
@@ -51,6 +51,9 @@ private:
 
 	int m_CurrIndexCount = 0;
 	int m_MaxIndexCount = 0;
+
+	ID3D11Buffer* m_VertexBuffer;
+	ID3D11Buffer* m_IndexBuffer;
 
 	bool m_Registerd = false;
 };
