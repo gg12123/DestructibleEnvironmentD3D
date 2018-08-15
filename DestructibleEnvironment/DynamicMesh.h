@@ -2,6 +2,7 @@
 #include "IMeshRenderer.h"
 #include "Entity.h"
 #include "Vertex.h"
+#include "D3DBuffers.h"
 
 class DynamicMesh : public Entity, IMeshRenderer
 {
@@ -52,8 +53,8 @@ private:
 	int m_CurrIndexCount = 0;
 	int m_MaxIndexCount = 0;
 
-	ID3D11Buffer* m_VertexBuffer;
-	ID3D11Buffer* m_IndexBuffer;
+	D3DBuffers::BufferPtr m_VertexBuffer = D3DBuffers::NullBufferPtr();
+	D3DBuffers::BufferPtr m_IndexBuffer = D3DBuffers::NullBufferPtr();
 
 	bool m_Registerd = false;
 };

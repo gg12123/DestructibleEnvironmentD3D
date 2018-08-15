@@ -3,6 +3,7 @@
 #include <memory>
 #include "Common\DeviceResources.h"
 #include "ConstantBufferInputTypes.h"
+#include "D3DBuffers.h"
 
 class IMeshRenderer;
 class Light;
@@ -29,6 +30,11 @@ public:
 		m_Camera = &cam;
 	}
 
+	auto& GetBuffers()
+	{
+		return *m_Buffers;
+	}
+
 	void Render();
 
 	void BindVertexBuffer(ID3D11Buffer* buffer, unsigned int stride, unsigned int offset);
@@ -45,8 +51,8 @@ private:
 	std::shared_ptr<DX::DeviceResources> m_DeviceResources;
 	ID3D11DeviceContext3* m_Context;
 
-	ID3D11Buffer* m_PerObjectConstantBuffer;
-	ID3D11Buffer* m_PerSceneConstantBuffer;
+	D3DBuffers::BufferPtr m_PerObjectConstantBuffer = D3DBuffers::NullBufferPtr();
+	D3DBuffers::BufferPtr m_PerSceneConstantBuffer = D3DBuffers::NullBufferPtr();
 
 	PerObjectShaderConstants m_PerObjectConstants;
 	PerSceneShaderConstants m_PerSceneConstants;
@@ -58,7 +64,7 @@ private:
 
 	ID3D11InputLayout*	m_InputLayout;
 
-	// buffer pools here
+	std::unique_ptr<D3DBuffers> m_Buffers;
 
 	Camera* m_Camera;
 	Light* m_Light;

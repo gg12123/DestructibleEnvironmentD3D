@@ -4,8 +4,8 @@
 
 void DynamicMesh::Render(Renderer& renderer)
 {
-	renderer.BindVertexBuffer(m_VertexBuffer, sizeof(Vertex), 0U);
-	renderer.BindIndexBuffer(m_IndexBuffer);
+	renderer.BindVertexBuffer(m_VertexBuffer.get(), sizeof(Vertex), 0U);
+	renderer.BindIndexBuffer(m_IndexBuffer.get());
 	renderer.SetObjectToWorld(GetTransform());
 
 	renderer.Draw(m_CurrIndexCount);

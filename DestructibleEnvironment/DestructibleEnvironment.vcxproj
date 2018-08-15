@@ -220,6 +220,7 @@
     <ClInclude Include="Physics.h" />
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="Point.h" />
+    <ClInclude Include="Pool.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="Random.h" />
     <ClInclude Include="Renderer.h" />

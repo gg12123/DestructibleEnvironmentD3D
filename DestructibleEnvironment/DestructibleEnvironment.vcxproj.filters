@@ -192,6 +192,9 @@
     <ClInclude Include="D3DBuffers.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Pool.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">
