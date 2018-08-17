@@ -35,12 +35,38 @@ Vector3 Shape::CentreAndCache()
 	return c;
 }
 
+void Shape::InitRequiredVertAndIndexCounts()
+{
+	m_RequiredNumVerts = 0;
+	m_RequiredNumIndicies = 0;
+
+	for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
+	{
+		auto numVerts = (*it)->GetPoints().size();
+
+		m_RequiredNumVerts += numVerts;
+		m_RequiredNumIndicies += 3 * (numVerts - 2);
+	}
+}
+
 void Shape::InitFaces(const Vector3& finalFaceNormal)
 {
 	m_Faces.push_back(&m_FinalFaceCreator.CreateFace(finalFaceNormal));
 
+	m_RequiredNumVerts = 0;
+	m_RequiredNumIndicies = 0;
+
 	for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
-		(*it)->CachePoints();
+	{
+		auto f = *it;
+
+		f->CachePoints();
+
+		auto numVerts = f->GetPoints().size();
+
+		m_RequiredNumVerts += numVerts;
+		m_RequiredNumIndicies += 3 * (numVerts - 2);
+	}
 }
 
 bool Shape::SplitPoints(const Vector3& P0, const Vector3& n, Shape& shapeAbove, Shape& shapeBelow)
@@ -89,7 +115,7 @@ bool Shape::Split(const Vector3& collPointWs, const Vector3& collNormalWs, Shape
 	auto& shapeBelow = *(new Shape()); // from pool
 
 	shapeAbove.Clear();
-	shapeBelow.Clear(); // will new clearing when it come from the pool
+	shapeBelow.Clear(); // will need clearing when it come from the pool
 
 	if (SplitPoints(P0, n, shapeAbove, shapeBelow))
 	{

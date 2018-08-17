@@ -42,6 +42,17 @@ public:
 	void SetObjectToWorld(const Transform& transform);
 	void Draw(int indexCount);
 
+	template<class T>
+	void InsertIntoBuffer(ID3D11Buffer* buffer, T* data, int numElements)
+	{
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
+		DX::ThrowIfFailed(m_Context->Map(buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+		memcpy(mappedResource.pData, data, numElements * sizeof(T));
+		m_Context->Unmap(buffer, 0);
+	}
+
 private:
 	void CreateShaders();
 

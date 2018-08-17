@@ -7,6 +7,7 @@
 
 auto D3DBufferDeleter = [](ID3D11Buffer* buffer)
 {
+	buffer->Release();
 	delete buffer;
 };
 
@@ -103,6 +104,16 @@ public:
 			return m_IndexBufferPool->GetObject();
 
 		return BufferPtr(CreateDynamicIndexBuffer(reqSize, m_Device), D3DBufferDeleter);
+	}
+
+	void ReturnIndexBuffer(const BufferPtr& buf)
+	{
+		m_IndexBufferPool->Return(buf);
+	}
+
+	void ReturnVertexBuffer(const BufferPtr& buf)
+	{
+		m_VertexBufferPool->Return(buf);
 	}
 
 private:

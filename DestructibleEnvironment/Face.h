@@ -30,11 +30,21 @@ public:
 		m_Normal = normal;
 	}
 
+	auto GetNormal() const
+	{
+		return m_Normal;
+	}
+
 	void Split(const NewPointsGetter& newPoints, Shape& shapeAbove, Shape& shapeBelow);
 
-	std::vector<Point*>& GetPoints()
+	auto& GetPoints()
 	{
 		return m_Points;
+	}
+
+	auto& GetCachedPoints()
+	{
+		return m_CachedPoints;
 	}
 
 	void CachePoints();

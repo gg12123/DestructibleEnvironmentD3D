@@ -84,8 +84,17 @@ public:
 		m_Dirty = false;
 	}
 
-	int GetRequiredVertexCount() const;
-	int GetRequiredIndexCount() const;
+	int GetRequiredVertexCount() const
+	{
+		return m_RequiredNumVerts;
+	}
+
+	int GetRequiredIndexCount() const
+	{
+		return m_RequiredNumIndicies;
+	}
+
+	void InitRequiredVertAndIndexCounts();
 
 private:
 
@@ -95,6 +104,9 @@ private:
 	void InitFaces(const Vector3& finalFaceNormal);
 	void InitNewShape(Shape& shape, const Vector3& finalFaceNormal);
 	bool SplitPoints(const Vector3& P0, const Vector3& n, Shape& shapeAbove, Shape& shapeBelow);
+
+	int m_RequiredNumVerts;
+	int m_RequiredNumIndicies;
 
 	std::vector<Point*> m_Points;
 	std::vector<ShapeEdge*> m_Edges;

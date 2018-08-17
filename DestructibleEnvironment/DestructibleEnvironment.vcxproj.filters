@@ -195,6 +195,9 @@
     <ClInclude Include="Pool.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="ArrayWrapper.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">
