@@ -214,6 +214,7 @@
     <ClInclude Include="Face.h" />
     <ClInclude Include="FinalFaceCreator.h" />
     <ClInclude Include="IMeshRenderer.h" />
+    <ClInclude Include="InitialShapeCreator.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="NewPointsGetter.h" />
@@ -258,6 +259,7 @@
     <ClCompile Include="Shape.cpp" />
     <ClCompile Include="ShapeEdge.cpp" />
     <ClCompile Include="ShapeProxy.cpp" />
+    <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">

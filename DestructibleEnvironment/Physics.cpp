@@ -3,13 +3,17 @@
 #include "PhysicsEngine.h"
 #include "Shape.h"
 #include "ShapeProxy.h"
+#include "InitialShapeCreator.h"
+#include "World.h"
 
 Shape & Physics::AddDynamicRigidbody(ShapeProxy& proxy)
 {
 	auto shape = new Shape(); // pool
+	InitialShapeCreator::Create(*shape, proxy.GetInitialWidth(), proxy.GetInitialHeight(), proxy.GetTransform());
+
 	m_BodiesToBeAdded.push_back(shape);
 
-	// this proxy has come from the world so just push iit onto the list
+	// this proxy has come from the world so just push it onto the list
 	m_ShapeProxies.push_back(&proxy);
 
 	return *shape;
@@ -52,8 +56,7 @@ void Physics::CreateShapeProxy(Shape& shape)
 
 	// this proxy has been created for a shape that was added by the physics thread
 	// so it needs registering with the world
-
-	// register
+	m_World->RegisterEntity(*prox);
 
 	m_ShapeProxies.push_back(prox);
 }

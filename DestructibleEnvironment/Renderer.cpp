@@ -7,8 +7,9 @@
 #include "Light.h"
 #include "Common\DirectXHelper.h"
 
-Renderer::Renderer(const std::shared_ptr<DX::DeviceResources>& deviceResources) : m_DeviceResources(deviceResources)
+void Renderer::SetResources(const std::shared_ptr<DX::DeviceResources>& deviceResources)
 {
+	m_DeviceResources = deviceResources;
 	m_Context = m_DeviceResources->GetD3DDeviceContext();
 
 	m_PerObjectConstantBuffer = D3DBuffers::CreateConstantBuffer<PerObjectShaderConstants>(m_DeviceResources->GetD3DDevice());

@@ -14,17 +14,7 @@ DestructibleEnvironmentMain::DestructibleEnvironmentMain(const std::shared_ptr<D
 	// Register to be notified if the Device is lost or recreated
 	m_deviceResources->RegisterDeviceNotify(this);
 
-	// TODO: Replace this with your app's content initialization.
-	m_sceneRenderer = std::unique_ptr<Sample3DSceneRenderer>(new Sample3DSceneRenderer(m_deviceResources));
-
-	m_fpsTextRenderer = std::unique_ptr<SampleFpsTextRenderer>(new SampleFpsTextRenderer(m_deviceResources));
-
-	// TODO: Change the timer settings if you want something other than the default variable timestep mode.
-	// e.g. for 60 FPS fixed timestep update logic, call:
-	/*
-	m_timer.SetFixedTimeStep(true);
-	m_timer.SetTargetElapsedSeconds(1.0 / 60);
-	*/
+	m_World.Init(m_deviceResources);
 }
 
 DestructibleEnvironmentMain::~DestructibleEnvironmentMain()
@@ -37,31 +27,18 @@ DestructibleEnvironmentMain::~DestructibleEnvironmentMain()
 void DestructibleEnvironmentMain::CreateWindowSizeDependentResources() 
 {
 	// TODO: Replace this with the size-dependent initialization of your app's content.
-	m_sceneRenderer->CreateWindowSizeDependentResources();
 }
 
 // Updates the application state once per frame.
 void DestructibleEnvironmentMain::Update() 
 {
-	// Update scene objects.
-	m_timer.Tick([&]()
-	{
-		// TODO: Replace this with your app's content update functions.
-		m_sceneRenderer->Update(m_timer);
-		m_fpsTextRenderer->Update(m_timer);
-	});
+	m_World.Update();
 }
 
 // Renders the current frame according to the current application state.
 // Returns true if the frame was rendered and is ready to be displayed.
-bool DestructibleEnvironmentMain::Render() 
+void DestructibleEnvironmentMain::Render()
 {
-	// Don't try to render anything before the first Update.
-	if (m_timer.GetFrameCount() == 0)
-	{
-		return false;
-	}
-
 	auto context = m_deviceResources->GetD3DDeviceContext();
 
 	// Reset the viewport to target the whole screen.
@@ -76,25 +53,24 @@ bool DestructibleEnvironmentMain::Render()
 	context->ClearRenderTargetView(m_deviceResources->GetBackBufferRenderTargetView(), DirectX::Colors::CornflowerBlue);
 	context->ClearDepthStencilView(m_deviceResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	// Render the scene objects.
-	// TODO: Replace this with your app's content rendering functions.
-	m_sceneRenderer->Render();
-	m_fpsTextRenderer->Render();
-
-	return true;
+	m_World.Render();
 }
 
 // Notifies renderers that device resources need to be released.
 void DestructibleEnvironmentMain::OnDeviceLost()
 {
-	m_sceneRenderer->ReleaseDeviceDependentResources();
-	m_fpsTextRenderer->ReleaseDeviceDependentResources();
+	// TODO - work out what I should do here
+
+	//m_sceneRenderer->ReleaseDeviceDependentResources();
+	//m_fpsTextRenderer->ReleaseDeviceDependentResources();
 }
 
 // Notifies renderers that device resources may now be recreated.
 void DestructibleEnvironmentMain::OnDeviceRestored()
 {
-	m_sceneRenderer->CreateDeviceDependentResources();
-	m_fpsTextRenderer->CreateDeviceDependentResources();
+	// TODO - work out what I should do here
+
+	//m_sceneRenderer->CreateDeviceDependentResources();
+	//m_fpsTextRenderer->CreateDeviceDependentResources();
 	CreateWindowSizeDependentResources();
 }

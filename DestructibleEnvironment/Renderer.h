@@ -13,7 +13,7 @@ class Transform;
 class Renderer
 {
 public:
-	Renderer(const std::shared_ptr<DX::DeviceResources>& deviceResources);
+	void SetResources(const std::shared_ptr<DX::DeviceResources>& deviceResources);
 
 	void Register(IMeshRenderer& toReg)
 	{

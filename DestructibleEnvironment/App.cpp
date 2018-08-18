@@ -99,11 +99,8 @@ void App::Run()
 			CoreWindow::GetForCurrentThread()->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
 
 			m_main->Update();
-
-			if (m_main->Render())
-			{
-				m_deviceResources->Present();
-			}
+			m_main->Render();
+			m_deviceResources->Present();
 		}
 		else
 		{

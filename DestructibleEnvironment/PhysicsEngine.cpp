@@ -1,6 +1,11 @@
 #include "pch.h"
 #include "PhysicsEngine.h"
 
+void PhysicsEngine::StartRunning()
+{
+	// create thread here
+}
+
 void PhysicsEngine::Run()
 {
 	while (m_Running)
@@ -16,6 +21,11 @@ void PhysicsEngine::Run()
 
 		DoCollisionDetection();
 	}
+}
+
+void PhysicsEngine::DoCollisionDetection()
+{
+
 }
 
 void PhysicsEngine::UpdateBodies()

@@ -29,6 +29,14 @@ public:
 		return m_SafeToSync;
 	}
 
+	void StopRunning()
+	{
+		m_Running = false;
+		m_SafeToSync = false; // do this so it doesnt get stuck waiting for flag to be cleared when game thread is finished.
+	}
+
+	void StartRunning();
+
 private:
 	void Run();
 

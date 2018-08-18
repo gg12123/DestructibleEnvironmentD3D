@@ -18,9 +18,16 @@ public:
 		return m_Transform;
 	}
 
+	virtual void Update()
+	{
+	}
+
 protected:
 
-	World & GetWorld();
+	World & GetWorld()
+	{
+		return *m_World;
+	}
 
 	virtual void Awake()
 	{

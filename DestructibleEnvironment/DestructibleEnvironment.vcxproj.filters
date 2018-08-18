@@ -112,6 +112,9 @@
     <ClCompile Include="Renderer.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="World.cpp">
+      <Filter>CoreStuff</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -197,6 +200,9 @@
     </ClInclude>
     <ClInclude Include="ArrayWrapper.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="InitialShapeCreator.h">
+      <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

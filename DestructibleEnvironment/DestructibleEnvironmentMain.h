@@ -2,8 +2,7 @@
 
 #include "Common\StepTimer.h"
 #include "Common\DeviceResources.h"
-#include "Content\Sample3DSceneRenderer.h"
-#include "Content\SampleFpsTextRenderer.h"
+#include "World.h"
 
 // Renders Direct2D and 3D content on the screen.
 namespace DestructibleEnvironment
@@ -15,7 +14,7 @@ namespace DestructibleEnvironment
 		~DestructibleEnvironmentMain();
 		void CreateWindowSizeDependentResources();
 		void Update();
-		bool Render();
+		void Render();
 
 		// IDeviceNotify
 		virtual void OnDeviceLost();
@@ -25,11 +24,9 @@ namespace DestructibleEnvironment
 		// Cached pointer to device resources.
 		std::shared_ptr<DX::DeviceResources> m_deviceResources;
 
-		// TODO: Replace with your own content renderers.
-		std::unique_ptr<Sample3DSceneRenderer> m_sceneRenderer;
-		std::unique_ptr<SampleFpsTextRenderer> m_fpsTextRenderer;
-
 		// Rendering loop timer.
 		DX::StepTimer m_timer;
+
+		World m_World;
 	};
 }

@@ -95,11 +95,11 @@ public:
 	}
 
 	void InitRequiredVertAndIndexCounts();
+	Vector3 CentreAndCache();
 
 private:
 
 	Vector3 CalculateSplitPlaneNormal(const Vector3& P0, const Vector3& collNormal);
-	Vector3 CentreAndCache();
 	Vector3 CalculateCentre();
 	void InitFaces(const Vector3& finalFaceNormal);
 	void InitNewShape(Shape& shape, const Vector3& finalFaceNormal);
