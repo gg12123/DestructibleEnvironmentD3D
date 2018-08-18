@@ -57,7 +57,7 @@ void Renderer::BindIndexBuffer(ID3D11Buffer* buffer)
 	m_Context->IASetIndexBuffer(buffer, DXGI_FORMAT_R32_UINT, 0);
 }
 
-void Renderer::SetObjectToWorld(const Transform& transform)
+void Renderer::SetObjectToWorld(Transform& transform)
 {
 	m_PerObjectConstants.ModelToWorldMatrix = transform.GetLocalToWorldMatrix();
 

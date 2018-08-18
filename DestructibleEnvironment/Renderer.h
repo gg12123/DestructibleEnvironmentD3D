@@ -13,6 +13,10 @@ class Transform;
 class Renderer
 {
 public:
+	Renderer()
+	{
+	}
+
 	void SetResources(const std::shared_ptr<DX::DeviceResources>& deviceResources);
 
 	void Register(IMeshRenderer& toReg)
@@ -39,7 +43,7 @@ public:
 
 	void BindVertexBuffer(ID3D11Buffer* buffer, unsigned int stride, unsigned int offset);
 	void BindIndexBuffer(ID3D11Buffer* buffer);
-	void SetObjectToWorld(const Transform& transform);
+	void SetObjectToWorld(Transform& transform);
 	void Draw(int indexCount);
 
 	template<class T>

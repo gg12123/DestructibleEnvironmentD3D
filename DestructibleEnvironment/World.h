@@ -9,6 +9,9 @@ class Entity;
 class World
 {
 public:
+	World()
+	{
+	}
 
 	~World()
 	{

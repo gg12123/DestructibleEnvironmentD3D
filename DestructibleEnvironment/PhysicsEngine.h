@@ -2,6 +2,7 @@
 #include <atomic>
 #include <vector>
 #include <memory>
+#include <thread>
 
 class Shape;
 
@@ -33,6 +34,9 @@ public:
 	{
 		m_Running = false;
 		m_SafeToSync = false; // do this so it doesnt get stuck waiting for flag to be cleared when game thread is finished.
+
+		if (m_Thread.joinable())
+			m_Thread.join();
 	}
 
 	void StartRunning();
@@ -56,4 +60,6 @@ private:
 	std::vector<Shape*> m_BodiesAdded;
 
 	std::vector<std::unique_ptr<Shape>> m_Bodies;
+
+	std::thread m_Thread;
 };

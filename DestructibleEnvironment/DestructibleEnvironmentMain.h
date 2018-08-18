@@ -21,6 +21,8 @@ namespace DestructibleEnvironment
 		virtual void OnDeviceRestored();
 
 	private:
+		void RegisterEntitiesWithWorld();
+
 		// Cached pointer to device resources.
 		std::shared_ptr<DX::DeviceResources> m_deviceResources;
 

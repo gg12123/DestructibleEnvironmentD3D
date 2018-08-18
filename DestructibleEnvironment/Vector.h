@@ -104,6 +104,21 @@ public:
 		res /= res.Magnitude();
 		return res;
 	}
+
+	static inline Vector3 Right()
+	{
+		return Vector3(1.0f, 0.0f, 0.0f);
+	}
+
+	static inline Vector3 Up()
+	{
+		return Vector3(0.0f, 1.0f, 0.0f);
+	}
+
+	static inline Vector3 Foward()
+	{
+		return Vector3(0.0f, 0.0f, 1.0f);
+	}
 };
 
 inline Vector3 operator+(const Vector3& lhs, const Vector3& rhs)

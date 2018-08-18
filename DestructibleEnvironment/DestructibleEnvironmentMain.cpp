@@ -1,6 +1,10 @@
 ﻿#include "pch.h"
 #include "DestructibleEnvironmentMain.h"
 #include "Common\DirectXHelper.h"
+#include "ShapeProxy.h"
+#include "Camera.h"
+#include "Light.h"
+#include "Math.h"
 
 using namespace DestructibleEnvironment;
 using namespace Windows::Foundation;
@@ -15,12 +19,36 @@ DestructibleEnvironmentMain::DestructibleEnvironmentMain(const std::shared_ptr<D
 	m_deviceResources->RegisterDeviceNotify(this);
 
 	m_World.Init(m_deviceResources);
+	RegisterEntitiesWithWorld();
 }
 
 DestructibleEnvironmentMain::~DestructibleEnvironmentMain()
 {
 	// Deregister device notification
 	m_deviceResources->RegisterDeviceNotify(nullptr);
+}
+
+void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
+{
+	auto shape = new ShapeProxy();
+	shape->GetTransform().SetPosition(Vector3::Zero());
+	shape->GetTransform().SetRotation(Quaternion::Identity());
+	shape->SetInitialHeight(2.0f);
+	shape->SetInitialWidth(1.0f);
+	m_World.RegisterEntity(*shape);
+
+	auto cam = new Camera();
+	cam->GetTransform().SetPosition(Vector3(10.0f, 0.0f, 0.0f));
+	cam->GetTransform().SetRotation(Quaternion::LookRotation(-Vector3::Right()));
+	cam->SetFov(Math::ToRadians(45.0f));
+	cam->SetFarClip(1000.0f);
+	cam->SetNearClip(0.1f);
+	m_World.RegisterEntity(*cam);
+
+	auto light = new Light();
+	light->GetTransform().SetPosition(Vector3(5.0f, 5.0f, 2.0f));
+	light->GetTransform().SetRotation(Quaternion::Identity());
+	m_World.RegisterEntity(*light);
 }
 
 // Updates application state when the window size changes (e.g. device orientation change)

@@ -77,6 +77,9 @@
     <Filter Include="Misc">
       <UniqueIdentifier>{d5c622b3-c526-42c7-adc2-e6da648b64dd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rendering\Shaders">
+      <UniqueIdentifier>{c379f3b6-7844-4de2-a74f-561eb8b1a8c2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
@@ -204,6 +207,9 @@
     <ClInclude Include="InitialShapeCreator.h">
       <Filter>Physics</Filter>
     </ClInclude>
+    <ClInclude Include="Math.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">
@@ -215,5 +221,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="DestructibleEnvironment_TemporaryKey.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="MyVertexShader.hlsl">
+      <Filter>Rendering\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="MyPixelShader.hlsl">
+      <Filter>Rendering\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

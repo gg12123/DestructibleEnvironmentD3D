@@ -6,6 +6,10 @@ template<int Size>
 class Matrix
 {
 public:
+	Matrix()
+	{
+	}
+
 	Matrix(float val)
 	{
 		for (int i = 0; i < Size; i++)

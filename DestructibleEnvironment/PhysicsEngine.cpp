@@ -1,9 +1,11 @@
 #include "pch.h"
 #include "PhysicsEngine.h"
 
+
 void PhysicsEngine::StartRunning()
 {
-	// create thread here
+	if (!m_Thread.joinable())
+		m_Thread = std::thread(&PhysicsEngine::Run, this);
 }
 
 void PhysicsEngine::Run()
