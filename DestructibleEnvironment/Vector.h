@@ -19,12 +19,9 @@ public:
 		z = zComp;
 	}
 
-	Vector3& operator-()
+	Vector3 operator-()
 	{
-		x = -x;
-		y = -y;
-		z = -z;
-		return *this;
+		return Vector3(-x, -y, -x);
 	}
 
 	Vector3& operator*=(float rhs)
@@ -116,20 +113,20 @@ inline Vector3 operator+(const Vector3& lhs, const Vector3& rhs)
 
 inline Vector3 operator-(const Vector3& lhs, const Vector3& rhs)
 {
-
+	return Vector3(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z);
 }
 
 inline Vector3 operator/(const Vector3& lhs, float rhs)
 {
-
+	return Vector3(lhs.x / rhs, lhs.y / rhs, lhs.z / rhs);
 }
 
 inline Vector3 operator*(float lhs, const Vector3& rhs)
 {
-
+	return Vector3(lhs * rhs.x, lhs * rhs.y, lhs * rhs.z);
 }
 
-inline Vector3 operator*(const Vector3& rhs, float lhs)
+inline Vector3 operator*(const Vector3& lhs, float rhs)
 {
-
+	return rhs * lhs;
 }
