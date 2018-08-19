@@ -3,8 +3,7 @@
 #include <vector>
 #include <memory>
 #include <thread>
-
-class Shape;
+#include "Shape.h"
 
 class PhysicsEngine
 {

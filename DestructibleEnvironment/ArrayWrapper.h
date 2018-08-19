@@ -9,10 +9,10 @@ public:
 		m_CurrCount = 0;
 	}
 
-	void Add(const T& toAdd)
+	void Add(T&& toAdd)
 	{
 		assert(m_CurrCount < N);
-		m_Data[m_CurrCount] = toAdd;
+		m_Data[m_CurrCount] = std::forward<T>(toAdd);
 		m_CurrCount++;
 	}
 

@@ -5,20 +5,24 @@
 #include "Vertex.h"
 #include "Common\DirectXHelper.h"
 
-auto D3DBufferDeleter = [](ID3D11Buffer* buffer)
+struct D3DBufferDeleter
 {
-	buffer->Release();
-	delete buffer;
+public:
+	void operator()(ID3D11Buffer* buffer) const
+	{ 
+		buffer->Release();
+		delete buffer;
+	}
 };
 
 class D3DBuffers
 {
 public:
-	using BufferPtr = std::unique_ptr<ID3D11Buffer, decltype(D3DBufferDeleter)>;
+	using BufferPtr = std::unique_ptr<ID3D11Buffer, D3DBufferDeleter>;
 
 	static BufferPtr NullBufferPtr()
 	{
-		return BufferPtr(nullptr, D3DBufferDeleter);
+		return BufferPtr(nullptr, D3DBufferDeleter());
 	}
 
 	static ID3D11Buffer* CreateDynamicIndexBuffer(int size, ID3D11Device3* device)
@@ -68,25 +72,25 @@ public:
 			)
 		);
 
-		return BufferPtr(buffer, D3DBufferDeleter);
+		return BufferPtr(buffer, D3DBufferDeleter());
 	}
 
 	D3DBuffers(ID3D11Device3* device)
 	{
-		auto vertBuffCreator = [=]()
+		std::function<BufferPtr()> vertBuffCreator = std::move([=]()
 		{
-			return BufferPtr(CreateDynamicVertexBuffer<Vertex>(VertexBufferSize, device), D3DBufferDeleter);
-		};
+			return BufferPtr(CreateDynamicVertexBuffer<Vertex>(VertexBufferSize, device), D3DBufferDeleter());
+		});
 
-		auto indexBuffCreator = [=]()
+		std::function<BufferPtr()> indexBuffCreator = std::move([=]()
 		{
-			return BufferPtr(CreateDynamicIndexBuffer(VertexBufferSize, device), D3DBufferDeleter);
-		};
+			return BufferPtr(CreateDynamicIndexBuffer(VertexBufferSize, device), D3DBufferDeleter());
+		});
 
 		const auto intialPoolSize = 100;
 
-		m_VertexBufferPool = std::unique_ptr<Pool<BufferPtr>>(new Pool<BufferPtr>(vertBuffCreator, intialPoolSize));
-		m_IndexBufferPool = std::unique_ptr<Pool<BufferPtr>>(new Pool<BufferPtr>(indexBuffCreator, intialPoolSize));
+		m_VertexBufferPool = std::unique_ptr<Pool<BufferPtr>>(new Pool<BufferPtr>(std::move(vertBuffCreator), intialPoolSize));
+		m_IndexBufferPool = std::unique_ptr<Pool<BufferPtr>>(new Pool<BufferPtr>(std::move(indexBuffCreator), intialPoolSize));
 		m_Device = device;
 	}
 
@@ -95,7 +99,7 @@ public:
 		if (reqSize <= VertexBufferSize)
 			return m_VertexBufferPool->GetObject();
 
-		return BufferPtr(CreateDynamicVertexBuffer<Vertex>(reqSize, m_Device), D3DBufferDeleter);
+		return BufferPtr(CreateDynamicVertexBuffer<Vertex>(reqSize, m_Device), D3DBufferDeleter());
 	}
 
 	BufferPtr GetIndexBuffer(int reqSize)
@@ -103,17 +107,17 @@ public:
 		if (reqSize <= IndexBufferSize)
 			return m_IndexBufferPool->GetObject();
 
-		return BufferPtr(CreateDynamicIndexBuffer(reqSize, m_Device), D3DBufferDeleter);
+		return BufferPtr(CreateDynamicIndexBuffer(reqSize, m_Device), D3DBufferDeleter());
 	}
 
-	void ReturnIndexBuffer(const BufferPtr& buf)
+	void ReturnIndexBuffer(BufferPtr&& buf)
 	{
-		m_IndexBufferPool->Return(buf);
+		m_IndexBufferPool->Return(std::move(buf));
 	}
 
-	void ReturnVertexBuffer(const BufferPtr& buf)
+	void ReturnVertexBuffer(BufferPtr&& buf)
 	{
-		m_VertexBufferPool->Return(buf);
+		m_VertexBufferPool->Return(std::move(buf));
 	}
 
 private:

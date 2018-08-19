@@ -3,8 +3,7 @@
 #include <memory>
 #include "Renderer.h"
 #include "Physics.h"
-
-class Entity;
+#include "Entity.h"
 
 class World
 {

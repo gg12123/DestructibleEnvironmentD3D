@@ -3,6 +3,11 @@
 #include "Shape.h"
 #include "World.h"
 
+ShapeProxy::ShapeProxy(Shape& shape)
+{
+	m_Shape = &shape;
+}
+
 void ShapeProxy::Awake()
 {
 	if (!m_Shape)
@@ -34,14 +39,14 @@ void ShapeProxy::Syncronise()
 			auto baseIndex = verts.GetCurrCount();
 			auto numPoints = points.size();
 
-			indicies.Add(baseIndex);
+			indicies.Add(static_cast<unsigned short>(baseIndex));
 			verts.Add(Vertex(points.at(0), normal));
 
-			for (int i = 1; i < numPoints - 1; i++)
+			for (auto i = 1U; i < numPoints - 1U; i++)
 			{
 				verts.Add(Vertex(points.at(i), normal));
-				indicies.Add(baseIndex + i);
-				indicies.Add(baseIndex + i + 1);
+				indicies.Add(static_cast<unsigned short>(baseIndex + i));
+				indicies.Add(static_cast<unsigned short>(baseIndex + i + 1U));
 			}
 
 			verts.Add(Vertex(points.at(numPoints - 1), normal));

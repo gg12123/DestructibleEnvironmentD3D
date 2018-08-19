@@ -5,6 +5,8 @@
 #include "Face.h"
 #include "Random.h"
 
+NewPointsGetter Shape::m_NewPointsGetter;
+
 void Shape::AddPoint(Point& p)
 {
 	p.SetId(m_CurrId);

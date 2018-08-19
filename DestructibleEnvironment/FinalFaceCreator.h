@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Vector.h"
+#include "Vector3.h"
 #include "Point.h"
 #include "ShapeEdge.h"
 #include "Face.h"

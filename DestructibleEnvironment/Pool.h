@@ -8,7 +8,7 @@ class Pool
 public:
 	Pool(std::function<T()> creator, int initalSize)
 	{
-		m_Creator = creator;
+		m_Creator = std::move(creator);
 
 		for (int i = 0; i < initalSize; i++)
 			m_Objects.push(m_Creator());
@@ -18,16 +18,16 @@ public:
 	{
 		if (m_Objects.size() > 0)
 		{
-			auto obj = m_Objects.top();
+			auto obj = std::move(m_Objects.top());
 			m_Objects.pop();
 			return obj;
 		}
 		return m_Creator();
 	}
 
-	void Return(const T& toRet)
+	void Return(T&& toRet)
 	{
-		m_Objects.push(toRet);
+		m_Objects.push(std::forward<T>(toRet));
 	}
 
 private:

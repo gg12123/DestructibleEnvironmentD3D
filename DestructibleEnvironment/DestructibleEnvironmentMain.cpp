@@ -4,7 +4,7 @@
 #include "ShapeProxy.h"
 #include "Camera.h"
 #include "Light.h"
-#include "Math.h"
+#include "MathUtils.h"
 
 using namespace DestructibleEnvironment;
 using namespace Windows::Foundation;
@@ -40,7 +40,7 @@ void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 	auto cam = new Camera();
 	cam->GetTransform().SetPosition(Vector3(10.0f, 0.0f, 0.0f));
 	cam->GetTransform().SetRotation(Quaternion::LookRotation(-Vector3::Right()));
-	cam->SetFov(Math::ToRadians(45.0f));
+	cam->SetFov(MathUtils::ToRadians(45.0f));
 	cam->SetFarClip(1000.0f);
 	cam->SetNearClip(0.1f);
 	m_World.RegisterEntity(*cam);

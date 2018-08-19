@@ -1,7 +1,7 @@
 #pragma once
 #include "Shape.h"
 #include "ShapeProxy.h"
-#include "Vector.h"
+#include "Vector3.h"
 #include "Point.h"
 #include "Face.h"
 #include "ShapeEdge.h"

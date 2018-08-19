@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "World.h"
-#include "Entity.h"
 
 void World::RegisterEntity(Entity& ent)
 {

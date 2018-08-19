@@ -1,5 +1,5 @@
 #pragma once
-#include "Vector.h"
+#include "Vector3.h"
 #include "Quaternion.h"
 #include "Matrix.h"
 
@@ -72,19 +72,19 @@ public:
 	Vector3 GetForward()
 	{
 		ReCalculateIfDirty();
-		FromColumn(m_LocalToWorld.M[2]);
+		return FromColumn(m_LocalToWorld.M[2]);
 	}
 
 	Vector3 GetUp()
 	{
 		ReCalculateIfDirty();
-		FromColumn(m_LocalToWorld.M[1]);
+		return FromColumn(m_LocalToWorld.M[1]);
 	}
 
 	Vector3 GetRight()
 	{
 		ReCalculateIfDirty();
-		FromColumn(m_LocalToWorld.M[0]);
+		return FromColumn(m_LocalToWorld.M[0]);
 	}
 
 private:

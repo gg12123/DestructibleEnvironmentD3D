@@ -216,7 +216,7 @@
     <ClInclude Include="IMeshRenderer.h" />
     <ClInclude Include="InitialShapeCreator.h" />
     <ClInclude Include="Light.h" />
-    <ClInclude Include="Math.h" />
+    <ClInclude Include="MathUtils.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="NewPointsGetter.h" />
     <ClInclude Include="pch.h" />
@@ -232,7 +232,7 @@
     <ClInclude Include="ShapeProxy.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TwoDArray.h" />
-    <ClInclude Include="Vector.h" />
+    <ClInclude Include="Vector3.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>

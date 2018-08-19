@@ -1,9 +1,13 @@
 #pragma once
-#include "Vector.h"
+#include "Vector3.h"
 
 class Vertex
 {
 public:
+	Vertex()
+	{
+	}
+
 	Vertex(const Vector3& pos, const Vector3& normal)
 	{
 		Position = pos;

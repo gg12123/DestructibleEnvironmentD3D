@@ -6,10 +6,6 @@
 #include "Point.h"
 #include "NewPointsGetter.h"
 
-Face::~Face()
-{
-}
-
 int Face::CountNumInside()
 {
 	auto n = 0;
@@ -21,7 +17,7 @@ int Face::CountNumInside()
 	return n;
 }
 
-void Face::Split(const NewPointsGetter& newPoints, Shape& shapeAbove, Shape& shapeBelow)
+void Face::Split(NewPointsGetter& newPoints, Shape& shapeAbove, Shape& shapeBelow)
 {
 	// use pool
 	auto* aboveFace = new Face();
@@ -37,7 +33,7 @@ void Face::Split(const NewPointsGetter& newPoints, Shape& shapeAbove, Shape& sha
 	auto newAboveEdge = new ShapeEdge();
 	auto newBelowEdge = new ShapeEdge();
 
-	for (auto i = 0; i < m_Points.size(); i++)
+	for (auto i = 0U; i < m_Points.size(); i++)
 	{
 		auto next = (i + 1) % m_Points.size();
 

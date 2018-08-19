@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Vector.h"
+#include "Vector3.h"
 #include <vector>
 
 class Point;
@@ -35,7 +35,7 @@ public:
 		return m_Normal;
 	}
 
-	void Split(const NewPointsGetter& newPoints, Shape& shapeAbove, Shape& shapeBelow);
+	void Split(NewPointsGetter& newPoints, Shape& shapeAbove, Shape& shapeBelow);
 
 	auto& GetPoints()
 	{

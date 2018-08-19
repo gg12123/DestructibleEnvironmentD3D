@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "PhysicsEngine.h"
 
-
 void PhysicsEngine::StartRunning()
 {
 	if (!m_Thread.joinable())
