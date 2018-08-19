@@ -39,14 +39,14 @@ void ShapeProxy::Syncronise()
 			auto baseIndex = verts.GetCurrCount();
 			auto numPoints = points.size();
 
-			indicies.Add(static_cast<unsigned short>(baseIndex));
+			indicies.Add(baseIndex);
 			verts.Add(Vertex(points.at(0), normal));
 
 			for (auto i = 1U; i < numPoints - 1U; i++)
 			{
 				verts.Add(Vertex(points.at(i), normal));
-				indicies.Add(static_cast<unsigned short>(baseIndex + i));
-				indicies.Add(static_cast<unsigned short>(baseIndex + i + 1U));
+				indicies.Add(baseIndex + i);
+				indicies.Add(baseIndex + i + 1U);
 			}
 
 			verts.Add(Vertex(points.at(numPoints - 1), normal));

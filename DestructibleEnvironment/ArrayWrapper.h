@@ -9,10 +9,11 @@ public:
 		m_CurrCount = 0;
 	}
 
-	void Add(T&& toAdd)
+	template<class Tin>
+	void Add(Tin&& toAdd)
 	{
 		assert(m_CurrCount < N);
-		m_Data[m_CurrCount] = std::forward<T>(toAdd);
+		m_Data[m_CurrCount] = std::forward<Tin>(toAdd);
 		m_CurrCount++;
 	}
 

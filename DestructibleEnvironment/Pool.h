@@ -25,9 +25,10 @@ public:
 		return m_Creator();
 	}
 
-	void Return(T&& toRet)
+	template<class Tin>
+	void Return(Tin&& toRet)
 	{
-		m_Objects.push(std::forward<T>(toRet));
+		m_Objects.push(std::forward<Tin>(toRet));
 	}
 
 private:
