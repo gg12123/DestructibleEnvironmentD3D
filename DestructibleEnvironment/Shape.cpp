@@ -11,7 +11,7 @@ void Shape::AddPoint(Point& p)
 {
 	p.SetId(m_CurrId);
 	m_CurrId++;
-	m_Points.push_back(&p);
+	m_Points.emplace_back(&p);
 }
 
 Vector3 Shape::CalculateCentre()
@@ -62,7 +62,7 @@ void Shape::InitFaces(const Vector3& finalFaceNormal)
 	{
 		auto f = *it;
 
-		f->CachePoints();
+		f->CachePoints(m_CachedFaceNormals, m_CachedFaceP0s);
 
 		auto numVerts = f->GetPoints().size();
 

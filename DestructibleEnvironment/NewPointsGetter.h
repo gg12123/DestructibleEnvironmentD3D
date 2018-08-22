@@ -2,6 +2,7 @@
 
 #pragma once
 #include "TwoDArray.h"
+#include "ShapeConstants.h"
 
 class Point;
 
@@ -23,8 +24,6 @@ struct PointPair
 class NewPointsGetter
 {
 public:
-	static int constexpr MaxNumPoints = 50;
-
 	NewPointsGetter()
 	{
 	}
@@ -44,6 +43,6 @@ public:
 private:
 	PointPair & Get(const Point& existing1, const Point& existing2);
 
-	TwoDArray<MaxNumPoints, MaxNumPoints, PointPair> m_PointsAlongEdges;
-	std::array<PointPair, MaxNumPoints> m_PointsOnPoints;
+	TwoDArray<ShapeConstants::MaxNumPoints, ShapeConstants::MaxNumPoints, PointPair> m_PointsAlongEdges;
+	std::array<PointPair, ShapeConstants::MaxNumPoints> m_PointsOnPoints;
 };

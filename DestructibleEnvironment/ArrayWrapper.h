@@ -27,6 +27,11 @@ public:
 		return m_Data;
 	}
 
+	void Clear()
+	{
+		m_CurrCount = 0;
+	}
+
 private:
 	int m_CurrCount;
 	T m_Data[N];

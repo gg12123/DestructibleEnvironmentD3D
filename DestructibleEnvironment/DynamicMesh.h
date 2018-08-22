@@ -26,11 +26,13 @@ protected:
 
 	auto& MapVertexBuffer()
 	{
+		m_VertexMemory.Clear();
 		return m_VertexMemory;
 	}
 
 	auto& MapIndexBuffer()
 	{
+		m_IndexMemory.Clear();
 		return m_IndexMemory;
 	}
 

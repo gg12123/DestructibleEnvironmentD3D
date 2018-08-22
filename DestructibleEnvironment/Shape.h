@@ -17,29 +17,39 @@ public:
 	{
 	}
 
-	std::vector<Point*>& GetPoints()
+	auto& GetPoints()
 	{
 		return m_Points;
 	}
 
-	std::vector<ShapeEdge*>& GetEdges()
+	auto& GetEdges()
 	{
 		return m_Edges;
 	}
 
-	std::vector<Face*>& GetFaces()
+	auto& GetFaces()
 	{
 		return m_Faces;
 	}
 
-	std::vector<Vector3>& GetCachedPoints()
+	auto& GetCachedPoints()
 	{
 		return m_CachedPoints;
 	}
 
-	std::vector<Vector3>& GetCachedEdgePoints()
+	auto& GetCachedEdgePoints()
 	{
 		return m_CachedEdgePoints;
+	}
+
+	auto& GetCachedFaceNormals()
+	{
+		return m_CachedFaceNormals;
+	}
+
+	auto& GetCachedFaceP0s()
+	{
+		return m_CachedFaceP0s;
 	}
 
 	void Clear()
@@ -50,6 +60,8 @@ public:
 
 		m_CachedPoints.clear();
 		m_CachedEdgePoints.clear();
+		m_CachedFaceNormals.clear();
+		m_CachedFaceP0s.clear();
 
 		m_CurrId = 0;
 	}
@@ -113,7 +125,9 @@ private:
 	std::vector<Face*> m_Faces;
 
 	std::vector<Vector3> m_CachedPoints;
-	std::vector<Vector3> m_CachedEdgePoints;
+	std::vector<int> m_CachedEdgePoints;
+	std::vector<Vector3> m_CachedFaceNormals;
+	std::vector<Vector3> m_CachedFaceP0s;
 
 	static NewPointsGetter m_NewPointsGetter;
 

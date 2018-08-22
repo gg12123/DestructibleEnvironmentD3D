@@ -42,7 +42,7 @@ public:
 		}
 	}
 
-	void Cache(std::vector<Vector3>& edgePoints);
+	void Cache(std::vector<int>& edgePoints);
 
 	void Split(const Vector3& P0, const Vector3& n, NewPointsGetter& newPoints, Shape& shapeAbove, Shape& shapeBelow);
 

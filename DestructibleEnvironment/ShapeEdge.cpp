@@ -13,10 +13,10 @@ ShapeEdge::~ShapeEdge()
 {
 }
 
-void ShapeEdge::Cache(std::vector<Vector3>& edgePoints)
+void ShapeEdge::Cache(std::vector<int>& edgePoints)
 {
-	edgePoints.push_back(m_EdgeP1->GetPoint());
-	edgePoints.push_back(m_EdgeP2->GetPoint());
+	edgePoints.push_back(m_EdgeP1->GetId());
+	edgePoints.push_back(m_EdgeP2->GetId());
 }
 
 void ShapeEdge::SplitAtEnd(NewPointsGetter& newPoints, Shape& shapeAbove, Shape& shapeBelow)

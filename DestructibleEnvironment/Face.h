@@ -47,7 +47,7 @@ public:
 		return m_CachedPoints;
 	}
 
-	void CachePoints();
+	void CachePoints(std::vector<Vector3>& faceNormals, std::vector<Vector3>& faceP0s);
 	int CountNumInside();
 
 private:

@@ -118,6 +118,9 @@
     <ClCompile Include="World.cpp">
       <Filter>CoreStuff</Filter>
     </ClCompile>
+    <ClCompile Include="CollisionDetector.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -209,6 +212,12 @@
     </ClInclude>
     <ClInclude Include="Vector3.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionDetector.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="ShapeConstants.h">
+      <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

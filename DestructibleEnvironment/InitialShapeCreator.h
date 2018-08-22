@@ -71,7 +71,7 @@ public:
 
 		auto& faces = shape.GetFaces();
 		for (auto it = faces.begin(); it != faces.end(); it++)
-			(*it)->CachePoints();
+			(*it)->CachePoints(shape.GetCachedFaceNormals(), shape.GetCachedFaceP0s());
 
 		shape.GetTransform().SetEqualTo(transform);
 	}

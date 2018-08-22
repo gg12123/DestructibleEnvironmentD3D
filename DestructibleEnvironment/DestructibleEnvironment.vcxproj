@@ -200,6 +200,7 @@
     <ClInclude Include="App.h" />
     <ClInclude Include="ArrayWrapper.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CollisionDetector.h" />
     <ClInclude Include="Common\DeviceResources.h" />
     <ClInclude Include="ConstantBufferInputTypes.h" />
     <ClInclude Include="D3DBuffers.h" />
@@ -228,6 +229,7 @@
     <ClInclude Include="Random.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shape.h" />
+    <ClInclude Include="ShapeConstants.h" />
     <ClInclude Include="ShapeEdge.h" />
     <ClInclude Include="ShapeProxy.h" />
     <ClInclude Include="Transform.h" />
@@ -238,6 +240,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="CollisionDetector.cpp" />
     <ClCompile Include="Common\DeviceResources.cpp" />
     <ClCompile Include="DestructibleEnvironmentMain.cpp" />
     <ClCompile Include="Content\SampleFpsTextRenderer.cpp" />

@@ -66,7 +66,7 @@ public:
 	void CentreAndCache(const Vector3& centre, std::vector<Vector3>& points)
 	{
 		m_Point -= centre;
-		points.push_back(centre);
+		points.emplace_back(centre);
 	}
 
 	Point* GetLinkedPoint1() const

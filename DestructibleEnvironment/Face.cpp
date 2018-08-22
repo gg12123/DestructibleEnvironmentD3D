@@ -101,10 +101,13 @@ void Face::ProcessNewFace(Face& face, ShapeEdge& newEdge, Shape& shape) const
 	}
 }
 
-void Face::CachePoints()
+void Face::CachePoints(std::vector<Vector3>& faceNormals, std::vector<Vector3>& faceP0s)
 {
 	m_CachedPoints.clear();
 
 	for (auto it = m_Points.begin(); it != m_Points.end(); it++)
-		m_CachedPoints.push_back((*it)->GetPoint());
+		m_CachedPoints.emplace_back((*it)->GetPoint());
+
+	faceNormals.emplace_back(m_Normal);
+	faceP0s.emplace_back(m_CachedPoints[0]);
 }
