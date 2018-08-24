@@ -16,10 +16,10 @@ void Point::Split(const Vector3& P0, const Vector3& n, NewPointsGetter& newPoint
 		auto newAbove = this;
 		auto newBelow = new Point(m_Point); // get from pool
 
-		newPoints.AddPoints(*this, *newAbove, *newBelow);
-
 		shapeAbove.AddPoint(*newAbove);
 		shapeBelow.AddPoint(*newBelow);
+
+		newPoints.AddPoints(*this, *newAbove, *newBelow);
 
 		m_PlaneRelationship = PointPlaneRelationship::Inside;
 		numInside++;

@@ -37,6 +37,7 @@ private:
 };
 
 class Shape;
+class Transform;
 
 class CollisionDetector
 {
@@ -44,12 +45,28 @@ public:
 	CollisionData * FindCollision(Shape& shape1, Shape& shape2);
 
 private:
-	void FindPointFaceCollision(const std::vector<Vector3>& faceNormals, const std::vector<Vector3> faceP0s, const Vector3& point);
+	void FindPointFaceCollision(const std::vector<Vector3>& faceNormals, const std::vector<Vector3>& faceP0s, const Vector3& point);
 	void FindPointFaceCollisions(Shape& shapeFaces, ArrayWrapper<Vector3, ShapeConstants::MaxNumPoints>&  points);
+
+	void FindEdgeCollision(const std::vector<Vector3>& facePoints, const Vector3& faceNormal, const Vector3& edgeP0, const Vector3& edgeP1);
+	void FindEdgeCollisions(Shape& shapeFaces, const Vector3& edgeP0, const Vector3& edgeP1);
+	void FindEdgeCollisions(Shape& shapeFaces, ArrayWrapper<Vector3, ShapeConstants::MaxNumPoints>&  points, const std::vector<int>& edges);
+
+	// Use the active Transform - i.e. the one whose space is being worked in
+	Vector3 TransformPoint(const Vector3& point);
+	Vector3 TransformDirection(const Vector3& dir);
+	Vector3 InverseTransformPoint(const Vector3& point);
+	Vector3 InverseTransformDirection(const Vector3& dir);
+
+	CollisionData& FinalCollisionData();
 
 	std::vector<CollisionData*> m_FoundCollisions;
 	CollisionDataPool m_DataPool;
 
 	ArrayWrapper<Vector3, ShapeConstants::MaxNumPoints> m_Shape1TransformedPoints;
 	ArrayWrapper<Vector3, ShapeConstants::MaxNumPoints> m_Shape2TransformedPoints;
+
+	Shape* m_Shape1;
+	Shape* m_Shape2;
+	Transform* m_ActiveTransform;
 };
