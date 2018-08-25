@@ -32,6 +32,10 @@ public:
 		m_Fov = val;
 	}
 
+protected:
+
+	void Awake() override;
+
 private:
 	float m_Fov;
 	float m_Aspect = 1.0f; // this needs to come from the window config - probs through the renderer

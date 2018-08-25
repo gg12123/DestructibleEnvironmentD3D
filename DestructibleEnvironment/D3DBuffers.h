@@ -4,6 +4,8 @@
 #include "Pool.h"
 #include "Vertex.h"
 #include "Common\DirectXHelper.h"
+#include "ShapeConstants.h"
+#include "MathUtils.h"
 
 struct D3DBufferDeleter
 {
@@ -11,7 +13,6 @@ public:
 	void operator()(ID3D11Buffer* buffer) const
 	{ 
 		buffer->Release();
-		delete buffer;
 	}
 };
 
@@ -29,7 +30,14 @@ public:
 	{
 		ID3D11Buffer* buffer;
 
-		CD3D11_BUFFER_DESC indexBufferDesc(size * sizeof(unsigned short), D3D11_BIND_INDEX_BUFFER, D3D11_USAGE_DYNAMIC);
+		D3D11_BUFFER_DESC indexBufferDesc = { 0 };
+		indexBufferDesc.ByteWidth = MathUtils::RoundUp(size * sizeof(unsigned short), 16);
+		indexBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+		indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		indexBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		indexBufferDesc.MiscFlags = 0;
+		indexBufferDesc.StructureByteStride = 0;
+
 		DX::ThrowIfFailed(
 			device->CreateBuffer(
 				&indexBufferDesc,
@@ -46,7 +54,14 @@ public:
 	{
 		ID3D11Buffer* buffer;
 
-		CD3D11_BUFFER_DESC vertexBufferDesc(size * sizeof(T), D3D11_BIND_VERTEX_BUFFER, D3D11_USAGE_DYNAMIC);
+		D3D11_BUFFER_DESC vertexBufferDesc = { 0 };
+		vertexBufferDesc.ByteWidth = MathUtils::RoundUp(size * sizeof(T), 16);
+		vertexBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+		vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		vertexBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		vertexBufferDesc.MiscFlags = 0;
+		vertexBufferDesc.StructureByteStride = 0;
+
 		DX::ThrowIfFailed(
 			device->CreateBuffer(
 				&vertexBufferDesc,
@@ -63,7 +78,7 @@ public:
 	{
 		ID3D11Buffer* buffer;
 
-		CD3D11_BUFFER_DESC constantBufferDesc(sizeof(T), D3D11_BIND_CONSTANT_BUFFER);
+		CD3D11_BUFFER_DESC constantBufferDesc(MathUtils::RoundUp(sizeof(T), 16), D3D11_BIND_CONSTANT_BUFFER);
 		DX::ThrowIfFailed(
 			device->CreateBuffer(
 				&constantBufferDesc,
@@ -121,8 +136,8 @@ public:
 	}
 
 private:
-	static constexpr int VertexBufferSize = 100;
-	static constexpr int IndexBufferSize = 100;
+	static constexpr int VertexBufferSize = ShapeConstants::MaxNumVerts;
+	static constexpr int IndexBufferSize = ShapeConstants::MaxNumIndicies;
 
 	std::unique_ptr<Pool<BufferPtr>> m_VertexBufferPool;
 	std::unique_ptr<Pool<BufferPtr>> m_IndexBufferPool;

@@ -22,7 +22,7 @@ public:
 
 	Vector3 operator-()
 	{
-		return Vector3(-x, -y, -x);
+		return Vector3(-x, -y, -z);
 	}
 
 	Vector3& operator*=(float rhs)

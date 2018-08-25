@@ -93,7 +93,7 @@ public:
 		auto col3 = res.M[3];
 
 		col3[0] = tran.x;
-		col3[1] = tran.x;
+		col3[1] = tran.y;
 		col3[2] = tran.z;
 
 		return res;

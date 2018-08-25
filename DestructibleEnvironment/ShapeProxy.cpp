@@ -38,13 +38,14 @@ void ShapeProxy::Syncronise()
 			auto normal = f->GetNormal();
 			auto baseIndex = verts.GetCurrCount();
 			auto numPoints = points.size();
-
-			indicies.Add(baseIndex);
+			
 			verts.Add(Vertex(points.at(0), normal));
 
 			for (auto i = 1U; i < numPoints - 1U; i++)
 			{
 				verts.Add(Vertex(points.at(i), normal));
+
+				indicies.Add(baseIndex);
 				indicies.Add(baseIndex + i);
 				indicies.Add(baseIndex + i + 1U);
 			}

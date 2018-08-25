@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "CollisionDetector.h"
 #include "Shape.h"
 #include "MathUtils.h"
@@ -167,9 +168,37 @@ void CollisionDetector::FindEdgeCollisions(Shape& shapeFaces, ArrayWrapper<Vecto
 	}
 }
 
+// Coll normal will point from body 1 to body 2
 CollisionData& CollisionDetector::FinalCollisionData()
 {
+	auto body1To2 = Vector3::Normalize(m_Shape2->GetTransform().GetPosition() - m_Shape1->GetTransform().GetPosition());
+	auto maxComp = 0.0f;
 
+	auto& collData = m_DataPool.GetNextData();
+
+	collData.Position = Vector3::Zero();
+
+	for (auto it = m_FoundCollisions.begin(); it != m_FoundCollisions.end(); it++)
+	{
+		auto data = *it;
+
+		auto comp = fabs(Vector3::Dot(body1To2, data->Normal));
+
+		if (comp > maxComp)
+		{
+			collData.Normal = data->Normal;
+			collData.Penetration = data->Penetration;
+			maxComp = comp;
+		}
+		collData.Position += data->Position;
+	}
+
+	if (Vector3::Dot(collData.Normal, body1To2) < 0.0f)
+		collData.Normal *= -1.0f;
+
+	collData.Position /= static_cast<float>(m_FoundCollisions.size());
+
+	return collData;
 }
 
 CollisionData * CollisionDetector::FindCollision(Shape& shape1, Shape& shape2)

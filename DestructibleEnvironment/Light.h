@@ -9,4 +9,7 @@ public:
 	{
 		return GetTransform().GetPosition();
 	}
+
+protected:
+	void Awake() override;
 };

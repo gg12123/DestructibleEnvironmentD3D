@@ -42,6 +42,7 @@ class Transform;
 class CollisionDetector
 {
 public:
+	// Coll normal will point from shape 1 to shape 2
 	CollisionData * FindCollision(Shape& shape1, Shape& shape2);
 
 private:

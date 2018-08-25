@@ -28,7 +28,7 @@ public:
 
 	float GetInitialHeight() const
 	{
-		return m_InitialWidth;
+		return m_InitialHeight;
 	}
 
 	void SetInitialWidth(float val)

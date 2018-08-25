@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <memory>
+#include <atomic>
 #include "Common\DeviceResources.h"
 #include "ConstantBufferInputTypes.h"
 #include "D3DBuffers.h"
@@ -80,6 +81,9 @@ private:
 	ID3D11InputLayout*	m_InputLayout;
 
 	std::unique_ptr<D3DBuffers> m_Buffers;
+
+	std::atomic<bool> m_LoadedVS = false;
+	std::atomic<bool> m_LoadedPS = false;
 
 	Camera* m_Camera;
 	Light* m_Light;

@@ -7,6 +7,11 @@ class Entity
 {
 public:
 
+	virtual ~Entity()
+	{
+		auto i = 0;
+	}
+
 	void Awake(World& world)
 	{
 		m_World = &world;

@@ -22,29 +22,35 @@ void Renderer::SetResources(const std::shared_ptr<DX::DeviceResources>& deviceRe
 
 void Renderer::CreateShaders()
 {
+	// TODO - get rid of the stupid loaded flags.
+
 	auto loadVSTask = DX::ReadDataAsync(L"MyVertexShader.cso");
 	auto loadPSTask = DX::ReadDataAsync(L"MyPixelShader.cso");
+	
+	loadVSTask.then([this](const std::vector<byte>& vsFileData)
+	{
+		DX::ThrowIfFailed(m_DeviceResources->GetD3DDevice()->CreateVertexShader(&vsFileData[0], vsFileData.size(),
+			nullptr, &m_VertexShader));
 
-	loadVSTask.wait();
-	loadPSTask.wait();
+		static const D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
+		{
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		};
 
-	auto& vsFileData = loadVSTask.get();
-	auto& psFileData = loadPSTask.get();
+		DX::ThrowIfFailed(m_DeviceResources->GetD3DDevice()->CreateInputLayout(vertexDesc, ARRAYSIZE(vertexDesc),
+			&vsFileData[0], vsFileData.size(), &m_InputLayout));
 
-	DX::ThrowIfFailed(m_DeviceResources->GetD3DDevice()->CreateVertexShader( &vsFileData[0], vsFileData.size(),
-			nullptr, &m_VertexShader ) );
+		m_LoadedVS = true;
+	});
 
-	DX::ThrowIfFailed(m_DeviceResources->GetD3DDevice()->CreatePixelShader(&psFileData[0], psFileData.size(),
+	loadPSTask.then([this](const std::vector<byte>& psFileData)
+	{
+		DX::ThrowIfFailed(m_DeviceResources->GetD3DDevice()->CreatePixelShader(&psFileData[0], psFileData.size(),
 			nullptr, &m_PixelShader));
 
-	static const D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
-
-	DX::ThrowIfFailed(m_DeviceResources->GetD3DDevice()->CreateInputLayout(vertexDesc, ARRAYSIZE(vertexDesc),
-			&vsFileData[0], vsFileData.size(), &m_InputLayout));
+		m_LoadedPS = true;
+	});
 }
 
 void Renderer::BindVertexBuffer(ID3D11Buffer* buffer, unsigned int stride, unsigned int offset)
@@ -54,7 +60,7 @@ void Renderer::BindVertexBuffer(ID3D11Buffer* buffer, unsigned int stride, unsig
 
 void Renderer::BindIndexBuffer(ID3D11Buffer* buffer)
 {
-	m_Context->IASetIndexBuffer(buffer, DXGI_FORMAT_R32_UINT, 0);
+	m_Context->IASetIndexBuffer(buffer, DXGI_FORMAT_R16_UINT, 0);
 }
 
 void Renderer::SetObjectToWorld(Transform& transform)
@@ -73,6 +79,9 @@ void Renderer::Draw(int indexCount)
 
 void Renderer::Render()
 {
+	if (!m_LoadedVS || !m_LoadedPS)
+		return;
+
 	m_Context->VSSetShader(m_VertexShader, nullptr, 0);
 	m_Context->PSSetShader(m_PixelShader, nullptr, 0);
 
