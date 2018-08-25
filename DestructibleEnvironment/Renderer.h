@@ -40,6 +40,11 @@ public:
 		return *m_Buffers;
 	}
 
+	bool IsReadyToRender()
+	{
+		return m_LoadedVS && m_LoadedPS;
+	}
+
 	void Render();
 
 	void BindVertexBuffer(ID3D11Buffer* buffer, unsigned int stride, unsigned int offset);

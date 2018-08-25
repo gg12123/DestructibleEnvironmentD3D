@@ -92,6 +92,9 @@ void App::Load(Platform::String^ entryPoint)
 // This method is called after the window becomes active.
 void App::Run()
 {
+	while (!m_main->IsReady())
+		;
+
 	while (!m_windowClosed)
 	{
 		if (m_windowVisible)

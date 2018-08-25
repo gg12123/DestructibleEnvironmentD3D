@@ -22,8 +22,6 @@ void Renderer::SetResources(const std::shared_ptr<DX::DeviceResources>& deviceRe
 
 void Renderer::CreateShaders()
 {
-	// TODO - get rid of the stupid loaded flags.
-
 	auto loadVSTask = DX::ReadDataAsync(L"MyVertexShader.cso");
 	auto loadPSTask = DX::ReadDataAsync(L"MyPixelShader.cso");
 	
@@ -79,9 +77,6 @@ void Renderer::Draw(int indexCount)
 
 void Renderer::Render()
 {
-	if (!m_LoadedVS || !m_LoadedPS)
-		return;
-
 	m_Context->VSSetShader(m_VertexShader, nullptr, 0);
 	m_Context->PSSetShader(m_PixelShader, nullptr, 0);
 

@@ -27,8 +27,8 @@ PixelShaderInput main(VertexShaderInput input)
 	PixelShaderInput output;
 	float4 pos = float4(input.pos, 1.0f);
 
-	pos = mul(pos, modelToWorldMatrix);
-	pos = mul(pos, vPMatrix);
+	pos = mul(modelToWorldMatrix, pos);
+	pos = mul(vPMatrix, pos);
 	output.pos = pos;
 
 	output.color = float3(1.0f, 0.0f, 0.0f);

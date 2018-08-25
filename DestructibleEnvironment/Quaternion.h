@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector3.h"
+#include "MathUtils.h"
 #include <assert.h>
 
 class Quaternion
@@ -53,18 +54,20 @@ public:
 
 		auto z = forward;
 		auto y = Vector3::Normalize(Vector3::ProjectOnPlane(forward, up));
-		auto x = Vector3::Cross(y, z); // TODO - is this the right order?
+		auto x = Vector3::Cross(y, z); // Right handed
 
-		Quaternion res;
+		Quaternion q;
 
-		res.r = sqrt(1.0f + x.x + y.y + z.z) * 0.5f;
+		q.r = sqrt(MathUtils::Max(0.0f, 1.0f + x.x + y.y + z.z)) / 2.0f;
+		q.x = sqrt(MathUtils::Max(0.0f, 1.0f + x.x - y.y - z.z)) / 2.0f;
+		q.y = sqrt(MathUtils::Max(0.0f, 1.0f - x.x + y.y - z.z)) / 2.0f;
+		q.z = sqrt(MathUtils::Max(0.0f, 1.0f - x.x - y.y + z.z)) / 2.0f;
 
-		auto xx = 1.0f / (4.0f * res.r);
+		q.x *= MathUtils::Sign(z.y - y.z);
+		q.y *= MathUtils::Sign(x.z - z.x);
+		q.z *= MathUtils::Sign(y.x - x.y);
 
-		res.x = (z.y - y.z) * xx;
-		res.y = (x.z - z.x) * xx;
-		res.z = (y.x - x.y) * xx;
+		return q;
 
-		return res;
 	}
 };

@@ -31,7 +31,7 @@ DestructibleEnvironmentMain::~DestructibleEnvironmentMain()
 void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 {
 	auto shape = new ShapeProxy();
-	shape->GetTransform().SetPosition(Vector3::Zero());
+	shape->GetTransform().SetPosition(Vector3(0.0f, 0.0f, 0.0f));
 	shape->GetTransform().SetRotation(Quaternion::Identity());
 	shape->SetInitialHeight(2.0f);
 	shape->SetInitialWidth(1.0f);

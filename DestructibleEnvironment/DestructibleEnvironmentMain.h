@@ -16,6 +16,11 @@ namespace DestructibleEnvironment
 		void Update();
 		void Render();
 
+		bool IsReady()
+		{
+			return m_World.GetRenderer().IsReadyToRender();
+		}
+
 		// IDeviceNotify
 		virtual void OnDeviceLost();
 		virtual void OnDeviceRestored();

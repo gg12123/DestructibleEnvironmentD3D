@@ -67,21 +67,21 @@ public:
 		auto qj2 = qj * qj;
 		auto qk2 = qk * qk;
 		auto qi2 = qi * qi;
-		
+
 		auto col0 = res.M[0];
 		col0[0] = 1.0f - 2.0f * (qj2 + qk2);
-		col0[1] = 2.0f * (qi * qj + qk * qr);
-		col0[2] = 2.0f * (qi * qk - qj * qr);
-
+		col0[1] = 2.0f * (qi * qj - qk * qr);
+		col0[2] = 2.0f * (qi * qk + qj * qr);
+		
 		auto col1 = res.M[1];
-		col1[0] = 2.0f * (qi * qj - qk * qr);
+		col1[0] = 2.0f * (qi * qj + qk * qr);
 		col1[1] = 1.0f - 2.0f * (qi2 + qk2);
-		col1[2] = 2.0f * (qj * qk + qi * qr);
+		col1[2] = 2.0f * (qj * qk - qi * qr);
 
 		auto col2 = res.M[2];
-		col2[0] = 2.0f * (qi * qk + qj * qr);
-		col2[1] = 2.0f * (qj * qk - qi * qr);
-		col2[2] = 1.0f - 2.0f * (qi2 - qj2);
+		col2[0] = 2.0f * (qi * qk - qj * qr);
+		col2[1] = 2.0f * (qj * qk + qi * qr);
+		col2[2] = 1.0f - 2.0f * (qi2 + qj2);
 
 		return res;
 	}
