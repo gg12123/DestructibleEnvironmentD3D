@@ -25,13 +25,22 @@ struct PixelShaderInput
 PixelShaderInput main(VertexShaderInput input)
 {
 	PixelShaderInput output;
-	float4 pos = float4(input.pos, 1.0f);
 
+	float4 pos = float4(input.pos, 1.0f);
 	pos = mul(modelToWorldMatrix, pos);
+
+	float3 worldPos = float3(pos.x, pos.y, pos.z);
+
 	pos = mul(vPMatrix, pos);
 	output.pos = pos;
 
-	output.color = float3(1.0f, 0.0f, 0.0f);
+	float4 normal = float4(input.normal, 0.0f);
+	normal = mul(modelToWorldMatrix, normal);
+
+	float3 n = float3(normal.x, normal.y, normal.z);
+	float diffuse = dot(n, normalize(lightPosition - worldPos));
+
+	output.color = diffuse * float3(1.0f, 0.0f, 0.0f);
 
 	return output;
 }

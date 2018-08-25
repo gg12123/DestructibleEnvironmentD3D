@@ -92,8 +92,17 @@ void App::Load(Platform::String^ entryPoint)
 // This method is called after the window becomes active.
 void App::Run()
 {
-	while (!m_main->IsReady())
-		;
+	while (!m_main->IsReady() && !m_windowClosed)
+	{
+		if (m_windowVisible)
+		{
+			CoreWindow::GetForCurrentThread()->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
+		}
+		else
+		{
+			CoreWindow::GetForCurrentThread()->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessOneAndAllPending);
+		}
+	}
 
 	while (!m_windowClosed)
 	{

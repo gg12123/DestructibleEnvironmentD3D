@@ -1,16 +1,2 @@
-﻿  App.cpp
-  Camera.cpp
-  CollisionDetector.cpp
-  DestructibleEnvironmentMain.cpp
-  DynamicMesh.cpp
-  Face.cpp
-  Light.cpp
-  Physics.cpp
-  PhysicsEngine.cpp
-  Point.cpp
-  Renderer.cpp
-  Shape.cpp
-  ShapeEdge.cpp
-  ShapeProxy.cpp
-  World.cpp
+﻿  DestructibleEnvironmentMain.cpp
   DestructibleEnvironment.vcxproj -> C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\DestructibleEnvironment.exe

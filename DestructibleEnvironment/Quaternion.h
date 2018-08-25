@@ -54,7 +54,7 @@ public:
 
 		auto z = forward;
 		auto y = Vector3::Normalize(Vector3::ProjectOnPlane(forward, up));
-		auto x = Vector3::Cross(y, z); // Right handed
+		auto x = Vector3::Cross(y, z);
 
 		Quaternion q;
 
@@ -68,6 +68,5 @@ public:
 		q.z *= MathUtils::Sign(y.x - x.y);
 
 		return q;
-
 	}
 };
