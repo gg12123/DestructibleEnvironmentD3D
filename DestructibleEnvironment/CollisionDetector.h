@@ -2,39 +2,10 @@
 #include <vector>
 #include <memory>
 #include "Vector3.h"
-#include "ShapeConstants.h"
+#include "Constants.h"
 #include "ArrayWrapper.h"
-
-class CollisionData
-{
-public:
-	Vector3 Normal;
-	Vector3 Position;
-	float Penetration;
-};
-
-class CollisionDataPool
-{
-public:
-
-	void Reset()
-	{
-		m_Curr = 0;
-	}
-
-	CollisionData & GetNextData()
-	{
-		if (m_Curr == m_Data.size())
-			m_Data.emplace_back(std::unique_ptr<CollisionData>(new CollisionData()));
-
-		m_Curr++;
-		return *m_Data[m_Curr - 1];
-	}
-
-private:
-	std::vector<std::unique_ptr<CollisionData>> m_Data;
-	int m_Curr;
-};
+#include "PoolOfRecyclables.h"
+#include "CollisionData.h"
 
 class Shape;
 class Transform;
@@ -42,16 +13,27 @@ class Transform;
 class CollisionDetector
 {
 public:
-	// Coll normal will point from shape 1 to shape 2
+	CollisionDetector()
+	{
+		std::function<std::unique_ptr<CollisionData>()> creator = []()
+		{
+			return std::unique_ptr<CollisionData>(new CollisionData());
+		};
+
+		m_DataPool = std::unique_ptr<PoolOfRecyclables<std::unique_ptr<CollisionData>>>
+			(new PoolOfRecyclables<std::unique_ptr<CollisionData>>(10, std::move(creator)));
+	}
+
+	// Coll normal will point from shape 1 to shape 2. The data must be used befor the next call to this method
 	CollisionData * FindCollision(Shape& shape1, Shape& shape2);
 
 private:
 	void FindPointFaceCollision(const std::vector<Vector3>& faceNormals, const std::vector<Vector3>& faceP0s, const Vector3& point);
-	void FindPointFaceCollisions(Shape& shapeFaces, ArrayWrapper<Vector3, ShapeConstants::MaxNumPoints>&  points);
+	void FindPointFaceCollisions(Shape& shapeFaces, ArrayWrapper<Vector3, Constants::MaxNumPoints>&  points);
 
 	void FindEdgeCollision(const std::vector<Vector3>& facePoints, const Vector3& faceNormal, const Vector3& edgeP0, const Vector3& edgeP1);
 	void FindEdgeCollisions(Shape& shapeFaces, const Vector3& edgeP0, const Vector3& edgeP1);
-	void FindEdgeCollisions(Shape& shapeFaces, ArrayWrapper<Vector3, ShapeConstants::MaxNumPoints>&  points, const std::vector<int>& edges);
+	void FindEdgeCollisions(Shape& shapeFaces, ArrayWrapper<Vector3, Constants::MaxNumPoints>&  points, const std::vector<int>& edges);
 
 	// Use the active Transform - i.e. the one whose space is being worked in
 	Vector3 TransformPoint(const Vector3& point);
@@ -62,10 +44,10 @@ private:
 	CollisionData& FinalCollisionData();
 
 	std::vector<CollisionData*> m_FoundCollisions;
-	CollisionDataPool m_DataPool;
+	std::unique_ptr<PoolOfRecyclables<std::unique_ptr<CollisionData>>> m_DataPool;
 
-	ArrayWrapper<Vector3, ShapeConstants::MaxNumPoints> m_Shape1TransformedPoints;
-	ArrayWrapper<Vector3, ShapeConstants::MaxNumPoints> m_Shape2TransformedPoints;
+	ArrayWrapper<Vector3, Constants::MaxNumPoints> m_Shape1TransformedPoints;
+	ArrayWrapper<Vector3, Constants::MaxNumPoints> m_Shape2TransformedPoints;
 
 	Shape* m_Shape1;
 	Shape* m_Shape2;

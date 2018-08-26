@@ -20,7 +20,7 @@ public:
 		z = zComp;
 	}
 
-	Vector3 operator-()
+	Vector3 operator-() const
 	{
 		return Vector3(-x, -y, -z);
 	}

@@ -4,10 +4,16 @@
 #include <memory>
 #include <thread>
 #include "Shape.h"
+#include "Constants.h"
 
 class PhysicsEngine
 {
 public:
+
+	PhysicsEngine()
+	{
+		m_Bodies.reserve(Constants::MaxNumShapes);
+	}
 
 	auto& GetBodiesToBeAdded()
 	{

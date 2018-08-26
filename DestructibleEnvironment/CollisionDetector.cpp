@@ -51,9 +51,9 @@ void CollisionDetector::FindPointFaceCollision(const std::vector<Vector3>& faceN
 		currIndex++;
 	}
 
-	auto& coll = m_DataPool.GetNextData();
+	auto& coll = *m_DataPool->Recycle();
 
-	coll.Normal = TransformDirection(faceNormals[indexOfClosest]);
+	coll.Normal1To2 = TransformDirection(faceNormals[indexOfClosest]);
 	coll.Position = TransformPoint(point);
 	coll.Penetration = closestDist;
 
@@ -61,7 +61,7 @@ void CollisionDetector::FindPointFaceCollision(const std::vector<Vector3>& faceN
 }
 
 // points must be in the shapes space
-void CollisionDetector::FindPointFaceCollisions(Shape& shapeFaces, ArrayWrapper<Vector3, ShapeConstants::MaxNumPoints>& points)
+void CollisionDetector::FindPointFaceCollisions(Shape& shapeFaces, ArrayWrapper<Vector3, Constants::MaxNumPoints>& points)
 {
 	auto& faceNormals = shapeFaces.GetCachedFaceNormals();
 	auto& faceP0s = shapeFaces.GetCachedFaceP0s();
@@ -108,7 +108,7 @@ void CollisionDetector::FindEdgeCollision(const std::vector<Vector3>& facePoints
 	auto& closestP0 = facePoints[closestEdgeIndex];
 	auto& closestP1 = facePoints[(closestEdgeIndex + 1) % size];
 
-	auto& coll = m_DataPool.GetNextData();
+	auto& coll = *m_DataPool->Recycle();
 
 	auto cross = Vector3::Cross(closestP1 - closestP0, edgeP1 - edgeP0);
 	auto mag = cross.Magnitude();
@@ -116,7 +116,7 @@ void CollisionDetector::FindEdgeCollision(const std::vector<Vector3>& facePoints
 	if (mag > 0.00001f)
 	{
 		cross /= mag;
-		coll.Normal = TransformDirection(cross);
+		coll.Normal1To2 = TransformDirection(cross);
 		coll.Penetration = Vector3::Dot(edgeP0 - closestP0, cross);
 	}
 	else
@@ -124,8 +124,8 @@ void CollisionDetector::FindEdgeCollision(const std::vector<Vector3>& facePoints
 		auto bodyToBody = m_Shape1->GetTransform().GetPosition() - m_Shape2->GetTransform().GetPosition();
 		auto edgeDir = Vector3::Normalize(TransformDirection(edgeP1 - edgeP0));
 
-		coll.Normal = Vector3::Normalize(Vector3::ProjectOnPlane(edgeDir, bodyToBody));
-		coll.Penetration = Vector3::Dot(edgeP0 - closestP0, InverseTransformDirection(coll.Normal));
+		coll.Normal1To2 = Vector3::Normalize(Vector3::ProjectOnPlane(edgeDir, bodyToBody));
+		coll.Penetration = Vector3::Dot(edgeP0 - closestP0, InverseTransformDirection(coll.Normal1To2));
 	}
 
 	coll.Position = TransformPoint(intPoint);
@@ -154,7 +154,7 @@ void CollisionDetector::FindEdgeCollisions(Shape& shapeFaces, const Vector3& edg
 	}
 }
 
-void CollisionDetector::FindEdgeCollisions(Shape& shapeFaces, ArrayWrapper<Vector3, ShapeConstants::MaxNumPoints>&  points, const std::vector<int>& edges)
+void CollisionDetector::FindEdgeCollisions(Shape& shapeFaces, ArrayWrapper<Vector3, Constants::MaxNumPoints>&  points, const std::vector<int>& edges)
 {
 	auto pointsData = points.GetData();
 	auto size = edges.size();
@@ -174,7 +174,7 @@ CollisionData& CollisionDetector::FinalCollisionData()
 	auto body1To2 = Vector3::Normalize(m_Shape2->GetTransform().GetPosition() - m_Shape1->GetTransform().GetPosition());
 	auto maxComp = 0.0f;
 
-	auto& collData = m_DataPool.GetNextData();
+	auto& collData = *m_DataPool->Recycle();
 
 	collData.Position = Vector3::Zero();
 
@@ -182,19 +182,19 @@ CollisionData& CollisionDetector::FinalCollisionData()
 	{
 		auto data = *it;
 
-		auto comp = fabs(Vector3::Dot(body1To2, data->Normal));
+		auto comp = fabs(Vector3::Dot(body1To2, data->Normal1To2));
 
 		if (comp > maxComp)
 		{
-			collData.Normal = data->Normal;
+			collData.Normal1To2 = data->Normal1To2;
 			collData.Penetration = data->Penetration;
 			maxComp = comp;
 		}
 		collData.Position += data->Position;
 	}
 
-	if (Vector3::Dot(collData.Normal, body1To2) < 0.0f)
-		collData.Normal *= -1.0f;
+	if (Vector3::Dot(collData.Normal1To2, body1To2) < 0.0f)
+		collData.Normal1To2 *= -1.0f;
 
 	collData.Position /= static_cast<float>(m_FoundCollisions.size());
 
@@ -204,7 +204,7 @@ CollisionData& CollisionDetector::FinalCollisionData()
 CollisionData * CollisionDetector::FindCollision(Shape& shape1, Shape& shape2)
 {
 	m_FoundCollisions.clear();
-	m_DataPool.Reset();
+	m_DataPool->Reset();
 
 	m_Shape1TransformedPoints.Clear();
 	m_Shape2TransformedPoints.Clear();

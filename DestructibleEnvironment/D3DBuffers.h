@@ -4,7 +4,7 @@
 #include "Pool.h"
 #include "Vertex.h"
 #include "Common\DirectXHelper.h"
-#include "ShapeConstants.h"
+#include "Constants.h"
 #include "MathUtils.h"
 
 struct D3DBufferDeleter
@@ -92,15 +92,15 @@ public:
 
 	D3DBuffers(ID3D11Device3* device)
 	{
-		std::function<BufferPtr()> vertBuffCreator = std::move([=]()
+		std::function<BufferPtr()> vertBuffCreator = [device]()
 		{
 			return BufferPtr(CreateDynamicVertexBuffer<Vertex>(VertexBufferSize, device), D3DBufferDeleter());
-		});
+		};
 
-		std::function<BufferPtr()> indexBuffCreator = std::move([=]()
+		std::function<BufferPtr()> indexBuffCreator = [device]()
 		{
 			return BufferPtr(CreateDynamicIndexBuffer(VertexBufferSize, device), D3DBufferDeleter());
-		});
+		};
 
 		const auto intialPoolSize = 100;
 
@@ -136,8 +136,8 @@ public:
 	}
 
 private:
-	static constexpr int VertexBufferSize = ShapeConstants::MaxNumVerts;
-	static constexpr int IndexBufferSize = ShapeConstants::MaxNumIndicies;
+	static constexpr int VertexBufferSize = Constants::MaxNumVerts;
+	static constexpr int IndexBufferSize = Constants::MaxNumIndicies;
 
 	std::unique_ptr<Pool<BufferPtr>> m_VertexBufferPool;
 	std::unique_ptr<Pool<BufferPtr>> m_IndexBufferPool;

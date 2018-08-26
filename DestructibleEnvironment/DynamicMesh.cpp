@@ -2,8 +2,8 @@
 #include "DynamicMesh.h"
 #include "World.h"
 
-ArrayWrapper<Vertex, ShapeConstants::MaxNumVerts> DynamicMesh::m_VertexMemory;
-ArrayWrapper<unsigned short, ShapeConstants::MaxNumIndicies> DynamicMesh::m_IndexMemory;
+ArrayWrapper<Vertex, Constants::MaxNumVerts> DynamicMesh::m_VertexMemory;
+ArrayWrapper<unsigned short, Constants::MaxNumIndicies> DynamicMesh::m_IndexMemory;
 
 void DynamicMesh::Render(Renderer& renderer)
 {
@@ -39,7 +39,7 @@ void DynamicMesh::SetVertCount(int count)
 {
 	// TODO - only switch buffer if current one is too small
 
-	assert(count < ShapeConstants::MaxNumVerts);
+	assert(count < Constants::MaxNumVerts);
 
 	auto& b = GetWorld().GetRenderer().GetBuffers();
 
@@ -55,7 +55,7 @@ void DynamicMesh::SetIndexCount(int count)
 {
 	// TODO - only switch buffer if current one is too small
 
-	assert(count < ShapeConstants::MaxNumIndicies);
+	assert(count < Constants::MaxNumIndicies);
 
 	auto& b = GetWorld().GetRenderer().GetBuffers();
 

@@ -18,6 +18,8 @@ void Renderer::SetResources(const std::shared_ptr<DX::DeviceResources>& deviceRe
 	CreateShaders();
 
 	m_Buffers = std::unique_ptr<D3DBuffers>(new D3DBuffers(m_DeviceResources->GetD3DDevice()));
+
+	m_Renderers.reserve(Constants::MaxNumShapes);
 }
 
 void Renderer::CreateShaders()

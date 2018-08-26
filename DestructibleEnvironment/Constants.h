@@ -1,6 +1,6 @@
 #pragma once
 
-class ShapeConstants
+class Constants
 {
 public:
 	static int constexpr MaxPointsForSplit = 30;
@@ -10,4 +10,6 @@ public:
 	static int constexpr MaxNumVerts = MaxNumFaces * 4; // one vert for each point on the face, plus one for a centre point
 	static int constexpr MaxNumTris = MaxNumFaces * 3; // one for each point on face
 	static int constexpr MaxNumIndicies = MaxNumTris * 3;
+
+	static int constexpr MaxNumShapes = 200;
 };

@@ -6,10 +6,8 @@ template<class T>
 class Pool
 {
 public:
-	Pool(std::function<T()> creator, int initalSize)
+	Pool(std::function<T()> creator, int initalSize) : m_Creator(std::move(creator))
 	{
-		m_Creator = std::move(creator);
-
 		for (int i = 0; i < initalSize; i++)
 			m_Objects.push(m_Creator());
 	}

@@ -70,3 +70,23 @@ public:
 		return q;
 	}
 };
+
+inline Quaternion operator*(const Quaternion& lhs, float rhs)
+{
+
+}
+
+inline Quaternion operator+(const Quaternion& lhs, const Quaternion& rhs)
+{
+
+}
+
+inline Quaternion operator*(const Quaternion& lhs, const Quaternion& rhs)
+{
+
+}
+
+inline Quaternion operator*(const Quaternion& lhs, const Vector3& rhs)
+{
+	return lhs * Quaternion(0.0f, rhs.x, rhs.y, rhs.z);
+}

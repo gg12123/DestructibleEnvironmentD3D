@@ -6,12 +6,12 @@
 class Transform
 {
 public:
-	Vector3 GetPosition() const
+	const Vector3& GetPosition() const
 	{
 		return m_Position;
 	}
 
-	Quaternion GetRotation() const
+	const Quaternion& GetRotation() const
 	{
 		return m_Rotation;
 	}

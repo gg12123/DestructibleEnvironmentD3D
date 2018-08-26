@@ -4,7 +4,7 @@
 #include "Vertex.h"
 #include "D3DBuffers.h"
 #include "ArrayWrapper.h"
-#include "ShapeConstants.h"
+#include "Constants.h"
 
 class DynamicMesh : public Entity, IMeshRenderer
 {
@@ -43,8 +43,8 @@ protected:
 private:
 	void LazyRegister();
 
-	static ArrayWrapper<Vertex, ShapeConstants::MaxNumVerts> m_VertexMemory;
-	static ArrayWrapper<unsigned short, ShapeConstants::MaxNumIndicies> m_IndexMemory;
+	static ArrayWrapper<Vertex, Constants::MaxNumVerts> m_VertexMemory;
+	static ArrayWrapper<unsigned short, Constants::MaxNumIndicies> m_IndexMemory;
 
 	int m_CurrVertCount = 0;
 	int m_CurrIndexCount = 0;
