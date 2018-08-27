@@ -17,6 +17,8 @@ public:
 	{
 	}
 
+	virtual ~Shape();
+
 	auto& GetPoints()
 	{
 		return m_Points;

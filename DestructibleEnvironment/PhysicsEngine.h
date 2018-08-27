@@ -3,8 +3,10 @@
 #include <vector>
 #include <memory>
 #include <thread>
-#include "Shape.h"
 #include "Constants.h"
+#include "GameThreadToPhysicsThreadAction.h"
+#include "Rigidbody.h"
+#include "StaticBody.h"
 
 class PhysicsEngine
 {
@@ -12,17 +14,27 @@ public:
 
 	PhysicsEngine()
 	{
-		m_Bodies.reserve(Constants::MaxNumShapes);
+		m_DynamicBodies.reserve(Constants::MaxNumShapes);
 	}
 
-	auto& GetBodiesToBeAdded()
+	auto& GetGameToPhysicsActions()
 	{
-		return m_BodiesToBeAdded;
+		return m_GameToPhysicsActions;
 	}
 
 	auto& GetBodiesAdded()
 	{
 		return m_BodiesAdded;
+	}
+
+	auto& GetDynamicBodies()
+	{
+		return m_DynamicBodies;
+	}
+
+	auto& GetStaticBodies()
+	{
+		return m_StaticBodies;
 	}
 
 	void ClearSafeToSync()
@@ -51,20 +63,21 @@ private:
 
 	void DoCollisionDetection();
 	void UpdateBodies();
-	void TransferBodiesAddedByGameThread();
+	void ExecuteGameToPhysicsActions();
 
 	std::atomic<bool> m_Running = true;
 	std::atomic<bool> m_SafeToSync = false;
 
-	// the game thread fills this during collision detection, i.e. the sync phase. The bodies
-	// are then added into main collection during updateBodies()
-	std::vector<Shape*> m_BodiesToBeAdded;
+	// the game thread fills this during collision detection, i.e. the sync phase.
+	// the actions are executed at the start of updateBodies().
+	std::vector<std::unique_ptr<IGameTheadToPhysicsThreadAction>> m_GameToPhysicsActions;
 
 	// this is filled with the bodies added by the physics engine (due to splits) during UpdateBodies().
 	// the game thread creates proxies and clears the list at the next sync phase
-	std::vector<Shape*> m_BodiesAdded;
+	std::vector<Rigidbody*> m_BodiesAdded;
 
-	std::vector<std::unique_ptr<Shape>> m_Bodies;
+	std::vector<std::unique_ptr<Rigidbody>> m_DynamicBodies;
+	std::vector<std::unique_ptr<StaticBody>> m_StaticBodies;
 
 	std::thread m_Thread;
 };

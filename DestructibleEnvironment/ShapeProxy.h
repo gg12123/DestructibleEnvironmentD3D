@@ -3,6 +3,10 @@
 
 class Shape;
 
+// TODO - not all shapes need a dynamic mesh to this needs sorting at some point.
+// could just specify the required buffer type to the base.
+// I think verts could still be inserted using the same map in sync method
+// because non dynamic buffers still allow CPU to write.
 class ShapeProxy : public DynamicMesh
 {
 public:
@@ -44,6 +48,7 @@ public:
 protected:
 	void Awake() override;
 
+	virtual Shape& RegisterWithPhysics() = 0;
 private:
 	Shape * m_Shape = nullptr;
 

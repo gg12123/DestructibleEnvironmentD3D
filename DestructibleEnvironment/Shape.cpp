@@ -7,6 +7,25 @@
 
 NewPointsGetter Shape::m_NewPointsGetter;
 
+Shape::~Shape()
+{
+	// TODO - it would be nice to use smart pointers,
+	// but they would be a bit awakward during the split algorithm - maybe not worth it.
+
+	for (auto it = m_Points.begin(); it != m_Points.end(); it++)
+		delete (*it);
+
+	for (auto it = m_Edges.begin(); it != m_Edges.end(); it++)
+		delete (*it);
+
+	for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
+		delete (*it);
+
+	m_Points.clear();
+	m_Edges.clear();
+	m_Faces.clear();
+}
+
 void Shape::AddPoint(Point& p)
 {
 	p.SetId(m_CurrId);
@@ -86,8 +105,6 @@ bool Shape::SplitPoints(const Vector3& P0, const Vector3& n, Shape& shapeAbove, 
 		{
 			if ((*it)->CountNumInside() >= 3)
 			{
-				//Debug.LogWarning("Failed to split shape!");
-
 				// will need to do something to stop the newly created points from leaking here.
 				// could you existing inside points to get the new ones out of NewPointsGetter, then delete them.
 

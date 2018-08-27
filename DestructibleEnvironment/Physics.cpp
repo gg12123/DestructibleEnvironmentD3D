@@ -3,20 +3,36 @@
 #include "PhysicsEngine.h"
 #include "Shape.h"
 #include "ShapeProxy.h"
+#include "StaticShapeProxy.h"
+#include "DynamicBodyProxy.h"
 #include "InitialShapeCreator.h"
 #include "World.h"
+#include "StaticBody.h"
 
-Shape & Physics::AddDynamicRigidbody(ShapeProxy& proxy)
+Shape & Physics::AddStaticRigidbody(StaticShapeProxy& proxy)
 {
-	auto shape = new Shape(); // pool
-	InitialShapeCreator::Create(*shape, proxy.GetInitialWidth(), proxy.GetInitialHeight(), proxy.GetTransform());
+	auto body = std::unique_ptr<StaticBody>(new StaticBody()); // pool
+	InitialShapeCreator::Create(*body, proxy.GetInitialWidth(), proxy.GetInitialHeight(), proxy.GetTransform());
 
-	m_BodiesToBeAdded.push_back(shape);
+	m_GameToPhysicsActions.emplace_back(std::unique_ptr<IGameTheadToPhysicsThreadAction>(new AddStaticRigidbodyAction(std::move(body))));
 
 	// this proxy has come from the world so just push it onto the list
 	m_ShapeProxies.push_back(&proxy);
 
-	return *shape;
+	return *body;
+}
+
+Shape & Physics::AddDynamicRigidbody(DynamicBodyProxy& proxy)
+{
+	auto body = std::unique_ptr<Rigidbody>(new Rigidbody()); // pool
+	InitialShapeCreator::Create(*body, proxy.GetInitialWidth(), proxy.GetInitialHeight(), proxy.GetTransform());
+
+	m_GameToPhysicsActions.emplace_back(std::unique_ptr<IGameTheadToPhysicsThreadAction>(new AddDynamicRigidbodyAction(std::move(body))));
+
+	// this proxy has come from the world so just push it onto the list
+	m_ShapeProxies.push_back(&proxy);
+
+	return *body;
 }
 
 void Physics::Syncronise()
@@ -25,10 +41,10 @@ void Physics::Syncronise()
 	{
 		// physics engine is doing collision detection. This is when it is safe to sync state
 
-		// trasfer the bodies added by the game thread into the physics engine. It will then transfer these
-		// into its main collection when it gets to updating the bodies - after this sync phase
-		m_Engine.GetBodiesToBeAdded().swap(m_BodiesToBeAdded);
-		m_BodiesToBeAdded.clear();
+		// trasfer actions into the physics engine. It will then execute these
+		// when it gets to updating the bodies - after this sync phase
+		m_Engine.GetGameToPhysicsActions().swap(m_GameToPhysicsActions);
+		m_GameToPhysicsActions.clear();
 
 		// create proxies for any bodies that were added by the engine during its last updateBodies() step.
 		CreateProxiesForBodiesAddedByEngine();
@@ -45,14 +61,14 @@ void Physics::CreateProxiesForBodiesAddedByEngine()
 {
 	auto& newBodies = m_Engine.GetBodiesAdded();
 	for (auto it = newBodies.begin(); it != newBodies.end(); it++)
-		CreateShapeProxy(**it);
+		CreateShapeProxyForBodyAddedByPhysics(**it);
 
 	newBodies.clear();
 }
 
-void Physics::CreateShapeProxy(Shape& shape)
+void Physics::CreateShapeProxyForBodyAddedByPhysics(Shape& shape)
 {
-	auto prox = new ShapeProxy(shape);
+	auto prox = new DynamicBodyProxy(shape);
 
 	// this proxy has been created for a shape that was added by the physics thread
 	// so it needs registering with the world

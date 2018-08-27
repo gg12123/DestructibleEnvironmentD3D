@@ -12,7 +12,7 @@ void ShapeProxy::Awake()
 {
 	if (!m_Shape)
 	{
-		m_Shape = &GetWorld().GetPhysics().AddDynamicRigidbody(*this);
+		m_Shape = &RegisterWithPhysics(); // GetWorld().GetPhysics().AddDynamicRigidbody(*this);
 	}
 }
 

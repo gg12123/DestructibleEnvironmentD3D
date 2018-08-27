@@ -1,17 +1,21 @@
 #pragma once
 #include "Vector3.h"
 #include "PhysicsEngine.h"
+#include "GameThreadToPhysicsThreadAction.h"
 #include <vector>
 
 class Shape;
 class ShapeProxy;
+class StaticShapeProxy;
+class DynamicBodyProxy;
 class PhysicsEngine;
 class World;
 
 class Physics
 {
 public:
-	Shape & AddDynamicRigidbody(ShapeProxy& proxy);
+	Shape & AddDynamicRigidbody(DynamicBodyProxy& proxy);
+	Shape & AddStaticRigidbody(StaticShapeProxy& proxy);
 
 	void Syncronise();
 
@@ -31,10 +35,11 @@ public:
 	}
 
 private:
-	void CreateShapeProxy(Shape& shape);
+	void CreateShapeProxyForBodyAddedByPhysics(Shape& shape);
 	void CreateProxiesForBodiesAddedByEngine();
 
-	std::vector<Shape*> m_BodiesToBeAdded;
+	std::vector<std::unique_ptr<IGameTheadToPhysicsThreadAction>> m_GameToPhysicsActions;
+
 	std::vector<ShapeProxy*> m_ShapeProxies;
 
 	PhysicsEngine m_Engine;

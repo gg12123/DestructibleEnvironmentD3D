@@ -212,10 +212,12 @@
     <ClInclude Include="Content\Sample3DSceneRenderer.h" />
     <ClInclude Include="Content\SampleFpsTextRenderer.h" />
     <ClInclude Include="Content\ShaderStructures.h" />
+    <ClInclude Include="DynamicBodyProxy.h" />
     <ClInclude Include="DynamicMesh.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Face.h" />
     <ClInclude Include="FinalFaceCreator.h" />
+    <ClInclude Include="GameThreadToPhysicsThreadAction.h" />
     <ClInclude Include="IMeshRenderer.h" />
     <ClInclude Include="InitialShapeCreator.h" />
     <ClInclude Include="Light.h" />
@@ -238,6 +240,8 @@
     <ClInclude Include="Constants.h" />
     <ClInclude Include="ShapeEdge.h" />
     <ClInclude Include="ShapeProxy.h" />
+    <ClInclude Include="StaticBody.h" />
+    <ClInclude Include="StaticShapeProxy.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TwoDArray.h" />
     <ClInclude Include="Vector3.h" />
@@ -253,8 +257,10 @@
     <ClCompile Include="DestructibleEnvironmentMain.cpp" />
     <ClCompile Include="Content\SampleFpsTextRenderer.cpp" />
     <ClCompile Include="Content\Sample3DSceneRenderer.cpp" />
+    <ClCompile Include="DynamicBodyProxy.cpp" />
     <ClCompile Include="DynamicMesh.cpp" />
     <ClCompile Include="Face.cpp" />
+    <ClCompile Include="GameTheadToPhysicsThreadAction.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="NewPointsGetter.cpp" />
     <ClCompile Include="pch.cpp">
@@ -273,6 +279,7 @@
     <ClCompile Include="Shape.cpp" />
     <ClCompile Include="ShapeEdge.cpp" />
     <ClCompile Include="ShapeProxy.cpp" />
+    <ClCompile Include="StaticShapeProxy.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>

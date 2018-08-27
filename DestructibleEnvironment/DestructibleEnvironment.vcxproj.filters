@@ -133,6 +133,15 @@
     <ClCompile Include="Rigidbody.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
+    <ClCompile Include="GameTheadToPhysicsThreadAction.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="DynamicBodyProxy.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticShapeProxy.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -248,6 +257,18 @@
     </ClInclude>
     <ClInclude Include="PhysicsTime.h">
       <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="GameThreadToPhysicsThreadAction.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticBody.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="DynamicBodyProxy.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticShapeProxy.h">
+      <Filter>Misc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -9,7 +9,6 @@ public:
 
 	virtual ~Entity()
 	{
-		auto i = 0;
 	}
 
 	void Awake(World& world)

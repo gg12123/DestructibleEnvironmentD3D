@@ -31,15 +31,15 @@ void PhysicsEngine::DoCollisionDetection()
 
 void PhysicsEngine::UpdateBodies()
 {
-	TransferBodiesAddedByGameThread();
+	ExecuteGameToPhysicsActions();
 
 	// add forces and do required splits, putting all new bodies into m_BodiesAdded
 }
 
-void PhysicsEngine::TransferBodiesAddedByGameThread()
+void PhysicsEngine::ExecuteGameToPhysicsActions()
 {
-	for (auto it = m_BodiesToBeAdded.begin(); it != m_BodiesToBeAdded.end(); it++)
-		m_Bodies.push_back(std::unique_ptr<Shape>(*it));
+	for (auto it = m_GameToPhysicsActions.begin(); it != m_GameToPhysicsActions.end(); it++)
+		(*it)->Apply(*this);
 
-	m_BodiesToBeAdded.clear();
+	m_GameToPhysicsActions.clear();
 }
