@@ -1,15 +1,31 @@
 #include "Rigidbody.h"
 #include "PhysicsTime.h"
 
-void Rigidbody::ApplyImpulses()
+void Rigidbody::ApplyImpulses(std::vector<SplitInfo>& splits)
 {
+	Impulse* biggest = nullptr;
+	auto biggestImpact = 0.0f;
+
 	for  (auto it = m_Impulses.begin(); it != m_Impulses.end(); it++)
 	{
-		if (ApplyImpulse(**it))
-			break; // TODO - do something more clever when a split occurs
+		auto imp = **it;
+		auto impact = imp.Impact;
+
+		ApplyImpulse(imp);
+
+		if (impact > biggestImpact)
+		{
+			biggest = &imp;
+			biggestImpact = impact;
+		}
 	}
 
 	m_Impulses.clear();
+
+	if (biggest && (biggest->Impact > GetMass()))
+	{
+		splits.emplace_back(SplitInfo(*this, *biggest));
+	}
 }
 
 void Rigidbody::UpdateTransform()
@@ -23,7 +39,7 @@ void Rigidbody::UpdateTransform()
 	t.SetRotation(q + q * m_AngularVelocityLocal * (0.5f * PhysicsTime::DeltaTime()));
 }
 
-bool Rigidbody::ApplyImpulse(const Impulse& impulse)
+void Rigidbody::ApplyImpulse(const Impulse& impulse)
 {
 	m_VelocityWorld += impulse.WorldImpulse / GetMass();
 
@@ -31,18 +47,6 @@ bool Rigidbody::ApplyImpulse(const Impulse& impulse)
 	auto J = impulse.LocalImpulse;
 
 	m_AngularVelocityLocal += (GetInertiaInverse() * Vector3::Cross(r, J));
-
-	if (impulse.Impact > GetMass()) // TODO - use better condition
-	{
-		// split
-		return true;
-	}
-	return false;
-}
-
-void Rigidbody::Update()
-{
-
 }
 
 void Rigidbody::CalculateForces(Vector3& forcesWorld, Vector3& momentsLocal)
@@ -68,9 +72,9 @@ void Rigidbody::ApplyNormalForces()
 	Integrate(f, m);
 }
 
-void Rigidbody::Update()
+void Rigidbody::Update(std::vector<SplitInfo>& splits)
 {
 	ApplyNormalForces();
-	ApplyImpulses();
-	UpdateTransform(); // will need to update transform of any shapes resulting from a split
+	ApplyImpulses(splits);
+	UpdateTransform();
 }

@@ -270,6 +270,9 @@
     <ClInclude Include="StaticShapeProxy.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="SplitInfo.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">

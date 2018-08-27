@@ -3,6 +3,7 @@
 #include "Matrix.h"
 #include "PhysicsObject.h"
 #include "CollisionData.h"
+#include "SplitInfo.h"
 
 class Rigidbody : public PhysicsObject
 {
@@ -37,16 +38,21 @@ public:
 		return m_VelocityWorld + Vector3::Cross(GetAngularVelocityWorld(), worldPoint - GetTransform().GetPosition());
 	}
 
-	void Update();
+	void Update(std::vector<SplitInfo>& splits);
+
+	void CopyVelocity(const Rigidbody& toCopy)
+	{
+		m_VelocityWorld = toCopy.m_VelocityWorld;
+		m_AngularVelocityLocal = toCopy.m_AngularVelocityLocal;
+	}
 
 private:
 	void UpdateTransform();
-	void ApplyImpulses();
+	void ApplyImpulses(std::vector<SplitInfo>& splits);
 	void CalculateForces(Vector3& forcesWorld, Vector3& momentsLocal);
 	void Integrate(const Vector3& forcesWorld, const Vector3& momentsLocal);
 	void ApplyNormalForces();
-
-	bool ApplyImpulse(const Impulse& impulse);
+	void ApplyImpulse(const Impulse& impulse);
 
 	std::vector<Impulse*> m_Impulses;
 

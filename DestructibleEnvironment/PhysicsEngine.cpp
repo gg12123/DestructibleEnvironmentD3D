@@ -33,7 +33,29 @@ void PhysicsEngine::UpdateBodies()
 {
 	ExecuteGameToPhysicsActions();
 
-	// add forces and do required splits, putting all new bodies into m_BodiesAdded
+	m_Splits.clear();
+
+	for (auto it = m_DynamicBodies.begin(); it != m_DynamicBodies.end; it++)
+		(*it)->Update(m_Splits);
+
+	ProcessSplits();
+}
+
+void PhysicsEngine::ProcessSplits()
+{
+	for (auto it = m_Splits.begin(); it != m_Splits.end(); it++)
+	{
+		auto& s = *it;
+
+		auto newBody = std::unique_ptr<Rigidbody>(new Rigidbody()); // from pool
+		newBody->CopyVelocity(*s.ToSplit);
+
+		s.ToSplit->Split(s.CauseImpulse->WorldCollisionPoint, *newBody);
+
+		m_BodiesAdded.emplace_back(newBody.get());
+		m_DynamicBodies.emplace_back(std::move(newBody));
+	}
+	m_Splits.clear();
 }
 
 void PhysicsEngine::ExecuteGameToPhysicsActions()

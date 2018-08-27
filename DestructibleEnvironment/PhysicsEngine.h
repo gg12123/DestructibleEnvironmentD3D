@@ -7,6 +7,7 @@
 #include "GameThreadToPhysicsThreadAction.h"
 #include "Rigidbody.h"
 #include "StaticBody.h"
+#include "SplitInfo.h"
 
 class PhysicsEngine
 {
@@ -64,6 +65,7 @@ private:
 	void DoCollisionDetection();
 	void UpdateBodies();
 	void ExecuteGameToPhysicsActions();
+	void ProcessSplits();
 
 	std::atomic<bool> m_Running = true;
 	std::atomic<bool> m_SafeToSync = false;
@@ -78,6 +80,8 @@ private:
 
 	std::vector<std::unique_ptr<Rigidbody>> m_DynamicBodies;
 	std::vector<std::unique_ptr<StaticBody>> m_StaticBodies;
+
+	std::vector<SplitInfo> m_Splits;
 
 	std::thread m_Thread;
 };

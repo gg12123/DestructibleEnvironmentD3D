@@ -115,7 +115,7 @@ bool Shape::SplitPoints(const Vector3& P0, const Vector3& n, Shape& shapeAbove, 
 	return true;
 }
 
-Vector3 Shape::CalculateSplitPlaneNormal(const Vector3& P0, const Vector3& collNormal)
+Vector3 Shape::CalculateSplitPlaneNormal(const Vector3& P0)
 {
 	auto p = Random::Range(0.0f, 0.5f) * m_CachedPoints[Random::Range(0, m_CachedPoints.size())];
 
@@ -124,12 +124,11 @@ Vector3 Shape::CalculateSplitPlaneNormal(const Vector3& P0, const Vector3& collN
 	return Vector3::ProjectOnPlane(Vector3(-toP0.y, -toP0.z, toP0.x), toP0);
 }
 
-bool Shape::Split(const Vector3& collPointWs, const Vector3& collNormalWs, Shape& shapeAbove)
+bool Shape::Split(const Vector3& collPointWs, Shape& shapeAbove)
 {
 	auto P0 = m_Transform.ToLocalPosition(collPointWs);
-	auto collNormalLocal = m_Transform.ToLocalDirection(collNormalWs);
 
-	auto n = CalculateSplitPlaneNormal(P0, collNormalLocal);
+	auto n = CalculateSplitPlaneNormal(P0);
 
 	auto& shapeBelow = *(new Shape()); // from pool
 

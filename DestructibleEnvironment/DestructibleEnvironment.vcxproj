@@ -240,6 +240,7 @@
     <ClInclude Include="Constants.h" />
     <ClInclude Include="ShapeEdge.h" />
     <ClInclude Include="ShapeProxy.h" />
+    <ClInclude Include="SplitInfo.h" />
     <ClInclude Include="StaticBody.h" />
     <ClInclude Include="StaticShapeProxy.h" />
     <ClInclude Include="Transform.h" />

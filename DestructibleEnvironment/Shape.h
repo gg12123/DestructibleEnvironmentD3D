@@ -81,7 +81,7 @@ public:
 
 	void AddPoint(Point& p);
 
-	bool Split(const Vector3& collPointWs, const Vector3& collNormalWs, Shape& shapeAbove);
+	bool Split(const Vector3& collPointWs, Shape& shapeAbove);
 
 	bool IsDirty()
 	{
@@ -113,7 +113,7 @@ public:
 
 private:
 
-	Vector3 CalculateSplitPlaneNormal(const Vector3& P0, const Vector3& collNormal);
+	Vector3 CalculateSplitPlaneNormal(const Vector3& P0);
 	Vector3 CalculateCentre();
 	void InitFaces(const Vector3& finalFaceNormal);
 	void InitNewShape(Shape& shape, const Vector3& finalFaceNormal);
