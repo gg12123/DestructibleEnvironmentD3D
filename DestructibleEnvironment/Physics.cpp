@@ -8,6 +8,7 @@
 #include "InitialShapeCreator.h"
 #include "World.h"
 #include "StaticBody.h"
+#include "GameControlledDynamicBody.h"
 
 Shape & Physics::AddStaticRigidbody(StaticShapeProxy& proxy)
 {
@@ -22,7 +23,7 @@ Shape & Physics::AddStaticRigidbody(StaticShapeProxy& proxy)
 	return *body;
 }
 
-Shape & Physics::AddDynamicRigidbody(DynamicBodyProxy& proxy)
+Rigidbody & Physics::AddDynamicRigidbody(DynamicBodyProxy& proxy)
 {
 	auto body = std::unique_ptr<Rigidbody>(new Rigidbody()); // pool
 	InitialShapeCreator::Create(*body, proxy.GetInitialWidth(), proxy.GetInitialHeight(), proxy.GetTransform());
@@ -33,6 +34,12 @@ Shape & Physics::AddDynamicRigidbody(DynamicBodyProxy& proxy)
 	m_ShapeProxies.push_back(&proxy);
 
 	return *body;
+}
+
+Rigidbody & Physics::AddGameControlledRigidbody(GameControlledDynamicBody& proxy)
+{
+	auto& body = AddDynamicRigidbody(proxy);
+	m_GameControlledProxies.emplace_back(&proxy);
 }
 
 void Physics::Syncronise()
@@ -52,6 +59,10 @@ void Physics::Syncronise()
 		// tell the proxies to sync.
 		for (auto it = m_ShapeProxies.begin(); it != m_ShapeProxies.end(); it++)
 			(*it)->Syncronise();
+
+		// allow game to add forces etc to physics objects
+		for (auto it = m_GameControlledProxies.begin(); it != m_GameControlledProxies.end(); it++)
+			(*it)->FixedUpdate();
 
 		m_Engine.ClearSafeToSync();
 	}

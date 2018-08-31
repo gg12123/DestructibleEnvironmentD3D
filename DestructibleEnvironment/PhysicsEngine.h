@@ -8,6 +8,8 @@
 #include "Rigidbody.h"
 #include "StaticBody.h"
 #include "SplitInfo.h"
+#include "CollisionDetector.h"
+#include "CollisionResponder.h"
 
 class PhysicsEngine
 {
@@ -82,6 +84,9 @@ private:
 	std::vector<std::unique_ptr<StaticBody>> m_StaticBodies;
 
 	std::vector<SplitInfo> m_Splits;
+
+	CollisionDetector m_CollisionDetector;
+	CollisionResponder m_CollisionResponder;
 
 	std::thread m_Thread;
 };

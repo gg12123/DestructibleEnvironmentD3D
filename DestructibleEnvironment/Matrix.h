@@ -9,6 +9,8 @@ class Matrix
 public:
 	Matrix()
 	{
+		for (int i = 0; i < Size; i++)
+			memset(M[i], 0, Size * sizeof(float));
 	}
 
 	Matrix(float val)
@@ -46,7 +48,7 @@ public:
 
 	static inline Matrix<Size> Indentity()
 	{
-		Matrix<Size> m(0.0f);
+		Matrix<Size> m;
 
 		for (int i = 0; i < Size; i++)
 			m.M[i][i] = 1.0f;
@@ -154,25 +156,49 @@ Matrix<N> operator*(const Matrix<N>& lhs, const Matrix<N>& rhs)
 {
 	Matrix<N> result;
 
-	for (int j = 0; j < N; j++)
+	for (int i = 0; i < N; i++)
 	{
-		for (int i = 0; i < N; i++)
-		{
-			auto sum = 0.0f;
+		auto iColB = rhs.M[i];
+		auto iColC = result.M[i];
 
-			for (int n = 0; n < N; n++)
+		for (int j = 0; j < N; j++)
+		{
+			auto jColA = lhs.M[j];
+			auto ijB = iColB[j];
+
+			for (int k = 0; k < N; k++)
 			{
-				sum += lhs.M[n][i] * rhs.M[j][n]; // TODO - maybe transposing one of them first will be faster?
+				iColC[k] += ijB * jColA[k];
 			}
-			result.M[j][i] = sum;
 		}
 	}
+
 	return result;
 }
 
+//template<int N>
+//Matrix<N> operator*(const Matrix<N>& lhs, const Matrix<N>& rhs)
+//{
+//	Matrix<N> result;
+//
+//	for (int j = 0; j < N; j++)
+//	{
+//		for (int i = 0; i < N; i++)
+//		{
+//			auto sum = 0.0f;
+//
+//			for (int n = 0; n < N; n++)
+//			{
+//				sum += lhs.M[n][i] * rhs.M[j][n]; // TODO - maybe transposing one of them first will be faster?
+//			}
+//			result.M[j][i] = sum;
+//		}
+//	}
+//	return result;
+//}
+
 using Matrix3 = Matrix<3>;
 using Matrix4 = Matrix<4>;
-
 
 static inline Vector3 operator*(const Matrix3& lhs, const Vector3& rhs)
 {

@@ -142,6 +142,9 @@
     <ClCompile Include="StaticShapeProxy.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
+    <ClCompile Include="GameControlledDynamicBody.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -272,6 +275,9 @@
     </ClInclude>
     <ClInclude Include="SplitInfo.h">
       <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="GameControlledDynamicBody.h">
+      <Filter>Misc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

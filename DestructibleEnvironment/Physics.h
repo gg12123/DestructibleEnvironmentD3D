@@ -10,11 +10,13 @@ class StaticShapeProxy;
 class DynamicBodyProxy;
 class PhysicsEngine;
 class World;
+class GameControlledDynamicBody;
 
 class Physics
 {
 public:
-	Shape & AddDynamicRigidbody(DynamicBodyProxy& proxy);
+	Rigidbody & AddGameControlledRigidbody(GameControlledDynamicBody& proxy);
+	Rigidbody & AddDynamicRigidbody(DynamicBodyProxy& proxy);
 	Shape & AddStaticRigidbody(StaticShapeProxy& proxy);
 
 	void Syncronise();
@@ -40,7 +42,8 @@ private:
 
 	std::vector<std::unique_ptr<IGameTheadToPhysicsThreadAction>> m_GameToPhysicsActions;
 
-	std::vector<ShapeProxy*> m_ShapeProxies;
+	std::vector<ShapeProxy*> m_ShapeProxies; // all the proxies
+	std::vector<GameControlledDynamicBody*> m_GameControlledProxies;
 
 	PhysicsEngine m_Engine;
 

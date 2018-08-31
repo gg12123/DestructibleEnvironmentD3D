@@ -46,11 +46,21 @@ public:
 		m_AngularVelocityLocal = toCopy.m_AngularVelocityLocal;
 	}
 
+	void AddForce(const Vector3& forceWorld)
+	{
+		m_AddedForceWorld += forceWorld;
+	}
+
+	void AddMoment(const Vector3& momentWorld)
+	{
+		m_AddedMomentsLocal += GetTransform().ToLocalDirection(momentWorld);
+	}
+
 private:
 	void UpdateTransform();
 	void ApplyImpulses(std::vector<SplitInfo>& splits);
-	void CalculateForces(Vector3& forcesWorld, Vector3& momentsLocal);
-	void Integrate(const Vector3& forcesWorld, const Vector3& momentsLocal);
+	void CalculateForces();
+	void Integrate();
 	void ApplyNormalForces();
 	void ApplyImpulse(const Impulse& impulse);
 
@@ -58,6 +68,9 @@ private:
 
 	Vector3 m_VelocityWorld;
 	Vector3 m_AngularVelocityLocal;
+
+	Vector3 m_AddedForceWorld;
+	Vector3 m_AddedMomentsLocal;
 
 	float m_Drag;
 	float m_AngularDrag;

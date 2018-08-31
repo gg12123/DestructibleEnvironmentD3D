@@ -1,5 +1,10 @@
 #include "DynamicBodyProxy.h"
 #include "World.h"
+#include "Rigidbody.h"
+
+DynamicBodyProxy::DynamicBodyProxy(Shape& body) : ShapeProxy(body)
+{
+}
 
 Shape & DynamicBodyProxy::RegisterWithPhysics()
 {

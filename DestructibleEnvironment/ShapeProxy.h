@@ -19,12 +19,6 @@ public:
 
 	void Syncronise();
 
-	virtual void FixedUpdate()
-	{
-		// could call this on the physics thread
-		// and use it to add forces to the physics shape (not this one!).
-	}
-
 	float GetInitialWidth() const
 	{
 		return m_InitialWidth;
