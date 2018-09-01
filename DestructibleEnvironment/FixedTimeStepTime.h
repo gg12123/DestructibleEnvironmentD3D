@@ -6,17 +6,17 @@ class Timer
 public:
 	void Start()
 	{
-		m_StartedTime = std::chrono::high_resolution_clock::now();
+		m_StartedTime = std::chrono::steady_clock::now();
 	}
 
 	int64 GetElapsedNanoSeconds()
 	{
-		auto curr = std::chrono::high_resolution_clock::now();
+		auto curr = std::chrono::steady_clock::now();
 		return std::chrono::duration_cast<std::chrono::nanoseconds>(curr - m_StartedTime).count();
 	}
 
 private:
-	std::chrono::time_point<std::chrono::high_resolution_clock> m_StartedTime;
+	std::chrono::time_point<std::chrono::steady_clock> m_StartedTime;
 };
 
 class FixedTimeStepTime

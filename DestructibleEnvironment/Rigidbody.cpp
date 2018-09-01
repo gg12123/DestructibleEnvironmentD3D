@@ -7,6 +7,8 @@ void Rigidbody::ApplyImpulses(std::vector<SplitInfo>& splits)
 	Impulse* biggest = nullptr;
 	auto biggestImpact = 0.0f;
 
+	m_ToSeperate = Vector3::Zero();
+
 	for  (auto it = m_Impulses.begin(); it != m_Impulses.end(); it++)
 	{
 		auto imp = **it;
@@ -33,7 +35,7 @@ void Rigidbody::UpdateTransform()
 {
 	auto& t = GetTransform();
 
-	t.SetPosition(t.GetPosition() + m_VelocityWorld * PhysicsTime::FixedDeltaTime);
+	t.SetPosition(t.GetPosition() + m_VelocityWorld * PhysicsTime::FixedDeltaTime + m_ToSeperate);
 
 	auto& q = t.GetRotation();
 
@@ -48,11 +50,13 @@ void Rigidbody::ApplyImpulse(const Impulse& impulse)
 	auto J = impulse.LocalImpulse;
 
 	m_AngularVelocityLocal += (GetInertiaInverse() * Vector3::Cross(r, J));
+
+	m_ToSeperate += impulse.ToSeperate * Vector3::Normalize(impulse.WorldImpulse);
 }
 
 void Rigidbody::CalculateForces()
 {
-	static constexpr float g = 9.8f;
+	static constexpr float g = 1.0f; // 9.8f;
 
 	m_AddedForceWorld -= GetMass() * g * Vector3::Up();
 	m_AddedForceWorld -= m_Drag * m_VelocityWorld;

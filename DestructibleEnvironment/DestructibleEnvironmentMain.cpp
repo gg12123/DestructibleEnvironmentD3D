@@ -32,23 +32,37 @@ DestructibleEnvironmentMain::~DestructibleEnvironmentMain()
 
 void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 {
-	auto shape = new DynamicBodyProxy();
-	shape->GetTransform().SetPosition(Vector3(0.0f, 0.0f, 0.0f));
-	shape->GetTransform().SetRotation(Quaternion::LookRotation(Vector3::Normalize(Vector3(1.0f, 0.0f, 1.0f))));
-	shape->SetInitialHeight(2.0f);
-	shape->SetInitialWidth(1.0f);
-	m_World.RegisterEntity(*shape);
+	auto body = new DynamicBodyProxy();
+	auto bodyPos = Vector3(0.0f, 5.0f, 0.0f);
+	body->GetTransform().SetPosition(bodyPos);
+	body->GetTransform().SetRotation(Quaternion::LookRotation(Vector3::Normalize(Vector3(1.0f, 0.0f, 1.0f))));
+	body->SetInitialHeight(2.0f);
+	body->SetInitialWidth(1.0f);
+	body->SetMass(1.0f);
+	body->SetDrag(0.7f);
+	body->SetAngularDrag(0.7f);
+	m_World.RegisterEntity(*body);
+
+	auto floor = new StaticShapeProxy();
+	auto floorPos = Vector3(0.0f, 0.0f, 0.0f);
+	floor->GetTransform().SetPosition(floorPos);
+	floor->GetTransform().SetRotation(Quaternion::Identity());
+	floor->SetInitialHeight(1.0f);
+	floor->SetInitialWidth(10.0f);
+	m_World.RegisterEntity(*floor);
 
 	auto cam = new Camera();
-	cam->GetTransform().SetPosition(Vector3(10.0f, 0.0f, 0.0f));
-	cam->GetTransform().SetRotation(Quaternion::LookRotation(-Vector3::Right()));
+	auto camPos = Vector3(10.0f, 6.0f, 0.0f);
+	auto camLookDir = Vector3::Normalize((bodyPos + floorPos) / 2.0f - camPos);
+	cam->GetTransform().SetPosition(camPos);
+	cam->GetTransform().SetRotation(Quaternion::LookRotation(camLookDir));
 	cam->SetFov(MathUtils::ToRadians(45.0f));
 	cam->SetFarClip(1000.0f);
 	cam->SetNearClip(0.1f);
 	m_World.RegisterEntity(*cam);
 
 	auto light = new Light();
-	light->GetTransform().SetPosition(Vector3(5.0f, 5.0f, 2.0f));
+	light->GetTransform().SetPosition(Vector3(15.0f, 15.0f, 2.0f));
 	light->GetTransform().SetRotation(Quaternion::Identity());
 	m_World.RegisterEntity(*light);
 }

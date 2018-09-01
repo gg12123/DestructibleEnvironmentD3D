@@ -5,6 +5,12 @@
 class PhysicsObject : public Shape
 {
 public:
+	PhysicsObject()
+	{
+		m_Inertia = Matrix3::Indentity();
+		m_InertiaInverse = Matrix3::Indentity();
+	}
+
 	virtual void AddImpulse(Impulse& impulse)
 	{
 	}
@@ -27,6 +33,11 @@ public:
 	virtual Vector3 WorldVelocityAt(const Vector3& worldPoint)
 	{
 		return Vector3::Zero();
+	}
+
+	void SetMass(float mass)
+	{
+		m_Mass = mass;
 	}
 
 private:

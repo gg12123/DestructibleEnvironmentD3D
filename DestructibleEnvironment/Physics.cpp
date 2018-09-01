@@ -15,12 +15,14 @@ Shape & Physics::AddStaticRigidbody(StaticShapeProxy& proxy)
 	auto body = std::unique_ptr<StaticBody>(new StaticBody()); // pool
 	InitialShapeCreator::Create(*body, proxy.GetInitialWidth(), proxy.GetInitialHeight(), proxy.GetTransform());
 
+	auto& toRet = *body;
+
 	m_GameToPhysicsActions.emplace_back(std::unique_ptr<IGameTheadToPhysicsThreadAction>(new AddStaticRigidbodyAction(std::move(body))));
 
 	// this proxy has come from the world so just push it onto the list
 	m_ShapeProxies.push_back(&proxy);
 
-	return *body;
+	return toRet;
 }
 
 Rigidbody & Physics::AddDynamicRigidbody(DynamicBodyProxy& proxy)
@@ -28,12 +30,19 @@ Rigidbody & Physics::AddDynamicRigidbody(DynamicBodyProxy& proxy)
 	auto body = std::unique_ptr<Rigidbody>(new Rigidbody()); // pool
 	InitialShapeCreator::Create(*body, proxy.GetInitialWidth(), proxy.GetInitialHeight(), proxy.GetTransform());
 
+	auto& b = *body;
+
+	// maybe a flag to indicate weather to use volume to calculate mass?
+	b.SetMass(proxy.GetMass());
+	b.SetDrag(proxy.GetDrag());
+	b.SetAngularDrag(proxy.GetAngularDrag());
+
 	m_GameToPhysicsActions.emplace_back(std::unique_ptr<IGameTheadToPhysicsThreadAction>(new AddDynamicRigidbodyAction(std::move(body))));
 
 	// this proxy has come from the world so just push it onto the list
 	m_ShapeProxies.push_back(&proxy);
 
-	return *body;
+	return b;
 }
 
 Rigidbody & Physics::AddGameControlledRigidbody(GameControlledDynamicBody& proxy)

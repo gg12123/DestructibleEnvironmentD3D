@@ -5,7 +5,7 @@ class MathUtils
 {
 public:
 	static constexpr float Pi = 3.14159265358979323846f;
-	static constexpr float Infinity = 0.0f; // TODO
+	static constexpr float Infinity = FLT_MAX;
 
 	static inline float ToRadians(float degrees)
 	{

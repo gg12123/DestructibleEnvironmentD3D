@@ -9,21 +9,7 @@ NewPointsGetter Shape::m_NewPointsGetter;
 
 Shape::~Shape()
 {
-	// TODO - it would be nice to use smart pointers,
-	// but they would be a bit awakward during the split algorithm - maybe not worth it.
-
-	for (auto it = m_Points.begin(); it != m_Points.end(); it++)
-		delete (*it);
-
-	for (auto it = m_Edges.begin(); it != m_Edges.end(); it++)
-		delete (*it);
-
-	for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
-		delete (*it);
-
-	m_Points.clear();
-	m_Edges.clear();
-	m_Faces.clear();
+	// return points, edges, faces to pool.
 }
 
 void Shape::AddPoint(Point& p)

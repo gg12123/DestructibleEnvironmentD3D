@@ -56,6 +56,16 @@ public:
 		m_AddedMomentsLocal += GetTransform().ToLocalDirection(momentWorld);
 	}
 
+	void SetDrag(float drag)
+	{
+		m_Drag = drag;
+	}
+
+	void SetAngularDrag(float angDrag)
+	{
+		m_AngularDrag = angDrag;
+	}
+
 private:
 	void UpdateTransform();
 	void ApplyImpulses(std::vector<SplitInfo>& splits);
@@ -71,6 +81,8 @@ private:
 
 	Vector3 m_AddedForceWorld;
 	Vector3 m_AddedMomentsLocal;
+
+	Vector3 m_ToSeperate;
 
 	float m_Drag;
 	float m_AngularDrag;

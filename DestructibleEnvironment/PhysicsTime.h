@@ -3,5 +3,5 @@
 class PhysicsTime
 {
 public:
-	static constexpr float FixedDeltaTime = 1.0f / 60.0f;
+	static constexpr float FixedDeltaTime = 0.02f;
 };
