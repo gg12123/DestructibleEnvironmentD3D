@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "StaticShapeProxy.h"
 #include "World.h"
 

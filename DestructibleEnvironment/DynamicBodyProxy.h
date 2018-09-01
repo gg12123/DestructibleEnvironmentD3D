@@ -5,6 +5,10 @@
 class DynamicBodyProxy : public ShapeProxy
 {
 public:
+	DynamicBodyProxy()
+	{
+	}
+
 	DynamicBodyProxy(Shape& body);
 
 protected:

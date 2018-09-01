@@ -279,6 +279,9 @@
     <ClInclude Include="GameControlledDynamicBody.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="FixedTimeStepTime.h">
+      <Filter>CoreStuff</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">

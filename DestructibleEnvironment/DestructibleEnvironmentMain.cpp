@@ -5,6 +5,8 @@
 #include "Camera.h"
 #include "Light.h"
 #include "MathUtils.h"
+#include "DynamicBodyProxy.h"
+#include "StaticShapeProxy.h"
 
 using namespace DestructibleEnvironment;
 using namespace Windows::Foundation;
@@ -30,7 +32,7 @@ DestructibleEnvironmentMain::~DestructibleEnvironmentMain()
 
 void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 {
-	auto shape = new ShapeProxy();
+	auto shape = new DynamicBodyProxy();
 	shape->GetTransform().SetPosition(Vector3(0.0f, 0.0f, 0.0f));
 	shape->GetTransform().SetRotation(Quaternion::LookRotation(Vector3::Normalize(Vector3(1.0f, 0.0f, 1.0f))));
 	shape->SetInitialHeight(2.0f);

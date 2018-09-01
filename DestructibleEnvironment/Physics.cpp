@@ -40,6 +40,7 @@ Rigidbody & Physics::AddGameControlledRigidbody(GameControlledDynamicBody& proxy
 {
 	auto& body = AddDynamicRigidbody(proxy);
 	m_GameControlledProxies.emplace_back(&proxy);
+	return body;
 }
 
 void Physics::Syncronise()

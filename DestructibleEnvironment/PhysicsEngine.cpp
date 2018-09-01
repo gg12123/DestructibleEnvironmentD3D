@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "PhysicsEngine.h"
+#include "PhysicsTime.h"
 
 void PhysicsEngine::StartRunning()
 {
@@ -9,12 +10,17 @@ void PhysicsEngine::StartRunning()
 
 void PhysicsEngine::Run()
 {
+	m_Time.SetFixedDeltaTime(PhysicsTime::FixedDeltaTime);
+	m_Time.Start();
+
 	while (m_Running)
 	{
-		while (m_SafeToSync) // and wait for fixed time step to elapse
+		while (m_SafeToSync)
 		{
 			// collision detection will be expensive so execution shoulnt get to here
 		}
+
+		m_Time.WaitForNextUpdateTime();
 
 		UpdateBodies();
 
@@ -43,7 +49,7 @@ void PhysicsEngine::DoCollisionDetection()
 				m_CollisionResponder.CalculateResponse(*coll, bodyi, *m_DynamicBodies[j]);
 		}
 
-		for (auto j = 0; j < staticCount; j++)
+		for (auto j = 0U; j < staticCount; j++)
 		{
 			auto coll = m_CollisionDetector.FindCollision(bodyi, *m_StaticBodies[j]);
 
@@ -59,7 +65,7 @@ void PhysicsEngine::UpdateBodies()
 
 	m_Splits.clear();
 
-	for (auto it = m_DynamicBodies.begin(); it != m_DynamicBodies.end; it++)
+	for (auto it = m_DynamicBodies.begin(); it != m_DynamicBodies.end(); it++)
 		(*it)->Update(m_Splits);
 
 	ProcessSplits();

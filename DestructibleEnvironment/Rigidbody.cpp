@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Rigidbody.h"
 #include "PhysicsTime.h"
 
@@ -32,11 +33,11 @@ void Rigidbody::UpdateTransform()
 {
 	auto& t = GetTransform();
 
-	t.SetPosition(t.GetPosition() + m_VelocityWorld * PhysicsTime::DeltaTime());
+	t.SetPosition(t.GetPosition() + m_VelocityWorld * PhysicsTime::FixedDeltaTime);
 
 	auto& q = t.GetRotation();
 
-	t.SetRotation(q + q * m_AngularVelocityLocal * (0.5f * PhysicsTime::DeltaTime()));
+	t.SetRotation(q + q * m_AngularVelocityLocal * (0.5f * PhysicsTime::FixedDeltaTime));
 }
 
 void Rigidbody::ApplyImpulse(const Impulse& impulse)
@@ -61,8 +62,8 @@ void Rigidbody::CalculateForces()
 
 void  Rigidbody::Integrate()
 {
-	m_VelocityWorld += (m_AddedForceWorld / GetMass()) * PhysicsTime::DeltaTime();
-	m_AngularVelocityLocal += (GetInertiaInverse() * m_AddedMomentsLocal) * PhysicsTime::DeltaTime();
+	m_VelocityWorld += (m_AddedForceWorld / GetMass()) * PhysicsTime::FixedDeltaTime;
+	m_AngularVelocityLocal += (GetInertiaInverse() * m_AddedMomentsLocal) * PhysicsTime::FixedDeltaTime;
 }
 
 void Rigidbody::ApplyNormalForces()

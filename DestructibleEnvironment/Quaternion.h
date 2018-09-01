@@ -23,14 +23,27 @@ public:
 
 	Quaternion()
 	{
-		r = 1.0f;
-		x = y = z = 0.0f;
 	}
 
-	Vector3 Rotate(const Vector3& toRot) const
+	void Normalize()
 	{
-		assert(false);
-		return Vector3::Zero();
+		auto mag = sqrt(x*x + y * y + z * z + r * r);
+
+		x /= mag;
+		y /= mag;
+		z /= mag;
+		r /= mag;
+	}
+
+	Vector3 Rotate(const Vector3& v) const
+	{
+		Vector3 u(x, y, z);
+
+		auto s = r;
+
+		return (2.0f * Vector3::Dot(u, v) * u
+			+ (s*s - Vector3::Dot(u, u)) * v
+			+ 2.0f * s * Vector3::Cross(u, v));
 	}
 
 	Quaternion Conj() const
@@ -40,7 +53,14 @@ public:
 
 	static inline Quaternion Identity()
 	{
-		return Quaternion();
+		Quaternion q;
+
+		q.r = 1.0f;
+		q.x = 0.0f;
+		q.y = 0.0f;
+		q.z = 0.0f;
+
+		return q;
 	}
 
 	static inline Quaternion LookRotation(const Vector3& forward)
@@ -73,20 +93,37 @@ public:
 
 inline Quaternion operator*(const Quaternion& lhs, float rhs)
 {
+	return Quaternion(lhs.r * rhs, lhs.x * rhs, lhs.y * rhs, lhs.z * rhs);
+}
 
+inline Quaternion operator*(float lhs, const Quaternion& rhs)
+{
+	return rhs * lhs;
 }
 
 inline Quaternion operator+(const Quaternion& lhs, const Quaternion& rhs)
 {
-
+	return Quaternion(lhs.r + rhs.r, lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z);
 }
 
 inline Quaternion operator*(const Quaternion& lhs, const Quaternion& rhs)
 {
+	Quaternion res;
 
+	res.x = lhs.x * rhs.r + lhs.y * rhs.z - lhs.z * rhs.y + lhs.r * rhs.x;
+	res.y = -lhs.x * rhs.z + lhs.y * rhs.r + lhs.z * rhs.x + lhs.r * rhs.y;
+	res.z = lhs.x * rhs.y - lhs.y * rhs.x + lhs.z * rhs.r + lhs.r * rhs.z;
+	res.r = -lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z + lhs.r * rhs.r;
+
+	return res;
 }
 
 inline Quaternion operator*(const Quaternion& lhs, const Vector3& rhs)
 {
 	return lhs * Quaternion(0.0f, rhs.x, rhs.y, rhs.z);
+}
+
+inline Quaternion operator*(const Vector3& lhs, const Quaternion& rhs)
+{
+	return Quaternion(0.0f, lhs.x, lhs.y, lhs.z) * rhs;
 }

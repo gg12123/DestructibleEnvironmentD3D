@@ -217,6 +217,7 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Face.h" />
     <ClInclude Include="FinalFaceCreator.h" />
+    <ClInclude Include="FixedTimeStepTime.h" />
     <ClInclude Include="GameControlledDynamicBody.h" />
     <ClInclude Include="GameThreadToPhysicsThreadAction.h" />
     <ClInclude Include="IMeshRenderer.h" />

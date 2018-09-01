@@ -10,6 +10,7 @@
 #include "SplitInfo.h"
 #include "CollisionDetector.h"
 #include "CollisionResponder.h"
+#include "FixedTimeStepTime.h"
 
 class PhysicsEngine
 {
@@ -87,6 +88,7 @@ private:
 
 	CollisionDetector m_CollisionDetector;
 	CollisionResponder m_CollisionResponder;
+	FixedTimeStepTime m_Time;
 
 	std::thread m_Thread;
 };
