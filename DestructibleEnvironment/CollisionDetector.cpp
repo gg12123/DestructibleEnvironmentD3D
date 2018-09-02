@@ -53,8 +53,8 @@ void CollisionDetector::FindPointFaceCollision(const std::vector<Vector3>& faceN
 
 	auto& coll = *m_DataPool->Recycle();
 
-	coll.Normal1To2 = TransformDirection(faceNormals[indexOfClosest]);
-	coll.Position = TransformPoint(point);
+	coll.Normal1To2 = faceNormals[indexOfClosest];
+	coll.Position = point;
 	coll.Penetration = closestDist;
 
 	m_FoundCollisions.emplace_back(&coll);
@@ -168,42 +168,118 @@ void CollisionDetector::FindEdgeCollisions(Shape& shapeFaces, ArrayWrapper<Vecto
 	}
 }
 
-// Coll normal will point from body 1 to body 2
-CollisionData& CollisionDetector::FinalCollisionData()
+static Vector3 AverageCollPoint(const std::vector<CollisionData*>& collData)
 {
+	auto ave = Vector3::Zero();
+
+	for (auto it = collData.begin(); it != collData.end(); it++)
+		ave += (*it)->Position;
+
+	return ave / static_cast<float>(collData.size());
+}
+
+void CollisionDetector::FinalisePointFaceCollisions(Shape& shapeFaces)
+{
+	if (m_FoundCollisions.size() > 0)
+	{
+		auto collPoint = AverageCollPoint(m_FoundCollisions);
+
+		auto& faceP0s = shapeFaces.GetCachedFaceP0s();
+		auto& faceNormals = shapeFaces.GetCachedFaceNormals();
+
+		auto itN = faceNormals.begin();
+		auto itP = faceP0s.begin();
+
+		auto closestDist = MathUtils::Infinity;
+		auto indexOfClosest = 0;
+		auto currIndex = 0;
+
+		for (; itN != faceNormals.end(); itN++, itP++)
+		{
+			auto absComp = fabs(Vector3::Dot(collPoint - *itP, *itN));
+
+			if (absComp < closestDist)
+			{ 
+				closestDist = absComp;
+				indexOfClosest = currIndex;
+			}
+
+			currIndex++;
+		}
+
+		auto& coll = *m_DataPool->Recycle();
+
+		coll.Normal1To2 = TransformDirection(faceNormals[indexOfClosest]);
+		coll.Penetration = closestDist;
+		coll.Position = TransformPoint(collPoint);
+
+		m_FinalisedFoundCollisions.emplace_back(&coll);
+		m_FoundCollisions.clear();
+	}
+}
+
+// Coll normal will point from body 1 to body 2
+void CollisionDetector::FinaliseEdgeCollisions()
+{
+	if (m_FoundCollisions.size() > 0)
+	{
+		auto body1To2 = Vector3::Normalize(m_Shape2->GetTransform().GetPosition() - m_Shape1->GetTransform().GetPosition());
+		auto maxComp = -1.0f;
+
+		auto& collData = *m_DataPool->Recycle();
+
+		collData.Position = Vector3::Zero();
+
+		for (auto it = m_FoundCollisions.begin(); it != m_FoundCollisions.end(); it++)
+		{
+			auto data = *it;
+
+			auto comp = fabs(Vector3::Dot(body1To2, data->Normal1To2));
+
+			if (comp > maxComp)
+			{
+				collData.Normal1To2 = data->Normal1To2;
+				collData.Penetration = data->Penetration;
+				maxComp = comp;
+			}
+			collData.Position += data->Position;
+		}
+
+		collData.Position /= static_cast<float>(m_FoundCollisions.size());
+
+		m_FinalisedFoundCollisions.emplace_back(&collData);
+	}
+}
+
+CollisionData* CollisionDetector::FinalCollisionData()
+{
+	if (m_FinalisedFoundCollisions.size() == 0)
+		return nullptr;
+
 	auto body1To2 = Vector3::Normalize(m_Shape2->GetTransform().GetPosition() - m_Shape1->GetTransform().GetPosition());
-	auto maxComp = 0.0f;
+	auto maxComp = -1.0f;
+	CollisionData* best = nullptr;
 
-	auto& collData = *m_DataPool->Recycle();
-
-	collData.Position = Vector3::Zero();
-
-	for (auto it = m_FoundCollisions.begin(); it != m_FoundCollisions.end(); it++)
+	for (auto it = m_FinalisedFoundCollisions.begin(); it != m_FinalisedFoundCollisions.end(); it++)
 	{
 		auto data = *it;
 
 		auto comp = fabs(Vector3::Dot(body1To2, data->Normal1To2));
 
 		if (comp > maxComp)
-		{
-			collData.Normal1To2 = data->Normal1To2;
-			collData.Penetration = data->Penetration;
-			maxComp = comp;
-		}
-		collData.Position += data->Position;
+			best = data;
 	}
 
-	if (Vector3::Dot(collData.Normal1To2, body1To2) < 0.0f)
-		collData.Normal1To2 *= -1.0f;
+	if (Vector3::Dot(best->Normal1To2, body1To2) < 0.0f)
+		best->Normal1To2 *= -1.0f;
 
-	collData.Position /= static_cast<float>(m_FoundCollisions.size());
-
-	return collData;
+	return best;
 }
 
 CollisionData * CollisionDetector::FindCollision(Shape& shape1, Shape& shape2)
 {
 	m_FoundCollisions.clear();
+	m_FinalisedFoundCollisions.clear();
 	m_DataPool->Reset();
 
 	m_Shape1TransformedPoints.Clear();
@@ -229,14 +305,14 @@ CollisionData * CollisionDetector::FindCollision(Shape& shape1, Shape& shape2)
 
 	m_ActiveTransform = &shape1.GetTransform();
 	FindPointFaceCollisions(shape1, m_Shape2TransformedPoints);
+	FinalisePointFaceCollisions(shape1);
 
 	m_ActiveTransform = &shape2.GetTransform();
 	FindPointFaceCollisions(shape2, m_Shape1TransformedPoints);
+	FinalisePointFaceCollisions(shape2);
 
 	FindEdgeCollisions(shape2, m_Shape1TransformedPoints, shape1.GetCachedEdgePoints());
+	FinaliseEdgeCollisions();
 
-	if (m_FoundCollisions.size() > 0)
-		return &FinalCollisionData();
-
-	return nullptr;
+	return FinalCollisionData();
 }

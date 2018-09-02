@@ -10,7 +10,7 @@ static float CalculateS(const Vector3& n, const Vector3& r, const Matrix3 inerti
 
 void CollisionResponder::CalculateResponse(const CollisionData& collData, PhysicsObject& body1, PhysicsObject& body2)
 {
-	static constexpr float e = 0.9f; // TODO - get this from somewere else
+	static constexpr float e = 0.5f; // TODO - get this from somewere else
 
 	auto& collPointWorld = collData.Position;
 	auto& collNormalWorld = collData.Normal1To2;
@@ -49,19 +49,21 @@ void CollisionResponder::CalculateResponse(const CollisionData& collData, Physic
 		auto& impulse1 = *m_ImpulseDataPool->Recycle();
 		auto& impulse2 = *m_ImpulseDataPool->Recycle();
 
+		auto pen = collData.Penetration;
+
 		impulse1.Impact = impact;
 		impulse1.LocalCollisionPoint = r1;
 		impulse1.WorldCollisionPoint = collPointWorld;
 		impulse1.LocalImpulse = -J * collisionNormalBody1Local;
 		impulse1.WorldImpulse = -J * collNormalWorld;
-		impulse1.ToSeperate = v1N / (v1N + v2N);
+		impulse1.ToSeperate = (v1N / (v1N + v2N)) * pen;
 
 		impulse2.Impact = impact;
 		impulse2.LocalCollisionPoint = r2;
 		impulse2.WorldCollisionPoint = collPointWorld;
 		impulse2.LocalImpulse = J * collisionNormalBody2Local;
 		impulse2.WorldImpulse = J * collNormalWorld;
-		impulse2.ToSeperate = v2N / (v1N + v2N);
+		impulse2.ToSeperate = (v2N / (v1N + v2N)) * pen;
 
 		body1.AddImpulse(impulse1);
 		body2.AddImpulse(impulse2);

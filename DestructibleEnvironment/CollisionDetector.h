@@ -41,9 +41,13 @@ private:
 	Vector3 InverseTransformPoint(const Vector3& point);
 	Vector3 InverseTransformDirection(const Vector3& dir);
 
-	CollisionData& FinalCollisionData();
+	void FinalisePointFaceCollisions(Shape& shapeFaces);
+	void FinaliseEdgeCollisions();
+
+	CollisionData* FinalCollisionData();
 
 	std::vector<CollisionData*> m_FoundCollisions;
+	std::vector<CollisionData*> m_FinalisedFoundCollisions;
 	std::unique_ptr<PoolOfRecyclables<std::unique_ptr<CollisionData>>> m_DataPool;
 
 	ArrayWrapper<Vector3, Constants::MaxNumPoints> m_Shape1TransformedPoints;

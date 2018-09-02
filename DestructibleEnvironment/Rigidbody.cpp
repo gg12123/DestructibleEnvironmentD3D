@@ -56,7 +56,7 @@ void Rigidbody::ApplyImpulse(const Impulse& impulse)
 
 void Rigidbody::CalculateForces()
 {
-	static constexpr float g = 1.0f; // 9.8f;
+	static constexpr float g = 9.8f;
 
 	m_AddedForceWorld -= GetMass() * g * Vector3::Up();
 	m_AddedForceWorld -= m_Drag * m_VelocityWorld;
