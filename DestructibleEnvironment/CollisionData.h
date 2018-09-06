@@ -18,6 +18,5 @@ public:
 	Vector3 WorldCollisionPoint;
 	Vector3 LocalCollisionPoint;
 
-	float ToSeperate; // seperate in same direction as impulse
 	float Impact;
 };

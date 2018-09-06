@@ -36,9 +36,9 @@ void Rigidbody::UpdateTransform()
 	auto& t = GetTransform();
 
 	t.SetPosition(t.GetPosition() + m_VelocityWorld * PhysicsTime::FixedDeltaTime + m_ToSeperate);
+	m_ToSeperate = Vector3::Zero();
 
 	auto& q = t.GetRotation();
-
 	t.SetRotation(q + q * m_AngularVelocityLocal * (0.5f * PhysicsTime::FixedDeltaTime));
 }
 
@@ -50,8 +50,6 @@ void Rigidbody::ApplyImpulse(const Impulse& impulse)
 	auto J = impulse.LocalImpulse;
 
 	m_AngularVelocityLocal += (GetInertiaInverse() * Vector3::Cross(r, J));
-
-	m_ToSeperate += impulse.ToSeperate * Vector3::Normalize(impulse.WorldImpulse);
 }
 
 void Rigidbody::CalculateForces()

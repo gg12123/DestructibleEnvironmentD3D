@@ -54,9 +54,20 @@ public:
 		z /= rhs;
 	}
 
-	float Magnitude()
+	float Magnitude() const
 	{
 		return sqrt(x * x + y * y + z * z);
+	}
+
+	Vector3 InDirectionOf(const Vector3& refDir) const
+	{
+		auto& thisRef = *this;
+		return (Vector3::Dot(thisRef, refDir) < 0.0f) ? -thisRef : thisRef;
+	}
+
+	Vector3 Normalized() const
+	{
+		return Vector3::Normalize(*this);
 	}
 
 	// static

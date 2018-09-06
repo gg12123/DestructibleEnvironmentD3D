@@ -80,6 +80,9 @@
     <Filter Include="Rendering\Shaders">
       <UniqueIdentifier>{c379f3b6-7844-4de2-a74f-561eb8b1a8c2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Physics\CollisionStuff">
+      <UniqueIdentifier>{04fac677-b925-430b-a9f5-05698220f9d4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
@@ -118,17 +121,11 @@
     <ClCompile Include="World.cpp">
       <Filter>CoreStuff</Filter>
     </ClCompile>
-    <ClCompile Include="CollisionDetector.cpp">
-      <Filter>Physics</Filter>
-    </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="Light.cpp">
       <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="CollisionResponder.cpp">
-      <Filter>Physics</Filter>
     </ClCompile>
     <ClCompile Include="Rigidbody.cpp">
       <Filter>Physics</Filter>
@@ -144,6 +141,12 @@
     </ClCompile>
     <ClCompile Include="GameControlledDynamicBody.cpp">
       <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionDetector.cpp">
+      <Filter>Physics\CollisionStuff</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionResponder.cpp">
+      <Filter>Physics\CollisionStuff</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -237,22 +240,13 @@
     <ClInclude Include="Vector3.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="CollisionDetector.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
     <ClInclude Include="PoolOfRecyclables.h">
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Constants.h">
       <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="CollisionResponder.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
     <ClInclude Include="Rigidbody.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="CollisionData.h">
       <Filter>Physics</Filter>
     </ClInclude>
     <ClInclude Include="PhysicsObject.h">
@@ -281,6 +275,18 @@
     </ClInclude>
     <ClInclude Include="FixedTimeStepTime.h">
       <Filter>CoreStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionData.h">
+      <Filter>Physics\CollisionStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionDetector.h">
+      <Filter>Physics\CollisionStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionResponder.h">
+      <Filter>Physics\CollisionStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="PotentialCollision.h">
+      <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -13,6 +13,11 @@ public:
 		m_Impulses.emplace_back(&impulse);
 	}
 
+	void AddToRequiredToSeperate(const Vector3& toSep) override
+	{
+		m_ToSeperate += toSep;
+	}
+
 	const Vector3& GetVelocityWorld() const
 	{
 		return m_VelocityWorld;

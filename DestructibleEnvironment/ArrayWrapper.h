@@ -17,7 +17,7 @@ public:
 		m_CurrCount++;
 	}
 
-	int GetCurrCount()
+	int GetCurrCount() const
 	{
 		return m_CurrCount;
 	}

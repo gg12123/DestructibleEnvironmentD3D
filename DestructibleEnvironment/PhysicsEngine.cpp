@@ -37,24 +37,22 @@ void PhysicsEngine::DoCollisionDetection()
 
 	m_CollisionResponder.Reset();
 
+	CollisionData collData;
+
 	for (auto i = 0U; i < dynamicCount; i++)
 	{
 		auto& bodyi = *m_DynamicBodies[i];
 
 		for (auto j = i + 1; j < dynamicCount; j++)
 		{
-			auto coll = m_CollisionDetector.FindCollision(bodyi, *m_DynamicBodies[j]);
-
-			if (coll)
-				m_CollisionResponder.CalculateResponse(*coll, bodyi, *m_DynamicBodies[j]);
+			if (m_CollisionDetector.FindCollision(bodyi, *m_DynamicBodies[j], collData))
+				m_CollisionResponder.CalculateResponse(collData, bodyi, *m_DynamicBodies[j]);
 		}
 
 		for (auto j = 0U; j < staticCount; j++)
 		{
-			auto coll = m_CollisionDetector.FindCollision(bodyi, *m_StaticBodies[j]);
-
-			if (coll)
-				m_CollisionResponder.CalculateResponse(*coll, bodyi, *m_StaticBodies[j]);
+			if (m_CollisionDetector.FindCollision(bodyi, *m_StaticBodies[j], collData))
+				m_CollisionResponder.CalculateResponse(collData, bodyi, *m_StaticBodies[j]);
 		}
 	}
 }

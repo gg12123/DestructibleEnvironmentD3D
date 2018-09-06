@@ -14,6 +14,7 @@ void CollisionResponder::CalculateResponse(const CollisionData& collData, Physic
 
 	auto& collPointWorld = collData.Position;
 	auto& collNormalWorld = collData.Normal1To2;
+	auto pen = collData.Penetration;
 
 	auto v1 = body1.WorldVelocityAt(collPointWorld);
 	auto v2 = body2.WorldVelocityAt(collPointWorld);
@@ -49,23 +50,27 @@ void CollisionResponder::CalculateResponse(const CollisionData& collData, Physic
 		auto& impulse1 = *m_ImpulseDataPool->Recycle();
 		auto& impulse2 = *m_ImpulseDataPool->Recycle();
 
-		auto pen = collData.Penetration;
-
 		impulse1.Impact = impact;
 		impulse1.LocalCollisionPoint = r1;
 		impulse1.WorldCollisionPoint = collPointWorld;
 		impulse1.LocalImpulse = -J * collisionNormalBody1Local;
 		impulse1.WorldImpulse = -J * collNormalWorld;
-		impulse1.ToSeperate = (v1N / (v1N + v2N)) * pen;
 
 		impulse2.Impact = impact;
 		impulse2.LocalCollisionPoint = r2;
 		impulse2.WorldCollisionPoint = collPointWorld;
 		impulse2.LocalImpulse = J * collisionNormalBody2Local;
 		impulse2.WorldImpulse = J * collNormalWorld;
-		impulse2.ToSeperate = (v2N / (v1N + v2N)) * pen;
 
 		body1.AddImpulse(impulse1);
 		body2.AddImpulse(impulse2);
+
+		body1.AddToRequiredToSeperate((v1N / (v1N + v2N)) * pen * collNormalWorld);
+		body2.AddToRequiredToSeperate((v2N / (v1N + v2N)) * pen * collNormalWorld);
+	}
+	else
+	{
+		body1.AddToRequiredToSeperate(0.5f * pen * collNormalWorld);
+		body2.AddToRequiredToSeperate(0.5f * pen * collNormalWorld);
 	}
 }
