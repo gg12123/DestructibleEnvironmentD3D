@@ -25,6 +25,7 @@ public:
 	void SetRotation(const Quaternion& rot)
 	{
 		m_Rotation = rot;
+		m_Rotation.Normalize();
 		m_Dirty = true;
 	}
 
@@ -43,7 +44,7 @@ public:
 
 	Vector3 ToLocalDirection(const Vector3& worldDir) const
 	{
-		return m_Rotation.Conj().Rotate(worldDir);
+		return m_Rotation.Conj().RotateV(worldDir);
 	}
 
 	Vector3 ToWorldPosition(const Vector3& localPos)
@@ -54,7 +55,7 @@ public:
 
 	Vector3 ToWorldDirection(const Vector3& localDir)
 	{
-		return m_Rotation.Rotate(localDir);
+		return m_Rotation.RotateV(localDir);
 	}
 
 	Matrix4 GetLocalToWorldMatrix()

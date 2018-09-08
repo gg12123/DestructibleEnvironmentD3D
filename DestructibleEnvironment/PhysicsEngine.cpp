@@ -71,18 +71,28 @@ void PhysicsEngine::UpdateBodies()
 
 void PhysicsEngine::ProcessSplits()
 {
-	//for (auto it = m_Splits.begin(); it != m_Splits.end(); it++)
-	//{
-	//	auto& s = *it;
-	//
-	//	auto newBody = std::unique_ptr<Rigidbody>(new Rigidbody()); // from pool
-	//	newBody->CopyVelocity(*s.ToSplit);
-	//
-	//	s.ToSplit->Split(s.CauseImpulse->WorldCollisionPoint, *newBody);
-	//
-	//	m_BodiesAdded.emplace_back(newBody.get());
-	//	m_DynamicBodies.emplace_back(std::move(newBody));
-	//}
+	if (m_DynamicBodies.size() == 1)
+	{
+		for (auto it = m_Splits.begin(); it != m_Splits.end(); it++)
+		{
+			auto& s = *it;
+
+			auto newBody = std::unique_ptr<Rigidbody>(new Rigidbody()); // from pool
+
+			auto& toSplit = *s.ToSplit;
+
+			newBody->CopyVelocity(toSplit);
+			newBody->CopyMotionProperties(toSplit);
+
+			toSplit.Split(s.CauseImpulse->WorldCollisionPoint, *newBody);
+
+			newBody->GetTransform().SetPosition(toSplit.GetTransform().GetPosition() + 5.0f * Vector3::Up());
+
+			m_BodiesAdded.emplace_back(newBody.get());
+			m_DynamicBodies.emplace_back(std::move(newBody));
+		}
+	}
+
 	m_Splits.clear();
 }
 

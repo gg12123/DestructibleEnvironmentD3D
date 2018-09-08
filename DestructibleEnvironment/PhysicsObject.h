@@ -17,6 +17,8 @@ public:
 
 	virtual void AddToRequiredToSeperate(const Vector3& toSep)
 	{
+		auto i = 0;
+		i++;
 	}
 
 	float GetMass() const

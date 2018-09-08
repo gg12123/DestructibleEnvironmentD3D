@@ -20,6 +20,7 @@ public:
 	void Init(const std::shared_ptr<DX::DeviceResources>& deviceResources)
 	{
 		m_Renderer.SetResources(deviceResources);
+		m_Physics.SetWorld(*this);
 		m_Physics.StartRunningPhysicsThread();
 	}
 

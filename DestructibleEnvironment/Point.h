@@ -85,7 +85,6 @@ public:
 		{
 			return m_LinkedPoint2;
 		}
-
 		else if (m_LinkedPoint2 == &prev)
 		{
 			return m_LinkedPoint1;
@@ -102,7 +101,6 @@ public:
 			m_LinkedPoint1 = &linkedPoint;
 			return;
 		}
-
 		else if (m_LinkedPoint2 == nullptr)
 		{
 			m_LinkedPoint2 = &linkedPoint;

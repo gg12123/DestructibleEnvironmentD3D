@@ -33,12 +33,14 @@ DestructibleEnvironmentMain::~DestructibleEnvironmentMain()
 void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 {
 	auto body = new DynamicBodyProxy();
-	auto bodyPos = Vector3(0.0f, 5.0f, 0.0f);
+	auto bodyPos = Vector3(0.0f, 6.0f, 0.0f);
 	body->GetTransform().SetPosition(bodyPos);
-	body->GetTransform().SetRotation(Quaternion::LookRotation(Vector3::Normalize(Vector3(1.0f, 0.0f, 1.0f))));
-	body->SetInitialHeight(2.0f);
+	auto bodyForward = Vector3(1.0f, 0.0f, 0.0f).Normalized();
+	auto bodyUp = Vector3(0.0f, 1.0f, 1.0f).Normalized();
+	body->GetTransform().SetRotation(Quaternion::LookRotation(bodyForward, bodyUp));
+	body->SetInitialHeight(3.0f);
 	body->SetInitialWidth(1.0f);
-	body->SetMass(1.0f);
+	body->SetMass(0.1f);
 	body->SetDrag(0.7f);
 	body->SetAngularDrag(0.7f);
 	m_World.RegisterEntity(*body);

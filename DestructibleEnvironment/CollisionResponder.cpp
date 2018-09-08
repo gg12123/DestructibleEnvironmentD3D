@@ -65,12 +65,12 @@ void CollisionResponder::CalculateResponse(const CollisionData& collData, Physic
 		body1.AddImpulse(impulse1);
 		body2.AddImpulse(impulse2);
 
-		body1.AddToRequiredToSeperate((v1N / (v1N + v2N)) * pen * collNormalWorld);
+		body1.AddToRequiredToSeperate(-(v1N / (v1N + v2N)) * pen * collNormalWorld);
 		body2.AddToRequiredToSeperate((v2N / (v1N + v2N)) * pen * collNormalWorld);
 	}
 	else
 	{
-		body1.AddToRequiredToSeperate(0.5f * pen * collNormalWorld);
+		body1.AddToRequiredToSeperate(-0.5f * pen * collNormalWorld);
 		body2.AddToRequiredToSeperate(0.5f * pen * collNormalWorld);
 	}
 }

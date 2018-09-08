@@ -36,7 +36,7 @@ bool CollisionDetector::FindEdgeCollision(const std::vector<Vector3>& facePoints
 		auto& P0 = facePoints[i];
 		auto& P1 = facePoints[next];
 
-		auto n = Vector3::Normalize(Vector3::Cross(faceNormal, P1 - P0));
+		auto n = Vector3::Normalize(Vector3::Cross(P1 - P0, faceNormal));
 
 		auto comp = Vector3::Dot(n, intPoint - P0);
 
@@ -66,6 +66,9 @@ void CollisionDetector::FindEdgeCollisions(Shape& shapeFaces, const Vector3& edg
 		auto comp1 = Vector3::Dot(edgeP1 - P0, normal);
 
 		if (comp0 > 0.0f && comp1 > 0.0f)
+			return;
+
+		if (comp0 == 0.0f && comp1 == 0.0f)
 			return;
 
 		if (comp0 * comp1 <= 0.0f)
@@ -107,7 +110,7 @@ bool CollisionDetector::FindBestPotentialCollision(CollisionData& outputData)
 	auto avaragePoint = Vector3::Zero();
 	PotentialCollision *best = nullptr;
 	auto highestComp = -1.0f;
-	auto dir1To2 = Vector3::Normalize(m_Shape2->GetTransform().GetPosition() - m_Shape2->GetTransform().GetPosition());
+	auto dir1To2 = Vector3::Normalize(m_Shape2->GetTransform().GetPosition() - m_Shape1->GetTransform().GetPosition());
 
 	for (auto it = m_PotentialCollisionPool->Begin(); it != m_PotentialCollisionPool->End(); it++)
 	{

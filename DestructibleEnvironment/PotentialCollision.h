@@ -22,7 +22,7 @@ public:
 				mostInside = comp;
 		}
 
-		return mostInside;
+		return fabs(mostInside);
 	}
 
 	Vector3 GetNormalWorldSpace() const

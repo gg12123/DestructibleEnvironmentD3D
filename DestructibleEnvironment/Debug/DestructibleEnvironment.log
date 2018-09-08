@@ -1,16 +1,8 @@
-﻿  compilation object save succeeded; see C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\SamplePixelShader.cso
-  compilation object save succeeded; see C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\SampleVertexShader.cso
-  compilation object save succeeded; see C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\MyPixelShader.cso
-  compilation object save succeeded; see C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\MyVertexShader.cso
-  pch.cpp
-  App.cpp
+﻿  App.cpp
   Camera.cpp
   CollisionDetector.cpp
   CollisionResponder.cpp
-  DeviceResources.cpp
   DestructibleEnvironmentMain.cpp
-  SampleFpsTextRenderer.cpp
-  Sample3DSceneRenderer.cpp
   DynamicBodyProxy.cpp
   DynamicMesh.cpp
   Face.cpp
@@ -21,7 +13,6 @@
   Physics.cpp
   PhysicsEngine.cpp
   Point.cpp
-  Renderer.cpp
   Rigidbody.cpp
   Shape.cpp
   ShapeEdge.cpp

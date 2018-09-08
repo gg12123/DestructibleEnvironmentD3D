@@ -27,7 +27,7 @@ public:
 
 	void Normalize()
 	{
-		auto mag = sqrt(x*x + y * y + z * z + r * r);
+		auto mag = sqrt(x * x + y * y + z * z + r * r);
 
 		x /= mag;
 		y /= mag;
@@ -35,16 +35,7 @@ public:
 		r /= mag;
 	}
 
-	Vector3 Rotate(const Vector3& v) const
-	{
-		Vector3 u(x, y, z);
-
-		auto s = r;
-
-		return (2.0f * Vector3::Dot(u, v) * u
-			+ (s*s - Vector3::Dot(u, u)) * v
-			+ 2.0f * s * Vector3::Cross(u, v));
-	}
+	Vector3 RotateV(const Vector3& v) const;
 
 	Quaternion Conj() const
 	{
@@ -83,9 +74,19 @@ public:
 		q.y = sqrt(MathUtils::Max(0.0f, 1.0f - x.x + y.y - z.z)) / 2.0f;
 		q.z = sqrt(MathUtils::Max(0.0f, 1.0f - x.x - y.y + z.z)) / 2.0f;
 
-		q.x *= MathUtils::Sign(z.y - y.z);
-		q.y *= MathUtils::Sign(x.z - z.x);
-		q.z *= MathUtils::Sign(y.x - x.y);
+		//q.x *= MathUtils::Sign(z.y - y.z);
+		//q.y *= MathUtils::Sign(x.z - z.x);
+		//q.z *= MathUtils::Sign(y.x - x.y);
+
+		q.x *= MathUtils::Sign(y.z - z.y);
+		q.y *= MathUtils::Sign(z.x - x.z);
+		q.z *= MathUtils::Sign(x.y - y.x);
+
+		q.Normalize();
+
+		//auto xOut = q.RotateV(Vector3::Right());
+		//auto yOut = q.RotateV(Vector3::Up());
+		//auto zOut = q.RotateV(Vector3::Foward());
 
 		return q;
 	}

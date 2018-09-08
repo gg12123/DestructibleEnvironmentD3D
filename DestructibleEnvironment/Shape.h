@@ -88,11 +88,6 @@ public:
 		return m_Dirty;
 	}
 
-	void SetDirty()
-	{
-		m_Dirty = true;
-	}
-
 	void ClearDirty()
 	{
 		m_Dirty = false;
@@ -112,6 +107,10 @@ public:
 	Vector3 CentreAndCache();
 
 private:
+	void SetDirty()
+	{
+		m_Dirty = true;
+	}
 
 	Vector3 CalculateSplitPlaneNormal(const Vector3& P0);
 	Vector3 CalculateCentre();

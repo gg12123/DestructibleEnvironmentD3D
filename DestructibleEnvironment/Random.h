@@ -4,15 +4,6 @@
 class Random
 {
 public:
-	static float Range(float min, float max)
-	{
-		assert(false);
-		return min;
-	}
-
-	static int Range(int minInclusive, int maxExclusive)
-	{
-		assert(false);
-		return minInclusive;
-	}
+	static float Range(float min, float max);
+	static int Range(int minInclusive, int maxExclusive);
 };

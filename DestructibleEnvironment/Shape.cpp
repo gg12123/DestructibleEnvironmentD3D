@@ -103,18 +103,20 @@ bool Shape::SplitPoints(const Vector3& P0, const Vector3& n, Shape& shapeAbove, 
 
 Vector3 Shape::CalculateSplitPlaneNormal(const Vector3& P0)
 {
-	auto p = Random::Range(0.0f, 0.5f) * m_CachedPoints[Random::Range(0, m_CachedPoints.size())];
+	auto p = Vector3::Zero(); // Random::Range(0.0f, 0.5f) * m_CachedPoints[Random::Range(0, m_CachedPoints.size())];
 
 	auto toP0 = Vector3::Normalize(P0 - p);
 
-	return Vector3::ProjectOnPlane(Vector3(-toP0.y, -toP0.z, toP0.x), toP0);
+	return Vector3::ProjectOnPlane(Vector3(-toP0.y, -toP0.z, toP0.x), toP0).Normalized();
 }
 
 bool Shape::Split(const Vector3& collPointWs, Shape& shapeAbove)
 {
-	auto P0 = m_Transform.ToLocalPosition(collPointWs);
+	//auto P0 = m_Transform.ToLocalPosition(collPointWs);
+	//auto n = CalculateSplitPlaneNormal(P0);
 
-	auto n = CalculateSplitPlaneNormal(P0);
+	auto P0 = Vector3::Zero();
+	auto n = Vector3::Up();
 
 	auto& shapeBelow = *(new Shape()); // from pool
 
@@ -132,9 +134,12 @@ bool Shape::Split(const Vector3& collPointWs, Shape& shapeAbove)
 		m_Points.swap(shapeBelow.GetPoints());
 		m_Edges.swap(shapeBelow.GetEdges());
 		m_Faces.swap(shapeBelow.GetFaces());
+		m_FinalFaceCreator = shapeBelow.m_FinalFaceCreator;
 
 		m_CachedPoints.clear();
 		m_CachedEdgePoints.clear();
+		m_CachedFaceNormals.clear();
+		m_CachedFaceP0s.clear();
 
 		InitNewShape(shapeAbove, -n);
 		InitNewShape(*this, n);
@@ -155,4 +160,6 @@ void Shape::InitNewShape(Shape& shape, const Vector3& finalFaceNormal)
 
 	shape.GetTransform().SetPosition(m_Transform.ToWorldPosition(c));
 	shape.GetTransform().SetRotation(m_Transform.GetRotation());
+
+	shape.SetDirty();
 }
