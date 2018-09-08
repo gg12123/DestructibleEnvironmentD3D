@@ -85,8 +85,6 @@ bool Shape::SplitPoints(const Vector3& P0, const Vector3& n, Shape& shapeAbove, 
 
 	if (numInside >= 3)
 	{
-		//Debug.Log(numInside.ToString() + " points inside plane");
-
 		for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
 		{
 			if ((*it)->CountNumInside() >= 3)
@@ -103,7 +101,7 @@ bool Shape::SplitPoints(const Vector3& P0, const Vector3& n, Shape& shapeAbove, 
 
 Vector3 Shape::CalculateSplitPlaneNormal(const Vector3& P0)
 {
-	auto p = Vector3::Zero(); // Random::Range(0.0f, 0.5f) * m_CachedPoints[Random::Range(0, m_CachedPoints.size())];
+	auto p = Random::Range(0.0f, 0.5f) * m_CachedPoints[Random::Range(0, m_CachedPoints.size())];
 
 	auto toP0 = Vector3::Normalize(P0 - p);
 
@@ -112,11 +110,8 @@ Vector3 Shape::CalculateSplitPlaneNormal(const Vector3& P0)
 
 bool Shape::Split(const Vector3& collPointWs, Shape& shapeAbove)
 {
-	//auto P0 = m_Transform.ToLocalPosition(collPointWs);
-	//auto n = CalculateSplitPlaneNormal(P0);
-
-	auto P0 = Vector3::Zero();
-	auto n = Vector3::Up();
+	auto P0 = m_Transform.ToLocalPosition(collPointWs);
+	auto n = CalculateSplitPlaneNormal(P0);
 
 	auto& shapeBelow = *(new Shape()); // from pool
 

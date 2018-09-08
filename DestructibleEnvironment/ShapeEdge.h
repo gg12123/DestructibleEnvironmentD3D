@@ -53,7 +53,7 @@ public:
 
 	Point* GetEdgeP2() const
 	{
-		return m_EdgeP1;
+		return m_EdgeP2;
 	}
 
 private:

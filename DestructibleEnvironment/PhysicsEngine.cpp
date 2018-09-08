@@ -84,12 +84,15 @@ void PhysicsEngine::ProcessSplits()
 			newBody->CopyVelocity(toSplit);
 			newBody->CopyMotionProperties(toSplit);
 
-			toSplit.Split(s.CauseImpulse->WorldCollisionPoint, *newBody);
-
-			newBody->GetTransform().SetPosition(toSplit.GetTransform().GetPosition() + 5.0f * Vector3::Up());
-
-			m_BodiesAdded.emplace_back(newBody.get());
-			m_DynamicBodies.emplace_back(std::move(newBody));
+			if (toSplit.Split(s.CauseImpulse->WorldCollisionPoint, *newBody))
+			{
+				m_BodiesAdded.emplace_back(newBody.get());
+				m_DynamicBodies.emplace_back(std::move(newBody));
+			}
+			else
+			{
+				// return new body to pool
+			}
 		}
 	}
 
