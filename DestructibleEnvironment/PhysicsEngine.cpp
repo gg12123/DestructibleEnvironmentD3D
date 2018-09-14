@@ -82,7 +82,7 @@ void PhysicsEngine::ProcessSplits()
 			auto& toSplit = *s.ToSplit;
 
 			newBody->CopyVelocity(toSplit);
-			newBody->CopyMotionProperties(toSplit);
+			newBody->CalculateMotionProperties();
 
 			if (toSplit.Split(s.CauseImpulse->WorldCollisionPoint, *newBody))
 			{

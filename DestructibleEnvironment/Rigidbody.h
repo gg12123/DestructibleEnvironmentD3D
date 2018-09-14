@@ -58,6 +58,8 @@ public:
 		SetMass(toCopy.GetMass());
 	}
 
+	void CalculateMotionProperties();
+
 	void AddForce(const Vector3& forceWorld)
 	{
 		m_AddedForceWorld += forceWorld;

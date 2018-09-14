@@ -48,6 +48,16 @@ public:
 		return m_Point;
 	}
 
+	Vector3 GetPointWeighted() const
+	{
+		return m_OwnedEdgeLength * m_Point;
+	}
+
+	void IncrementOwnedEdgeLength(float amount)
+	{
+		m_OwnedEdgeLength += amount;
+	}
+
 	void SetPoint(const Vector3& p)
 	{
 		m_Point = p;
@@ -63,10 +73,11 @@ public:
 		m_Id = id;
 	}
 
-	void CentreAndCache(const Vector3& centre, std::vector<Vector3>& points)
+	Vector3 CentreAndCache(const Vector3& centre, std::vector<Vector3>& points)
 	{
 		m_Point -= centre;
 		points.emplace_back(m_Point);
+		return m_Point;
 	}
 
 	Point* GetLinkedPoint1() const
@@ -146,6 +157,7 @@ private:
 	Vector3 m_Point;
 
 	int m_Id;
+	float m_OwnedEdgeLength;
 
 	PointPlaneRelationship m_PlaneRelationship;
 };

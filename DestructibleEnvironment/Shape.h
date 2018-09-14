@@ -4,6 +4,7 @@
 #include "FinalFaceCreator.h"
 #include "Transform.h"
 #include "NewPointsGetter.h"
+#include "Bounds.h"
 #include <vector>
 
 class Point;
@@ -18,16 +19,6 @@ public:
 	}
 
 	virtual ~Shape();
-
-	auto& GetPoints()
-	{
-		return m_Points;
-	}
-
-	auto& GetEdges()
-	{
-		return m_Edges;
-	}
 
 	auto& GetFaces()
 	{
@@ -54,6 +45,11 @@ public:
 		return m_CachedFaceP0s;
 	}
 
+	auto& GetLocalBounds()
+	{
+		return m_LocalBounds;
+	}
+
 	void Clear()
 	{
 		m_Faces.clear();
@@ -66,12 +62,13 @@ public:
 		m_CachedFaceP0s.clear();
 
 		m_CurrId = 0;
+		m_TotalEdgeLength = 0.0f;
 	}
 
 	void AddNewEdgeFromFaceSplit(ShapeEdge& e)
 	{
-		m_Edges.push_back(&e);
 		m_FinalFaceCreator.AddEdge(e);
+		AddEdge(e);
 	}
 
 	Transform& GetTransform()
@@ -80,6 +77,7 @@ public:
 	}
 
 	void AddPoint(Point& p);
+	void AddEdge(ShapeEdge& e);
 
 	bool Split(const Vector3& collPointWs, Shape& shapeAbove);
 
@@ -117,6 +115,7 @@ private:
 	void InitFaces(const Vector3& finalFaceNormal);
 	void InitNewShape(Shape& shape, const Vector3& finalFaceNormal);
 	bool SplitPoints(const Vector3& P0, const Vector3& n, Shape& shapeAbove, Shape& shapeBelow);
+	void TransferSplitResultsToThis(Shape& splitResult);
 
 	int m_RequiredNumVerts;
 	int m_RequiredNumIndicies;
@@ -134,7 +133,9 @@ private:
 
 	FinalFaceCreator m_FinalFaceCreator;
 	Transform m_Transform;
+	Bounds m_LocalBounds;
 
 	int m_CurrId = 0;
 	bool m_Dirty = true;
+	float m_TotalEdgeLength = 0.0f;
 };

@@ -19,22 +19,30 @@ void Shape::AddPoint(Point& p)
 	m_Points.emplace_back(&p);
 }
 
+void Shape::AddEdge(ShapeEdge& e)
+{
+	m_Edges.emplace_back(&e);
+	m_TotalEdgeLength += e.RegisterLengthWithPoints();
+}
+
 Vector3 Shape::CalculateCentre()
 {
 	auto c = Vector3::Zero();
 
 	for (auto it = m_Points.begin(); it != m_Points.end(); it++)
-		c += (*it)->GetPoint();
+		c += (*it)->GetPointWeighted();
 
-	return c / static_cast<float>(m_Points.size());
+	return c / m_TotalEdgeLength;
 }
 
 Vector3 Shape::CentreAndCache()
 {
 	auto c = CalculateCentre();
 
+	m_LocalBounds.Reset();
+
 	for (auto it = m_Points.begin(); it != m_Points.end(); it++)
-		(*it)->CentreAndCache(c, m_CachedPoints);
+		m_LocalBounds.Update((*it)->CentreAndCache(c, m_CachedPoints));
 
 	for (auto it = m_Edges.begin(); it != m_Edges.end(); it++)
 		(*it)->Cache(m_CachedEdgePoints);
@@ -74,6 +82,20 @@ void Shape::InitFaces(const Vector3& finalFaceNormal)
 		m_RequiredNumVerts += numVerts;
 		m_RequiredNumIndicies += 3 * (numVerts - 2);
 	}
+}
+
+void Shape::TransferSplitResultsToThis(Shape& splitResult)
+{
+	m_Points.swap(splitResult.m_Points);
+	m_Edges.swap(splitResult.m_Edges);
+	m_Faces.swap(splitResult.GetFaces());
+	m_FinalFaceCreator = splitResult.m_FinalFaceCreator;
+	m_TotalEdgeLength = splitResult.m_TotalEdgeLength;
+
+	m_CachedPoints.clear();
+	m_CachedEdgePoints.clear();
+	m_CachedFaceNormals.clear();
+	m_CachedFaceP0s.clear();
 }
 
 bool Shape::SplitPoints(const Vector3& P0, const Vector3& n, Shape& shapeAbove, Shape& shapeBelow)
@@ -126,15 +148,7 @@ bool Shape::Split(const Vector3& collPointWs, Shape& shapeAbove)
 		for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
 			(*it)->Split(m_NewPointsGetter, shapeAbove, shapeBelow);
 
-		m_Points.swap(shapeBelow.GetPoints());
-		m_Edges.swap(shapeBelow.GetEdges());
-		m_Faces.swap(shapeBelow.GetFaces());
-		m_FinalFaceCreator = shapeBelow.m_FinalFaceCreator;
-
-		m_CachedPoints.clear();
-		m_CachedEdgePoints.clear();
-		m_CachedFaceNormals.clear();
-		m_CachedFaceP0s.clear();
+		TransferSplitResultsToThis(shapeBelow);
 
 		InitNewShape(shapeAbove, -n);
 		InitNewShape(*this, n);

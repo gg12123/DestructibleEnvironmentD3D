@@ -13,6 +13,17 @@ ShapeEdge::~ShapeEdge()
 {
 }
 
+float ShapeEdge::RegisterLengthWithPoints() const
+{
+	auto length = (m_EdgeP1->GetPoint() - m_EdgeP2->GetPoint()).Magnitude();
+	auto halfLength = 0.5f * length;
+
+	m_EdgeP1->IncrementOwnedEdgeLength(halfLength);
+	m_EdgeP2->IncrementOwnedEdgeLength(halfLength);
+
+	return length;
+}
+
 void ShapeEdge::Cache(std::vector<int>& edgePoints)
 {
 	edgePoints.push_back(m_EdgeP1->GetId());
@@ -26,12 +37,12 @@ void ShapeEdge::SplitAtEnd(NewPointsGetter& newPoints, Shape& shapeAbove, Shape&
 		if (m_EdgeP2->GetPlaneRelationship() == PointPlaneRelationship::Above)
 		{
 			m_EdgeP1 = &newPoints.GetPointAbove(*m_EdgeP1);
-			shapeAbove.GetEdges().push_back(this);
+			shapeAbove.AddEdge(*this);
 		}
 		else
 		{
 			m_EdgeP1 = &newPoints.GetPointBelow(*m_EdgeP1);
-			shapeBelow.GetEdges().push_back(this);
+			shapeBelow.AddEdge(*this);
 		}
 	}
 	else if (m_EdgeP2->GetPlaneRelationship() == PointPlaneRelationship::Inside)
@@ -39,12 +50,12 @@ void ShapeEdge::SplitAtEnd(NewPointsGetter& newPoints, Shape& shapeAbove, Shape&
 		if (m_EdgeP1->GetPlaneRelationship() == PointPlaneRelationship::Above)
 		{
 			m_EdgeP2 = &newPoints.GetPointAbove(*m_EdgeP2);
-			shapeAbove.GetEdges().push_back(this);
+			shapeAbove.AddEdge(*this);
 		}
 		else
 		{
 			m_EdgeP2 = &newPoints.GetPointBelow(*m_EdgeP2);
-			shapeBelow.GetEdges().push_back(this);
+			shapeBelow.AddEdge(*this);
 		}
 	}
 	else
@@ -69,8 +80,8 @@ void ShapeEdge::SplitInHalf(NewPointsGetter& newPoints, const Vector3& x, Shape&
 		auto newForBelow = new ShapeEdge(*m_EdgeP2, *b);
 		m_EdgeP2 = a;
 
-		shapeAbove.GetEdges().push_back(this);
-		shapeBelow.GetEdges().push_back(newForBelow);
+		shapeAbove.AddEdge(*this);
+		shapeBelow.AddEdge(*newForBelow);
 	}
 	else
 	{
@@ -78,8 +89,8 @@ void ShapeEdge::SplitInHalf(NewPointsGetter& newPoints, const Vector3& x, Shape&
 
 		m_EdgeP2 = b;
 
-		shapeAbove.GetEdges().push_back(newForAbove);
-		shapeBelow.GetEdges().push_back(this);
+		shapeAbove.AddEdge(*newForAbove);
+		shapeBelow.AddEdge(*this);
 	}
 }
 
@@ -93,11 +104,11 @@ void ShapeEdge::Split(const Vector3& P0, const Vector3& n, NewPointsGetter& newP
 	}
 	else if (Point::BothAbove(*m_EdgeP1, *m_EdgeP2))
 	{
-		shapeAbove.GetEdges().push_back(this);
+		shapeAbove.AddEdge(*this);
 	}
 	else if (Point::BothBelow(*m_EdgeP1, *m_EdgeP2))
 	{
-		shapeBelow.GetEdges().push_back(this);
+		shapeBelow.AddEdge(*this);
 	}
 	else if (Point::BothInside(*m_EdgeP1, *m_EdgeP2))
 	{

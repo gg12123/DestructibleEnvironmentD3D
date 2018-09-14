@@ -294,6 +294,9 @@
     <ClInclude Include="PotentialCollision.h">
       <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
+    <ClInclude Include="Bounds.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">

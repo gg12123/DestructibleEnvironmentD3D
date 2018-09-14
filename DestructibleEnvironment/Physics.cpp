@@ -32,10 +32,7 @@ Rigidbody & Physics::AddDynamicRigidbody(DynamicBodyProxy& proxy)
 
 	auto& b = *body;
 
-	// maybe a flag to indicate weather to use volume to calculate mass?
-	b.SetMass(proxy.GetMass());
-	b.SetDrag(proxy.GetDrag());
-	b.SetAngularDrag(proxy.GetAngularDrag());
+	b.CalculateMotionProperties();
 
 	m_GameToPhysicsActions.emplace_back(std::unique_ptr<IGameTheadToPhysicsThreadAction>(new AddDynamicRigidbodyAction(std::move(body))));
 
@@ -49,6 +46,11 @@ Rigidbody & Physics::AddGameControlledRigidbody(GameControlledDynamicBody& proxy
 {
 	auto& body = AddDynamicRigidbody(proxy);
 	m_GameControlledProxies.emplace_back(&proxy);
+
+	body.SetMass(proxy.GetMass());
+	body.SetDrag(proxy.GetDrag());
+	body.SetAngularDrag(proxy.GetAngularDrag());
+
 	return body;
 }
 

@@ -8,6 +8,7 @@ void Point::Split(const Vector3& P0, const Vector3& n, NewPointsGetter& newPoint
 {
 	m_LinkedPoint1 = nullptr;
 	m_LinkedPoint2 = nullptr;
+	m_OwnedEdgeLength = 0.0f;
 
 	auto comp = Vector3::Dot(m_Point - P0, n);
 

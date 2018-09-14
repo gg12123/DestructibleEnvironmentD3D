@@ -40,20 +40,20 @@ public:
 
 		// edges
 
-		shape.GetEdges().push_back(new ShapeEdge(*P1, *P0));
-		shape.GetEdges().push_back(new ShapeEdge(*P0, *P3));
-		shape.GetEdges().push_back(new ShapeEdge(*P3, *P2));
-		shape.GetEdges().push_back(new ShapeEdge(*P2, *P1));
+		shape.AddEdge(*(new ShapeEdge(*P1, *P0)));
+		shape.AddEdge(*(new ShapeEdge(*P0, *P3)));
+		shape.AddEdge(*(new ShapeEdge(*P3, *P2)));
+		shape.AddEdge(*(new ShapeEdge(*P2, *P1)));
 
-		shape.GetEdges().push_back(new ShapeEdge(*P0, *P4));
-		shape.GetEdges().push_back(new ShapeEdge(*P3, *P7));
-		shape.GetEdges().push_back(new ShapeEdge(*P2, *P6));
-		shape.GetEdges().push_back(new ShapeEdge(*P1, *P5));
+		shape.AddEdge(*(new ShapeEdge(*P0, *P4)));
+		shape.AddEdge(*(new ShapeEdge(*P3, *P7)));
+		shape.AddEdge(*(new ShapeEdge(*P2, *P6)));
+		shape.AddEdge(*(new ShapeEdge(*P1, *P5)));
 
-		shape.GetEdges().push_back(new ShapeEdge(*P4, *P7));
-		shape.GetEdges().push_back(new ShapeEdge(*P7, *P6));
-		shape.GetEdges().push_back(new ShapeEdge(*P6, *P5));
-		shape.GetEdges().push_back(new ShapeEdge(*P5, *P4));
+		shape.AddEdge(*(new ShapeEdge(*P4, *P7)));
+		shape.AddEdge(*(new ShapeEdge(*P7, *P6)));
+		shape.AddEdge(*(new ShapeEdge(*P6, *P5)));
+		shape.AddEdge(*(new ShapeEdge(*P5, *P4)));
 
 		// faces
 

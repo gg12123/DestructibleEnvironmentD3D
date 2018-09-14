@@ -56,6 +56,8 @@ public:
 		return m_EdgeP2;
 	}
 
+	float RegisterLengthWithPoints() const;
+
 private:
 	void SplitInHalf(NewPointsGetter& newPoints, const Vector3& x, Shape& shapeAbove, Shape& shapeBelow);
 	void SplitAtEnd(NewPointsGetter& newPoints, Shape& shapeAbove, Shape& shapeBelow);

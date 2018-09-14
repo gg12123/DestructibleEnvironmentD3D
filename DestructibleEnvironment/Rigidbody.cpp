@@ -2,6 +2,19 @@
 #include "Rigidbody.h"
 #include "PhysicsTime.h"
 
+void Rigidbody::CalculateMotionProperties()
+{
+	auto mass = GetLocalBounds().GetVolume();
+
+	SetMass(mass);
+
+	// inertia
+
+	// TODO - not sure how to calculate these...
+	m_Drag = 0.7f;
+	m_AngularDrag = 0.7f;
+}
+
 void Rigidbody::ApplyImpulses(std::vector<SplitInfo>& splits)
 {
 	Impulse* biggest = nullptr;
