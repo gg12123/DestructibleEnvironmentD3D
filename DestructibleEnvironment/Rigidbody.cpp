@@ -2,13 +2,48 @@
 #include "Rigidbody.h"
 #include "PhysicsTime.h"
 
+void Rigidbody::CalculateInertia()
+{
+	auto& points = GetPoints();
+
+	auto m = GetMass() / GetTotalEdgeLength();
+
+	auto Ixx = 0.0f;
+	auto Iyy = 0.0f;
+	auto Izz = 0.0f;
+
+	auto Ixy = 0.0f;
+	auto Ixz = 0.0f;
+	auto Iyz = 0.0f;
+
+	for (auto it = points.begin(); it != points.end(); it++)
+	{
+		auto P = (*it)->GetPointWeighted();
+
+		Ixx += (P.y * P.y + P.z * P.z) * m;
+		Iyy += (P.x * P.x + P.z * P.z) * m;
+		Izz += (P.x * P.x + P.y * P.y) * m;
+
+		Ixy += (P.x * P.y) * m;
+		Ixz += (P.x * P.z) * m;
+		Iyz += (P.y * P.z) * m;
+	}
+
+	Matrix3 inertia;
+
+	auto col0 = inertia.M[0];
+
+	auto col1 = inertia.M[1];
+
+	auto col2 = inertia.M[2];
+
+	SetInertia(inertia);
+}
+
 void Rigidbody::CalculateMotionProperties()
 {
-	auto mass = GetLocalBounds().GetVolume();
-
-	SetMass(mass);
-
-	// inertia
+	SetMass(GetLocalBounds().GetVolume());
+	CalculateInertia();
 
 	// TODO - not sure how to calculate these...
 	m_Drag = 0.7f;

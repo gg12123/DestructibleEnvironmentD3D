@@ -87,6 +87,7 @@ private:
 	void Integrate();
 	void ApplyNormalForces();
 	void ApplyImpulse(const Impulse& impulse);
+	void CalculateInertia();
 
 	std::vector<Impulse*> m_Impulses;
 

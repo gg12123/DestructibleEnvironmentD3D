@@ -46,6 +46,13 @@ public:
 		m_Mass = mass;
 	}
 
+protected:
+	void SetInertia(const Matrix3& inertia)
+	{
+		m_Inertia = inertia;
+		m_InertiaInverse = Matrix3::Inverse(inertia);
+	}
+
 private:
 	float m_Mass;
 	Matrix3 m_Inertia;

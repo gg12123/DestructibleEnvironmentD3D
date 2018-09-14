@@ -101,8 +101,19 @@ public:
 		return m_RequiredNumIndicies;
 	}
 
+	float GetTotalEdgeLength() const
+	{
+		return m_TotalEdgeLength;
+	}
+
 	void InitRequiredVertAndIndexCounts();
 	Vector3 CentreAndCache();
+
+protected:
+	auto& GetPoints()
+	{
+		return m_Points;
+	}
 
 private:
 	void SetDirty()
