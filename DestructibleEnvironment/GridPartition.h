@@ -33,14 +33,14 @@ public:
 
 	void GetRegionCovered(const Bounds& bounds, GridRegion& region)
 	{
-		region.XStart = (bounds.GetXMin() - m_Origin.x) / m_XSqaureSize;
-		region.XEnd = ((bounds.GetXMax() - m_Origin.x) / m_XSqaureSize) + 1;
+		region.XStart = static_cast<uint32>((bounds.GetXMin() - m_Origin.x) / m_XSqaureSize);
+		region.XEnd = static_cast<uint32>((bounds.GetXMax() - m_Origin.x) / m_XSqaureSize) + 1U;
 
-		region.YStart = (bounds.GetYMin() - m_Origin.y) / m_YSqaureSize;
-		region.YEnd = ((bounds.GetYMax() - m_Origin.y) / m_YSqaureSize) + 1;
+		region.YStart = static_cast<uint32>((bounds.GetYMin() - m_Origin.y) / m_YSqaureSize);
+		region.YEnd = static_cast<uint32>((bounds.GetYMax() - m_Origin.y) / m_YSqaureSize) + 1U;
 
-		region.ZStart = (bounds.GetZMin() - m_Origin.z) / m_ZSqaureSize;
-		region.ZEnd = ((bounds.GetZMax() - m_Origin.z) / m_ZSqaureSize) + 1;
+		region.ZStart = static_cast<uint32>((bounds.GetZMin() - m_Origin.z) / m_ZSqaureSize);
+		region.ZEnd = static_cast<uint32>((bounds.GetZMax() - m_Origin.z) / m_ZSqaureSize) + 1U;
 	}
 
 private:

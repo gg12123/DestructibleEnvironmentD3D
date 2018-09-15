@@ -4,8 +4,9 @@
 #include "PhysicsObject.h"
 #include "CollisionData.h"
 #include "SplitInfo.h"
+#include "LastCheckedAgainst.h"
 
-class Rigidbody : public PhysicsObject
+class Rigidbody : public PhysicsObject, public LastCheckedAgainst<Rigidbody*>
 {
 public:
 	void AddImpulse(Impulse& impulse) override

@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "DynamicGridPartition.h"
 #include "Rigidbody.h"
 #include "MathUtils.h"
@@ -65,8 +66,7 @@ void DynamicGridPartition::HandleCollisions(const std::vector<Rigidbody*>& bodie
 	CalculateGridDimensions(bodies);
 
 	m_GridSquares->Reset();
-
-	// reset the collision responder
+	m_Responder.Reset();
 
 	for (auto it = bodies.begin(); it != bodies.end(); it++)
 		HandleBody(**it);
@@ -74,6 +74,8 @@ void DynamicGridPartition::HandleCollisions(const std::vector<Rigidbody*>& bodie
 
 void DynamicGridPartition::HandleBody(Rigidbody& body)
 {
+	body.SetLastCheckedAgainst(nullptr);
+
 	m_Grid.GetRegionCovered(body.GetWorldBounds(), m_Region);
 
 	for (auto i = m_Region.XStart; i < m_Region.XEnd; i++)
@@ -84,7 +86,7 @@ void DynamicGridPartition::HandleBody(Rigidbody& body)
 			{
 				auto& square = m_Grid.At(i, j, k);
 
-				if (!square || square->WasPlacedOnGridThisTick(m_GridSquares->NumRecycled()))
+				if (!square->WasPlacedOnGridThisTick(m_GridSquares->NumRecycled()))
 				{
 					square = m_GridSquares->Recycle().get();
 					square->Reset();

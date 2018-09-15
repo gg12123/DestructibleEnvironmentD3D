@@ -8,6 +8,8 @@ class PoolOfRecyclables
 public:
 	PoolOfRecyclables(uint32 initialSize, std::function<T()> creator) : m_Creator(std::move(creator))
 	{
+		m_Contents.reserve(initialSize);
+
 		for (auto i = 0U; i < initialSize; i++)
 			m_Contents.emplace_back(m_Creator());
 	}

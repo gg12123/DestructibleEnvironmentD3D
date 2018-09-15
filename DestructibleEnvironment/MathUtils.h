@@ -7,6 +7,7 @@ public:
 	static constexpr float Pi = 3.14159265358979323846f;
 	static constexpr float Infinity = FLT_MAX;
 	static constexpr float NegativeInfinity = FLT_MIN;
+	static constexpr int32 IntMax = INT32_MAX;
 
 	static inline float ToRadians(float degrees)
 	{

@@ -226,6 +226,7 @@
     <ClInclude Include="GridPartition.h" />
     <ClInclude Include="IMeshRenderer.h" />
     <ClInclude Include="InitialShapeCreator.h" />
+    <ClInclude Include="LastCheckedAgainst.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="MathUtils.h" />
     <ClInclude Include="Matrix.h" />

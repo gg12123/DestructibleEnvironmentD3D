@@ -85,17 +85,17 @@ public:
 
 	float GetXRange() const
 	{
-
+		return m_XMax - m_XMin;
 	}
 
 	float GetYRange() const
 	{
-
+		return m_YMax - m_YMin;
 	}
 
 	float GetZRange() const
 	{
-
+		return m_ZMax - m_ZMin;
 	}
 
 private:

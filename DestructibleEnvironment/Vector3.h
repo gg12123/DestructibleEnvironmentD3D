@@ -171,3 +171,14 @@ inline Vector3 Vector3::Foward()
 {
 	return Vector3(0.0f, 0.0f, 1.0f);
 }
+
+inline void Vector3::LineDefinedByTwoPlanes(const Vector3& planeP0, const Vector3& planeN0, const Vector3& planeP1, const Vector3& planeN1, Vector3& lineP0, Vector3& lineDir)
+{
+	assert(false);
+}
+
+inline Vector3 Vector3::PointClosestToOtherLine(const Vector3& lineP0, const Vector3& lineDir, const Vector3& otherLineP0, const Vector3& otherLineDir)
+{
+	assert(false);
+	return Vector3::Zero();
+}
