@@ -33,6 +33,11 @@ public:
 		return (a > b) ? a : b;
 	}
 
+	static inline float Min(float a, float b)
+	{
+		return (a < b) ? a : b;
+	}
+
 	static inline float Sign(float x)
 	{
 		return (x >= 0.0f) ? 1.0f : -1.0f;

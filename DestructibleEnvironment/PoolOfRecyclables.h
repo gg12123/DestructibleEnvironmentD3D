@@ -6,9 +6,9 @@ template<class T>
 class PoolOfRecyclables
 {
 public:
-	PoolOfRecyclables(int initialSize, std::function<T()> creator) : m_Creator(std::move(creator))
+	PoolOfRecyclables(uint32 initialSize, std::function<T()> creator) : m_Creator(std::move(creator))
 	{
-		for (auto i = 0; i < initialSize; i++)
+		for (auto i = 0U; i < initialSize; i++)
 			m_Contents.emplace_back(m_Creator());
 	}
 
@@ -53,7 +53,7 @@ public:
 		return m_CurrEnd;
 	}
 
-	auto& At(uint16 index)
+	auto& At(uint32 index)
 	{
 		assert(index < m_Curr);
 		return m_Contents[index];
@@ -62,6 +62,6 @@ public:
 private:
 	std::function<T()> m_Creator;
 	std::vector<T> m_Contents;
-	uint16 m_Curr;
+	uint32 m_Curr;
 	typename std::vector<T>::iterator m_CurrEnd;
 };

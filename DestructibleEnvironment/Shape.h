@@ -50,6 +50,11 @@ public:
 		return m_LocalBounds;
 	}
 
+	auto& GetWorldBounds()
+	{
+		return m_WorldBounds;
+	}
+
 	void Clear()
 	{
 		m_Faces.clear();
@@ -109,6 +114,11 @@ public:
 	void InitRequiredVertAndIndexCounts();
 	Vector3 CentreAndCache();
 
+	void UpdateWorldBounds()
+	{
+
+	}
+
 protected:
 	auto& GetPoints()
 	{
@@ -145,6 +155,7 @@ private:
 	FinalFaceCreator m_FinalFaceCreator;
 	Transform m_Transform;
 	Bounds m_LocalBounds;
+	Bounds m_WorldBounds;
 
 	int m_CurrId = 0;
 	bool m_Dirty = true;

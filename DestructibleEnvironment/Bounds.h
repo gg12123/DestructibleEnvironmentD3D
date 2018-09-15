@@ -53,6 +53,51 @@ public:
 
 	}
 
+	float GetXMin() const
+	{
+		return m_XMin;
+	}
+
+	float GetXMax() const
+	{
+		return m_XMax;
+	}
+
+	float GetYMin() const
+	{
+		return m_YMin;
+	}
+
+	float GetYMax() const
+	{
+		return m_YMax;
+	}
+
+	float GetZMin() const
+	{
+		return m_ZMin;
+	}
+
+	float GetZMax() const
+	{
+		return m_ZMax;
+	}
+
+	float GetXRange() const
+	{
+
+	}
+
+	float GetYRange() const
+	{
+
+	}
+
+	float GetZRange() const
+	{
+
+	}
+
 private:
 	float m_XMin;
 	float m_XMax;

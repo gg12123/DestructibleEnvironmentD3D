@@ -214,6 +214,8 @@
     <ClInclude Include="Content\SampleFpsTextRenderer.h" />
     <ClInclude Include="Content\ShaderStructures.h" />
     <ClInclude Include="DynamicBodyProxy.h" />
+    <ClInclude Include="DynamicGridPartition.h" />
+    <ClInclude Include="DynamicGridSquare.h" />
     <ClInclude Include="DynamicMesh.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Face.h" />
@@ -221,6 +223,7 @@
     <ClInclude Include="FixedTimeStepTime.h" />
     <ClInclude Include="GameControlledDynamicBody.h" />
     <ClInclude Include="GameThreadToPhysicsThreadAction.h" />
+    <ClInclude Include="GridPartition.h" />
     <ClInclude Include="IMeshRenderer.h" />
     <ClInclude Include="InitialShapeCreator.h" />
     <ClInclude Include="Light.h" />
@@ -263,6 +266,8 @@
     <ClCompile Include="Content\SampleFpsTextRenderer.cpp" />
     <ClCompile Include="Content\Sample3DSceneRenderer.cpp" />
     <ClCompile Include="DynamicBodyProxy.cpp" />
+    <ClCompile Include="DynamicGridPartition.cpp" />
+    <ClCompile Include="DynamicGridSquare.cpp" />
     <ClCompile Include="DynamicMesh.cpp" />
     <ClCompile Include="Face.cpp" />
     <ClCompile Include="GameControlledDynamicBody.cpp" />

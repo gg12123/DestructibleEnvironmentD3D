@@ -3,24 +3,26 @@
 #include <stdlib.h>
 #include <time.h>
 
-class SeedRand
+static void Seed()
 {
-public:
-	SeedRand()
+	static bool seeded = false;
+
+	if (!seeded)
 	{
 		srand(time(NULL));
+		seeded = true;
 	}
-};
-
-static SeedRand s = SeedRand();
+}
 
 float Random::Range(float min, float max)
 {
+	Seed();
 	auto p = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 	return min + p * (max - min);
 }
 
 int Random::Range(int minInclusive, int maxExclusive)
 {
+	Seed();
 	return rand() % (maxExclusive - minInclusive) + minInclusive;
 }
