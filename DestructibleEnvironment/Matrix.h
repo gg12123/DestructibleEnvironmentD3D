@@ -118,7 +118,46 @@ public:
 
 	static inline Matrix<3> Inverse(const Matrix<3>& mat)
 	{
+		auto col0 = mat.M[0];
+		auto e11 = col0[0];
+		auto e21 = col0[1];
+		auto e31 = col0[2];
 
+		auto col1 = mat.M[1];
+		auto e12 = col1[0];
+		auto e22 = col1[1];
+		auto e32 = col1[2];
+
+		auto col2 = mat.M[2];
+		auto e13 = col2[0];
+		auto e23 = col2[1];
+		auto e33 = col2[2];
+
+		auto d = e11 * e22 * e33 -
+			e11 * e32 * e23 +
+			e21 * e32 * e13 -
+			e21 * e12 * e33 +
+			e31 * e12 * e23 -
+			e31 * e22 * e13;
+
+		Matrix3 inv;
+
+		auto invCol0 = inv.M[0];
+		invCol0[0] = (e22 * e33 - e23 * e32) / d;
+		invCol0[1] = -(e21 * e33 - e23 * e31) / d;
+		invCol0[2] = (e21 * e32 - e22 * e31) / d;
+
+		auto invCol1 = inv.M[1];
+		invCol1[0] = -(e12 * e33 - e13 * e32) / d;
+		invCol1[1] = (e11 * e33 - e13 * e31) / d;
+		invCol1[2] = -(e11 * e32 - e12 * e31) / d;
+
+		auto invCol2 = inv.M[2];
+		invCol2[0] = (e12 * e23 - e13 * e22) / d;
+		invCol2[1] = -(e11 * e23 - e13 * e21) / d;
+		invCol2[2] = (e11 * e22 - e12 * e21) / d;
+
+		return inv;
 	}
 
 	static inline Vector3 MatrixVectorMul3(const Matrix<Size>& lhs, const Vector3& rhs)

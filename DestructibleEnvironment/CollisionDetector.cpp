@@ -80,9 +80,24 @@ void CollisionDetector::FindEdgeCollisions(Shape& shapeFaces, const Vector3& edg
 
 	if (count == 2)
 	{
-		// TODO - add a potential collision for the edge collision.
-		// use the most recent two potential collision normals to find the other edge
-		// as the intersection between the two planes.
+		auto end = m_PotentialCollisionPool->NumRecycled();
+
+		auto& col1 = m_PotentialCollisionPool->At(end - 1);
+		auto& col2 = m_PotentialCollisionPool->At(end - 2);
+
+		Vector3 lineP0, lineDir;
+		Vector3::LineDefinedByTwoPlanes(col1.GetPointLocal(), col1.GetNormalLocal(), col2.GetPointLocal(), col2.GetNormalLocal(), lineP0, lineDir);
+
+		auto otherLineDir = (edgeP1 - edgeP0).Normalized();
+		auto cross = Vector3::Cross(otherLineDir, lineDir);
+
+		if (cross.Magnitude() > 0.0001f)
+		{
+			auto normal = cross.InDirectionOf(col1.GetNormalLocal()).Normalized();
+			auto pointOnLine = Vector3::PointClosestToOtherLine(lineP0, lineDir, edgeP0, otherLineDir);
+
+			m_PotentialCollisionPool->Recycle().Init(pointOnLine, normal, *m_CurrentOthersPoints, *m_ActiveTransform);
+		}
 	}
 }
 

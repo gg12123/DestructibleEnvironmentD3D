@@ -32,10 +32,19 @@ void Rigidbody::CalculateInertia()
 	Matrix3 inertia;
 
 	auto col0 = inertia.M[0];
+	col0[0] = Ixx;
+	col0[1] = -Ixy;
+	col0[2] = -Ixz;
 
 	auto col1 = inertia.M[1];
+	col1[0] = -Ixy;
+	col1[1] = Iyy;
+	col1[2] = -Iyz;
 
 	auto col2 = inertia.M[2];
+	col2[0] = -Ixz;
+	col2[1] = -Iyz;
+	col2[2] = Izz;
 
 	SetInertia(inertia);
 }
@@ -71,7 +80,9 @@ void Rigidbody::ApplyImpulses(std::vector<SplitInfo>& splits)
 
 	m_Impulses.clear();
 
-	if (biggest && (biggest->Impact > GetMass()))
+	static constexpr float splitMultiplier = 1.5f;
+
+	if (biggest && (biggest->Impact > splitMultiplier * GetMass()))
 	{
 		splits.emplace_back(SplitInfo(*this, *biggest));
 	}

@@ -35,6 +35,16 @@ public:
 		return m_OwnerTransform->ToWorldPosition(m_PointOnOwner);
 	}
 
+	Vector3 GetPointLocal() const
+	{
+		return m_PointOnOwner;
+	}
+
+	Vector3 GetNormalLocal() const
+	{
+		return m_Normal;
+	}
+
 	void Init(const Vector3& pointLocal, const Vector3& normalLocal,
 			 ArrayWrapper<Vector3, Constants::MaxNumPoints>& otherPoints, Transform& activeTransform)
 	{

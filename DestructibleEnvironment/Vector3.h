@@ -76,6 +76,8 @@ public:
 	static inline Vector3 Cross(const Vector3& v1, const Vector3& v2);
 	static inline Vector3 ProjectOnPlane(const Vector3& planeNormal, const Vector3& vector);
 	static inline Vector3 LinePlaneIntersection(const Vector3& planeP0, const Vector3& planeNormal, const Vector3& lineP0, const Vector3& lineP1);
+	static inline void LineDefinedByTwoPlanes(const Vector3& planeP0, const Vector3& planeN0, const Vector3& planeP1, const Vector3& planeN1, Vector3& lineP0, Vector3& lineDir);
+	static inline Vector3 PointClosestToOtherLine(const Vector3& lineP0, const Vector3& lineDir, const Vector3& otherLineP0, const Vector3& otherLineDir);
 	static inline Vector3 Zero();
 	static inline Vector3 Normalize(const Vector3& v);
 	static inline Vector3 Right();

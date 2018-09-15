@@ -53,6 +53,12 @@ public:
 		return m_CurrEnd;
 	}
 
+	auto& At(uint16 index)
+	{
+		assert(index < m_Curr);
+		return m_Contents[index];
+	}
+
 private:
 	std::function<T()> m_Creator;
 	std::vector<T> m_Contents;
