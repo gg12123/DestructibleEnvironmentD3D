@@ -108,3 +108,17 @@ private:
 	float m_ZMin;
 	float m_ZMax;
 };
+
+struct RadiusBoundsType
+{
+};
+
+struct AABBBoundsType
+{
+};
+
+template<class T>
+struct BoundsType
+{
+	static constexpr T Value = T();
+};

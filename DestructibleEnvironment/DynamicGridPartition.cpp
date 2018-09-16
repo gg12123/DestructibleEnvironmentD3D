@@ -5,60 +5,20 @@
 
 void DynamicGridPartition::CalculateGridDimensions(const std::vector<std::unique_ptr<Rigidbody>>& bodies)
 {
-	auto origin = Vector3(MathUtils::Infinity, MathUtils::Infinity, MathUtils::Infinity);
+	m_DynamicBodiesBounds.Calculate<std::vector<std::unique_ptr<Rigidbody>>, RadiusBoundsType>(bodies);
 
-	auto xSizeAverage = 0.0f;
-	auto ySizeAverage = 0.0f;
-	auto zSizeAverage = 0.0f;
+	auto origin = Vector3(m_DynamicBodiesBounds.GetXMin(), m_DynamicBodiesBounds.GetYMin(), m_DynamicBodiesBounds.GetZMin());
 
-	auto xMax = MathUtils::NegativeInfinity;
-	auto yMax = MathUtils::NegativeInfinity;
-	auto zMax = MathUtils::NegativeInfinity;
-
-	for (auto it = bodies.begin(); it != bodies.end(); it++)
-	{
-		auto& body = **it;
-		auto& bounds = body.GetWorldBounds();
-
-		body.UpdateWorldBounds();
-
-		if (bounds.GetXMin() < origin.x)
-			origin.x = bounds.GetXMin();
-
-		if (bounds.GetYMin() < origin.y)
-			origin.y = bounds.GetYMin();
-
-		if (bounds.GetZMin() < origin.z)
-			origin.z = bounds.GetZMin();
-
-		if (bounds.GetXMax() > xMax)
-			xMax = bounds.GetXMax();
-
-		if (bounds.GetYMax() > yMax)
-			yMax = bounds.GetYMax();
-
-		if (bounds.GetZMax() > zMax)
-			zMax = bounds.GetZMax();
-
-		xSizeAverage += bounds.GetXRange();
-		ySizeAverage += bounds.GetYRange();
-		zSizeAverage += bounds.GetZRange();
-	}
-
-	auto xRange = xMax - origin.x;
-	auto yRange = yMax - origin.y;
-	auto zRange = zMax - origin.z;
-
-	auto xSizeMin = xRange / static_cast<float>(XGridNumSquares - 1);
-	auto ySizeMin = yRange / static_cast<float>(YGridNumSquares - 1);
-	auto zSizeMin = zRange / static_cast<float>(ZGridNumSquares - 1);
+	auto xSizeMin = m_DynamicBodiesBounds.GetCollectionXRange() / static_cast<float>(XGridNumSquares - 1);
+	auto ySizeMin = m_DynamicBodiesBounds.GetCollectionYRange() / static_cast<float>(YGridNumSquares - 1);
+	auto zSizeMin = m_DynamicBodiesBounds.GetCollectionZRange() / static_cast<float>(ZGridNumSquares - 1);
 
 	auto c = static_cast<float>(bodies.size());
-	xSizeAverage = MathUtils::Min(xSizeAverage / c, xSizeMin);
-	ySizeAverage = MathUtils::Min(ySizeAverage / c, ySizeMin);
-	zSizeAverage = MathUtils::Min(zSizeAverage / c, zSizeMin);
+	auto xSize = MathUtils::Min(m_DynamicBodiesBounds.GetXAverageRange(), xSizeMin);
+	auto ySize = MathUtils::Min(m_DynamicBodiesBounds.GetYAverageRange() / c, ySizeMin);
+	auto zSize = MathUtils::Min(m_DynamicBodiesBounds.GetZAverageRange() / c, zSizeMin);
 
-	m_Grid.SetSqaureDimensions(xSizeAverage, ySizeAverage, zSizeAverage, origin);
+	m_Grid.SetSqaureDimensions(xSize, ySize, zSize, origin);
 }
 
 void DynamicGridPartition::HandleCollisions(const std::vector<std::unique_ptr<Rigidbody>>& bodies)

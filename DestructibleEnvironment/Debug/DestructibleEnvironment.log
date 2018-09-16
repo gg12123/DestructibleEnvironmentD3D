@@ -1,16 +1,8 @@
-﻿  compilation object save succeeded; see C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\SamplePixelShader.cso
-  compilation object save succeeded; see C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\SampleVertexShader.cso
-  compilation object save succeeded; see C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\MyPixelShader.cso
-  compilation object save succeeded; see C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\MyVertexShader.cso
-  pch.cpp
-  App.cpp
+﻿  App.cpp
   Camera.cpp
   CollisionDetector.cpp
   CollisionResponder.cpp
-  DeviceResources.cpp
   DestructibleEnvironmentMain.cpp
-  SampleFpsTextRenderer.cpp
-  Sample3DSceneRenderer.cpp
   DynamicBodyProxy.cpp
   DynamicGridPartition.cpp
   DynamicGridSquare.cpp
@@ -19,18 +11,13 @@
   GameControlledDynamicBody.cpp
   GameTheadToPhysicsThreadAction.cpp
   Light.cpp
-  NewPointsGetter.cpp
   Physics.cpp
   PhysicsEngine.cpp
   Point.cpp
-  Quaternion.cpp
-  Random.cpp
-  Renderer.cpp
   Rigidbody.cpp
   Shape.cpp
   ShapeEdge.cpp
   ShapeProxy.cpp
-c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\random.cpp(12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
   StaticShapeProxy.cpp
   World.cpp
   DestructibleEnvironment.vcxproj -> C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\DestructibleEnvironment.exe

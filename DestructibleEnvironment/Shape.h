@@ -114,10 +114,13 @@ public:
 	void InitRequiredVertAndIndexCounts();
 	Vector3 CentreAndCache();
 
-	// Overload this with one that uses aabb. Use tag dispatch for the overload?
-	void UpdateWorldBounds()
+	void UpdateWorldBounds(RadiusBoundsType)
 	{
 		m_WorldBounds.ConstrcutFromCentreAndRadius(m_Transform.GetPosition(), m_BoundingRadius);
+	}
+
+	void UpdateWorldBounds(AABBBoundsType)
+	{
 	}
 
 protected:

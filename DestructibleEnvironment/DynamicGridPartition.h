@@ -7,6 +7,7 @@
 #include "CollisionDetector.h"
 #include "CollisionResponder.h"
 #include "Rigidbody.h"
+#include "BodyCollectionBounds.h"
 
 class DynamicGridPartition
 {
@@ -50,6 +51,8 @@ private:
 
 	CollisionDetector m_Detector;
 	CollisionResponder m_Responder;
+
+	BodyCollectionBounds m_DynamicBodiesBounds;
 
 	uint32 m_NextSquareIndex;
 };
