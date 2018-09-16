@@ -199,6 +199,7 @@
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="ArrayWrapper.h" />
+    <ClInclude Include="BodyCollectionBounds.h" />
     <ClInclude Include="Bounds.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CollisionData.h" />

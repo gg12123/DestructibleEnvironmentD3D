@@ -70,6 +70,11 @@ public:
 		return Vector3::Normalize(*this);
 	}
 
+	void Normalize()
+	{
+		(*this) /= Magnitude();
+	}
+
 	// static
 
 	static inline float Dot(const Vector3& v1, const Vector3& v2);
@@ -174,7 +179,14 @@ inline Vector3 Vector3::Foward()
 
 inline void Vector3::LineDefinedByTwoPlanes(const Vector3& planeP0, const Vector3& planeN0, const Vector3& planeP1, const Vector3& planeN1, Vector3& lineP0, Vector3& lineDir)
 {
-	assert(false);
+	lineDir = Vector3::Cross(planeN0, planeN1);
+
+	auto mag = lineDir.Magnitude();
+	assert(mag > 0.0f);
+	lineDir /= mag;
+
+	auto u = Vector3::Cross(planeN0, lineDir);
+	lineP0 = LinePlaneIntersection(planeP1, planeN1, planeP0, planeP0 + u);
 }
 
 inline Vector3 Vector3::PointClosestToOtherLine(const Vector3& lineP0, const Vector3& lineDir, const Vector3& otherLineP0, const Vector3& otherLineDir)

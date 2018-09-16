@@ -40,9 +40,18 @@ Vector3 Shape::CentreAndCache()
 	auto c = CalculateCentre();
 
 	m_LocalBounds.Reset();
+	m_BoundingRadius = MathUtils::NegativeInfinity;
 
 	for (auto it = m_Points.begin(); it != m_Points.end(); it++)
-		m_LocalBounds.Update((*it)->CentreAndCache(c, m_CachedPoints));
+	{
+		auto Pcentred = (*it)->CentreAndCache(c, m_CachedPoints);
+
+		auto mag = Pcentred.Magnitude();
+		if (mag > m_BoundingRadius)
+			m_BoundingRadius = mag;
+
+		m_LocalBounds.Update(Pcentred);
+	}
 
 	for (auto it = m_Edges.begin(); it != m_Edges.end(); it++)
 		(*it)->Cache(m_CachedEdgePoints);

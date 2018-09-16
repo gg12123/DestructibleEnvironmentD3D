@@ -6,8 +6,7 @@
 #include "DynamicGridSquare.h"
 #include "CollisionDetector.h"
 #include "CollisionResponder.h"
-
-class Rigidbody;
+#include "Rigidbody.h"
 
 class DynamicGridPartition
 {
@@ -37,10 +36,10 @@ public:
 			new PoolOfRecyclables<std::unique_ptr<DynamicGridSquare>>(XGridNumSquares * YGridNumSquares, squareCreator));
 	}
 
-	void HandleCollisions(const std::vector<Rigidbody*>& bodies);
+	void HandleCollisions(const std::vector<std::unique_ptr<Rigidbody>>& bodies);
 
 private:
-	void CalculateGridDimensions(const std::vector<Rigidbody*>& bodies);
+	void CalculateGridDimensions(const std::vector<std::unique_ptr<Rigidbody>>& bodies);
 	void HandleBody(Rigidbody& body);
 
 	GridPartition<DynamicGridSquare*, XGridNumSquares, YGridNumSquares, ZGridNumSquares> m_Grid;

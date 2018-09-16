@@ -3,7 +3,7 @@
 #include "Rigidbody.h"
 #include "MathUtils.h"
 
-void DynamicGridPartition::CalculateGridDimensions(const std::vector<Rigidbody*>& bodies)
+void DynamicGridPartition::CalculateGridDimensions(const std::vector<std::unique_ptr<Rigidbody>>& bodies)
 {
 	auto origin = Vector3(MathUtils::Infinity, MathUtils::Infinity, MathUtils::Infinity);
 
@@ -49,9 +49,9 @@ void DynamicGridPartition::CalculateGridDimensions(const std::vector<Rigidbody*>
 	auto yRange = yMax - origin.y;
 	auto zRange = zMax - origin.z;
 
-	auto xSizeMin = ceilf(xRange / static_cast<float>(XGridNumSquares));
-	auto ySizeMin = ceilf(yRange / static_cast<float>(YGridNumSquares));
-	auto zSizeMin = ceilf(zRange / static_cast<float>(ZGridNumSquares));
+	auto xSizeMin = xRange / static_cast<float>(XGridNumSquares - 1);
+	auto ySizeMin = yRange / static_cast<float>(YGridNumSquares - 1);
+	auto zSizeMin = zRange / static_cast<float>(ZGridNumSquares - 1);
 
 	auto c = static_cast<float>(bodies.size());
 	xSizeAverage = MathUtils::Min(xSizeAverage / c, xSizeMin);
@@ -61,7 +61,7 @@ void DynamicGridPartition::CalculateGridDimensions(const std::vector<Rigidbody*>
 	m_Grid.SetSqaureDimensions(xSizeAverage, ySizeAverage, zSizeAverage, origin);
 }
 
-void DynamicGridPartition::HandleCollisions(const std::vector<Rigidbody*>& bodies)
+void DynamicGridPartition::HandleCollisions(const std::vector<std::unique_ptr<Rigidbody>>& bodies)
 {
 	CalculateGridDimensions(bodies);
 
