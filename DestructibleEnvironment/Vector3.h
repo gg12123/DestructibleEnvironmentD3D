@@ -191,6 +191,13 @@ inline void Vector3::LineDefinedByTwoPlanes(const Vector3& planeP0, const Vector
 
 inline Vector3 Vector3::PointClosestToOtherLine(const Vector3& lineP0, const Vector3& lineDir, const Vector3& otherLineP0, const Vector3& otherLineDir)
 {
-	assert(false);
-	return Vector3::Zero();
+	auto parralelPlanesNormal = Vector3::Cross(lineDir, otherLineDir);
+	auto mag = parralelPlanesNormal.Magnitude();
+
+	assert(mag > 0.0f);
+	parralelPlanesNormal /= mag;
+
+	auto n = Vector3::Cross(otherLineDir, parralelPlanesNormal);
+
+	return LinePlaneIntersection(otherLineP0, n, lineP0, lineP0 + lineDir);
 }

@@ -95,7 +95,7 @@ void Physics::CreateShapeProxyForBodyAddedByPhysics(Shape& shape)
 
 	// this proxy has been created for a shape that was added by the physics thread
 	// so it needs registering with the world
-	m_World->RegisterEntity(*prox);
+	m_World->RegisterEntity(std::unique_ptr<Entity>(prox));
 
 	m_ShapeProxies.push_back(prox);
 }

@@ -34,7 +34,7 @@ public:
 		return m_Physics;
 	}
 
-	void RegisterEntity(Entity& ent);
+	void RegisterEntity(std::unique_ptr<Entity>&& ent);
 	void RegisterEntityForUpdate(Entity& ent);
 
 	void Update();

@@ -7,6 +7,7 @@
 #include "MathUtils.h"
 #include "DynamicBodyProxy.h"
 #include "StaticShapeProxy.h"
+#include "Random.h"
 
 using namespace DestructibleEnvironment;
 using namespace Windows::Foundation;
@@ -30,20 +31,80 @@ DestructibleEnvironmentMain::~DestructibleEnvironmentMain()
 	m_deviceResources->RegisterDeviceNotify(nullptr);
 }
 
-void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
+// ###################### to be deleted #####################################
+static Vector3 bodiesCentre = Vector3(0.0f, 6.0f, 0.0f);
+static float bodiesRadius = 20.0f;
+static uint16 bodiesCount = 5;
+static float sizeMax = 2.0f;
+static float sizeMin = 0.5f;
+
+static Vector3 RandDir()
+{
+	return Vector3(Random::Range(0.1f, 1.0f), Random::Range(0.1f, 1.0f), Random::Range(0.1f, 1.0f)).Normalized();
+}
+
+static Quaternion RandRot()
+{
+	auto r = Quaternion(Random::Range(0.1f, 1.0f), Random::Range(0.1f, 1.0f), Random::Range(0.1f, 1.0f), Random::Range(0.1f, 1.0f));
+	r.Normalize();
+	return r;
+}
+
+static float RandSize()
+{
+	return Random::Range(sizeMin, sizeMax);
+}
+
+static DynamicBodyProxy* CreateBody(const Vector3& pos, const Quaternion& rot, float width, float height)
 {
 	auto body = new DynamicBodyProxy();
-	auto bodyPos = Vector3(0.0f, 6.0f, 0.0f);
-	body->GetTransform().SetPosition(bodyPos);
+	body->GetTransform().SetPosition(pos);
+	body->GetTransform().SetRotation(rot);
+	body->SetInitialHeight(height);
+	body->SetInitialWidth(width);
+	return body;
+}
+
+static void CreateRandomBodies(World& world)
+{
+	std::vector<DynamicBodyProxy*> added;
+
+	for (auto i = 0U; i < bodiesCount; i++)
+	{
+		auto pos = bodiesCentre + Random::Range(0.0f, bodiesRadius) * RandDir();
+		auto validPos = true;
+
+		for (auto it = added.begin(); it != added.end(); it++)
+		{
+			auto& other = **it;
+
+			auto dist = (pos - other.GetTransform().GetPosition()).Magnitude();
+
+			if (dist < sizeMax)
+			{
+				validPos = false;
+				break;
+			}
+		}
+
+		if (validPos)
+		{
+			auto b = CreateBody(pos, RandRot(), RandSize(), RandSize());
+			added.emplace_back(b);
+			world.RegisterEntity(std::unique_ptr<Entity>(b));
+		}
+	}
+}
+
+void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
+{
+	auto bodyPos = bodiesCentre;
 	auto bodyForward = Vector3(1.0f, 0.0f, 0.0f).Normalized();
 	auto bodyUp = Vector3(0.0f, 1.0f, 1.0f).Normalized();
-	body->GetTransform().SetRotation(Quaternion::LookRotation(bodyForward, bodyUp));
-	body->SetInitialHeight(3.0f);
-	body->SetInitialWidth(1.0f);
-	body->SetMass(0.1f);
-	body->SetDrag(0.7f);
-	body->SetAngularDrag(0.7f);
-	m_World.RegisterEntity(*body);
+	auto body = CreateBody(bodyPos, Quaternion::LookRotation(bodyForward, bodyUp), 1.0f, 3.0f);
+	m_World.RegisterEntity(std::unique_ptr<Entity>(body));
+
+	//CreateRandomBodies(m_World);
 
 	auto floor = new StaticShapeProxy();
 	auto floorPos = Vector3(0.0f, 0.0f, 0.0f);
@@ -51,23 +112,25 @@ void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 	floor->GetTransform().SetRotation(Quaternion::Identity());
 	floor->SetInitialHeight(1.0f);
 	floor->SetInitialWidth(10.0f);
-	m_World.RegisterEntity(*floor);
+	m_World.RegisterEntity(std::unique_ptr<Entity>(floor));
 
 	auto cam = new Camera();
 	auto camPos = Vector3(10.0f, 6.0f, 0.0f);
-	auto camLookDir = Vector3::Normalize((bodyPos + floorPos) / 2.0f - camPos);
+	auto camLookDir = Vector3::Normalize((bodiesCentre + floorPos) / 2.0f - camPos);
 	cam->GetTransform().SetPosition(camPos);
 	cam->GetTransform().SetRotation(Quaternion::LookRotation(camLookDir));
 	cam->SetFov(MathUtils::ToRadians(45.0f));
 	cam->SetFarClip(1000.0f);
 	cam->SetNearClip(0.1f);
-	m_World.RegisterEntity(*cam);
+	m_World.RegisterEntity(std::unique_ptr<Entity>(cam));
 
 	auto light = new Light();
 	light->GetTransform().SetPosition(Vector3(15.0f, 15.0f, 2.0f));
 	light->GetTransform().SetRotation(Quaternion::Identity());
-	m_World.RegisterEntity(*light);
+	m_World.RegisterEntity(std::unique_ptr<Entity>(light));
 }
+
+// ###############################################################
 
 // Updates application state when the window size changes (e.g. device orientation change)
 void DestructibleEnvironmentMain::CreateWindowSizeDependentResources() 

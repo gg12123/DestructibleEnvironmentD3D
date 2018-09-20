@@ -1,10 +1,10 @@
 #include "pch.h"
 #include "World.h"
 
-void World::RegisterEntity(Entity& ent)
+void World::RegisterEntity(std::unique_ptr<Entity>&& ent)
 {
-	ent.Awake(*this);
-	m_Entities.push_back(std::unique_ptr<Entity>(&ent));
+	ent->Awake(*this);
+	m_Entities.emplace_back(std::move(ent));
 }
 
 void World::Update()
