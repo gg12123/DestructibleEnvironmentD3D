@@ -24,9 +24,9 @@ public:
 		return m_VelocityWorld;
 	}
 
-	const Vector3& GetAngularVelocityLocal() const
+	const Vector3& GetAngularVelocityWorld() const
 	{
-		return m_AngularVelocityLocal;
+		return m_AngularVelocityWorld;
 	}
 
 	Vector3 GetVelocityLocal()
@@ -34,14 +34,14 @@ public:
 		return GetTransform().ToLocalDirection(m_VelocityWorld);
 	}
 
-	Vector3 GetAngularVelocityWorld()
+	Vector3 GetAngularVelocityLocal()
 	{
-		return GetTransform().ToWorldDirection(m_AngularVelocityLocal);
+		return GetTransform().ToLocalDirection(m_AngularVelocityWorld);
 	}
 
 	Vector3 WorldVelocityAt(const Vector3& worldPoint) override
 	{
-		return m_VelocityWorld + Vector3::Cross(GetAngularVelocityWorld(), worldPoint - GetTransform().GetPosition());
+		return m_VelocityWorld + Vector3::Cross(m_AngularVelocityWorld, worldPoint - GetTransform().GetPosition());
 	}
 
 	void Update(std::vector<SplitInfo>& splits);
@@ -49,7 +49,7 @@ public:
 	void CopyVelocity(const Rigidbody& toCopy)
 	{
 		m_VelocityWorld = toCopy.m_VelocityWorld;
-		m_AngularVelocityLocal = toCopy.m_AngularVelocityLocal;
+		m_AngularVelocityWorld = toCopy.m_AngularVelocityWorld;
 	}
 
 	void CopyMotionProperties(const Rigidbody& toCopy)
@@ -68,7 +68,7 @@ public:
 
 	void AddMoment(const Vector3& momentWorld)
 	{
-		m_AddedMomentsLocal += GetTransform().ToLocalDirection(momentWorld);
+		m_AddedMomentsWorld += momentWorld;
 	}
 
 	void SetDrag(float drag)
@@ -93,10 +93,10 @@ private:
 	std::vector<Impulse*> m_Impulses;
 
 	Vector3 m_VelocityWorld;
-	Vector3 m_AngularVelocityLocal;
+	Vector3 m_AngularVelocityWorld;
 
 	Vector3 m_AddedForceWorld;
-	Vector3 m_AddedMomentsLocal;
+	Vector3 m_AddedMomentsWorld;
 
 	Vector3 m_ToSeperate;
 

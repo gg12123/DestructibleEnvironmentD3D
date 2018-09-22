@@ -1,5 +1,6 @@
 #pragma once
 #include <math.h>
+#include "MathUtils.h"
 
 class Vector3
 {
@@ -136,6 +137,7 @@ inline Vector3 Vector3::ProjectOnPlane(const Vector3& planeNormal, const Vector3
 	return vector - (planeNormal * Dot(vector, planeNormal));
 }
 
+// assuming that the line intersect the plane
 inline Vector3 Vector3::LinePlaneIntersection(const Vector3& planeP0, const Vector3& planeNormal, const Vector3& lineP0, const Vector3& lineP1)
 {
 	auto l = Normalize(lineP1 - lineP0);
@@ -143,7 +145,8 @@ inline Vector3 Vector3::LinePlaneIntersection(const Vector3& planeP0, const Vect
 	auto num = Vector3::Dot(planeP0 - lineP0, planeNormal);
 	auto denom = Vector3::Dot(l, planeNormal);
 
-	assert(denom != 0.0f);
+	if (fabs(denom) < MathUtils::SmallNumber)
+		return (lineP0 + lineP1) / 2.0f;
 
 	auto u = num / denom;
 

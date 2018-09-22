@@ -54,6 +54,14 @@ public:
 		return q;
 	}
 
+	static inline Quaternion AngleAxis(float angle, const Vector3& axis)
+	{
+		auto halfCosAngle = 0.5f * cos(angle);
+		auto halfSinAngle = 0.5f * sin(angle);
+
+		return Quaternion(halfCosAngle, halfSinAngle * axis.x, halfSinAngle * axis.y, halfSinAngle * axis.z);
+	}
+
 	static inline Quaternion LookRotation(const Vector3& forward)
 	{
 		return LookRotation(forward, Vector3::Up());

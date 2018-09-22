@@ -13,10 +13,7 @@ class Impulse
 {
 public:
 	Vector3 WorldImpulse;
-	Vector3 LocalImpulse;
-
 	Vector3 WorldCollisionPoint;
-	Vector3 LocalCollisionPoint;
 
 	float Impact;
 };

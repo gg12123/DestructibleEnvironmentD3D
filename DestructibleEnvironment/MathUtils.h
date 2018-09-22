@@ -8,6 +8,7 @@ public:
 	static constexpr float Infinity = FLT_MAX;
 	static constexpr float NegativeInfinity = FLT_MIN;
 	static constexpr int32 IntMax = INT32_MAX;
+	static constexpr float SmallNumber = 0.00001f;
 
 	static inline float ToRadians(float degrees)
 	{

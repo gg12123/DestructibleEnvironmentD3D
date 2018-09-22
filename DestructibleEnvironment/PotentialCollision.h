@@ -35,12 +35,12 @@ public:
 		return m_OwnerTransform->ToWorldPosition(m_PointOnOwner);
 	}
 
-	Vector3 GetPointLocal() const
+	const Vector3& GetPointLocal() const
 	{
 		return m_PointOnOwner;
 	}
 
-	Vector3 GetNormalLocal() const
+	const Vector3& GetNormalLocal() const
 	{
 		return m_Normal;
 	}

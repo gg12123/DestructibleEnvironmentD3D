@@ -26,14 +26,24 @@ public:
 		return m_Mass;
 	}
 
-	const Matrix3& GetInertia() const
+	const Matrix3& GetInertiaLocal() const
 	{
 		return m_Inertia;
 	}
 
-	const Matrix3& GetInertiaInverse() const
+	const Matrix3& GetInertiaInverseLocal() const
 	{
 		return m_InertiaInverse;
+	}
+
+	Matrix3 GetInertiaWorld()
+	{
+		return GetTransform().ApplySimilarityTransform(m_Inertia);
+	}
+
+	Matrix3 GetInertiaInverseWorld()
+	{
+		return GetTransform().ApplySimilarityTransform(m_InertiaInverse);
 	}
 
 	virtual Vector3 WorldVelocityAt(const Vector3& worldPoint)

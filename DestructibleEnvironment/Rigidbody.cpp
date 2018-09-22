@@ -46,7 +46,8 @@ void Rigidbody::CalculateInertia()
 	col2[1] = -Iyz;
 	col2[2] = Izz;
 
-	SetInertia(inertia);
+	SetInertia(Matrix3::Indentity());
+	//SetInertia(inertia);
 }
 
 void Rigidbody::CalculateMotionProperties()
@@ -55,8 +56,8 @@ void Rigidbody::CalculateMotionProperties()
 	CalculateInertia();
 
 	// TODO - not sure how to calculate these...
-	m_Drag = 0.7f;
-	m_AngularDrag = 0.7f;
+	m_Drag = 1.5f;
+	m_AngularDrag = 3.5f;
 }
 
 void Rigidbody::ApplyImpulses(std::vector<SplitInfo>& splits)
@@ -80,9 +81,9 @@ void Rigidbody::ApplyImpulses(std::vector<SplitInfo>& splits)
 
 	m_Impulses.clear();
 
-	static constexpr float splitMultiplier = 1.5f;
+	static constexpr float splitMultiplier = 2.0f;
 
-	if (biggest && (biggest->Impact > splitMultiplier * GetMass()))
+	if (biggest && (biggest->Impact > (1.0f / GetMass())))
 	{
 		splits.emplace_back(SplitInfo(*this, *biggest));
 	}
@@ -96,17 +97,17 @@ void Rigidbody::UpdateTransform()
 	m_ToSeperate = Vector3::Zero();
 
 	auto& q = t.GetRotation();
-	t.SetRotation(q + q * m_AngularVelocityLocal * (0.5f * PhysicsTime::FixedDeltaTime));
+	t.SetRotation(q + m_AngularVelocityWorld * q * 0.5f * PhysicsTime::FixedDeltaTime);
 }
 
 void Rigidbody::ApplyImpulse(const Impulse& impulse)
 {
 	m_VelocityWorld += impulse.WorldImpulse / GetMass();
 
-	auto r = impulse.LocalCollisionPoint;
-	auto J = impulse.LocalImpulse;
+	auto& r = impulse.WorldCollisionPoint - GetTransform().GetPosition();
+	auto& J = impulse.WorldImpulse;
 
-	m_AngularVelocityLocal += (GetInertiaInverse() * Vector3::Cross(r, J));
+	m_AngularVelocityWorld += (GetInertiaInverseWorld() * Vector3::Cross(r, J));
 }
 
 void Rigidbody::CalculateForces()
@@ -116,13 +117,13 @@ void Rigidbody::CalculateForces()
 	m_AddedForceWorld -= GetMass() * g * Vector3::Up();
 	m_AddedForceWorld -= m_Drag * m_VelocityWorld;
 
-	m_AddedMomentsLocal -= m_AngularDrag * m_AngularVelocityLocal;
+	m_AddedMomentsWorld -= m_AngularDrag * m_AngularVelocityWorld;
 }
 
 void  Rigidbody::Integrate()
 {
 	m_VelocityWorld += (m_AddedForceWorld / GetMass()) * PhysicsTime::FixedDeltaTime;
-	m_AngularVelocityLocal += (GetInertiaInverse() * m_AddedMomentsLocal) * PhysicsTime::FixedDeltaTime;
+	m_AngularVelocityWorld += (GetInertiaInverseWorld() * m_AddedMomentsWorld) * PhysicsTime::FixedDeltaTime;
 }
 
 void Rigidbody::ApplyNormalForces()
@@ -131,7 +132,7 @@ void Rigidbody::ApplyNormalForces()
 	Integrate();
 
 	m_AddedForceWorld = Vector3::Zero();
-	m_AddedMomentsLocal = Vector3::Zero();
+	m_AddedMomentsWorld = Vector3::Zero();
 }
 
 void Rigidbody::Update(std::vector<SplitInfo>& splits)

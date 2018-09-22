@@ -28,19 +28,13 @@ void CollisionResponder::CalculateResponse(const CollisionData& collData, Physic
 		auto& t1 = body1.GetTransform();
 		auto& t2 = body2.GetTransform();
 
-		auto r1 = t1.ToLocalPosition(collPointWorld);
-		auto r2 = t2.ToLocalPosition(collPointWorld);
-
-		auto collisionNormalBody1Local = t1.ToLocalDirection(collNormalWorld);
-		auto collisionNormalBody2Local = t2.ToLocalDirection(collNormalWorld);
-
-		auto s1 = CalculateS(collisionNormalBody1Local, r1, body1.GetInertiaInverse());
-		auto s2 = CalculateS(collisionNormalBody2Local, r2, body2.GetInertiaInverse());
+		auto s1 = CalculateS(collNormalWorld, collPointWorld - t1.GetPosition(), body1.GetInertiaInverseWorld());
+		auto s2 = CalculateS(collNormalWorld, collPointWorld - t2.GetPosition(), body2.GetInertiaInverseWorld());
 
 		auto m1 = body1.GetMass();
 		auto m2 = body2.GetMass();
 
-		auto J = (-signedImpact * (e + 1.0f)) / (1.0f / m1 + 1.0f / m2 + s1 + s2);
+		auto J = (-signedImpact * (e + 1.0f)) / ((1.0f / m1) + (1.0f / m2) + s1 + s2);
 
 		auto impact = -signedImpact;
 
@@ -51,15 +45,11 @@ void CollisionResponder::CalculateResponse(const CollisionData& collData, Physic
 		auto& impulse2 = *m_ImpulseDataPool->Recycle();
 
 		impulse1.Impact = impact;
-		impulse1.LocalCollisionPoint = r1;
 		impulse1.WorldCollisionPoint = collPointWorld;
-		impulse1.LocalImpulse = -J * collisionNormalBody1Local;
 		impulse1.WorldImpulse = -J * collNormalWorld;
 
 		impulse2.Impact = impact;
-		impulse2.LocalCollisionPoint = r2;
 		impulse2.WorldCollisionPoint = collPointWorld;
-		impulse2.LocalImpulse = J * collisionNormalBody2Local;
 		impulse2.WorldImpulse = J * collNormalWorld;
 
 		body1.AddImpulse(impulse1);

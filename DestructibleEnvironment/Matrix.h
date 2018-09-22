@@ -44,6 +44,23 @@ public:
 			c[i] = data[i];
 	}
 
+	Matrix<3> ToMatrix3()
+	{
+		Matrix3 mat3;
+		auto n = MathUtils::Min(3, Size);
+
+		for (auto i = 0; i < n; i++)
+		{
+			auto colOut = mat3.M[i];
+			auto colIn = M[i];
+
+			for (auto j = 0; j < n; j++)
+				colOut[j] = colIn[j];
+		}
+
+		return mat3;
+	}
+
 	// static
 
 	static inline Matrix<Size> Indentity()

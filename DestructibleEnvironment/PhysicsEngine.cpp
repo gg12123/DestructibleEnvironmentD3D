@@ -71,21 +71,25 @@ void PhysicsEngine::UpdateBodies()
 
 void PhysicsEngine::ProcessSplits()
 {
-	if (m_DynamicBodies.size() == 1)
+	static auto constexpr doSplits = false;
+
+	if (doSplits && (m_DynamicBodies.size() < 10))
 	{
 		for (auto it = m_Splits.begin(); it != m_Splits.end(); it++)
 		{
 			auto& s = *it;
-
+		
 			auto newBody = std::unique_ptr<Rigidbody>(new Rigidbody()); // from pool
-
+		
 			auto& toSplit = *s.ToSplit;
-
-			newBody->CopyVelocity(toSplit);
-			newBody->CalculateMotionProperties();
-
+		
 			if (toSplit.Split(s.CauseImpulse->WorldCollisionPoint, *newBody))
 			{
+				newBody->CopyVelocity(toSplit);
+		
+				newBody->CalculateMotionProperties();
+				toSplit.CalculateMotionProperties();
+		
 				m_BodiesAdded.emplace_back(newBody.get());
 				m_DynamicBodies.emplace_back(std::move(newBody));
 			}

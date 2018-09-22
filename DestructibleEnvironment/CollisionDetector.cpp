@@ -81,22 +81,28 @@ void CollisionDetector::FindEdgeCollisions(Shape& shapeFaces, const Vector3& edg
 	if (count == 2)
 	{
 		auto end = m_PotentialCollisionPool->NumRecycled();
-
+		
 		auto& col1 = m_PotentialCollisionPool->At(end - 1);
 		auto& col2 = m_PotentialCollisionPool->At(end - 2);
 
-		Vector3 lineP0, lineDir;
-		Vector3::LineDefinedByTwoPlanes(col1.GetPointLocal(), col1.GetNormalLocal(), col2.GetPointLocal(), col2.GetNormalLocal(), lineP0, lineDir);
+		auto& n1 = col1.GetNormalLocal();
+		auto& n2 = col2.GetNormalLocal();
 
-		auto otherLineDir = (edgeP1 - edgeP0).Normalized();
-		auto cross = Vector3::Cross(otherLineDir, lineDir);
-
-		if (cross.Magnitude() > 0.0001f)
+		if (Vector3::Cross(n1, n2).Magnitude() > MathUtils::SmallNumber)
 		{
-			auto normal = cross.InDirectionOf(col1.GetNormalLocal()).Normalized();
-			auto pointOnLine = Vector3::PointClosestToOtherLine(lineP0, lineDir, edgeP0, otherLineDir);
+			Vector3 lineP0, lineDir;
+			Vector3::LineDefinedByTwoPlanes(col1.GetPointLocal(), n1, col2.GetPointLocal(), n2, lineP0, lineDir);
 
-			m_PotentialCollisionPool->Recycle().Init(pointOnLine, normal, *m_CurrentOthersPoints, *m_ActiveTransform);
+			auto otherLineDir = (edgeP1 - edgeP0).Normalized();
+			auto cross = Vector3::Cross(otherLineDir, lineDir);
+
+			if (cross.Magnitude() > MathUtils::SmallNumber)
+			{
+				auto normal = cross.InDirectionOf(col1.GetNormalLocal()).Normalized();
+				auto pointOnLine = Vector3::PointClosestToOtherLine(lineP0, lineDir, edgeP0, otherLineDir);
+
+				m_PotentialCollisionPool->Recycle().Init(pointOnLine, normal, *m_CurrentOthersPoints, *m_ActiveTransform);
+			}
 		}
 	}
 }

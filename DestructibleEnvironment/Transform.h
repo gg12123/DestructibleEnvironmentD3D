@@ -58,6 +58,14 @@ public:
 		return m_Rotation.RotateV(localDir);
 	}
 
+	Matrix3 ApplySimilarityTransform(const Matrix3& localMatrix)
+	{
+		ReCalculateIfDirty();
+		auto rotMat = m_LocalToWorld.ToMatrix3();
+
+		return rotMat * localMatrix * rotMat.Transposed();
+	}
+
 	Matrix4 GetLocalToWorldMatrix()
 	{
 		ReCalculateIfDirty();

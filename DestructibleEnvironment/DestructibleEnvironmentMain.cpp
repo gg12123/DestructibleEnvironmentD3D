@@ -99,9 +99,9 @@ static void CreateRandomBodies(World& world)
 void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 {
 	auto bodyPos = bodiesCentre;
-	auto bodyForward = Vector3(1.0f, 0.0f, 0.0f).Normalized();
-	auto bodyUp = Vector3(0.0f, 1.0f, 1.0f).Normalized();
-	auto body = CreateBody(bodyPos, Quaternion::LookRotation(bodyForward, bodyUp), 1.0f, 3.0f);
+	//auto bodyForward = Vector3(1.0f, 0.0f, 0.0f).Normalized();
+	//auto bodyUp = Vector3(0.0f, 1.0f, 1.0f).Normalized();
+	auto body = CreateBody(bodyPos, RandRot(), 1.0f, 3.0f);
 	m_World.RegisterEntity(std::unique_ptr<Entity>(body));
 
 	//CreateRandomBodies(m_World);
@@ -111,7 +111,7 @@ void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 	floor->GetTransform().SetPosition(floorPos);
 	floor->GetTransform().SetRotation(Quaternion::Identity());
 	floor->SetInitialHeight(1.0f);
-	floor->SetInitialWidth(10.0f);
+	floor->SetInitialWidth(20.0f);
 	m_World.RegisterEntity(std::unique_ptr<Entity>(floor));
 
 	auto cam = new Camera();
