@@ -46,8 +46,8 @@ void Rigidbody::CalculateInertia()
 	col2[1] = -Iyz;
 	col2[2] = Izz;
 
-	SetInertia(Matrix3::Indentity());
-	//SetInertia(inertia);
+	//SetInertia(Matrix3::Indentity());
+	SetInertia(inertia);
 }
 
 void Rigidbody::CalculateMotionProperties()

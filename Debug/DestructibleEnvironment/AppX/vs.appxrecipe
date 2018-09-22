@@ -36,7 +36,7 @@
   <ItemGroup>
     <AppxPackagedFile Include="C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\DestructibleEnvironment.exe">
       <PackagePath>DestructibleEnvironment.exe</PackagePath>
-      <Modified>2018-09-22T11:16:44.192</Modified>
+      <Modified>2018-09-22T17:36:19.245</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\DestructibleEnvironment.winmd">
       <PackagePath>DestructibleEnvironment.winmd</PackagePath>

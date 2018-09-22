@@ -88,6 +88,8 @@ private:
 
 	CollisionDetector m_CollisionDetector;
 	CollisionResponder m_CollisionResponder;
+	CollisionData m_CollData;
+
 	FixedTimeStepTime m_Time;
 
 	std::thread m_Thread;

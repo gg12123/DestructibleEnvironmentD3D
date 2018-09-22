@@ -128,16 +128,18 @@ bool CollisionDetector::FindBestPotentialCollision(CollisionData& outputData)
 	if (m_PotentialCollisionPool->NumRecycled() == 0)
 		return false;
 
-	auto avaragePoint = Vector3::Zero();
 	PotentialCollision *best = nullptr;
 	auto highestComp = -1.0f;
 	auto dir1To2 = Vector3::Normalize(m_Shape2->GetTransform().GetPosition() - m_Shape1->GetTransform().GetPosition());
+	auto& points = outputData.Points;
+
+	points.clear();
 
 	for (auto it = m_PotentialCollisionPool->Begin(); it != m_PotentialCollisionPool->End(); it++)
 	{
 		auto& coll = *it;
 
-		avaragePoint += coll.GetPointWorldSpace();
+		points.emplace_back(coll.GetPointWorldSpace());
 
 		auto comp = fabs(Vector3::Dot(dir1To2, coll.GetNormalWorldSpace()));
 
@@ -148,7 +150,6 @@ bool CollisionDetector::FindBestPotentialCollision(CollisionData& outputData)
 		}
 	}
 
-	outputData.Position = avaragePoint / static_cast<float>(m_PotentialCollisionPool->NumRecycled());
 	outputData.Normal1To2 = best->GetNormalWorldSpace().InDirectionOf(dir1To2);
 	outputData.Penetration = best->CalculateRequiredSeperation();
 

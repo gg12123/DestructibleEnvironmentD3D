@@ -5,7 +5,7 @@ class CollisionData
 {
 public:
 	Vector3 Normal1To2;
-	Vector3 Position;
+	std::vector<Vector3> Points;
 	float Penetration;
 };
 

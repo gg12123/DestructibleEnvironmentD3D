@@ -136,43 +136,53 @@ public:
 	static inline Matrix<3> Inverse(const Matrix<3>& mat)
 	{
 		auto col0 = mat.M[0];
-		auto e11 = col0[0];
-		auto e21 = col0[1];
-		auto e31 = col0[2];
+		auto a = col0[0];
+		auto d = col0[1];
+		auto g = col0[2];
 
 		auto col1 = mat.M[1];
-		auto e12 = col1[0];
-		auto e22 = col1[1];
-		auto e32 = col1[2];
+		auto b = col1[0];
+		auto e = col1[1];
+		auto h = col1[2];
 
 		auto col2 = mat.M[2];
-		auto e13 = col2[0];
-		auto e23 = col2[1];
-		auto e33 = col2[2];
+		auto c = col2[0];
+		auto f = col2[1];
+		auto i = col2[2];
 
-		auto d = e11 * e22 * e33 -
-			e11 * e32 * e23 +
-			e21 * e32 * e13 -
-			e21 * e12 * e33 +
-			e31 * e12 * e23 -
-			e31 * e22 * e13;
+		auto A = e * i - f * h;
+		auto B = -(d * i - f * g);
+		auto C = d * h - e * g;
+
+		auto D = -(b * i - c * h);
+		auto E = (a * i - c * g);
+		auto F = -(a * h - b * g);
+
+		auto G = b * f - c * e;
+		auto H = -(a * f - c * d);
+		auto I = a * e - b * d;
+
+		auto det = (a * A + b * B + c * C);
+		assert(det != 0.0f);
+
+		auto invDet = 1.0f / det;
 
 		Matrix3 inv;
 
 		auto invCol0 = inv.M[0];
-		invCol0[0] = (e22 * e33 - e23 * e32) / d;
-		invCol0[1] = -(e21 * e33 - e23 * e31) / d;
-		invCol0[2] = (e21 * e32 - e22 * e31) / d;
+		invCol0[0] = A * invDet;
+		invCol0[1] = B * invDet;
+		invCol0[2] = C * invDet;
 
 		auto invCol1 = inv.M[1];
-		invCol1[0] = -(e12 * e33 - e13 * e32) / d;
-		invCol1[1] = (e11 * e33 - e13 * e31) / d;
-		invCol1[2] = -(e11 * e32 - e12 * e31) / d;
+		invCol1[0] = D * invDet;
+		invCol1[1] = E * invDet;
+		invCol1[2] = F * invDet;
 
 		auto invCol2 = inv.M[2];
-		invCol2[0] = (e12 * e23 - e13 * e22) / d;
-		invCol2[1] = -(e11 * e23 - e13 * e21) / d;
-		invCol2[2] = (e11 * e22 - e12 * e21) / d;
+		invCol2[0] = G * invDet;
+		invCol2[1] = H * invDet;
+		invCol2[2] = I * invDet;
 
 		return inv;
 	}

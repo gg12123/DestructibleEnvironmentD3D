@@ -8,23 +8,82 @@ static float CalculateS(const Vector3& n, const Vector3& r, const Matrix3 inerti
 	return Vector3::Dot(n, Vector3::Cross(x, r));
 }
 
-void CollisionResponder::CalculateResponse(const CollisionData& collData, PhysicsObject& body1, PhysicsObject& body2)
+template<bool useWeightedAverage>
+static bool CalculateCollisionPoint(const CollisionData& collData, PhysicsObject& body1, PhysicsObject& body2, Vector3& finalCollPoint)
 {
-	static constexpr float e = 0.5f; // TODO - get this from somewere else
+	auto weightSum = 0.0f;
 
-	auto& collPointWorld = collData.Position;
-	auto& collNormalWorld = collData.Normal1To2;
-	auto pen = collData.Penetration;
+	auto& collPoints = collData.Points;
+	auto& collNormal = collData.Normal1To2;
 
-	auto v1 = body1.WorldVelocityAt(collPointWorld);
-	auto v2 = body2.WorldVelocityAt(collPointWorld);
+	finalCollPoint = Vector3::Zero();
 
+	for (auto it = collPoints.begin(); it != collPoints.end(); it++)
+	{
+		auto& p = *it;
+
+		auto v1 = body1.WorldVelocityAt(p);
+		auto v2 = body2.WorldVelocityAt(p);
+
+		auto vr = v2 - v1;
+
+		auto signedImpact = Vector3::Dot(vr, collNormal);
+
+		if (signedImpact < 0.0f)
+		{
+			auto impact = fabs(signedImpact);
+
+			weightSum += impact;
+			finalCollPoint += impact * p;
+		}
+	}
+
+	if (weightSum > 0.0f)
+	{
+		finalCollPoint /= weightSum;
+		return true;
+	}
+	return false;
+}
+
+template<>
+static bool CalculateCollisionPoint<false>(const CollisionData& collData, PhysicsObject& body1, PhysicsObject& body2, Vector3& finalCollPoint)
+{
+	auto& collPoints = collData.Points;
+	auto& collNormal = collData.Normal1To2;
+
+	finalCollPoint = Vector3::Zero();
+
+	for (auto it = collPoints.begin(); it != collPoints.end(); it++)
+		finalCollPoint += *it;
+
+	finalCollPoint /= static_cast<float>(collPoints.size());
+
+	auto v1 = body1.WorldVelocityAt(finalCollPoint);
+	auto v2 = body2.WorldVelocityAt(finalCollPoint);
 	auto vr = v2 - v1;
 
-	auto signedImpact = Vector3::Dot(vr, collNormalWorld);
+	return (Vector3::Dot(vr, collNormal) < 0.0f);
+}
 
-	if (signedImpact < 0.0f)
+void CollisionResponder::CalculateResponse(const CollisionData& collData, PhysicsObject& body1, PhysicsObject& body2)
+{
+	static constexpr bool useWeigtedAverage = true;
+	static constexpr float e = 0.5f; // TODO - get this from somewere else
+
+	auto pen = collData.Penetration;
+	auto& collNormalWorld = collData.Normal1To2;
+
+	Vector3 collPointWorld;
+	if (CalculateCollisionPoint<useWeigtedAverage>(collData, body1, body2, collPointWorld))
 	{
+		auto v1 = body1.WorldVelocityAt(collPointWorld);
+		auto v2 = body2.WorldVelocityAt(collPointWorld);
+
+		auto vr = v2 - v1;
+
+		auto signedImpact = Vector3::Dot(vr, collNormalWorld);
+
 		auto& t1 = body1.GetTransform();
 		auto& t2 = body2.GetTransform();
 
