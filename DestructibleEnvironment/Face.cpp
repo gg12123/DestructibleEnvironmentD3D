@@ -6,15 +6,50 @@
 #include "Point.h"
 #include "NewPointsGetter.h"
 
-int Face::CountNumInside()
+bool Face::PreSplit(Shape& shapeAbove, Shape& shapeBelow, std::vector<Face*>& facesNeedingFullSplit)
 {
-	auto n = 0;
+	auto numInside = 0;
+	auto numAbove = 0;
+	auto numBelow = 0;
+
 	for (auto it = m_Points.begin(); it != m_Points.end(); it++)
 	{
-		if ((*it)->GetPlaneRelationship() == PointPlaneRelationship::Inside)
-			n++;
+		switch ((*it)->GetPlaneRelationship())
+		{
+		case PointPlaneRelationship::Inside:
+			numInside++;
+			break;
+		case PointPlaneRelationship::Above:
+			numAbove++;
+			break;
+		case PointPlaneRelationship::Below:
+			numBelow++;
+			break;
+		default:
+			break;
+		}
 	}
-	return n;
+
+	if (numInside == 3)
+		return false;
+
+	if ((numInside == 2) && (numAbove != 0) && (numBelow != 0))
+		return false;
+
+	if ((numInside == 2) || (numAbove != 0 && numBelow != 0))
+	{
+		facesNeedingFullSplit.emplace_back(this);
+	}
+	else if (numAbove == 0)
+	{
+		shapeBelow.GetFaces().emplace_back(this);
+	}
+	else if (numBelow == 0)
+	{
+		shapeAbove.GetFaces().emplace_back(this);
+	}
+
+	return true;
 }
 
 void Face::Split(NewPointsGetter& newPoints, Shape& shapeAbove, Shape& shapeBelow)
@@ -90,7 +125,7 @@ void Face::ProcessNewFace(Face& face, ShapeEdge& newEdge, Shape& shape) const
 	{
 		face.SetNormal(m_Normal);
 
-		shape.GetFaces().push_back(&face);
+		shape.GetFaces().emplace_back(&face);
 
 		if (IsNewlyFormedEdge(newEdge))
 			shape.AddNewEdgeFromFaceSplit(newEdge);

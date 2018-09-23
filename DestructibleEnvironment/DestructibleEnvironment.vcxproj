@@ -208,6 +208,7 @@
     <ClInclude Include="Common\DeviceResources.h" />
     <ClInclude Include="ConstantBufferInputTypes.h" />
     <ClInclude Include="D3DBuffers.h" />
+    <ClInclude Include="DebugLogger.h" />
     <ClInclude Include="DestructibleEnvironmentMain.h" />
     <ClInclude Include="Common\DirectXHelper.h" />
     <ClInclude Include="Common\StepTimer.h" />
@@ -229,7 +230,8 @@
     <ClInclude Include="InitialShapeCreator.h" />
     <ClInclude Include="LastCheckedAgainst.h" />
     <ClInclude Include="Light.h" />
-    <ClInclude Include="MathUtils.h" />
+    <ClInclude Include="Loggers.h" />
+    <ClInclude Include="MathU.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="NewPointsGetter.h" />
     <ClInclude Include="pch.h" />
@@ -252,6 +254,7 @@
     <ClInclude Include="SplitInfo.h" />
     <ClInclude Include="StaticBody.h" />
     <ClInclude Include="StaticShapeProxy.h" />
+    <ClInclude Include="StringU.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TwoDArray.h" />
     <ClInclude Include="Vector3.h" />

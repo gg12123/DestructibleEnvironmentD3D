@@ -4,7 +4,7 @@
 #include "ShapeProxy.h"
 #include "Camera.h"
 #include "Light.h"
-#include "MathUtils.h"
+#include "MathU.h"
 #include "DynamicBodyProxy.h"
 #include "StaticShapeProxy.h"
 #include "Random.h"
@@ -98,11 +98,13 @@ static void CreateRandomBodies(World& world)
 
 void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 {
-	auto bodyPos = bodiesCentre;
-	auto bodyForward = Vector3(1.0f, 0.0f, 0.0f).Normalized();
-	auto bodyUp = Vector3(0.0f, 1.0f, 1.0f).Normalized();
-	auto body = CreateBody(bodyPos, Quaternion::LookRotation(bodyForward, bodyUp), 1.0f, 3.0f);
-	m_World.RegisterEntity(std::unique_ptr<Entity>(body));
+	auto bodyPos1 = bodiesCentre + Vector3::Right();
+	auto bodyPos2 = bodiesCentre - Vector3::Right();
+	auto bodyPos3 = bodiesCentre + Vector3::Up();
+	
+	m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodyPos1, RandRot(), 1.0f, 1.0f)));
+	m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodyPos2, RandRot(), 1.0f, 1.0f)));
+	m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodyPos3, RandRot(), 1.0f, 1.0f)));
 
 	//CreateRandomBodies(m_World);
 
@@ -119,7 +121,7 @@ void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 	auto camLookDir = Vector3::Normalize((bodiesCentre + floorPos) / 2.0f - camPos);
 	cam->GetTransform().SetPosition(camPos);
 	cam->GetTransform().SetRotation(Quaternion::LookRotation(camLookDir));
-	cam->SetFov(MathUtils::ToRadians(45.0f));
+	cam->SetFov(MathU::ToRadians(45.0f));
 	cam->SetFarClip(1000.0f);
 	cam->SetNearClip(0.1f);
 	m_World.RegisterEntity(std::unique_ptr<Entity>(cam));

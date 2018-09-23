@@ -1,6 +1,6 @@
 #pragma once
 #include "Vector3.h"
-#include "MathUtils.h"
+#include "MathU.h"
 #include <assert.h>
 
 class Quaternion
@@ -77,18 +77,18 @@ public:
 
 		Quaternion q;
 
-		q.r = sqrt(MathUtils::Max(0.0f, 1.0f + x.x + y.y + z.z)) / 2.0f;
-		q.x = sqrt(MathUtils::Max(0.0f, 1.0f + x.x - y.y - z.z)) / 2.0f;
-		q.y = sqrt(MathUtils::Max(0.0f, 1.0f - x.x + y.y - z.z)) / 2.0f;
-		q.z = sqrt(MathUtils::Max(0.0f, 1.0f - x.x - y.y + z.z)) / 2.0f;
+		q.r = sqrt(MathU::Max(0.0f, 1.0f + x.x + y.y + z.z)) / 2.0f;
+		q.x = sqrt(MathU::Max(0.0f, 1.0f + x.x - y.y - z.z)) / 2.0f;
+		q.y = sqrt(MathU::Max(0.0f, 1.0f - x.x + y.y - z.z)) / 2.0f;
+		q.z = sqrt(MathU::Max(0.0f, 1.0f - x.x - y.y + z.z)) / 2.0f;
 
-		//q.x *= MathUtils::Sign(z.y - y.z);
-		//q.y *= MathUtils::Sign(x.z - z.x);
-		//q.z *= MathUtils::Sign(y.x - x.y);
+		//q.x *= MathU::Sign(z.y - y.z);
+		//q.y *= MathU::Sign(x.z - z.x);
+		//q.z *= MathU::Sign(y.x - x.y);
 
-		q.x *= MathUtils::Sign(y.z - z.y);
-		q.y *= MathUtils::Sign(z.x - x.z);
-		q.z *= MathUtils::Sign(x.y - y.x);
+		q.x *= MathU::Sign(y.z - z.y);
+		q.y *= MathU::Sign(z.x - x.z);
+		q.z *= MathU::Sign(x.y - y.x);
 
 		q.Normalize();
 

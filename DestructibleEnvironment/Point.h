@@ -122,7 +122,7 @@ public:
 		return;
 	}
 
-	void Split(const Vector3& P0, const Vector3& n, NewPointsGetter& newPoints, Shape& shapeAbove, Shape& shapeBelow, int& numInside);
+	void Split(const Vector3& P0, const Vector3& n, NewPointsGetter& newPoints, Shape& shapeAbove, Shape& shapeBelow, int& countAbove, int& countBelow);
 
 	static bool PointsBridgePlane(Point &p1, Point& p2)
 	{

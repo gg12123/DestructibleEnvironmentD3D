@@ -1,6 +1,6 @@
 #pragma once
 #include <math.h>
-#include "MathUtils.h"
+#include "MathU.h"
 
 class Vector3
 {
@@ -73,7 +73,10 @@ public:
 
 	void Normalize()
 	{
-		(*this) /= Magnitude();
+		auto mag = Magnitude();
+
+		if (mag > 0.0f)
+			(*this) /= Magnitude();
 	}
 
 	// static
@@ -145,7 +148,7 @@ inline Vector3 Vector3::LinePlaneIntersection(const Vector3& planeP0, const Vect
 	auto num = Vector3::Dot(planeP0 - lineP0, planeNormal);
 	auto denom = Vector3::Dot(l, planeNormal);
 
-	if (fabs(denom) < MathUtils::SmallNumber)
+	if (fabs(denom) < MathU::SmallNumber)
 		return (lineP0 + lineP1) / 2.0f;
 
 	auto u = num / denom;
@@ -161,8 +164,8 @@ inline Vector3 Vector3::Zero()
 inline Vector3 Vector3::Normalize(const Vector3& v)
 {
 	auto res = v;
-	res /= res.Magnitude();
-	return res;
+	auto mag = res.Magnitude();
+	return (mag > 0.0f ? res / mag : Vector3::Zero());
 }
 
 inline Vector3 Vector3::Right()

@@ -11,13 +11,13 @@ public:
 		m_YAverageRange = 0.0f;
 		m_ZAverageRange = 0.0f;
 
-		m_XMax = MathUtils::NegativeInfinity;
-		m_YMax = MathUtils::NegativeInfinity;
-		m_ZMax = MathUtils::NegativeInfinity;
+		m_XMax = MathU::NegativeInfinity;
+		m_YMax = MathU::NegativeInfinity;
+		m_ZMax = MathU::NegativeInfinity;
 
-		m_XMin = MathUtils::NegativeInfinity;
-		m_YMin = MathUtils::NegativeInfinity;
-		m_ZMin = MathUtils::NegativeInfinity;
+		m_XMin = MathU::NegativeInfinity;
+		m_YMin = MathU::NegativeInfinity;
+		m_ZMin = MathU::NegativeInfinity;
 
 		for (auto it = bodies.begin(); it != bodies.end(); it++)
 		{

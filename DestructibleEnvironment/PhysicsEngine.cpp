@@ -69,7 +69,7 @@ void PhysicsEngine::UpdateBodies()
 
 void PhysicsEngine::ProcessSplits()
 {
-	static auto constexpr doSplits = false;
+	static auto constexpr doSplits = true;
 
 	if (doSplits && (m_DynamicBodies.size() < 10))
 	{

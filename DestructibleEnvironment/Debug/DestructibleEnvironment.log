@@ -1,15 +1,2 @@
-﻿  App.cpp
-  Camera.cpp
-  CollisionResponder.cpp
-  DestructibleEnvironmentMain.cpp
-  DynamicBodyProxy.cpp
-  DynamicMesh.cpp
-  GameControlledDynamicBody.cpp
-  GameTheadToPhysicsThreadAction.cpp
-  Light.cpp
-  Physics.cpp
-  PhysicsEngine.cpp
-  ShapeProxy.cpp
-  StaticShapeProxy.cpp
-  World.cpp
+﻿  Random.cpp
   DestructibleEnvironment.vcxproj -> C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\DestructibleEnvironment.exe

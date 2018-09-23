@@ -97,8 +97,8 @@ void CollisionResponder::CalculateResponse(const CollisionData& collData, Physic
 
 		auto impact = -signedImpact;
 
-		auto v1N = MathUtils::Max(Vector3::Dot(v1, collNormalWorld), 0.0f);
-		auto v2N = MathUtils::Max(Vector3::Dot(v2, -collNormalWorld), 0.0f);
+		auto v1N = MathU::Max(Vector3::Dot(v1, collNormalWorld), 0.0f);
+		auto v2N = MathU::Max(Vector3::Dot(v2, -collNormalWorld), 0.0f);
 
 		auto& impulse1 = *m_ImpulseDataPool->Recycle();
 		auto& impulse2 = *m_ImpulseDataPool->Recycle();

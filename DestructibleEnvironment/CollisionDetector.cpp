@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "CollisionDetector.h"
 #include "Shape.h"
-#include "MathUtils.h"
+#include "MathU.h"
 #include "Transform.h"
 
 Vector3 CollisionDetector::TransformPoint(const Vector3& point)
@@ -88,7 +88,7 @@ void CollisionDetector::FindEdgeCollisions(Shape& shapeFaces, const Vector3& edg
 		auto& n1 = col1.GetNormalLocal();
 		auto& n2 = col2.GetNormalLocal();
 
-		if (Vector3::Cross(n1, n2).Magnitude() > MathUtils::SmallNumber)
+		if (Vector3::Cross(n1, n2).Magnitude() > MathU::SmallNumber)
 		{
 			Vector3 lineP0, lineDir;
 			Vector3::LineDefinedByTwoPlanes(col1.GetPointLocal(), n1, col2.GetPointLocal(), n2, lineP0, lineDir);
@@ -96,7 +96,7 @@ void CollisionDetector::FindEdgeCollisions(Shape& shapeFaces, const Vector3& edg
 			auto otherLineDir = (edgeP1 - edgeP0).Normalized();
 			auto cross = Vector3::Cross(otherLineDir, lineDir);
 
-			if (cross.Magnitude() > MathUtils::SmallNumber)
+			if (cross.Magnitude() > MathU::SmallNumber)
 			{
 				auto normal = cross.InDirectionOf(col1.GetNormalLocal()).Normalized();
 				auto pointOnLine = Vector3::PointClosestToOtherLine(lineP0, lineDir, edgeP0, otherLineDir);

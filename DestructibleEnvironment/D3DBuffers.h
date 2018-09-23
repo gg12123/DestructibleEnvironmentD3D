@@ -5,7 +5,7 @@
 #include "Vertex.h"
 #include "Common\DirectXHelper.h"
 #include "Constants.h"
-#include "MathUtils.h"
+#include "MathU.h"
 
 struct D3DBufferDeleter
 {
@@ -31,7 +31,7 @@ public:
 		ID3D11Buffer* buffer;
 
 		D3D11_BUFFER_DESC indexBufferDesc = { 0 };
-		indexBufferDesc.ByteWidth = MathUtils::RoundUp(size * sizeof(unsigned short), 16);
+		indexBufferDesc.ByteWidth = MathU::RoundUp(size * sizeof(unsigned short), 16);
 		indexBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 		indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		indexBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -55,7 +55,7 @@ public:
 		ID3D11Buffer* buffer;
 
 		D3D11_BUFFER_DESC vertexBufferDesc = { 0 };
-		vertexBufferDesc.ByteWidth = MathUtils::RoundUp(size * sizeof(T), 16);
+		vertexBufferDesc.ByteWidth = MathU::RoundUp(size * sizeof(T), 16);
 		vertexBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 		vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		vertexBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -78,7 +78,7 @@ public:
 	{
 		ID3D11Buffer* buffer;
 
-		CD3D11_BUFFER_DESC constantBufferDesc(MathUtils::RoundUp(sizeof(T), 16), D3D11_BIND_CONSTANT_BUFFER);
+		CD3D11_BUFFER_DESC constantBufferDesc(MathU::RoundUp(sizeof(T), 16), D3D11_BIND_CONSTANT_BUFFER);
 		DX::ThrowIfFailed(
 			device->CreateBuffer(
 				&constantBufferDesc,

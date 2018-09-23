@@ -1,7 +1,23 @@
 #include "pch.h"
 #include "Random.h"
+#include "Loggers.h"
+#include "StringU.h"
 #include <stdlib.h>
 #include <time.h>
+
+static constexpr auto useRandomSeed = true;
+
+template<bool random>
+uint32 GetSeed()
+{
+	return static_cast<uint32>(time(NULL));
+}
+
+template<>
+uint32 GetSeed<false>()
+{
+	return 10U;
+}
 
 static void Seed()
 {
@@ -9,7 +25,9 @@ static void Seed()
 
 	if (!seeded)
 	{
-		srand(time(NULL));
+		auto seed = GetSeed<useRandomSeed>();
+		Loggers::Physics().Log("Seed - " + StringU::ToString(seed));
+		srand(seed);
 		seeded = true;
 	}
 }

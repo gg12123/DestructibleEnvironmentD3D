@@ -47,7 +47,7 @@ public:
 	Matrix<3> ToMatrix3()
 	{
 		Matrix3 mat3;
-		auto n = MathUtils::Min(3, Size);
+		auto n = MathU::Min(3, Size);
 
 		for (auto i = 0; i < n; i++)
 		{

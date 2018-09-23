@@ -40,7 +40,7 @@ Vector3 Shape::CentreAndCache()
 	auto c = CalculateCentre();
 
 	m_LocalBounds.Reset();
-	m_BoundingRadius = MathUtils::NegativeInfinity;
+	m_BoundingRadius = MathU::NegativeInfinity;
 
 	for (auto it = m_Points.begin(); it != m_Points.end(); it++)
 	{
@@ -107,27 +107,16 @@ void Shape::TransferSplitResultsToThis(Shape& splitResult)
 	m_CachedFaceP0s.clear();
 }
 
-bool Shape::SplitPoints(const Vector3& P0, const Vector3& n, Shape& shapeAbove, Shape& shapeBelow)
+bool Shape::FindFacesToBeSplit(Shape& shapeAbove, Shape& shapeBelow)
 {
-	auto numInside = 0;
+	m_FacesToBeSplit.clear();
 
-	for (auto it = m_Points.begin(); it != m_Points.end(); it++)
-		(*it)->Split(P0, n, m_NewPointsGetter, shapeAbove, shapeBelow, numInside);
-
-	if (numInside >= 3)
+	for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
 	{
-		for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
-		{
-			if ((*it)->CountNumInside() >= 3)
-			{
-				// will need to do something to stop the newly created points from leaking here.
-				// could you existing inside points to get the new ones out of NewPointsGetter, then delete them.
-
-				return false;
-			}
-		}
+		if (!(*it)->PreSplit(shapeAbove, shapeBelow, m_FacesToBeSplit))
+			return false;
 	}
-	return true;
+	return true;;
 }
 
 Vector3 Shape::CalculateSplitPlaneNormal(const Vector3& P0)
@@ -145,17 +134,23 @@ bool Shape::Split(const Vector3& collPointWs, Shape& shapeAbove)
 	auto P0 = m_Transform.ToLocalPosition(collPointWs);
 	auto n = CalculateSplitPlaneNormal(P0);
 
-	auto& shapeBelow = *(new Shape()); // from pool
+	auto& shapeBelow = *(new Shape()); // from pool (or maybe this could just be a static thats used only to hold split results)
 
 	shapeAbove.Clear();
 	shapeBelow.Clear(); // will need clearing when it come from the pool
 
-	if (SplitPoints(P0, n, shapeAbove, shapeBelow))
+	auto countAbove = 0;
+	auto countBelow = 0;
+
+	for (auto it = m_Points.begin(); it != m_Points.end(); it++)
+		(*it)->Split(P0, n, m_NewPointsGetter, shapeAbove, shapeBelow, countAbove, countBelow);
+
+	if ((countAbove != 0) && (countBelow != 0) && FindFacesToBeSplit(shapeAbove, shapeBelow))
 	{
 		for (auto it = m_Edges.begin(); it != m_Edges.end(); it++)
 			(*it)->Split(P0, n, m_NewPointsGetter, shapeAbove, shapeBelow);
 
-		for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
+		for (auto it = m_FacesToBeSplit.begin(); it != m_FacesToBeSplit.end(); it++)
 			(*it)->Split(m_NewPointsGetter, shapeAbove, shapeBelow);
 
 		TransferSplitResultsToThis(shapeBelow);
@@ -168,6 +163,8 @@ bool Shape::Split(const Vector3& collPointWs, Shape& shapeAbove)
 		return true;
 	}
 
+	// ABORT THE SPLIT
+	// return shape below to the pool and also return any points created in Point::Split().
 	return false;
 }
 

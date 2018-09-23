@@ -12,7 +12,7 @@ public:
 		auto points = m_OthersTransformedPoints->GetData();
 		auto count = m_OthersTransformedPoints->GetCurrCount();
 
-		auto mostInside = MathUtils::Infinity;
+		auto mostInside = MathU::Infinity;
 
 		for (auto i = 0; i < count; i++)
 		{

@@ -86,6 +86,9 @@
     <Filter Include="Physics\ShapeAndSplitRelated">
       <UniqueIdentifier>{ce0e0f86-e67b-4bab-8ebe-accc413dee22}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Debuging">
+      <UniqueIdentifier>{049a5bdb-3e58-4c22-bd1e-71ee64ee63bc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
@@ -228,9 +231,6 @@
     <ClInclude Include="ArrayWrapper.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="MathUtils.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Vector3.h">
       <Filter>Utils</Filter>
     </ClInclude>
@@ -320,6 +320,18 @@
     </ClInclude>
     <ClInclude Include="BodyCollectionBounds.h">
       <Filter>Physics\CollisionStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="MathU.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="StringU.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugLogger.h">
+      <Filter>Debuging</Filter>
+    </ClInclude>
+    <ClInclude Include="Loggers.h">
+      <Filter>Debuging</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

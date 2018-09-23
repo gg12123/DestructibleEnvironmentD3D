@@ -18,7 +18,7 @@ public:
 
 	DynamicGridPartition()
 	{
-		m_NullSquare = std::unique_ptr<DynamicGridSquare>(new DynamicGridSquare(MathUtils::IntMax, m_Detector, m_Responder));
+		m_NullSquare = std::unique_ptr<DynamicGridSquare>(new DynamicGridSquare(MathU::IntMax, m_Detector, m_Responder));
 
 		for (auto i = 0U; i < XGridNumSquares; i++)
 			for (auto j = 0U; j < YGridNumSquares; j++)

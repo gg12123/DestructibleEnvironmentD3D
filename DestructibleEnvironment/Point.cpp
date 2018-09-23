@@ -4,7 +4,7 @@
 #include "Shape.h"
 #include "NewPointsGetter.h"
 
-void Point::Split(const Vector3& P0, const Vector3& n, NewPointsGetter& newPoints, Shape& shapeAbove, Shape& shapeBelow, int& numInside)
+void Point::Split(const Vector3& P0, const Vector3& n, NewPointsGetter& newPoints, Shape& shapeAbove, Shape& shapeBelow, int& countAbove, int& countBelow)
 {
 	m_LinkedPoint1 = nullptr;
 	m_LinkedPoint2 = nullptr;
@@ -23,16 +23,17 @@ void Point::Split(const Vector3& P0, const Vector3& n, NewPointsGetter& newPoint
 		newPoints.AddPoints(*this, *newAbove, *newBelow);
 
 		m_PlaneRelationship = PointPlaneRelationship::Inside;
-		numInside++;
 	}
 	else if (comp > 0.0f)
 	{
 		shapeAbove.AddPoint(*this);
 		m_PlaneRelationship = PointPlaneRelationship::Above;
+		countAbove++;
 	}
 	else
 	{
 		shapeBelow.AddPoint(*this);
 		m_PlaneRelationship = PointPlaneRelationship::Below;
+		countBelow++;
 	}
 }

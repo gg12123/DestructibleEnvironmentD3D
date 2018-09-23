@@ -139,8 +139,8 @@ private:
 	Vector3 CalculateCentre();
 	void InitFaces(const Vector3& finalFaceNormal);
 	void InitNewShape(Shape& shape, const Vector3& finalFaceNormal);
-	bool SplitPoints(const Vector3& P0, const Vector3& n, Shape& shapeAbove, Shape& shapeBelow);
 	void TransferSplitResultsToThis(Shape& splitResult);
+	bool FindFacesToBeSplit(Shape& shapeAbove, Shape& shapeBelow);
 
 	int m_RequiredNumVerts;
 	int m_RequiredNumIndicies;
@@ -153,6 +153,8 @@ private:
 	std::vector<int> m_CachedEdgePoints;
 	std::vector<Vector3> m_CachedFaceNormals;
 	std::vector<Vector3> m_CachedFaceP0s;
+
+	std::vector<Face*> m_FacesToBeSplit;
 
 	static NewPointsGetter m_NewPointsGetter;
 

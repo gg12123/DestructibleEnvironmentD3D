@@ -35,6 +35,7 @@ public:
 		return m_Normal;
 	}
 
+	bool PreSplit(Shape& shapeAbove, Shape& shapeBelow, std::vector<Face*>& facesNeedingFullSplit);
 	void Split(NewPointsGetter& newPoints, Shape& shapeAbove, Shape& shapeBelow);
 
 	auto& GetPoints()
@@ -48,10 +49,8 @@ public:
 	}
 
 	void CachePoints(std::vector<Vector3>& faceNormals, std::vector<Vector3>& faceP0s);
-	int CountNumInside();
 
 private:
-
 	bool IsNewlyFormedEdge(const ShapeEdge& e) const;
 
 	bool DefinesNewFace(const std::vector<Point*>& points) const

@@ -1,6 +1,6 @@
 #pragma once
 #include "Vector3.h"
-#include "MathUtils.h"
+#include "MathU.h"
 
 class Bounds
 {
@@ -12,14 +12,14 @@ public:
 
 	void Reset()
 	{
-		m_XMin = MathUtils::Infinity;
-		m_XMax = MathUtils::NegativeInfinity;
+		m_XMin = MathU::Infinity;
+		m_XMax = MathU::NegativeInfinity;
 
-		m_YMin = MathUtils::Infinity;
-		m_YMax = MathUtils::NegativeInfinity;
+		m_YMin = MathU::Infinity;
+		m_YMax = MathU::NegativeInfinity;
 
-		m_ZMin = MathUtils::Infinity;
-		m_ZMax = MathUtils::NegativeInfinity;
+		m_ZMin = MathU::Infinity;
+		m_ZMax = MathU::NegativeInfinity;
 	}
 
 	void Update(const Vector3& newPoint)

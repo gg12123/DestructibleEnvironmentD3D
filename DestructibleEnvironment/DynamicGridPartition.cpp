@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "DynamicGridPartition.h"
 #include "Rigidbody.h"
-#include "MathUtils.h"
+#include "MathU.h"
 
 void DynamicGridPartition::CalculateGridDimensions(const std::vector<std::unique_ptr<Rigidbody>>& bodies)
 {
@@ -14,9 +14,9 @@ void DynamicGridPartition::CalculateGridDimensions(const std::vector<std::unique
 	auto zSizeMin = m_DynamicBodiesBounds.GetCollectionZRange() / static_cast<float>(ZGridNumSquares - 1);
 
 	auto c = static_cast<float>(bodies.size());
-	auto xSize = MathUtils::Min(m_DynamicBodiesBounds.GetXAverageRange(), xSizeMin);
-	auto ySize = MathUtils::Min(m_DynamicBodiesBounds.GetYAverageRange() / c, ySizeMin);
-	auto zSize = MathUtils::Min(m_DynamicBodiesBounds.GetZAverageRange() / c, zSizeMin);
+	auto xSize = MathU::Min(m_DynamicBodiesBounds.GetXAverageRange(), xSizeMin);
+	auto ySize = MathU::Min(m_DynamicBodiesBounds.GetYAverageRange() / c, ySizeMin);
+	auto zSize = MathU::Min(m_DynamicBodiesBounds.GetZAverageRange() / c, zSizeMin);
 
 	m_Grid.SetSqaureDimensions(xSize, ySize, zSize, origin);
 }
