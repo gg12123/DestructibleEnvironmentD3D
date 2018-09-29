@@ -146,3 +146,22 @@ void Face::CachePoints(std::vector<Vector3>& faceNormals, std::vector<Vector3>& 
 	faceNormals.emplace_back(m_Normal);
 	faceP0s.emplace_back(m_CachedPoints[0]);
 }
+
+bool Face::PointIsInsideFace(const Vector3& point)
+{
+	auto size = m_CachedPoints.size();
+
+	for (auto i = 0U; i < size; i++)
+	{
+		auto next = (i + 1U) % size;
+
+		auto& P0 = m_CachedPoints[i];
+		auto& P1 = m_CachedPoints[next];
+
+		auto n = Vector3::Normalize(Vector3::Cross(P1 - P0, m_Normal));
+
+		if (Vector3::Dot(n, point - P0); > 0.0f)
+			return false;
+	}
+	return true;
+}

@@ -166,6 +166,15 @@
     <ClCompile Include="DynamicGridPartition.cpp">
       <Filter>Physics\CollisionStuff</Filter>
     </ClCompile>
+    <ClCompile Include="FaceSplitter.cpp">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClCompile>
+    <ClCompile Include="ConvexFaceCreator.cpp">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClCompile>
+    <ClCompile Include="IntersectionFinder.cpp">
+      <Filter>Physics\CollisionStuff</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -332,6 +341,27 @@
     </ClInclude>
     <ClInclude Include="Loggers.h">
       <Filter>Debuging</Filter>
+    </ClInclude>
+    <ClInclude Include="FaceFaceIntersection.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="ReadOnlyView.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="FaceSplitter.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="NewEdgePointsCotainer.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="ToBeNewPoint.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvexFaceCreator.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="IntersectionFinder.h">
+      <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

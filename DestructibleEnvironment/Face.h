@@ -3,6 +3,8 @@
 #pragma once
 
 #include "Vector3.h"
+#include "FaceFaceIntersection.h"
+#include "ReadOnlyView.h"
 #include <vector>
 
 class Point;
@@ -21,10 +23,6 @@ public:
 		// allocate space in vectors
 	}
 
-	~Face()
-	{
-	}
-
 	void SetNormal(const Vector3& normal)
 	{
 		m_Normal = normal;
@@ -35,33 +33,45 @@ public:
 		return m_Normal;
 	}
 
-	bool PreSplit(Shape& shapeAbove, Shape& shapeBelow, std::vector<Face*>& facesNeedingFullSplit);
-	void Split(NewPointsGetter& newPoints, Shape& shapeAbove, Shape& shapeBelow);
-
-	auto& GetPoints()
+	auto GetPlaneP0() const
 	{
-		return m_Points;
+		return m_CachedPoints[0];
 	}
 
-	auto& GetCachedPoints()
+	void RegisterIntersection(const FaceFaceIntersection& inter)
 	{
-		return m_CachedPoints;
+		m_Intersections.emplace_back(inter);
 	}
 
-	void CachePoints(std::vector<Vector3>& faceNormals, std::vector<Vector3>& faceP0s);
+	auto GetIntersections()
+	{
+		return ReadOnlyView<std::vector<FaceFaceIntersection>>(m_Intersections);
+	}
+
+	auto GetCachedPoints()
+	{
+		return ReadOnlyView<std::vector<Vector3>>(m_CachedPoints);
+	}
+
+	void AddPoint(const Vector3& p)
+	{
+		m_CachedPoints.emplace_back(p);
+	}
+
+	void Clear()
+	{
+		m_ToSharedPoints.clear();
+		m_CachedPoints.clear();
+		m_Intersections.clear();
+	}
+
+	bool PointIsInsideFace(const Vector3& point);
 
 private:
-	bool IsNewlyFormedEdge(const ShapeEdge& e) const;
-
-	bool DefinesNewFace(const std::vector<Point*>& points) const
-	{
-		return (points.size() > 2);
-	}
-
-	void ProcessNewFace(Face& face, ShapeEdge& newEdge, Shape& shape) const;
-
-	std::vector<Point*> m_Points;
+	std::vector<int> m_ToSharedPoints;
 	std::vector<Vector3> m_CachedPoints;
+
+	std::vector<FaceFaceIntersection> m_Intersections;
 
 	Vector3 m_Normal;
 };

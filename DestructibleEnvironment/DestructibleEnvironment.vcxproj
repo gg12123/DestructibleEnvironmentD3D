@@ -207,6 +207,7 @@
     <ClInclude Include="CollisionResponder.h" />
     <ClInclude Include="Common\DeviceResources.h" />
     <ClInclude Include="ConstantBufferInputTypes.h" />
+    <ClInclude Include="ConvexFaceCreator.h" />
     <ClInclude Include="D3DBuffers.h" />
     <ClInclude Include="DebugLogger.h" />
     <ClInclude Include="DestructibleEnvironmentMain.h" />
@@ -221,6 +222,8 @@
     <ClInclude Include="DynamicMesh.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Face.h" />
+    <ClInclude Include="FaceFaceIntersection.h" />
+    <ClInclude Include="FaceSplitter.h" />
     <ClInclude Include="FinalFaceCreator.h" />
     <ClInclude Include="FixedTimeStepTime.h" />
     <ClInclude Include="GameControlledDynamicBody.h" />
@@ -228,11 +231,13 @@
     <ClInclude Include="GridPartition.h" />
     <ClInclude Include="IMeshRenderer.h" />
     <ClInclude Include="InitialShapeCreator.h" />
+    <ClInclude Include="IntersectionFinder.h" />
     <ClInclude Include="LastCheckedAgainst.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Loggers.h" />
     <ClInclude Include="MathU.h" />
     <ClInclude Include="Matrix.h" />
+    <ClInclude Include="NewEdgePointsCotainer.h" />
     <ClInclude Include="NewPointsGetter.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Physics.h" />
@@ -245,6 +250,7 @@
     <ClInclude Include="PotentialCollision.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="Random.h" />
+    <ClInclude Include="ReadOnlyView.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Rigidbody.h" />
     <ClInclude Include="Shape.h" />
@@ -255,6 +261,7 @@
     <ClInclude Include="StaticBody.h" />
     <ClInclude Include="StaticShapeProxy.h" />
     <ClInclude Include="StringU.h" />
+    <ClInclude Include="ToBeNewPoint.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TwoDArray.h" />
     <ClInclude Include="Vector3.h" />
@@ -267,6 +274,7 @@
     <ClCompile Include="CollisionDetector.cpp" />
     <ClCompile Include="CollisionResponder.cpp" />
     <ClCompile Include="Common\DeviceResources.cpp" />
+    <ClCompile Include="ConvexFaceCreator.cpp" />
     <ClCompile Include="DestructibleEnvironmentMain.cpp" />
     <ClCompile Include="Content\SampleFpsTextRenderer.cpp" />
     <ClCompile Include="Content\Sample3DSceneRenderer.cpp" />
@@ -275,8 +283,10 @@
     <ClCompile Include="DynamicGridSquare.cpp" />
     <ClCompile Include="DynamicMesh.cpp" />
     <ClCompile Include="Face.cpp" />
+    <ClCompile Include="FaceSplitter.cpp" />
     <ClCompile Include="GameControlledDynamicBody.cpp" />
     <ClCompile Include="GameTheadToPhysicsThreadAction.cpp" />
+    <ClCompile Include="IntersectionFinder.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="NewPointsGetter.cpp" />
     <ClCompile Include="pch.cpp">

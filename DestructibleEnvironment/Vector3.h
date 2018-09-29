@@ -84,7 +84,7 @@ public:
 	static inline float Dot(const Vector3& v1, const Vector3& v2);
 	static inline Vector3 Cross(const Vector3& v1, const Vector3& v2);
 	static inline Vector3 ProjectOnPlane(const Vector3& planeNormal, const Vector3& vector);
-	static inline Vector3 LinePlaneIntersection(const Vector3& planeP0, const Vector3& planeNormal, const Vector3& lineP0, const Vector3& lineP1);
+	static inline bool LinePlaneIntersection(const Vector3& planeP0, const Vector3& planeNormal, const Vector3& lineP0, const Vector3& lineP1, Vector3& intPoint);
 	static inline void LineDefinedByTwoPlanes(const Vector3& planeP0, const Vector3& planeN0, const Vector3& planeP1, const Vector3& planeN1, Vector3& lineP0, Vector3& lineDir);
 	static inline Vector3 PointClosestToOtherLine(const Vector3& lineP0, const Vector3& lineDir, const Vector3& otherLineP0, const Vector3& otherLineDir);
 	static inline Vector3 Zero();
@@ -141,19 +141,20 @@ inline Vector3 Vector3::ProjectOnPlane(const Vector3& planeNormal, const Vector3
 }
 
 // assuming that the line intersect the plane
-inline Vector3 Vector3::LinePlaneIntersection(const Vector3& planeP0, const Vector3& planeNormal, const Vector3& lineP0, const Vector3& lineP1)
+inline bool Vector3::LinePlaneIntersection(const Vector3& planeP0, const Vector3& planeNormal, const Vector3& lineP0, const Vector3& lineP1, Vector3& intPoint)
 {
 	auto l = Normalize(lineP1 - lineP0);
 
 	auto num = Vector3::Dot(planeP0 - lineP0, planeNormal);
 	auto denom = Vector3::Dot(l, planeNormal);
 
-	if (fabs(denom) < MathU::SmallNumber)
-		return (lineP0 + lineP1) / 2.0f;
+	if (denom == 0.0f)
+		return false;
 
 	auto u = num / denom;
 
-	return lineP0 + u * l;
+	intPoint = lineP0 + u * l;
+	return true;
 }
 
 inline Vector3 Vector3::Zero()
