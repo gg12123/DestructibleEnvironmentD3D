@@ -28,6 +28,11 @@ public:
 
 	}
 
+	float Magnitude() const
+	{
+
+	}
+
 	// static
 
 	static inline float Dot(const Vector2& v1, const Vector2& v2);
