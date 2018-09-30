@@ -4,21 +4,31 @@ template<class T>
 class ReadOnlyView
 {
 public:
-	ReadOnlyView(T& coll)
+	ReadOnlyView(const std::vector<T>& coll)
 	{
-		m_Coll = coll;
+		m_Coll = &coll;
 	}
 
-	typename T::iterator Begin() const
+	const auto Begin() const
 	{
 		return m_Coll.begin();
 	}
 
-	typename T::iterator End() const
+	const auto End() const
 	{
 		return m_Coll.end();
 	}
 
+	const auto Data() const
+	{
+		return m_Coll.data();
+	}
+
+	auto Size() const
+	{
+		return m_Coll.size();
+	}
+
 private:
-	T * m_Coll;
+	const std::vector<T> * m_Coll;
 };

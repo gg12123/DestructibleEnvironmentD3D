@@ -208,6 +208,7 @@
     <ClInclude Include="Common\DeviceResources.h" />
     <ClInclude Include="ConstantBufferInputTypes.h" />
     <ClInclude Include="ConvexFaceCreator.h" />
+    <ClInclude Include="Polygon2.h" />
     <ClInclude Include="D3DBuffers.h" />
     <ClInclude Include="DebugLogger.h" />
     <ClInclude Include="DestructibleEnvironmentMain.h" />
@@ -245,6 +246,8 @@
     <ClInclude Include="PhysicsObject.h" />
     <ClInclude Include="PhysicsTime.h" />
     <ClInclude Include="Point.h" />
+    <ClInclude Include="Polygon2IntersectionFinder.h" />
+    <ClInclude Include="Polygon2Splitter.h" />
     <ClInclude Include="Pool.h" />
     <ClInclude Include="PoolOfRecyclables.h" />
     <ClInclude Include="PotentialCollision.h" />
@@ -264,6 +267,7 @@
     <ClInclude Include="ToBeNewPoint.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TwoDArray.h" />
+    <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="World.h" />

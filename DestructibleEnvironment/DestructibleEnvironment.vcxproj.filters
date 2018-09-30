@@ -363,6 +363,18 @@
     <ClInclude Include="IntersectionFinder.h">
       <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
+    <ClInclude Include="Vector2.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Polygon2Splitter.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="Polygon2.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Polygon2IntersectionFinder.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">
