@@ -1,6 +1,7 @@
 #pragma once
 #include <assert.h>
 #include "Polygon2.h"
+#include "PoolOfRecyclables.h"
 
 struct PerimPoint
 {
@@ -18,13 +19,13 @@ class Polygon2Splitter
 {
 public:
 	// input polys must be convex
-	void Split(const Polygon2& perimPoly, const Polygon2& containedPoly, std::vector<Polygon2>& splitResults)
+	void Split(const Polygon2& perimPoly, const Polygon2& containedPoly, std::vector<Polygon2*>& splitResults, PoolOfRecyclables<Polygon2>& polyPool)
 	{
 		m_PerimPoly = &perimPoly;
 		m_ContainedPoly = &containedPoly;
 
 		CreateCombinedPerimeterPoints();
-		CreateNewPolys(splitResults);
+		CreateNewPolys(splitResults, polyPool);
 	}
 
 private:
@@ -99,14 +100,14 @@ private:
 		}
 	}
 
-	void CreateNewPolys(std::vector<Polygon2>& splitResults)
+	void CreateNewPolys(std::vector<Polygon2*>& splitResults, PoolOfRecyclables<Polygon2>& polyPool)
 	{
 		auto startIndex = 0;
 		auto size = m_CombinedPerimPoints.size();
 
 		do
 		{
-			Polygon2 newPoly;
+			auto& newPoly = polyPool.Recycle();
 			newPoly.Add(m_CombinedPerimPoints[startIndex].Position);
 
 			auto index = (startIndex + 1) % size;
@@ -126,7 +127,7 @@ private:
 			newPoly.Add(m_CombinedPerimPoints[i1].Position);
 			newPoly.Add(m_CombinedPerimPoints[i2].Position);
 			
-			splitResults.emplace_back(std::move(newPoly));
+			splitResults.emplace_back(&newPoly);
 			startIndex = index;
 		} while (startIndex != 0);
 	}

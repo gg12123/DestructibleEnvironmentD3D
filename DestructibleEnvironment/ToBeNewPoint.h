@@ -32,11 +32,12 @@ public:
 		BeenStartedFrom = false;
 	}
 
-	void SetupAcrossPoint(const Vector3& pos, ToBeNewPoint& other)
+	void SetupAcrossPoint(const Vector3& pos, const Vector3& normal, ToBeNewPoint& other)
 	{
 		Type = NewPointType::AcrossFace;
 		Position = pos;
 		Other = &other;
+		FaceNormal = normal;
 		TimesAdded = 0;
 		LastVisitedId = 0;
 	}

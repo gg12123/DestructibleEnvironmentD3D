@@ -207,7 +207,8 @@
     <ClInclude Include="CollisionResponder.h" />
     <ClInclude Include="Common\DeviceResources.h" />
     <ClInclude Include="ConstantBufferInputTypes.h" />
-    <ClInclude Include="ConvexFaceCreator.h" />
+    <ClInclude Include="ConvexPolyCreator.h" />
+    <ClInclude Include="FaceRelationshipWithOtherShape.h" />
     <ClInclude Include="Polygon2.h" />
     <ClInclude Include="D3DBuffers.h" />
     <ClInclude Include="DebugLogger.h" />
@@ -260,6 +261,7 @@
     <ClInclude Include="Constants.h" />
     <ClInclude Include="ShapeEdge.h" />
     <ClInclude Include="ShapeProxy.h" />
+    <ClInclude Include="SplitFaceRegion.h" />
     <ClInclude Include="SplitInfo.h" />
     <ClInclude Include="StaticBody.h" />
     <ClInclude Include="StaticShapeProxy.h" />
@@ -278,7 +280,6 @@
     <ClCompile Include="CollisionDetector.cpp" />
     <ClCompile Include="CollisionResponder.cpp" />
     <ClCompile Include="Common\DeviceResources.cpp" />
-    <ClCompile Include="ConvexFaceCreator.cpp" />
     <ClCompile Include="DestructibleEnvironmentMain.cpp" />
     <ClCompile Include="Content\SampleFpsTextRenderer.cpp" />
     <ClCompile Include="Content\Sample3DSceneRenderer.cpp" />

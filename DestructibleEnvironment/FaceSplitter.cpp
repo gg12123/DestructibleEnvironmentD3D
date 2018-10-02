@@ -6,7 +6,8 @@ void FaceSplitter::AddPoint(ToBeNewPoint& p)
 {
 	p.TimesAdded++;
 	p.LastVisitedId = m_CurrentVisitId;
-	m_FaceCreator.AddPoint(p.Position);
+	
+	// add to current perim poly
 }
 
 void FaceSplitter::ProcessIntersection(const FaceFaceIntersection& inter)
@@ -45,6 +46,8 @@ void FaceSplitter::CreateNewPointObjects()
 	m_AcrossPoints.clear();
 	m_PerimeterPoints.clear();
 
+	m_NewPointsPool->Reset();
+
 	auto originalPoints = m_FaceBeingSplit->GetCachedPoints();
 	auto inters = m_FaceBeingSplit->GetIntersections();
 
@@ -78,8 +81,6 @@ void FaceSplitter::CreateNewPointObjects()
 
 		originalIndex++;
 	}
-
-	m_CurrentVisitId = 0;
 }
 
 void FaceSplitter::ProcessPointsStartingOnEdge(ToBeNewPoint& startEdgePoint)
@@ -106,40 +107,89 @@ void FaceSplitter::ProcessPointsStartingOnEdge(ToBeNewPoint& startEdgePoint)
 
 void FaceSplitter::SplitOriginalShapesFace(Face& toSplit)
 {
-	m_FaceBeingSplit = &toSplit;
-	CreateNewPointObjects();
-	CreateFacesAcrossEntireFaceToSplit();
+	SplitCommon(toSplit);
 }
 
 void FaceSplitter::SplitCutShapesFace(Face& toSplit)
 {
-	m_FaceBeingSplit = &toSplit;
-	CreateNewPointObjects();
-	CreateFacesInIntersectionOnly();
+	SplitCommon(toSplit);
 }
 
-void FaceSplitter::CreateFacesAcrossEntireFaceToSplit()
+void FaceSplitter::SplitCommon(Face& toSplit)
 {
-	assert(m_EdgePoints.size() > 0);
+	m_FaceBeingSplit = &toSplit;
+	CreateNewPointObjects();
+	CreateSplitFaceRegions();
+	AssignContainedChildren();
 
-	auto sep = GetNextStartEdgePointEntireFace();
+	for (auto it = m_Regions.begin(); it != m_Regions.end(); it++)
+		(*it)->GenerateInitialConvexPieces(*m_PolyPool, m_ConvexCreator);
 
-	m_FaceCreator.SetNormal(m_FaceBeingSplit->GetNormal());
-
-	while (sep)
+	for (auto it = m_Regions.begin(); it != m_Regions.end(); it++)
 	{
-		m_FaceCreator.Restart();
-		ProcessPointsStartingOnEdge(*sep);
-
-		auto& faces = DefinesStartOfFaceInIntersection(*sep) ? m_NewInsideFaces : m_NewOutsideFaces;
-		m_FaceCreator.CreateFaces(faces);
-		m_CurrentVisitId++;
-
-		sep = GetNextStartEdgePointEntireFace();
+		auto &r = **it;
+		if (!r.HasParent())
+			r.ClipToContainedChild(m_InersectionFinder, m_PolySplitter, *m_PolyPool);
 	}
 }
 
-ToBeNewPoint* FaceSplitter::GetNextStartAcrossPointIntersectionOnly()
+SplitFaceRegion& FaceSplitter::CreateNextReion(FaceRelationshipWithOtherShape inOrOut) // pass in weather the region is in or outside
+{
+	auto& region = m_RegionPool->Recycle();
+	region.Init(*m_CurrentPerimeterPoly);
+	m_Regions.emplace_back(&region);
+	m_CurrentPerimeterPoly = &m_PolyPool->Recycle();
+	return region;
+}
+
+void FaceSplitter::AssignContainedChildren()
+{
+	for (auto it = m_RegionsWithParents.begin(); it != m_RegionsWithParents.end(); it++)
+		FindParent(**it);
+}
+
+void FaceSplitter::FindParent(SplitFaceRegion& child)
+{
+	// cast out to other regions and use the first hit
+}
+
+void FaceSplitter::CreateSplitFaceRegions()
+{
+	m_Regions.clear();
+	m_RegionsWithParents.clear();
+
+	m_RegionPool->Reset();
+	m_PolyPool->Reset();
+
+	m_CurrentPerimeterPoly = &m_PolyPool->Recycle();
+	m_CurrentVisitId = 0;
+
+	auto sep = GetNextStartEdgePoint();
+	while (sep)
+	{
+		ProcessPointsStartingOnEdge(*sep);
+		CreateNextReion(DefinesStartOfFaceInIntersection(sep*) ? FaceRelationshipWithOtherShape::InIntersection : FaceRelationshipWithOtherShape::NotInIntersection);
+		m_CurrentVisitId++;
+		sep = GetNextStartEdgePoint();
+	}
+
+	auto sap = GetNextStartAcrossPoint();
+	while (sap)
+	{
+		ProcessPointsAcrossFaceOnly(*sap);
+		m_RegionsWithParents.emplace_back(CreateNextReion()); // determin relationship by casting from an edge in the normal direction and counting intersections
+		m_CurrentVisitId++;
+		sap = GetNextStartAcrossPoint();
+	}
+
+	if (m_EdgePoints.size() == 0)
+	{
+		// assign original points to curr poly
+		CreateNextReion(FaceRelationshipWithOtherShape::Unkown); // the relationship will be given by the contained child
+	}
+}
+
+ToBeNewPoint* FaceSplitter::GetNextStartAcrossPoint()
 {
 	for (auto it = m_AcrossPoints.begin(); it != m_AcrossPoints.end(); it++)
 	{
@@ -149,19 +199,7 @@ ToBeNewPoint* FaceSplitter::GetNextStartAcrossPointIntersectionOnly()
 	return nullptr;
 }
 
-ToBeNewPoint* FaceSplitter::GetNextStartEdgePointIntersectionOnly()
-{
-	for (auto it = m_EdgePoints.begin(); it != m_EdgePoints.end(); it++)
-	{
-		auto ep = *it;
-
-		if ((ep->TimesAdded == 0) && DefinesStartOfFaceInIntersection(*ep))
-			return ep;
-	}
-	return nullptr;
-}
-
-ToBeNewPoint* FaceSplitter::GetNextStartEdgePointEntireFace()
+ToBeNewPoint* FaceSplitter::GetNextStartEdgePoint()
 {
 	for (auto it = m_EdgePoints.begin(); it != m_EdgePoints.end(); it++)
 	{
@@ -171,37 +209,6 @@ ToBeNewPoint* FaceSplitter::GetNextStartEdgePointEntireFace()
 			return ep;
 	}
 	return nullptr;
-}
-
-void FaceSplitter::CreateFacesInIntersectionOnly()
-{
-	m_FaceCreator.SetNormal(m_FaceBeingSplit->GetNormal());
-
-	auto sep = GetNextStartEdgePointIntersectionOnly();
-	while (sep)
-	{
-		m_FaceCreator.Restart();
-		ProcessPointsStartingOnEdge(*sep);
-
-		m_FaceCreator.CreateFaces(m_NewInsideFaces);
-		m_FaceCreator.CreateUpsideDownFaces(m_NewOutsideFaces);
-		m_CurrentVisitId++;
-
-		sep = GetNextStartEdgePointIntersectionOnly();
-	}
-
-	auto sap = GetNextStartAcrossPointIntersectionOnly();
-	while (sap)
-	{
-		m_FaceCreator.Restart();
-		ProcessPointsAcrossFaceOnly(*sap);
-
-		m_FaceCreator.CreateFaces(m_NewInsideFaces);
-		m_FaceCreator.CreateUpsideDownFaces(m_NewOutsideFaces);
-		m_CurrentVisitId++;
-
-		sap = GetNextStartAcrossPointIntersectionOnly();
-	}
 }
 
 ToBeNewPoint& FaceSplitter::ProcessToNextEdgePointAlongPerimeter(ToBeNewPoint& ep)

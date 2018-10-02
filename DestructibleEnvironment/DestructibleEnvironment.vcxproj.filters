@@ -169,9 +169,6 @@
     <ClCompile Include="FaceSplitter.cpp">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClCompile>
-    <ClCompile Include="ConvexFaceCreator.cpp">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClCompile>
     <ClCompile Include="IntersectionFinder.cpp">
       <Filter>Physics\CollisionStuff</Filter>
     </ClCompile>
@@ -357,9 +354,6 @@
     <ClInclude Include="ToBeNewPoint.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
-    <ClInclude Include="ConvexFaceCreator.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
     <ClInclude Include="IntersectionFinder.h">
       <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
@@ -373,6 +367,15 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Polygon2IntersectionFinder.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="SplitFaceRegion.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvexPolyCreator.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="FaceRelationshipWithOtherShape.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
   </ItemGroup>
