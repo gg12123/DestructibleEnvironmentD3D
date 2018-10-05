@@ -3,14 +3,20 @@
 
 class Face;
 
+class FaceEdgeIntersection
+{
+public:
+	Face * PiercedFace;
+	int PiercingEdge;
+	Vector2 Position;
+};
+
 class FaceFaceIntersection
 {
 public:
-	Face * PiercedFace1;
-	int PiercingEdge1;
-	Vector3 Position1;
+	Face * Face1;
+	Face * Face2;
 
-	Face * PiercedFace2;
-	int PiercingEdge2;
-	Vector3 Position2;
+	FaceEdgeIntersection Intersection1;
+	FaceEdgeIntersection Intersection2;
 };

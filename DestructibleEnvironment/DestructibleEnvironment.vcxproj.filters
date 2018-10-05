@@ -342,9 +342,6 @@
     <ClInclude Include="FaceFaceIntersection.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
-    <ClInclude Include="ReadOnlyView.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="FaceSplitter.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>

@@ -11,7 +11,7 @@ public:
 		return m_EdgePoints[index].size() > 0;
 	}
 
-	void StartReturningEdgesFrom(int index, Vector3 edgeOrigin)
+	void StartReturningEdgesFrom(int index, Vector2 edgeOrigin)
 	{
 		m_PosOfLastReturned = edgeOrigin;
 		m_ActiveIndex = index;
@@ -52,7 +52,7 @@ public:
 	}
 
 private:
-	Vector3 m_PosOfLastReturned;
+	Vector2 m_PosOfLastReturned;
 	int m_ActiveIndex;
 	std::vector<std::vector<ToBeNewPoint*>> m_EdgePoints;
 };

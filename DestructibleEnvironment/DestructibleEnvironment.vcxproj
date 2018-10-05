@@ -254,7 +254,6 @@
     <ClInclude Include="PotentialCollision.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="Random.h" />
-    <ClInclude Include="ReadOnlyView.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Rigidbody.h" />
     <ClInclude Include="Shape.h" />

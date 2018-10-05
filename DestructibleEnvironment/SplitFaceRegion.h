@@ -4,7 +4,6 @@
 #include "Polygon2Splitter.h"
 #include "PoolOfRecyclables.h"
 #include "ConvexPolyCreator.h"
-#include "ReadOnlyView.h"
 #include "FaceRelationshipWithOtherShape.h"
 
 class SplitFaceRegion
@@ -15,10 +14,14 @@ public:
 		m_PerimeterPoly = &perimPoly;
 		m_ContainedChild = nullptr;
 		m_InOrOut = inOrOut;
-		m_HasParent = false;
 	}
 
-	FaceRelationshipWithOtherShape GetInOrOut()
+	const Polygon2& GetPerimeterPoly() const
+	{
+		return *m_PerimeterPoly;
+	}
+
+	FaceRelationshipWithOtherShape GetInOrOut() const
 	{
 		if (m_InOrOut == FaceRelationshipWithOtherShape::Unkown)
 		{
@@ -37,17 +40,33 @@ public:
 		convexCreator.ToConvexPieces(*m_PerimeterPoly, m_ConvexPieces, polyPool);
 	}
 
-	auto GetConvexPieces()
+	const auto& GetConvexPieces()
 	{
-		return ReadOnlyView<Polygon2*>(m_ConvexPieces);
+		return m_ConvexPieces;
+	}
+
+	void CreateFaces(std::vector<Face*>& faces, const Face& original) const
+	{
+		for (auto it = m_ConvexPieces.begin(); it != m_ConvexPieces.end(); it++)
+		{
+			auto f = new Face(); // use pool
+			f->Clear();
+
+			auto& points = (*it)->GetPoints();
+
+			for (auto it2 = points.begin(); it2 != points.end(); it2++)
+				f->AddPoint(original.ToShapeSpacePosition(*it2));
+
+			faces.emplace_back(f);
+		}
 	}
 
 	void ClipToContainedChild(Polygon2IntersectionFinder& intFinder, Polygon2Splitter& splitter, PoolOfRecyclables<Polygon2>& polyPool)
 	{
 		if (m_ContainedChild)
 		{
-			auto childsPieces = m_ContainedChild->GetConvexPieces();
-			for (auto it = childsPieces.Begin(); it != childsPieces.End(); it++)
+			auto& childsPieces = m_ContainedChild->GetConvexPieces();
+			for (auto it = childsPieces.begin(); it != childsPieces.end(); it++)
 				SplitToCovexPoly(**it, intFinder, splitter, polyPool);
 
 			m_ContainedChild->ClipToContainedChild(intFinder, splitter, polyPool);
@@ -57,12 +76,6 @@ public:
 	void SetContainedChild(SplitFaceRegion& c)
 	{
 		m_ContainedChild = &c;
-		c.m_HasParent = true;
-	}
-
-	bool HasParent()
-	{
-		return m_HasParent;
 	}
 
 private:
@@ -94,5 +107,4 @@ private:
 	std::vector<Polygon2*> m_ForOutput;
 
 	FaceRelationshipWithOtherShape m_InOrOut;
-	bool m_HasParent;
 };

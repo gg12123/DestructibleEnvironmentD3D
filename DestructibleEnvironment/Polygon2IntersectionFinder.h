@@ -84,9 +84,9 @@ public:
 private:
 	bool PointOnPolyIsOutsideOther(const Polygon2& poly, const Polygon2& other)
 	{
-		auto polyPoints = poly.GetPoints();
+		auto& polyPoints = poly.GetPoints();
 
-		for (auto it = polyPoints.Begin(); it != polyPoints.End(); it++)
+		for (auto it = polyPoints.begin(); it != polyPoints.end(); it++)
 		{
 			if (other.PointIsOutsideAssumingConvex(*it, MathU::SmallNumber))
 				return true;
@@ -113,64 +113,48 @@ private:
 		auto activePoly = m_CurrentIntersectionPoint.ActivePoly;
 		auto otherPoly = m_CurrentIntersectionPoint.OtherPoly;
 
-		auto pEnd = currPos + 100.0f * activePoly->GetDirectionAt(activePolyCurrEdgeIndex);
+		auto castDir = activePoly->GetDirectionAt(activePolyCurrEdgeIndex);
 
 		auto closestDist = MathU::Infinity;
-		auto indexOfClosest = -1;
-		Vector2 closestIntPoint;
+		EdgeCastHit* closestHit = nullptr;
 
-		auto otherPoints = otherPoly->GetPoints();
-		auto data = otherPoints.Data();
-		auto count = otherPoints.Size();
-
-		auto edgeMaskOnOther = activePolyCurrEdgeIndex != m_CurrentIntersectionPoint.EdgeOnActivePoly ? 
+		auto edgeMaskOnOther = activePolyCurrEdgeIndex != m_CurrentIntersectionPoint.EdgeOnActivePoly ?
 			-1 : m_CurrentIntersectionPoint.EdgeOnOtherPoly;
 
-		for (auto i = 0U; i < count; i++)
+		m_CastHitPoints.clear();
+		otherPoly->RayCastAllEdges(currPos, castDir, edgeMaskOnOther, m_CastHitPoints);
+
+		for (auto it = m_CastHitPoints.begin(); it != m_CastHitPoints.end(); it++)
 		{
-			if (i == edgeMaskOnOther)
-				continue;
+			auto dist = ((*it).HitPoint - currPos).Magnitude();
 
-			auto& p0 = data[i];
-			auto& p1 = data[(i + 1) % count];
-
-			Vector2 intPoint;
-			if (Vector2::LinesIntersect(p0, p1, currPos, pEnd, intPoint))
+			if (dist < closestDist)
 			{
-				auto dist = (intPoint - currPos).Magnitude();
-
-				if (dist < closestDist)
-				{
-					closestIntPoint = intPoint;
-					closestDist = dist;
-					indexOfClosest = i;
-				}
+				closestDist = dist;
+				closestHit = &(*it);
 			}
 		}
-		assert(indexOfClosest != -1); // if this does start to occur, I can just use the edge that is closest to an intersection
-		m_CurrentIntersectionPoint = PolyIntersectionPoint(closestIntPoint, *activePoly, *otherPoly, activePolyCurrEdgeIndex, indexOfClosest);
+
+		m_CurrentIntersectionPoint = PolyIntersectionPoint(closestHit->HitPoint, *activePoly, *otherPoly, activePolyCurrEdgeIndex, closestHit->HitEdgeIndex);
 	}
 
 	bool FindInitialIntersectionPoint(const Polygon2& poly1, const Polygon2& poly2)
 	{
-		auto poly1Points = poly1.GetPoints();
-		auto poly2Points = poly2.GetPoints();
+		auto& poly1Points = poly1.GetPoints();
+		auto& poly2Points = poly2.GetPoints();
 
-		auto poly1Data = poly1Points.Data();
-		auto poly2Data = poly2Points.Data();
-
-		auto poly1Count = poly1Points.Size();
-		auto poly2Count = poly2Points.Size();
+		auto poly1Count = poly1Points.size();
+		auto poly2Count = poly2Points.size();
 
 		for (auto i = 0U; i < poly1Count; i++)
 		{
-			auto& aP0 = poly1Data[i];
-			auto& aP1 = poly1Data[(i + 1) % poly1Count];
+			auto& aP0 = poly1Points[i];
+			auto& aP1 = poly1Points[(i + 1) % poly1Count];
 
 			for (auto j = 0U; j < poly2Count; j++)
 			{
-				auto& bP0 = poly2Data[j];
-				auto& bP1 = poly2Data[(j + 1) % poly2Count];
+				auto& bP0 = poly2Points[j];
+				auto& bP1 = poly2Points[(j + 1) % poly2Count];
 
 				Vector2 intPoint;
 				if (Vector2::LinesIntersect(aP0, aP1, bP0, bP1, intPoint))
@@ -208,4 +192,5 @@ private:
 
 	PolyIntersectionPoint m_CurrentIntersectionPoint;
 	Polygon2* m_Intersection;
+	std::vector<EdgeCastHit> m_CastHitPoints;
 };

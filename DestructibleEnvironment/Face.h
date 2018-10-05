@@ -3,8 +3,9 @@
 #pragma once
 
 #include "Vector3.h"
+#include "Vector2.h"
 #include "FaceFaceIntersection.h"
-#include "ReadOnlyView.h"
+#include "Polygon2.h"
 #include <vector>
 
 class Point;
@@ -23,6 +24,21 @@ public:
 		// allocate space in vectors
 	}
 
+	Vector2 ToFaceSpaceDirection(const Vector3& shapesSpaceDir) const
+	{
+
+	}
+
+	Vector2 ToFaceSpacePosition(const Vector3& shapesSpacePos) const
+	{
+
+	}
+
+	Vector3 ToShapeSpacePosition(const Vector2& faceSpacePos) const
+	{
+
+	}
+
 	void SetNormal(const Vector3& normal)
 	{
 		m_Normal = normal;
@@ -31,6 +47,10 @@ public:
 	auto GetNormal() const
 	{
 		return m_Normal;
+	}
+
+	Vector3 GetNormalWorld() const
+	{
 	}
 
 	auto GetPlaneP0() const
@@ -43,14 +63,24 @@ public:
 		m_Intersections.emplace_back(inter);
 	}
 
-	auto GetIntersections()
+	const auto& GetIntersections()
 	{
-		return ReadOnlyView<std::vector<FaceFaceIntersection>>(m_Intersections);
+		return m_Intersections;
 	}
 
-	auto GetCachedPoints()
+	const auto& GetCachedPoints()
 	{
-		return ReadOnlyView<std::vector<Vector3>>(m_CachedPoints);
+		return m_CachedPoints;
+	}
+
+	auto& GetShape()
+	{
+		return *m_OwnerShape;
+	}
+
+	const auto& GetFacePoly()
+	{
+		return m_FacePoly;
 	}
 
 	void AddPoint(const Vector3& p)
@@ -72,6 +102,8 @@ private:
 	std::vector<Vector3> m_CachedPoints;
 
 	std::vector<FaceFaceIntersection> m_Intersections;
+	Shape* m_OwnerShape;
+	Polygon2 m_FacePoly;
 
 	Vector3 m_Normal;
 };

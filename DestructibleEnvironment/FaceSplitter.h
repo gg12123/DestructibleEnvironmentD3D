@@ -21,11 +21,28 @@ public:
 	void SplitOriginalShapesFace(Face& toSplit);
 	void SplitCutShapesFace(Face& toSplit);
 
+	void Clear()
+	{
+		m_NewOutsideFaces.clear();
+		m_NewInIntersectionFaces.clear();
+	}
+
+	auto& GetNewOutsideFaces()
+	{
+		return m_NewOutsideFaces;
+	}
+
+	auto& GetNewInIntersectionFaces()
+	{
+		return m_NewInIntersectionFaces;
+	}
+
 private:
 	void SplitCommon(Face& toSplit);
 
 	void CreateNewPointObjects();
 	void ProcessIntersection(const FaceFaceIntersection& inter);
+	void ProcessIntersection(const FaceEdgeIntersection& inter, const Vector2& otherFaceNormal, ToBeNewPoint& newPoint, ToBeNewPoint& other);
 	void AddPoint(ToBeNewPoint& p);
 
 	ToBeNewPoint* GetNextStartEdgePoint();
@@ -39,7 +56,8 @@ private:
 	void ProcessPointsStartingOnEdge(ToBeNewPoint& startEdgePoint);
 	void ProcessPointsAcrossFaceOnly(ToBeNewPoint& startAcrossFacePoint);
 
-	bool DefinesStartOfFaceInIntersection(const ToBeNewPoint& sep);
+	FaceRelationshipWithOtherShape InOrOutForPerminRegion(const ToBeNewPoint& sep); // start edge point
+	FaceRelationshipWithOtherShape InOrOutForContainedRegion(const ToBeNewPoint& sap); // start across point
 
 	void CreateSplitFaceRegions();
 	SplitFaceRegion& CreateNextReion(FaceRelationshipWithOtherShape inOrOut);
@@ -48,12 +66,16 @@ private:
 
 	void AssignContainedChildren();
 	void FindParent(SplitFaceRegion& child);
+	bool RegionIsInsideOther(const SplitFaceRegion& maybeInside, const SplitFaceRegion& other, float& dist);
+
+	void CreateFaces(const SplitFaceRegion& region);
+	void CreateInIntersectionOnlyFaces(const SplitFaceRegion& region);
 
 	Face * m_FaceBeingSplit;
 	Polygon2* m_CurrentPerimeterPoly;
 
 	std::vector<Face*> m_NewOutsideFaces;
-	std::vector<Face*> m_NewInsideFaces;
+	std::vector<Face*> m_NewInIntersectionFaces;
 
 	std::vector<ToBeNewPoint*> m_PerimeterPoints;
 	std::vector<ToBeNewPoint*> m_EdgePoints;
@@ -68,8 +90,10 @@ private:
 	Polygon2Splitter m_PolySplitter;
 	ConvexPolyCreator m_ConvexCreator;
 
-	std::vector<SplitFaceRegion*> m_Regions;
-	std::vector<SplitFaceRegion*> m_RegionsWithParents;
+	std::vector<SplitFaceRegion*> m_PerimRegions;
+	std::vector<SplitFaceRegion*> m_ContainedRegions;
+
+	std::vector<EdgeCastHit> m_EdgeCastHits;
 
 	int m_CurrentVisitId;
 };

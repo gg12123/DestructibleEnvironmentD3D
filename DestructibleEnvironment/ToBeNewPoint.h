@@ -1,5 +1,5 @@
 #pragma once
-#include "Vector3.h"
+#include "Vector2.h"
 
 enum class NewPointType
 {
@@ -17,12 +17,12 @@ public:
 	int TimesAdded;
 	bool BeenStartedFrom;
 
-	Vector3 Position;
-	Vector3 FaceNormal;
+	Vector2 Position;
+	Vector2 FaceNormal;
 
 	int LastVisitedId;
 
-	void SetupEdgePoint(const Vector3& pos, const Vector3& normal, ToBeNewPoint& other)
+	void SetupEdgePoint(const Vector2& pos, const Vector2& normal, ToBeNewPoint& other)
 	{
 		Type = NewPointType::Edge;
 		Position = pos;
@@ -32,7 +32,7 @@ public:
 		BeenStartedFrom = false;
 	}
 
-	void SetupAcrossPoint(const Vector3& pos, const Vector3& normal, ToBeNewPoint& other)
+	void SetupAcrossPoint(const Vector2& pos, const Vector2& normal, ToBeNewPoint& other)
 	{
 		Type = NewPointType::AcrossFace;
 		Position = pos;
@@ -42,7 +42,7 @@ public:
 		LastVisitedId = 0;
 	}
 
-	void SetupOriginal(const Vector3& pos)
+	void SetupOriginal(const Vector2& pos)
 	{
 		Type = NewPointType::Edge;
 		Position = pos;
