@@ -58,7 +58,7 @@ public:
 		return m_CachedPoints[0];
 	}
 
-	void RegisterIntersection(const FaceFaceIntersection& inter)
+	void RegisterIntersection(const FaceFaceIntersection<Vector2>& inter)
 	{
 		m_Intersections.emplace_back(inter);
 	}
@@ -83,6 +83,11 @@ public:
 		return m_FacePoly;
 	}
 
+	const auto& GetSharedPoints() const
+	{
+		return m_ToSharedPoints;
+	}
+
 	void AddPoint(const Vector3& p)
 	{
 		m_CachedPoints.emplace_back(p);
@@ -95,13 +100,15 @@ public:
 		m_Intersections.clear();
 	}
 
-	bool PointIsInsideFace(const Vector3& point);
+	bool PointIsInsideFace(const Vector3& pointShapesSpace) const;
 
 private:
+	// all points related collections must be parralel.
+
 	std::vector<int> m_ToSharedPoints;
 	std::vector<Vector3> m_CachedPoints;
 
-	std::vector<FaceFaceIntersection> m_Intersections;
+	std::vector<FaceFaceIntersection<Vector2>> m_Intersections;
 	Shape* m_OwnerShape;
 	Polygon2 m_FacePoly;
 

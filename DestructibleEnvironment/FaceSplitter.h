@@ -41,8 +41,8 @@ private:
 	void SplitCommon(Face& toSplit);
 
 	void CreateNewPointObjects();
-	void ProcessIntersection(const FaceFaceIntersection& inter);
-	void ProcessIntersection(const FaceEdgeIntersection& inter, const Vector2& otherFaceNormal, ToBeNewPoint& newPoint, ToBeNewPoint& other);
+	void ProcessIntersection(const FaceFaceIntersection<Vector2>& inter);
+	void ProcessIntersection(const FaceEdgeIntersection<Vector2>& inter, const Vector2& otherFaceNormal, ToBeNewPoint& newPoint, ToBeNewPoint& other);
 	void AddPoint(ToBeNewPoint& p);
 
 	ToBeNewPoint* GetNextStartEdgePoint();

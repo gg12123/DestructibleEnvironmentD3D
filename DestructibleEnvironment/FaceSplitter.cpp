@@ -11,7 +11,7 @@ void FaceSplitter::AddPoint(ToBeNewPoint& p)
 	m_CurrentPerimeterPoly->Add(p.Position);
 }
 
-void FaceSplitter::ProcessIntersection(const FaceEdgeIntersection& inter, const Vector2& otherFaceNormal, ToBeNewPoint& newPoint, ToBeNewPoint& other)
+void FaceSplitter::ProcessIntersection(const FaceEdgeIntersection<Vector2>& inter, const Vector2& otherFaceNormal, ToBeNewPoint& newPoint, ToBeNewPoint& other)
 {
 	if (inter.PiercedFace == m_FaceBeingSplit)
 	{
@@ -26,7 +26,7 @@ void FaceSplitter::ProcessIntersection(const FaceEdgeIntersection& inter, const 
 	}
 }
 
-void FaceSplitter::ProcessIntersection(const FaceFaceIntersection& inter)
+void FaceSplitter::ProcessIntersection(const FaceFaceIntersection<Vector2>& inter)
 {
 	auto& p1 = m_NewPointsPool->Recycle();
 	auto& p2 = m_NewPointsPool->Recycle();

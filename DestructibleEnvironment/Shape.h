@@ -20,12 +20,12 @@ public:
 
 	virtual ~Shape();
 
-	auto& GetFaces()
+	const auto& GetFaces()
 	{
 		return m_Faces;
 	}
 
-	auto& GetCachedPoints()
+	const auto& GetCachedPoints()
 	{
 		return m_CachedPoints;
 	}
