@@ -21,10 +21,10 @@ public:
 	void SplitOriginalShapesFace(Face& toSplit);
 	void SplitCutShapesFace(Face& toSplit);
 
-	void Clear()
+	void SetOutputs(std::vector<Face*>& newOutside, std::vector<Face*>& newInIntersection)
 	{
-		m_NewOutsideFaces.clear();
-		m_NewInIntersectionFaces.clear();
+		m_NewOutsideFaces = &newOutside;
+		m_NewInIntersectionFaces = &newInIntersection;
 	}
 
 	auto& GetNewOutsideFaces()
@@ -68,14 +68,14 @@ private:
 	void FindParent(SplitFaceRegion& child);
 	bool RegionIsInsideOther(const SplitFaceRegion& maybeInside, const SplitFaceRegion& other, float& dist);
 
-	void CreateFaces(const SplitFaceRegion& region);
-	void CreateInIntersectionOnlyFaces(const SplitFaceRegion& region);
+	void CreateFacesFromOriginalFaceSplit(const SplitFaceRegion& region);
+	void CreateFacesFromCutShapeSplit(const SplitFaceRegion& region);
 
 	Face * m_FaceBeingSplit;
 	Polygon2* m_CurrentPerimeterPoly;
 
-	std::vector<Face*> m_NewOutsideFaces;
-	std::vector<Face*> m_NewInIntersectionFaces;
+	std::vector<Face*>* m_NewOutsideFaces = nullptr;
+	std::vector<Face*>* m_NewInIntersectionFaces = nullptr;
 
 	std::vector<ToBeNewPoint*> m_PerimeterPoints;
 	std::vector<ToBeNewPoint*> m_EdgePoints;

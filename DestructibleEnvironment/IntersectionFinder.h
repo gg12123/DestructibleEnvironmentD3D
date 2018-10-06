@@ -16,14 +16,14 @@ public:
 	// for collision detection
 	void FindFaceEdgeIntersections(Shape& shape1, Shape& shape2, std::vector<FaceEdgeIntersection<Vector3>>& inters);
 
+	static bool LineIsIntersectedWithFace(const Face& face, const Vector3& lineP0, const Vector3& lineP1, Vector3& intPoint);
+
 private:
 	void CommonInit(Shape& shape1, Shape& shape2);
 
-	bool EdgeIsIntersectedWithFace(const Face& face, const Vector3& edgeP0, const Vector3& edgeP1, Vector3& intPoint);
-
-	void FindFaceEdgeIntersections(const std::vector<Vector3>& transformedPoints, const std::vector<int>& edgeIndexes, const Face& face, std::vector<FaceEdgeIntersection<Vector3>>& inters);
-	void FindFaceEdgeIntersections(const Face& face1, const Face& face2, std::vector<FaceEdgeIntersection<Vector3>>& inters);
-	void FindFaceFaceIntersection(const Face& face1, const Face& face2, std::vector<FaceFaceIntersection<Vector3>>& inters);
+	void FindFaceEdgeIntersections(const std::vector<Vector3>& transformedPoints, const std::vector<int>& edgeIndexes, Face& face, std::vector<FaceEdgeIntersection<Vector3>>& inters);
+	void FindFaceEdgeIntersections(Face& face1, Face& face2, std::vector<FaceEdgeIntersection<Vector3>>& inters);
+	void FindFaceFaceIntersection(Face& face1, Face& face2, std::vector<FaceFaceIntersection<Vector3>>& inters);
 	void FindFaceFaceIntersections(std::vector<FaceFaceIntersection<Vector3>>& inters);
 	void FindFaceEdgeIntersections(std::vector<FaceEdgeIntersection<Vector3>>& inters);
 

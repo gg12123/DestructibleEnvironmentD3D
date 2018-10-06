@@ -3,7 +3,7 @@
 #include "Transform.h"
 #include "Shape.h"
 
-bool IntersectionFinder::EdgeIsIntersectedWithFace(const Face& face, const Vector3& edgeP0, const Vector3& edgeP1, Vector3& intPoint)
+bool IntersectionFinder::LineIsIntersectedWithFace(const Face& face, const Vector3& edgeP0, const Vector3& edgeP1, Vector3& intPoint)
 {
 	if (Vector3::LinePlaneIntersection(face.GetPlaneP0(), face.GetNormal(), edgeP0, edgeP1, intPoint))
 		return face.PointIsInsideFace(intPoint);
@@ -11,7 +11,7 @@ bool IntersectionFinder::EdgeIsIntersectedWithFace(const Face& face, const Vecto
 	return false;
 }
 
-void IntersectionFinder::FindFaceEdgeIntersections(const std::vector<Vector3>& transformedPoints, const std::vector<int>& edgeIndexes, const Face& face, std::vector<FaceEdgeIntersection<Vector3>>& inters)
+void IntersectionFinder::FindFaceEdgeIntersections(const std::vector<Vector3>& transformedPoints, const std::vector<int>& edgeIndexes, Face& face, std::vector<FaceEdgeIntersection<Vector3>>& inters)
 {
 	Vector3 intPoint;
 	auto c = edgeIndexes.size();
@@ -21,12 +21,12 @@ void IntersectionFinder::FindFaceEdgeIntersections(const std::vector<Vector3>& t
 		auto& p0 = transformedPoints[edgeIndexes[i]];
 		auto& p1 = transformedPoints[edgeIndexes[(i + 1) % c]];
 
-		if (EdgeIsIntersectedWithFace(face, p0, p1, intPoint))
+		if (LineIsIntersectedWithFace(face, p0, p1, intPoint))
 			inters.emplace_back(FaceEdgeIntersection<Vector3>(face, i, m_ActiveTransform->ToWorldPosition(intPoint)));
 	}
 }
 
-void IntersectionFinder::FindFaceEdgeIntersections(const Face& face1, const Face& face2, std::vector<FaceEdgeIntersection<Vector3>>& inters)
+void IntersectionFinder::FindFaceEdgeIntersections(Face& face1, Face& face2, std::vector<FaceEdgeIntersection<Vector3>>& inters)
 {
 	// testing faces 1s edges against face 2
 	m_ActiveTransform = &m_Shape2->GetTransform();
@@ -37,7 +37,7 @@ void IntersectionFinder::FindFaceEdgeIntersections(const Face& face1, const Face
 	FindFaceEdgeIntersections(m_Shape2sTransformedPoints, face2.GetSharedPoints(), face1, inters);
 }
 
-void IntersectionFinder::FindFaceFaceIntersection(const Face& face1, const Face& face2, std::vector<FaceFaceIntersection<Vector3>>& inters)
+void IntersectionFinder::FindFaceFaceIntersection(Face& face1, Face& face2, std::vector<FaceFaceIntersection<Vector3>>& inters)
 {
 	m_FaceEdgeIntersections.clear();
 	FindFaceEdgeIntersections(face1, face2, m_FaceEdgeIntersections);

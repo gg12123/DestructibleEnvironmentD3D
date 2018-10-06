@@ -47,18 +47,12 @@ public:
 
 	void CreateFaces(std::vector<Face*>& faces, const Face& original) const
 	{
-		for (auto it = m_ConvexPieces.begin(); it != m_ConvexPieces.end(); it++)
-		{
-			auto f = new Face(); // use pool
-			f->Clear();
+		CreateFacesImp<false>(faces, original);
+	}
 
-			auto& points = (*it)->GetPoints();
-
-			for (auto it2 = points.begin(); it2 != points.end(); it2++)
-				f->AddPoint(original.ToShapeSpacePosition(*it2));
-
-			faces.emplace_back(f);
-		}
+	void CreateReversedFaces(std::vector<Face*>& faces, const Face& original) const
+	{
+		CreateFacesImp<true>(faces, original);
 	}
 
 	void ClipToContainedChild(Polygon2IntersectionFinder& intFinder, Polygon2Splitter& splitter, PoolOfRecyclables<Polygon2>& polyPool)
@@ -79,6 +73,49 @@ public:
 	}
 
 private:
+	template<bool reversed> // not reversed
+	void AddPointsToFace(Face& face, const std::vector<Vector2>& points, const Face& original)
+	{
+		for (auto it2 = points.begin(); it2 != points.end(); it2++)
+			face.AddPoint(original.ToShapeSpacePosition(*it2));
+	}
+
+	template<> // reversed
+	void AddPointsToFace<true>(Face& face, const std::vector<Vector2>& points, const Face& original)
+	{
+		for (int i = points.size() - 1; i >= 0; i--)
+			face.AddPoint(original.ToShapeSpacePosition(points[i]));
+	}
+
+	template<bool reversed> // not reversed
+	void SetFaceNormal(Face& face, const Face& original)
+	{
+		face.SetNormal(original.GetNormal());
+	}
+
+	template<> // reversed
+	void SetFaceNormal<true>(Face& face, const Face& original)
+	{
+		face.SetNormal(-original.GetNormal());
+	}
+
+	template<bool reversed>
+	void CreateFacesImp(std::vector<Face*>& faces, const Face& original) const
+	{
+		for (auto it = m_ConvexPieces.begin(); it != m_ConvexPieces.end(); it++)
+		{
+			auto f = new Face(); // use pool
+			f->Clear();
+
+			auto& points = (*it)->GetPoints();
+
+			AddPointsToFace<reversed>(*f, points, original);
+			SetFaceNormal<reversed>(*f, original);
+
+			faces.emplace_back(f);
+		}
+	}
+
 	void SplitToCovexPoly(const Polygon2& splitterPoly, Polygon2IntersectionFinder& intFinder, Polygon2Splitter& splitter, PoolOfRecyclables<Polygon2>& polyPool)
 	{
 		m_ForOutput.clear();

@@ -35,6 +35,7 @@ public:
 
 	// static
 
+	static inline Vector2 Zero();
 	static inline Vector2 Up();
 	static inline Vector2 Right();
 	static inline float Dot(const Vector2& v1, const Vector2& v2);

@@ -58,17 +58,19 @@ public:
 		return m_CachedPoints[0];
 	}
 
-	void RegisterIntersection(const FaceFaceIntersection<Vector2>& inter)
-	{
-		m_Intersections.emplace_back(inter);
-	}
+	void RegisterIntersection(const FaceFaceIntersection<Vector3>& inter);
 
 	const auto& GetIntersections()
 	{
 		return m_Intersections;
 	}
 
-	const auto& GetCachedPoints()
+	bool HasRegisteredIntersections() const
+	{
+		return m_Intersections.size() > 0U;
+	}
+
+	const auto& GetCachedPoints() const
 	{
 		return m_CachedPoints;
 	}
@@ -90,6 +92,7 @@ public:
 
 	void AddPoint(const Vector3& p)
 	{
+		// TODO - calculate weight ????
 		m_CachedPoints.emplace_back(p);
 	}
 
@@ -100,9 +103,18 @@ public:
 		m_Intersections.clear();
 	}
 
+	void ClearRegisteredIntersections()
+	{
+		m_Intersections.clear();
+	}
+
 	bool PointIsInsideFace(const Vector3& pointShapesSpace) const;
 
+	void ReCentre(const Vector3& centre, Shape& owner);
+
 private:
+	void InitFaceCoOrdinateSystem(const Vector3& origin);
+
 	// all points related collections must be parralel.
 
 	std::vector<int> m_ToSharedPoints;

@@ -105,19 +105,22 @@ void FaceSplitter::ProcessPointsStartingOnEdge(ToBeNewPoint& startEdgePoint)
 	} while (ep != &startEdgePoint);
 }
 
-void FaceSplitter::CreateFaces(const SplitFaceRegion& region)
+void FaceSplitter::CreateFacesFromOriginalFaceSplit(const SplitFaceRegion& region)
 {
-	auto& vec = (region.GetInOrOut() == FaceRelationshipWithOtherShape::InIntersection) ?
+	auto vec = (region.GetInOrOut() == FaceRelationshipWithOtherShape::InIntersection) ?
 		m_NewInIntersectionFaces :
 		m_NewOutsideFaces;
 
-	region.CreateFaces(vec, *m_FaceBeingSplit);
+	region.CreateFaces(*vec, *m_FaceBeingSplit);
 }
 
-void FaceSplitter::CreateInIntersectionOnlyFaces(const SplitFaceRegion& region)
+void FaceSplitter::CreateFacesFromCutShapeSplit(const SplitFaceRegion& region)
 {
 	if (region.GetInOrOut() == FaceRelationshipWithOtherShape::InIntersection)
-		region.CreateFaces(m_NewInIntersectionFaces, *m_FaceBeingSplit);
+	{
+		region.CreateFaces(*m_NewInIntersectionFaces, *m_FaceBeingSplit);
+		region.CreateReversedFaces(*m_NewOutsideFaces, *m_FaceBeingSplit);
+	}
 }
 
 void FaceSplitter::SplitOriginalShapesFace(Face& toSplit)
@@ -125,10 +128,10 @@ void FaceSplitter::SplitOriginalShapesFace(Face& toSplit)
 	SplitCommon(toSplit);
 
 	for (auto it = m_PerimRegions.begin(); it != m_PerimRegions.end(); it++)
-		CreateFaces(**it);
+		CreateFacesFromOriginalFaceSplit(**it);
 
 	for (auto it = m_ContainedRegions.begin(); it != m_ContainedRegions.end(); it++)
-		CreateFaces(**it);
+		CreateFacesFromOriginalFaceSplit(**it);
 }
 
 void FaceSplitter::SplitCutShapesFace(Face& toSplit)
@@ -136,10 +139,10 @@ void FaceSplitter::SplitCutShapesFace(Face& toSplit)
 	SplitCommon(toSplit);
 
 	for (auto it = m_PerimRegions.begin(); it != m_PerimRegions.end(); it++)
-		CreateInIntersectionOnlyFaces(**it);
+		CreateFacesFromCutShapeSplit(**it);
 
 	for (auto it = m_ContainedRegions.begin(); it != m_ContainedRegions.end(); it++)
-		CreateInIntersectionOnlyFaces(**it);
+		CreateFacesFromCutShapeSplit(**it);
 }
 
 void FaceSplitter::SplitCommon(Face& toSplit)

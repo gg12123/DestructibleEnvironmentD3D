@@ -4,59 +4,30 @@
 #include "ShapeEdge.h"
 #include "Face.h"
 #include "Random.h"
-
-NewPointsGetter Shape::m_NewPointsGetter;
+#include "IntersectionFinder.h"
 
 Shape::~Shape()
 {
-	// return points, edges, faces to pool.
-}
-
-void Shape::AddPoint(Point& p)
-{
-	p.SetId(m_CurrId);
-	m_CurrId++;
-	m_Points.emplace_back(&p);
-}
-
-void Shape::AddEdge(ShapeEdge& e)
-{
-	m_Edges.emplace_back(&e);
-	m_TotalEdgeLength += e.RegisterLengthWithPoints();
+	// return faces to pool.
 }
 
 Vector3 Shape::CalculateCentre()
 {
 	auto c = Vector3::Zero();
+	auto count = 0;
 
-	for (auto it = m_Points.begin(); it != m_Points.end(); it++)
-		c += (*it)->GetPointWeighted();
-
-	return c / m_TotalEdgeLength;
-}
-
-Vector3 Shape::CentreAndCache()
-{
-	auto c = CalculateCentre();
-
-	m_LocalBounds.Reset();
-	m_BoundingRadius = MathU::NegativeInfinity;
-
-	for (auto it = m_Points.begin(); it != m_Points.end(); it++)
+	for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
 	{
-		auto Pcentred = (*it)->CentreAndCache(c, m_CachedPoints);
+		auto& points = (*it)->GetCachedPoints();
 
-		auto mag = Pcentred.Magnitude();
-		if (mag > m_BoundingRadius)
-			m_BoundingRadius = mag;
-
-		m_LocalBounds.Update(Pcentred);
+		for (auto it = points.begin(); it != points.end(); it++)
+		{
+			// TODO - use the edge length weighting. Maybe calculate a weight for each point when the point gets added to the face
+			c += (*it); 
+			count++;
+		}
 	}
-
-	for (auto it = m_Edges.begin(); it != m_Edges.end(); it++)
-		(*it)->Cache(m_CachedEdgePoints);
-
-	return c;
+	return c / count;
 }
 
 void Shape::InitRequiredVertAndIndexCounts()
@@ -66,57 +37,11 @@ void Shape::InitRequiredVertAndIndexCounts()
 
 	for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
 	{
-		auto numVerts = (*it)->GetPoints().size();
+		auto numVerts = (*it)->GetCachedPoints().size();
 
 		m_RequiredNumVerts += numVerts;
 		m_RequiredNumIndicies += 3 * (numVerts - 2);
 	}
-}
-
-void Shape::InitFaces(const Vector3& finalFaceNormal)
-{
-	m_Faces.push_back(&m_FinalFaceCreator.CreateFace(finalFaceNormal));
-
-	m_RequiredNumVerts = 0;
-	m_RequiredNumIndicies = 0;
-
-	for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
-	{
-		auto f = *it;
-
-		f->CachePoints(m_CachedFaceNormals, m_CachedFaceP0s);
-
-		auto numVerts = f->GetPoints().size();
-
-		m_RequiredNumVerts += numVerts;
-		m_RequiredNumIndicies += 3 * (numVerts - 2);
-	}
-}
-
-void Shape::TransferSplitResultsToThis(Shape& splitResult)
-{
-	m_Points.swap(splitResult.m_Points);
-	m_Edges.swap(splitResult.m_Edges);
-	m_Faces.swap(splitResult.GetFaces());
-	m_FinalFaceCreator = splitResult.m_FinalFaceCreator;
-	m_TotalEdgeLength = splitResult.m_TotalEdgeLength;
-
-	m_CachedPoints.clear();
-	m_CachedEdgePoints.clear();
-	m_CachedFaceNormals.clear();
-	m_CachedFaceP0s.clear();
-}
-
-bool Shape::FindFacesToBeSplit(Shape& shapeAbove, Shape& shapeBelow)
-{
-	m_FacesToBeSplit.clear();
-
-	for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
-	{
-		if (!(*it)->PreSplit(shapeAbove, shapeBelow, m_FacesToBeSplit))
-			return false;
-	}
-	return true;;
 }
 
 Vector3 Shape::CalculateSplitPlaneNormal(const Vector3& P0)
@@ -129,53 +54,46 @@ Vector3 Shape::CalculateSplitPlaneNormal(const Vector3& P0)
 	return Vector3::ProjectOnPlane(toP0, Vector3(-toP0.y, -toP0.z, toP0.x)).Normalized();
 }
 
-bool Shape::Split(const Vector3& collPointWs, Shape& shapeAbove)
+Face * Shape::RayCastFaces(const Vector3& origin, const Vector3& dir)
 {
-	auto P0 = m_Transform.ToLocalPosition(collPointWs);
-	auto n = CalculateSplitPlaneNormal(P0);
+	Vector3 intPoint;
+	Face* closest = nullptr;
+	auto minDist = MathU::Infinity;
+	auto pEnd = origin + 100.0f * dir; // TODO ...
 
-	auto& shapeBelow = *(new Shape()); // from pool (or maybe this could just be a static thats used only to hold split results)
-
-	shapeAbove.Clear();
-	shapeBelow.Clear(); // will need clearing when it come from the pool
-
-	auto countAbove = 0;
-	auto countBelow = 0;
-
-	for (auto it = m_Points.begin(); it != m_Points.end(); it++)
-		(*it)->Split(P0, n, m_NewPointsGetter, shapeAbove, shapeBelow, countAbove, countBelow);
-
-	if ((countAbove != 0) && (countBelow != 0) && FindFacesToBeSplit(shapeAbove, shapeBelow))
+	for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
 	{
-		for (auto it = m_Edges.begin(); it != m_Edges.end(); it++)
-			(*it)->Split(P0, n, m_NewPointsGetter, shapeAbove, shapeBelow);
+		auto f = *it;
+		if (IntersectionFinder::LineIsIntersectedWithFace(*f, origin, pEnd, intPoint))
+		{
+			auto dist = (intPoint - origin).Magnitude();
 
-		for (auto it = m_FacesToBeSplit.begin(); it != m_FacesToBeSplit.end(); it++)
-			(*it)->Split(m_NewPointsGetter, shapeAbove, shapeBelow);
-
-		TransferSplitResultsToThis(shapeBelow);
-
-		InitNewShape(shapeAbove, -n);
-		InitNewShape(*this, n);
-
-		// return shape below to pool
-
-		return true;
+			if (dist < minDist)
+			{
+				minDist = dist;
+				closest = f;
+			}
+		}
 	}
+	return closest;
+}
 
-	// ABORT THE SPLIT
-	// return shape below to the pool and also return any points created in Point::Split().
+bool Shape::PointIsInsideShape(const Vector3 shapesSpacePoint)
+{
+	auto castDir = Vector3::Right();
+	auto hitFace = RayCastFaces(shapesSpacePoint, castDir);
+
+	if (hitFace)
+		return (Vector3::Dot(hitFace->GetNormal(), castDir) > 0.0f);
+
 	return false;
 }
 
-void Shape::InitNewShape(Shape& shape, const Vector3& finalFaceNormal)
+void Shape::ReCentreFaces(const Vector3& centre)
 {
-	auto c = shape.CentreAndCache();
+	// this is also when the faces regster their points so clear cached points now
+	m_CachedPoints.clear();
 
-	shape.InitFaces(finalFaceNormal);
-
-	shape.GetTransform().SetPosition(m_Transform.ToWorldPosition(c));
-	shape.GetTransform().SetRotation(m_Transform.GetRotation());
-
-	shape.SetDirty();
+	for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
+		(*it)->ReCentre(centre, *this);
 }

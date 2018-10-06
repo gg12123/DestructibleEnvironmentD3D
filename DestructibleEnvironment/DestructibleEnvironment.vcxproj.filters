@@ -172,6 +172,9 @@
     <ClCompile Include="IntersectionFinder.cpp">
       <Filter>Physics\CollisionStuff</Filter>
     </ClCompile>
+    <ClCompile Include="ShapeSplitter.cpp">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -373,6 +376,9 @@
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="FaceRelationshipWithOtherShape.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="ShapeSplitter.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
   </ItemGroup>

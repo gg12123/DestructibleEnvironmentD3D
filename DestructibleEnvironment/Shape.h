@@ -30,21 +30,6 @@ public:
 		return m_CachedPoints;
 	}
 
-	auto& GetCachedEdgePoints()
-	{
-		return m_CachedEdgePoints;
-	}
-
-	auto& GetCachedFaceNormals()
-	{
-		return m_CachedFaceNormals;
-	}
-
-	auto& GetCachedFaceP0s()
-	{
-		return m_CachedFaceP0s;
-	}
-
 	auto& GetLocalBounds()
 	{
 		return m_LocalBounds;
@@ -55,36 +40,10 @@ public:
 		return m_WorldBounds;
 	}
 
-	void Clear()
-	{
-		m_Faces.clear();
-		m_Points.clear();
-		m_Edges.clear();
-
-		m_CachedPoints.clear();
-		m_CachedEdgePoints.clear();
-		m_CachedFaceNormals.clear();
-		m_CachedFaceP0s.clear();
-
-		m_CurrId = 0;
-		m_TotalEdgeLength = 0.0f;
-	}
-
-	void AddNewEdgeFromFaceSplit(ShapeEdge& e)
-	{
-		m_FinalFaceCreator.AddEdge(e);
-		AddEdge(e);
-	}
-
 	Transform& GetTransform()
 	{
 		return m_Transform;
 	}
-
-	void AddPoint(Point& p);
-	void AddEdge(ShapeEdge& e);
-
-	bool Split(const Vector3& collPointWs, Shape& shapeAbove);
 
 	bool IsDirty()
 	{
@@ -106,13 +65,7 @@ public:
 		return m_RequiredNumIndicies;
 	}
 
-	float GetTotalEdgeLength() const
-	{
-		return m_TotalEdgeLength;
-	}
-
 	void InitRequiredVertAndIndexCounts();
-	Vector3 CentreAndCache();
 
 	void UpdateWorldBounds(RadiusBoundsType)
 	{
@@ -123,10 +76,32 @@ public:
 	{
 	}
 
-protected:
-	auto& GetPoints()
+	Face * RayCastFaces(const Vector3& origin, const Vector3& dir);
+
+	bool PointIsInsideShape(const Vector3 shapesSpacePoint);
+
+	void SwapInNewFaces(std::vector<Face*>& newFaces, Transform& refTran) // faces are in the ref transforms local space
 	{
-		return m_Points;
+		m_Faces.swap(newFaces);
+
+		auto c = CalculateCentre();
+
+		ReCentreFaces(c);
+
+		GetTransform().SetPosition(refTran.ToWorldPosition(c));
+		GetTransform().SetRotation(refTran.GetRotation());
+
+		SetDirty();
+	}
+
+	int RegisterPoint(const Vector3& point)
+	{
+		// TODO
+		// add to cached points only if the point in unique.
+		// return the index
+
+		m_CachedPoints.emplace_back(point);
+		return m_CachedPoints.size() - 1;
 	}
 
 private:
@@ -137,35 +112,20 @@ private:
 
 	Vector3 CalculateSplitPlaneNormal(const Vector3& P0);
 	Vector3 CalculateCentre();
-	void InitFaces(const Vector3& finalFaceNormal);
-	void InitNewShape(Shape& shape, const Vector3& finalFaceNormal);
-	void TransferSplitResultsToThis(Shape& splitResult);
-	bool FindFacesToBeSplit(Shape& shapeAbove, Shape& shapeBelow);
+	void ReCentreFaces(const Vector3& centre);
 
 	int m_RequiredNumVerts;
 	int m_RequiredNumIndicies;
 
-	std::vector<Point*> m_Points;
-	std::vector<ShapeEdge*> m_Edges;
 	std::vector<Face*> m_Faces;
+	std::vector<Vector3> m_CachedPoints; // faces have indicies that key into here
 
-	std::vector<Vector3> m_CachedPoints;
-	std::vector<int> m_CachedEdgePoints;
-	std::vector<Vector3> m_CachedFaceNormals;
-	std::vector<Vector3> m_CachedFaceP0s;
-
-	std::vector<Face*> m_FacesToBeSplit;
-
-	static NewPointsGetter m_NewPointsGetter;
-
-	FinalFaceCreator m_FinalFaceCreator;
 	Transform m_Transform;
 	Bounds m_LocalBounds;
 	Bounds m_WorldBounds;
 
-	int m_CurrId = 0;
 	bool m_Dirty = true;
 
-	float m_TotalEdgeLength = 0.0f;
+	// float m_TotalEdgeLength = 0.0f; // TODO - work this back in somehow
 	float m_BoundingRadius;
 };
