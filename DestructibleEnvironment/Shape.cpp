@@ -78,15 +78,17 @@ Face * Shape::RayCastFaces(const Vector3& origin, const Vector3& dir)
 	return closest;
 }
 
-bool Shape::PointIsInsideShape(const Vector3 shapesSpacePoint)
+PointInPolyCase Shape::PointIsInsideShape(const Vector3 shapesSpacePoint)
 {
 	auto castDir = Vector3::Right();
 	auto hitFace = RayCastFaces(shapesSpacePoint, castDir);
 
-	if (hitFace)
-		return (Vector3::Dot(hitFace->GetNormal(), castDir) > 0.0f);
+	// TODO - this maybe fragile and doesnt consider on boundary case.
 
-	return false;
+	if (hitFace && (Vector3::Dot(hitFace->GetNormal(), castDir) > 0.0f))
+		return PointInPolyCase::Inside;
+
+	return PointInPolyCase::Outside;
 }
 
 void Shape::ReCentreFaces(const Vector3& centre)

@@ -165,7 +165,10 @@ void FaceSplitter::SplitCommon(Face& toSplit)
 SplitFaceRegion& FaceSplitter::CreateNextReion(FaceRelationshipWithOtherShape inOrOut) // pass in weather the region is in or outside
 {
 	auto& region = m_RegionPool->Recycle();
+
+	m_CurrentPerimeterPoly->EnsureCorrectWindingDirection();
 	region.Init(*m_CurrentPerimeterPoly, inOrOut);
+
 	m_CurrentPerimeterPoly = &m_PolyPool->Recycle();
 	return region;
 }
@@ -176,17 +179,33 @@ void FaceSplitter::AssignContainedChildren()
 		FindParent(**it);
 }
 
+static bool RegionIsInsideOther1(const SplitFaceRegion& maybeInside, const SplitFaceRegion& other)
+{
+	auto& testPoints = maybeInside.GetPerimeterPoly().GetPoints();
+	auto& otherPoly = other.GetPerimeterPoly();
+
+	auto c = PointInPolyCase::OnBoundary;
+	auto it = testPoints.begin();
+
+	while ((c == PointInPolyCase::OnBoundary) && (it != testPoints.end()))
+	{
+		c = otherPoly.PointIsInside(*it);
+		it++;
+	}
+	assert(c != PointInPolyCase::OnBoundary);
+	return (c == PointInPolyCase::Inside);
+}
+
 bool FaceSplitter::RegionIsInsideOther(const SplitFaceRegion& maybeInside, const SplitFaceRegion& other, float& dist)
 {
-	m_EdgeCastHits.clear();
-
-	auto origin = maybeInside.GetPerimeterPoly().GetPointAt(0);
-	auto dir = Vector2::Up();
-
-	other.GetPerimeterPoly().RayCastAllEdges(origin, dir, m_EdgeCastHits);
-
-	if (m_EdgeCastHits.size() % 2 != 0)
+	if (RegionIsInsideOther1(maybeInside, other))
 	{
+		auto origin = maybeInside.GetPerimeterPoly().GetPointAt(0);
+		auto dir = Vector2::Up();
+
+		m_EdgeCastHits.clear();
+		other.GetPerimeterPoly().RayCastAllEdges(origin, dir, m_EdgeCastHits);
+
 		dist = MathU::Infinity;
 
 		for (auto it = m_EdgeCastHits.begin(); it != m_EdgeCastHits.end(); it++)
@@ -201,13 +220,10 @@ bool FaceSplitter::RegionIsInsideOther(const SplitFaceRegion& maybeInside, const
 	return false;
 }
 
-void FaceSplitter::FindParent(SplitFaceRegion& child)
+void FaceSplitter::UpdateInFindParent(const std::vector<SplitFaceRegion*>& regions, const SplitFaceRegion& child, SplitFaceRegion*& parent, float& closest)
 {
-	auto closest = MathU::Infinity;
 	float dist;
-	SplitFaceRegion* parent = nullptr;
-
-	for (auto it = m_ContainedRegions.begin(); it != m_ContainedRegions.end(); it++)
+	for (auto it = regions.begin(); it != regions.end(); it++)
 	{
 		auto other = *it;
 		if (other == &child)
@@ -222,19 +238,16 @@ void FaceSplitter::FindParent(SplitFaceRegion& child)
 			}
 		}
 	}
+}
 
-	for (auto it = m_PerimRegions.begin(); it != m_PerimRegions.end(); it++)
-	{
-		auto other = *it;
-		if (RegionIsInsideOther(child, *other, dist))
-		{
-			if (dist < closest)
-			{
-				closest = dist;
-				parent = other;
-			}
-		}
-	}
+void FaceSplitter::FindParent(SplitFaceRegion& child)
+{
+	auto closest = MathU::Infinity;
+	SplitFaceRegion* parent = nullptr;
+
+	UpdateInFindParent(m_ContainedRegions, child, parent, closest);
+	UpdateInFindParent(m_PerimRegions, child, parent, closest);
+
 	assert(parent);
 	parent->SetContainedChild(child);
 }
@@ -376,12 +389,14 @@ FaceRelationshipWithOtherShape FaceSplitter::InOrOutForPerminRegion(const ToBeNe
 // the sap was inserted into the current perim poly at index 0
 FaceRelationshipWithOtherShape FaceSplitter::InOrOutForContainedRegion(const ToBeNewPoint& sap)
 {
-	auto origin = (m_CurrentPerimeterPoly->GetPointAt(0) + m_CurrentPerimeterPoly->GetPointAt(1)) / 2.0f;
+	auto a = m_CurrentPerimeterPoly->CalculateSignedArea();
 
-	m_EdgeCastHits.clear();
-	m_CurrentPerimeterPoly->RayCastAllEdges(origin, sap.FaceNormal, 0, m_EdgeCastHits);
+	// TODO - not sure if this is the right way around.
+	auto polyEdgeNormal = Polygon2::AreaGivesCorrectWinding(a) ?
+		m_CurrentPerimeterPoly->GetNormalAt(0) : 
+		-m_CurrentPerimeterPoly->GetNormalAt(0);
 
-	return m_EdgeCastHits.size() % 2 == 0 ?
+	return Vector2::Dot(sap.FaceNormal, polyEdgeNormal) > 0.0f ?
 		FaceRelationshipWithOtherShape::InIntersection :
 		FaceRelationshipWithOtherShape::NotInIntersection;
 }

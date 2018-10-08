@@ -7,9 +7,19 @@ static bool FaceIsInsideShape(Face& face, Shape& shape)
 	auto& tFace = face.GetShape().GetTransform();
 	auto& tShape = shape.GetTransform();
 
-	auto testPoint = tShape.ToLocalPosition(tFace.ToWorldPosition(face.GetCachedPoints()[0]));
+	auto c = PointInPolyCase::OnBoundary;
 
-	return shape.PointIsInsideShape(testPoint);
+	auto& facePoints = face.GetCachedPoints();
+	auto it = facePoints.begin();
+
+	while ((c == PointInPolyCase::OnBoundary) && (it != facePoints.end()))
+	{
+		auto testPoint = tShape.ToLocalPosition(tFace.ToWorldPosition(*it));
+		c = shape.PointIsInsideShape(testPoint);
+		it++;
+	}
+	assert(c != PointInPolyCase::OnBoundary);
+	return c == PointInPolyCase::Inside;
 }
 
 static Face& CreateReversedFace(const Face& f)

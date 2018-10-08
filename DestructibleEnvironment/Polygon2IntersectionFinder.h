@@ -55,25 +55,25 @@ public:
 			return true;
 		}
 
-		auto poly1PointOutsidePoly2 = PointOnPolyIsOutsideOther(poly1, poly2);
-		auto poly2PointOutsidePoly1 = PointOnPolyIsOutsideOther(poly2, poly1);
+		auto poly1OutsidePoly2 = PolyIsOutsideOtherAssumingNoOverlap(poly1, poly2);
+		auto poly2OutsidePoly1 = PolyIsOutsideOtherAssumingNoOverlap(poly2, poly1);
 
-		if (poly1PointOutsidePoly2 && poly2PointOutsidePoly1)
+		if (poly1OutsidePoly2 && poly2OutsidePoly1)
 			return false;
 
-		if (!poly1PointOutsidePoly2 && !poly2PointOutsidePoly1)
+		if (!poly1OutsidePoly2 && !poly2OutsidePoly1)
 		{
 			intersection = poly1; // The input polys are the same.
 			return true;
 		}
 
-		if (poly1PointOutsidePoly2)
+		if (poly1OutsidePoly2)
 		{
 			intersection = poly2;
 			return true;
 		}
 
-		if (poly2PointOutsidePoly1)
+		if (poly2OutsidePoly1)
 		{
 			intersection = poly1;
 			return true;
@@ -82,16 +82,19 @@ public:
 	}
 
 private:
-	bool PointOnPolyIsOutsideOther(const Polygon2& poly, const Polygon2& other)
+	bool PolyIsOutsideOtherAssumingNoOverlap(const Polygon2& poly, const Polygon2& other)
 	{
 		auto& polyPoints = poly.GetPoints();
+		auto c = PointInPolyCase::OnBoundary;
+		auto it = polyPoints.begin();
 
-		for (auto it = polyPoints.begin(); it != polyPoints.end(); it++)
+		while ((c == PointInPolyCase::OnBoundary) && (it != polyPoints.end()))
 		{
-			if (other.PointIsOutsideAssumingConvex(*it, MathU::SmallNumber))
-				return true;
+			c = other.PointIsInsideAssumingConvex(*it);
+			it++;
 		}
-		return false;
+
+		return c == PointInPolyCase::Outside;
 	}
 
 	void FindIntersectionOfOverlappingPolys()
@@ -179,7 +182,7 @@ private:
 
 		auto maybeInsideP = activePoly->GetPointAt(nextIndex);
 
-		while (otherPoly->PointIsInsideAssumingConvex(maybeInsideP))
+		while (otherPoly->PointIsInsideAssumingConvex(maybeInsideP) == PointInPolyCase::Inside)
 		{
 			m_Intersection->Add(maybeInsideP);
 			nextCastPoint = maybeInsideP;

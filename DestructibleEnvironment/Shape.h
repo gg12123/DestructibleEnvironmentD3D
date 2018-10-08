@@ -5,6 +5,7 @@
 #include "Transform.h"
 #include "NewPointsGetter.h"
 #include "Bounds.h"
+#include "PointInPolyCase.h"
 #include <vector>
 
 class Point;
@@ -78,7 +79,7 @@ public:
 
 	Face * RayCastFaces(const Vector3& origin, const Vector3& dir);
 
-	bool PointIsInsideShape(const Vector3 shapesSpacePoint);
+	PointInPolyCase PointIsInsideShape(const Vector3 shapesSpacePoint);
 
 	void SwapInNewFaces(std::vector<Face*>& newFaces, Transform& refTran) // faces are in the ref transforms local space
 	{

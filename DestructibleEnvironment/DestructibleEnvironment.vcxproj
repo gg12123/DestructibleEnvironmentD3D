@@ -209,6 +209,7 @@
     <ClInclude Include="ConstantBufferInputTypes.h" />
     <ClInclude Include="ConvexPolyCreator.h" />
     <ClInclude Include="FaceRelationshipWithOtherShape.h" />
+    <ClInclude Include="PointInPolyCase.h" />
     <ClInclude Include="Polygon2.h" />
     <ClInclude Include="D3DBuffers.h" />
     <ClInclude Include="DebugLogger.h" />

@@ -44,4 +44,9 @@ public:
 	{
 		return (x >= 0.0f) ? 1.0f : -1.0f;
 	}
+
+	static inline bool IsBetweenInclusive(float bound1, float bound2, float testVal)
+	{
+
+	}
 };

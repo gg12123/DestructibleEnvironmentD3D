@@ -66,6 +66,7 @@ private:
 
 	void AssignContainedChildren();
 	void FindParent(SplitFaceRegion& child);
+	void UpdateInFindParent(const std::vector<SplitFaceRegion*>& regions, const SplitFaceRegion& child, SplitFaceRegion*& parent, float& closest);
 	bool RegionIsInsideOther(const SplitFaceRegion& maybeInside, const SplitFaceRegion& other, float& dist);
 
 	void CreateFacesFromOriginalFaceSplit(const SplitFaceRegion& region);

@@ -23,6 +23,11 @@ public:
 		y += rhs.y;
 	}
 
+	Vector2 operator-() const
+	{
+		return Vector2(-x, -y);
+	}
+
 	Vector2 Normalized()
 	{
 
