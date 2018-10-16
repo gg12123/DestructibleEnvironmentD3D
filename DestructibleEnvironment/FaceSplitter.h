@@ -18,8 +18,7 @@ class Face;
 class FaceSplitter
 {
 public:
-	void SplitOriginalShapesFace(Face& toSplit);
-	void SplitCutShapesFace(Face& toSplit);
+	void SplitFace(Face& toSplit);
 
 	void SetOutputs(std::vector<Face*>& newOutside, std::vector<Face*>& newInIntersection)
 	{
@@ -69,8 +68,7 @@ private:
 	void UpdateInFindParent(const std::vector<SplitFaceRegion*>& regions, const SplitFaceRegion& child, SplitFaceRegion*& parent, float& closest);
 	bool RegionIsInsideOther(const SplitFaceRegion& maybeInside, const SplitFaceRegion& other, float& dist);
 
-	void CreateFacesFromOriginalFaceSplit(const SplitFaceRegion& region);
-	void CreateFacesFromCutShapeSplit(const SplitFaceRegion& region);
+	void CreateFacesFromSplit(const SplitFaceRegion& region);
 
 	Face * m_FaceBeingSplit;
 	Polygon2* m_CurrentPerimeterPoly;

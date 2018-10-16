@@ -90,6 +90,21 @@ public:
 		return m_ToSharedPoints;
 	}
 
+	const auto& GetLinkedFaces() const
+	{
+		return m_LinkedFaces;
+	}
+
+	void AddLink(int edge, Face& link, int linksEdge)
+	{
+
+	}
+
+	void DetachLinks()
+	{
+
+	}
+
 	void AddPoint(const Vector3& p)
 	{
 		// TODO - calculate weight ????
@@ -112,6 +127,16 @@ public:
 
 	void ReCentre(const Vector3& centre, Shape& owner);
 
+	int GetIdForSplitter() const
+	{
+		return m_IdForSplitter;
+	}
+
+	void SetIdForSplitter(int id)
+	{
+		m_IdForSplitter = id;
+	}
+
 private:
 	void InitFaceCoOrdinateSystem(const Vector3& origin);
 
@@ -119,10 +144,13 @@ private:
 
 	std::vector<int> m_ToSharedPoints;
 	std::vector<Vector3> m_CachedPoints;
+	std::vector<std::vector<Face*>> m_LinkedFaces;
 
 	std::vector<FaceFaceIntersection<Vector2>> m_Intersections;
 	Shape* m_OwnerShape;
 	Polygon2 m_FacePoly;
 
 	Vector3 m_Normal;
+
+	int m_IdForSplitter;
 };

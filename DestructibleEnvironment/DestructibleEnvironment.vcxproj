@@ -208,7 +208,9 @@
     <ClInclude Include="Common\DeviceResources.h" />
     <ClInclude Include="ConstantBufferInputTypes.h" />
     <ClInclude Include="ConvexPolyCreator.h" />
+    <ClInclude Include="FaceLinker.h" />
     <ClInclude Include="FaceRelationshipWithOtherShape.h" />
+    <ClInclude Include="PerFaceSplitData.h" />
     <ClInclude Include="PointInPolyCase.h" />
     <ClInclude Include="Polygon2.h" />
     <ClInclude Include="D3DBuffers.h" />

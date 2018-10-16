@@ -105,7 +105,7 @@ void FaceSplitter::ProcessPointsStartingOnEdge(ToBeNewPoint& startEdgePoint)
 	} while (ep != &startEdgePoint);
 }
 
-void FaceSplitter::CreateFacesFromOriginalFaceSplit(const SplitFaceRegion& region)
+void FaceSplitter::CreateFacesFromSplit(const SplitFaceRegion& region)
 {
 	auto vec = (region.GetInOrOut() == FaceRelationshipWithOtherShape::InIntersection) ?
 		m_NewInIntersectionFaces :
@@ -114,35 +114,15 @@ void FaceSplitter::CreateFacesFromOriginalFaceSplit(const SplitFaceRegion& regio
 	region.CreateFaces(*vec, *m_FaceBeingSplit);
 }
 
-void FaceSplitter::CreateFacesFromCutShapeSplit(const SplitFaceRegion& region)
-{
-	if (region.GetInOrOut() == FaceRelationshipWithOtherShape::InIntersection)
-	{
-		region.CreateFaces(*m_NewInIntersectionFaces, *m_FaceBeingSplit);
-		region.CreateReversedFaces(*m_NewOutsideFaces, *m_FaceBeingSplit);
-	}
-}
-
-void FaceSplitter::SplitOriginalShapesFace(Face& toSplit)
+void FaceSplitter::SplitFace(Face& toSplit)
 {
 	SplitCommon(toSplit);
 
 	for (auto it = m_PerimRegions.begin(); it != m_PerimRegions.end(); it++)
-		CreateFacesFromOriginalFaceSplit(**it);
+		CreateFacesFromSplit(**it);
 
 	for (auto it = m_ContainedRegions.begin(); it != m_ContainedRegions.end(); it++)
-		CreateFacesFromOriginalFaceSplit(**it);
-}
-
-void FaceSplitter::SplitCutShapesFace(Face& toSplit)
-{
-	SplitCommon(toSplit);
-
-	for (auto it = m_PerimRegions.begin(); it != m_PerimRegions.end(); it++)
-		CreateFacesFromCutShapeSplit(**it);
-
-	for (auto it = m_ContainedRegions.begin(); it != m_ContainedRegions.end(); it++)
-		CreateFacesFromCutShapeSplit(**it);
+		CreateFacesFromSplit(**it);
 }
 
 void FaceSplitter::SplitCommon(Face& toSplit)

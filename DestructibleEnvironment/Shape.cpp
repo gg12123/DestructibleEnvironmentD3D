@@ -54,43 +54,6 @@ Vector3 Shape::CalculateSplitPlaneNormal(const Vector3& P0)
 	return Vector3::ProjectOnPlane(toP0, Vector3(-toP0.y, -toP0.z, toP0.x)).Normalized();
 }
 
-Face * Shape::RayCastFaces(const Vector3& origin, const Vector3& dir)
-{
-	Vector3 intPoint;
-	Face* closest = nullptr;
-	auto minDist = MathU::Infinity;
-	auto pEnd = origin + 100.0f * dir; // TODO ...
-
-	for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
-	{
-		auto f = *it;
-		if (IntersectionFinder::LineIsIntersectedWithFace(*f, origin, pEnd, intPoint))
-		{
-			auto dist = (intPoint - origin).Magnitude();
-
-			if (dist < minDist)
-			{
-				minDist = dist;
-				closest = f;
-			}
-		}
-	}
-	return closest;
-}
-
-PointInPolyCase Shape::PointIsInsideShape(const Vector3 shapesSpacePoint)
-{
-	auto castDir = Vector3::Right();
-	auto hitFace = RayCastFaces(shapesSpacePoint, castDir);
-
-	// TODO - this maybe fragile and doesnt consider on boundary case.
-
-	if (hitFace && (Vector3::Dot(hitFace->GetNormal(), castDir) > 0.0f))
-		return PointInPolyCase::Inside;
-
-	return PointInPolyCase::Outside;
-}
-
 void Shape::ReCentreFaces(const Vector3& centre)
 {
 	// this is also when the faces regster their points so clear cached points now

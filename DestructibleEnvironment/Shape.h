@@ -77,10 +77,6 @@ public:
 	{
 	}
 
-	Face * RayCastFaces(const Vector3& origin, const Vector3& dir);
-
-	PointInPolyCase PointIsInsideShape(const Vector3 shapesSpacePoint);
-
 	void SwapInNewFaces(std::vector<Face*>& newFaces, Transform& refTran) // faces are in the ref transforms local space
 	{
 		m_Faces.swap(newFaces);
