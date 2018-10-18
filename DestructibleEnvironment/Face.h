@@ -95,7 +95,7 @@ public:
 		return m_LinkedFaces;
 	}
 
-	void AddLink(int edge, Face& link, int linksEdge)
+	void AddLink(int edgeOnSelf, Face& link, int linksEdge)
 	{
 
 	}

@@ -1,45 +1,91 @@
 #pragma once
 #include "Face.h"
 #include "PerFaceSplitData.h"
-
-class FaceWithEdge
-{
-public:
-	Face * TheFace;
-	int Edge;
-};
+#include "Vector3.h"
 
 class FaceLinker
 {
 public:
+	void SetPerFaceData(std::vector<PerFaceSplitData>& perFaceData)
+	{
+		m_PerFaceData = &perFaceData;
+	}
 
+	template<class... Ts>
+	void Link(const std::vector<Face*>& facesToLink, Ts&... searchVectors)
+	{
+		auto N = sizeof...(Ts);
+		std::array<const std::vector<Face*>*, N> potentialNeighbours = { (&searchVectors)... };
+
+		for (auto it = facesToLink.begin(); it != facesToLink.end(); it++)
+			LinkFace(**it, potentialNeighbours);
+	}
+
+	template<class... Ts>
+	void Link(Face& toLink, Ts&... searchVectors) // use this when linking faces detached from cut
+	{
+		auto N = sizeof...(Ts);
+		std::array<const std::vector<Face*>*, N> potentialNeighbours = { (&searchVectors)... };
+
+		LinkFace(toLink, potentialNeighbours);
+	}
 
 private:
+	static inline float DistanceBetweenEdges(const Vector3& toLinkP0, const Vector3& toLinkP1, const Vector3& otherP0, const Vector3& otherP1)
+	{
+		// if no overlap return infinity
+	}
+
 	template<int N>
-	void FindLinkForEdge(Face& toLink, int edgeToLink, const std::vector<Face*>* potentialNeighbours[N])
+	void FindLinkForEdge(Face& toLink, int edgeToLink, const std::array<const std::vector<Face*>*, N>& potentialNeighbours)
 	{
 		auto& points = toLink.GetCachedPoints();
 
 		auto& p0 = points[edgeToLink];
 		auto& p1 = points[(edgeToLink + 1) % points.size()];
 
-		FaceWithEdge neighbour;
+		Face* nearestNeighbour = nullptr;
+		auto edgeOnNN = -1;
+		auto closestDist = MathU::Infinity;
+
+		auto toLinksRelationship = m_PerFaceData[toLink.GetIdForSplitter()].RelationshipWithOtherShape;
 
 		for (int i = 0; i < N; i++)
 		{
 			auto& faces = *potentialNeighbours[i];
 
-			// find closest and ensure the face relationship with other shape is consistent
+			for (auto itFace = faces.begin(); itFace != faces.end(); itFace++)
+			{
+				auto& other = **itFace;
+				auto& otherPoints = other.GetCachedPoints();
+				auto otherPointCount = otherPoints.size();
+
+				for (auto j = 0U; j < otherPointCount; j++)
+				{
+					auto dist = DistanceBetweenEdges(p0, p1, otherPoints[j], otherPoints[(j + 1) % otherPointCount]);
+
+					if (dist < closestDist)
+					{
+						closestDist = dist;
+						nearestNeighbour = &other;
+						edgeOnNN = j;
+					}
+				}
+			}
 		}
 
-		// first check that the neighbours relationship is not inconsistent
+		auto& nnData = m_PerFaceData[nearestNeighbour->GetIdForSplitter()];
+		if (nnData.RelationshipWithOtherShape == FaceRelationshipWithOtherShape::Unkown)
+		{
+			// maybe do a test to check linking is the correct thing to do
+		}
 
-		m_PerFaceData[neighbour.TheFace->GetIdForSplitter()].RelationshipWithOtherShape =
-			m_PerFaceData[toLink.GetIdForSplitter()].RelationshipWithOtherShape;
+		nnData.RelationshipWithOtherShape = toLinksRelationship;
+		toLink.AddLink(edgeToLink, nearestNeighbour, edgeOnNN);
 	}
 
 	template<int N>
-	void LinkFace(Face& toLink, const std::vector<Face*>* potentialNeighbours[N])
+	void LinkFace(Face& toLink, const std::array<const std::vector<Face*>*, N>& potentialNeighbours)
 	{
 		auto& links = toLink.GetLinkedFaces();
 

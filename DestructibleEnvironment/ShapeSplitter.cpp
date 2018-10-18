@@ -50,15 +50,23 @@ void ShapeSplitter::AddPerFaceData(const std::vector<Face*>& faces, FaceRelation
 	}
 }
 
-void ShapeSplitter::SplitFaces(const std::vector<Face*>& toSplit, std::vector<Face*>& inIntersection, std::vector<Face*>& outside, std::vector<Face*>& detachedFrom)
+void ShapeSplitter::SplitFaces(const std::vector<Face*>& toSplit, std::vector<Face*>& inIntersection, std::vector<Face*>& outside, std::vector<Face*>& detachedFrom, std::vector<Face*>& notSplit)
 {
 	m_FaceSplitter.SetOutputs(outside, inIntersection);
 
 	for (auto it = toSplit.begin(); it != toSplit.end(); it++)
 	{
 		auto& f = **it;
-		DetachFace(f, detachedFrom);
-		m_FaceSplitter.SplitFace(f);
+
+		if (f.HasRegisteredIntersections())
+		{
+			DetachFace(f, detachedFrom);
+			m_FaceSplitter.SplitFace(f);
+		}
+		else
+		{
+			notSplit.emplace_back(&f);
+		}
 	}
 
 	AddPerFaceData(outside, FaceRelationshipWithOtherShape::NotInIntersection);
@@ -77,10 +85,10 @@ void ShapeSplitter::SplitFaces()
 	m_FacesDetachedFromOriginal.clear();
 
 	auto& orignalsFaces = m_OriginalShape->GetFaces();
-	SplitFaces(orignalsFaces, m_NewInIntersectionFacesFromOriginal, m_NewOutsideFacesFromOriginal, m_FacesDetachedFromOriginal);
+	SplitFaces(orignalsFaces, m_NewInIntersectionFacesFromOriginal, m_NewOutsideFacesFromOriginal, m_FacesDetachedFromOriginal, m_FaceNotSplitFromOriginal);
 
 	auto& cutShapesFaces = m_CutShape->GetFaces();
-	SplitFaces(orignalsFaces, m_NewInIntersectionFacesFromCut, m_NewOutsideFacesFromCut, m_FacesDetachedFromCut);
+	SplitFaces(orignalsFaces, m_NewInIntersectionFacesFromCut, m_NewOutsideFacesFromCut, m_FacesDetachedFromCut, m_FaceNotSplitFromCut);
 }
 
 void ShapeSplitter::SwapInNewFaces(Shape& newShape)
@@ -107,13 +115,24 @@ void ShapeSplitter::Split(const Vector3& splitPoint, const Vector3& splitNormal,
 
 	SplitFaces();
 
-	// create in intersection shapes
+	LinkForInside(m_NewInIntersectionFacesFromCut);
+	LinkForInside(m_NewInIntersectionFacesFromOriginal);
+	// use iterator to find the intersection shapes
 
 	ReverseFacesForOutside();
 
-	// create outside shapes
+	LinkForOutside(m_NewOutsideFacesFromOriginal);
+	LinkForOutside(m_NewOutsideFacesFromReversing);
+	// use iterator to find the outside shapes
 
-	// ensure detached from are fully linked
+	LinkForDetachedFrom(m_FacesDetachedFromOriginal);
+
+	for (auto it = m_FacesDetachedFromCut.begin(); it != m_FacesDetachedFromCut.end(); it++)
+	{
+		auto& face = **it;
+		if (m_PerFaceData[face.GetIdForSplitter()].RelationshipWithOtherShape != FaceRelationshipWithOtherShape::Unkown)
+			LinkForDetachedFrom(face);
+	}
 
 	SwapInNewFaces(newShape);
 }
@@ -161,4 +180,6 @@ void ShapeSplitter::ReverseFacesForOutside()
 		if (m_PerFaceData[f.GetIdForSplitter()].RelationshipWithOtherShape == FaceRelationshipWithOtherShape::InIntersection)
 			m_NewOutsideFacesFromReversing.emplace_back(CreateReversedFace(f));
 	}
+
+	AddPerFaceData(m_NewOutsideFacesFromReversing, FaceRelationshipWithOtherShape::NotInIntersection);
 }
