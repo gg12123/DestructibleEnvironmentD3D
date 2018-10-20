@@ -135,11 +135,7 @@ void ShapeSplitter::InitNewShapes(const std::vector<Shape*>& newShapes)
 void ShapeSplitter::Split(const Vector3& splitPoint, const Vector3& splitNormal, Shape& orginalShape, std::vector<Shape*>& newShapes)
 {
 	m_OriginalShape = &orginalShape;
-
-	// create cut shape first
-	// make it so the cut shapes points are expressed in the same local space as the orignal shapes points
-
-	PositionCutShape(splitPoint, splitNormal);
+	m_CutShape = &m_CutShapeCreator.Create(orginalShape.GetTransform(), splitPoint, splitNormal); // may need to convert these from world space
 
 	RegisterIntersections();
 

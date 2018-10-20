@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <vector>
+#include <stack>
 #include "Shape.h"
 #include "Face.h"
 #include "PerFaceSplitData.h"
@@ -45,16 +46,43 @@ private:
 
 	Shape& CreateShape(Face& rootFace)
 	{
-		auto& shape = GetNextShapeToUse();
+		auto& newShape = GetNextShapeToUse();
 		auto& perFaceData = *m_PerFaceData;
 
-		auto shapesRelationship = perFaceData[rootFace.GetIdForSplitter()].RelationshipWithOtherShape;
+		auto rootsRelationship = perFaceData[rootFace.GetIdForSplitter()].RelationshipWithOtherShape;
 
-		// iterate the faces and add to new shape
-		// check the relationship with the root face is consistent
-		// and assign it when it is unkown.
+		newShape.Clear();
+		m_FaceStack.push(&rootFace);
 
-		return shape;
+		while (!m_FaceStack.empty())
+		{
+			auto& next = *m_FaceStack.top();
+			m_FaceStack.pop();
+
+			auto id = next.GetIdForSplitter();
+			auto& nextsData = perFaceData[id];
+
+			nextsData.Visited = true;
+			newShape.AddFace(next);
+
+			if (nextsData.RelationshipWithOtherShape != FaceRelationshipWithOtherShape::Unkown)
+				assert(nextsData.RelationshipWithOtherShape == rootsRelationship);
+
+			nextsData.RelationshipWithOtherShape = rootsRelationship;
+
+			auto& links = next.GetLinkedFaces();
+			for (auto it1 = links.begin(); it1 != links.end(); it1++)
+			{
+				auto& edgesLinks = *it1;
+				for (auto it2 = edgesLinks.begin(); it2 != edgesLinks.end(); it2++)
+				{
+					auto linkedFace = *it2;
+					if (!perFaceData[linkedFace->GetIdForSplitter()].Visited)
+						m_FaceStack.push(linkedFace);
+				}
+			}
+		}
+		return newShape;
 	}
 
 	Face* FindNextRootFace(const std::vector<Face*>& faces)
@@ -72,4 +100,5 @@ private:
 
 	Shape * m_ShapeToUseNext = nullptr;
 	std::vector<PerFaceSplitData>* m_PerFaceData = nullptr;
+	std::stack<Face*> m_FaceStack;
 };

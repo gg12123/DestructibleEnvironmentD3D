@@ -6,6 +6,7 @@
 #include "FaceFaceIntersection.h"
 #include "PerFaceSplitData.h"
 #include "FaceIterator.h"
+#include "CutShapeCreator.h"
 
 class Shape;
 class Face;
@@ -30,7 +31,6 @@ public:
 	void Split(const Vector3& splitPoint, const Vector3& splitNormal, Shape& orginalShape, std::vector<Shape*>& newShapes);
 
 private:
-	void PositionCutShape(const Vector3& splitPoint, const Vector3& splitNormal);
 	void ClearRegisteredIntersections();
 	void RegisterIntersections();
 	void DetachFace(Face& face, std::vector<Face*>& detachedFrom);
@@ -62,6 +62,7 @@ private:
 	FaceSplitter m_FaceSplitter;
 	FaceLinker m_FaceLinker;
 	FaceIterator m_FaceIterator;
+	CutShapeCreator m_CutShapeCreator;
 
 	Shape * m_CutShape = nullptr; // will need a cut shape generator
 	Shape * m_OriginalShape = nullptr;
