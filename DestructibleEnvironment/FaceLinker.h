@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include "Face.h"
 #include "PerFaceSplitData.h"
 #include "Vector3.h"
@@ -36,6 +37,14 @@ private:
 		// if no overlap return infinity
 	}
 
+	static inline bool CanLink(FaceRelationshipWithOtherShape r1, FaceRelationshipWithOtherShape r2)
+	{
+		if (r1 != r2)
+			return (r1 == FaceRelationshipWithOtherShape::Unkown) || (r2 == FaceRelationshipWithOtherShape::Unkown);
+
+		return true;
+	}
+
 	template<int N>
 	void FindLinkForEdge(Face& toLink, int edgeToLink, const std::array<const std::vector<Face*>*, N>& potentialNeighbours)
 	{
@@ -48,7 +57,8 @@ private:
 		auto edgeOnNN = -1;
 		auto closestDist = MathU::Infinity;
 
-		auto toLinksRelationship = m_PerFaceData[toLink.GetIdForSplitter()].RelationshipWithOtherShape;
+		auto& perFaceData = *m_PerFaceData;
+		auto toLinksRelationship = perFaceData[toLink.GetIdForSplitter()].RelationshipWithOtherShape;
 
 		for (int i = 0; i < N; i++)
 		{
@@ -57,6 +67,10 @@ private:
 			for (auto itFace = faces.begin(); itFace != faces.end(); itFace++)
 			{
 				auto& other = **itFace;
+
+				if (!CanLink(toLinksRelationship, perFaceData[other.GetIdForSplitter()].RelationshipWithOtherShape))
+					continue;
+
 				auto& otherPoints = other.GetCachedPoints();
 				auto otherPointCount = otherPoints.size();
 
@@ -74,7 +88,7 @@ private:
 			}
 		}
 
-		auto& nnData = m_PerFaceData[nearestNeighbour->GetIdForSplitter()];
+		auto& nnData = perFaceData[nearestNeighbour->GetIdForSplitter()];
 		if (nnData.RelationshipWithOtherShape == FaceRelationshipWithOtherShape::Unkown)
 		{
 			// maybe do a test to check linking is the correct thing to do
@@ -96,5 +110,5 @@ private:
 		}
 	}
 
-	std::vector<PerFaceSplitData>* m_PerFaceData;
+	std::vector<PerFaceSplitData>* m_PerFaceData = nullptr;
 };

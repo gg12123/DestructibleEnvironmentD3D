@@ -5,6 +5,7 @@
 #include "FaceLinker.h"
 #include "FaceFaceIntersection.h"
 #include "PerFaceSplitData.h"
+#include "FaceIterator.h"
 
 class Shape;
 class Face;
@@ -26,7 +27,7 @@ public:
 		m_FaceLinker.SetPerFaceData(m_PerFaceData);
 	}
 
-	void Split(const Vector3& splitPoint, const Vector3& splitNormal, Shape& orginalShape, Shape& newShape);
+	void Split(const Vector3& splitPoint, const Vector3& splitNormal, Shape& orginalShape, std::vector<Shape*>& newShapes);
 
 private:
 	void PositionCutShape(const Vector3& splitPoint, const Vector3& splitNormal);
@@ -35,9 +36,11 @@ private:
 	void DetachFace(Face& face, std::vector<Face*>& detachedFrom);
 	void SplitFaces();
 	void SplitFaces(const std::vector<Face*>& toSplit, std::vector<Face*>& inIntersection, std::vector<Face*>& outside, std::vector<Face*>& detachedFrom, std::vector<Face*>& notSplit);
-	void SwapInNewFaces(Shape& newShape);
 	void AddPerFaceData(const std::vector<Face*>& faces, FaceRelationshipWithOtherShape relationship);
 	void ReverseFacesForOutside();
+	void ReturnUnusedCutShapeFaces();
+	void EnsureDetachedFromFacesAreFullyLinked();
+	void InitNewShapes(const std::vector<Shape*>& newShapes);
 
 	template<class T>
 	void LinkForDetachedFrom(T& arg)
@@ -58,6 +61,7 @@ private:
 	IntersectionFinder m_IntersectionFinder;
 	FaceSplitter m_FaceSplitter;
 	FaceLinker m_FaceLinker;
+	FaceIterator m_FaceIterator;
 
 	Shape * m_CutShape = nullptr; // will need a cut shape generator
 	Shape * m_OriginalShape = nullptr;

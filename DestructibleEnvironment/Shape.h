@@ -77,10 +77,19 @@ public:
 	{
 	}
 
-	void SwapInNewFaces(std::vector<Face*>& newFaces, Transform& refTran) // faces are in the ref transforms local space
+	void Clear()
 	{
-		m_Faces.swap(newFaces);
+		m_Faces.clear();
+		m_CachedPoints.clear();
+	}
 
+	void AddFace(Face& f)
+	{
+		m_Faces.emplace_back(&f);
+	}
+
+	void OnAllFacesAdded(Transform& refTran) // faces are in the ref transforms local space
+	{
 		auto c = CalculateCentre();
 
 		ReCentreFaces(c);
