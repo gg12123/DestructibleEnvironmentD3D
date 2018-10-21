@@ -18,17 +18,17 @@ void ShapeSplitter::DetachFace(Face& face, std::vector<Face*>& detachedFrom)
 {
 	auto& links = face.GetLinkedFaces();
 
-	for (auto it1 = links.begin(); it1 != links.end(); it1++)
+	for (auto it1 = links.Begin(); it1 != links.End(); it1++)
 	{
 		auto& linksForEdge = *it1;
 		for (auto it2 = linksForEdge.begin(); it2 != linksForEdge.end(); it2++)
 		{
-			auto linkedFace = *it2;
+			auto& linkedFace = (*it2).GetNeighbour();
 
-			if (linkedFace->HasRegisteredIntersections())
+			if (linkedFace.HasRegisteredIntersections())
 				continue;
 
-			auto& data = m_PerFaceData[linkedFace->GetIdForSplitter()];
+			auto& data = m_PerFaceData[linkedFace.GetIdForSplitter()];
 			if (!data.HasBeenAddedToDetachedFromList)
 			{
 				data.HasBeenAddedToDetachedFromList = true;

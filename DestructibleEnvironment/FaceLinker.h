@@ -105,7 +105,7 @@ private:
 
 		for (auto i = 0U; i < links.size(); i++)
 		{
-			if (links[i].size() == 0U)
+			if (links.At(i).size() == 0U)
 				FindLinkForEdge(toLink, i, potentialNeighbours);
 		}
 	}

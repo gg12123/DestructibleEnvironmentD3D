@@ -8,7 +8,7 @@
 
 bool Face::PointIsInsideFace(const Vector3& pointShapesSpace) const
 {
-	return m_FacePoly.PointIsInsideAssumingConvex(ToFaceSpacePosition(pointShapesSpace));
+	return m_FacePoly.PointIsInsideAssumingConvex(ToFaceSpacePosition(pointShapesSpace)) == PointInPolyCase::Inside;
 }
 
 void Face::RegisterIntersection(const FaceFaceIntersection<Vector3>& inter)
@@ -44,4 +44,27 @@ void Face::ReCentre(const Vector3& centre, Shape& owner)
 		m_FacePoly.Add(ToFaceSpacePosition(m_CachedPoints[i]));
 		m_ToSharedPoints.emplace_back(owner.RegisterPoint(m_CachedPoints[i]));
 	}
+}
+
+void Face::AddLink(int edgeOnSelf, Face& link, int linksEdge)
+{
+	if (!AlreadyLinkedTo(link, edgeOnSelf))
+	{
+		m_LinkedFaces->At(edgeOnSelf).emplace_back(LinkedNeighbour(link, linksEdge));
+		link.m_LinkedFaces->At(linksEdge).emplace_back(LinkedNeighbour(*this, edgeOnSelf));
+	}
+}
+
+void Face::DetachLinks()
+{
+	for (auto it1 = m_LinkedFaces->Begin(); it1 != m_LinkedFaces->End(); it1++)
+	{
+		auto& links = *it1;
+		for (auto it2 = links.begin(); it2 != links.end(); it2++)
+		{
+			auto& linkedNeighbour = *it2;
+			linkedNeighbour.GetNeighbour().RemoveLink(*this, linkedNeighbour.GetEdgeOnNeighbour());
+		}
+	}
+	m_LinkedFaces->Reset();
 }

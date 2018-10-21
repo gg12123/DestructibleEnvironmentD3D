@@ -77,6 +77,11 @@ public:
 	{
 	}
 
+	void ClearFaces()
+	{
+		m_Faces.clear();
+	}
+
 	void Clear()
 	{
 		m_Faces.clear();

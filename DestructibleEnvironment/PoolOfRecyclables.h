@@ -45,17 +45,17 @@ public:
 		return m_Curr;
 	}
 
-	auto Begin()
+	auto Begin() const
 	{
 		return m_Contents.begin();
 	}
 
-	auto End()
+	auto End() const
 	{
 		return m_CurrEnd;
 	}
 
-	auto& At(uint32 index)
+	T& At(uint32 index) const
 	{
 		assert(index < m_Curr);
 		return m_Contents[index];

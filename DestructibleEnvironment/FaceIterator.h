@@ -71,14 +71,14 @@ private:
 			nextsData.RelationshipWithOtherShape = rootsRelationship;
 
 			auto& links = next.GetLinkedFaces();
-			for (auto it1 = links.begin(); it1 != links.end(); it1++)
+			for (auto it1 = links.Begin(); it1 != links.End(); it1++)
 			{
 				auto& edgesLinks = *it1;
 				for (auto it2 = edgesLinks.begin(); it2 != edgesLinks.end(); it2++)
 				{
-					auto linkedFace = *it2;
-					if (!perFaceData[linkedFace->GetIdForSplitter()].Visited)
-						m_FaceStack.push(linkedFace);
+					auto& linkedFace = (*it2).GetNeighbour();
+					if (!perFaceData[linkedFace.GetIdForSplitter()].Visited)
+						m_FaceStack.push(&linkedFace);
 				}
 			}
 		}
