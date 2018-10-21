@@ -5,10 +5,16 @@
 #include "Transform.h"
 #include "Matrix.h"
 #include "CubeFacesCreator.h"
+#include "Random.h"
 
 class CutShapeCreator
 {
 public:
+	CutShapeCreator()
+	{
+
+	}
+
 	// split point and normal must be in the to split transforms space
 	Shape & Create(Transform& toSplitsTransform, const Vector3& splitPoint, const Vector3& splitNormal)
 	{
@@ -29,7 +35,15 @@ public:
 private:
 	Matrix4 CalculateCutShapesTransform(Transform& toSplitsTransform, const Vector3& splitPoint, const Vector3& splitNormal)
 	{
+		auto sZ = 100.0f;
+		auto r = Random::Range(0.0f, 0.5f);
 
+		auto A = r * splitPoint;
+		auto C = A + sZ * splitNormal;
+
+		auto q = Quaternion::LookRotation(-splitNormal, Vector3::OrthogonalDirection(splitNormal));
+
+		return Matrix4::FromTranslation(C) * Matrix4::FromRotation(q) * Matrix4::FromScale(sZ, sZ, sZ);
 	}
 
 	Shape m_CutShape;

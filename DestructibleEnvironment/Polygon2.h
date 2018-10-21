@@ -22,7 +22,10 @@ class Polygon2
 public:
 	void EnsureCorrectWindingDirection()
 	{
+		if (!AreaGivesCorrectWinding(CalculateSignedArea()))
+		{
 
+		}
 	}
 
 	float CalculateSignedArea() const
@@ -32,7 +35,9 @@ public:
 
 	static bool AreaGivesCorrectWinding(float a)
 	{
-
+		// polys must be clockwise
+		// negative area implies clockwise
+		return a < 0.0f;
 	}
 
 	void RayCastAllEdges(const Vector2& origin, const Vector2& dir, std::vector<EdgeCastHit>& hitPoints) const
@@ -130,6 +135,12 @@ public:
 		return (index + 1) % m_Points.size();
 	}
 
+	int PreviousIndex(int index) const
+	{
+		auto s = m_Points.size();
+		return (index - 1 + s) % s;
+	}
+
 	Vector2 GetDirectionAt(int index) const
 	{
 
@@ -143,6 +154,13 @@ public:
 	Vector2 GetCentre() const
 	{
 
+	}
+
+	// returns a negative number for clockwise and a positive number for anti-clockwise
+	float CalculateWindingAt(int index)
+	{
+		auto& p = m_Points[index];
+		return -Vector2::Cross2D(p - m_Points[PreviousIndex(index)], m_Points[NextIndex(index)] - p);
 	}
 
 private:

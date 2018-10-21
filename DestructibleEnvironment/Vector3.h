@@ -92,6 +92,7 @@ public:
 	static inline Vector3 Right();
 	static inline Vector3 Up();
 	static inline Vector3 Foward();
+	static  Vector3 OrthogonalDirection(const Vector3& v);
 };
 
 inline Vector3 operator+(const Vector3& lhs, const Vector3& rhs)
@@ -207,4 +208,9 @@ inline Vector3 Vector3::PointClosestToOtherLine(const Vector3& lineP0, const Vec
 	auto n = Vector3::Cross(otherLineDir, parralelPlanesNormal);
 
 	return LinePlaneIntersection(otherLineP0, n, lineP0, lineP0 + lineDir);
+}
+
+inline Vector3 Vector3::OrthogonalDirection(const Vector3& v)
+{
+	return Vector3::ProjectOnPlane(v, Vector3(-v.y, -v.z, v.x)).Normalized();
 }

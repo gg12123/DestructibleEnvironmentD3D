@@ -87,21 +87,6 @@ public:
 		auto qk2 = qk * qk;
 		auto qi2 = qi * qi;
 
-		//auto col0 = res.M[0];
-		//col0[0] = 1.0f - 2.0f * (qj2 + qk2);
-		//col0[1] = 2.0f * (qi * qj - qk * qr);
-		//col0[2] = 2.0f * (qi * qk + qj * qr);
-		//
-		//auto col1 = res.M[1];
-		//col1[0] = 2.0f * (qi * qj + qk * qr);
-		//col1[1] = 1.0f - 2.0f * (qi2 + qk2);
-		//col1[2] = 2.0f * (qj * qk - qi * qr);
-		//
-		//auto col2 = res.M[2];
-		//col2[0] = 2.0f * (qi * qk - qj * qr);
-		//col2[1] = 2.0f * (qj * qk + qi * qr);
-		//col2[2] = 1.0f - 2.0f * (qi2 + qj2);
-
 		auto col0 = res.M[0];
 		col0[0] = 1.0f - 2.0f * (qj2 + qk2);
 		col0[1] = 2.0f * (qi * qj + qk * qr);
@@ -129,6 +114,17 @@ public:
 		col3[0] = tran.x;
 		col3[1] = tran.y;
 		col3[2] = tran.z;
+
+		return res;
+	}
+
+	static inline Matrix<Size> FromScale(float sX, float sY, float sZ)
+	{
+		auto res = Matrix<Size>::Indentity();
+
+		res.M[0][0] = sX;
+		res.M[1][1] = sY;
+		res.M[2][2] = sZ;
 
 		return res;
 	}
@@ -256,27 +252,6 @@ Matrix<N> operator*(const Matrix<N>& lhs, const Matrix<N>& rhs)
 
 	return result;
 }
-
-//template<int N>
-//Matrix<N> operator*(const Matrix<N>& lhs, const Matrix<N>& rhs)
-//{
-//	Matrix<N> result;
-//
-//	for (int j = 0; j < N; j++)
-//	{
-//		for (int i = 0; i < N; i++)
-//		{
-//			auto sum = 0.0f;
-//
-//			for (int n = 0; n < N; n++)
-//			{
-//				sum += lhs.M[n][i] * rhs.M[j][n]; // TODO - maybe transposing one of them first will be faster?
-//			}
-//			result.M[j][i] = sum;
-//		}
-//	}
-//	return result;
-//}
 
 using Matrix3 = Matrix<3>;
 using Matrix4 = Matrix<4>;

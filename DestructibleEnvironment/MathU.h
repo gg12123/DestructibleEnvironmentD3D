@@ -8,7 +8,7 @@ public:
 	static constexpr float Infinity = FLT_MAX;
 	static constexpr float NegativeInfinity = FLT_MIN;
 	static constexpr int32 IntMax = INT32_MAX;
-	static constexpr float SmallNumber = 0.00001f;
+	static constexpr float SmallNumber = 0.0001f;
 
 	static inline float ToRadians(float degrees)
 	{
@@ -47,6 +47,9 @@ public:
 
 	static inline bool IsBetweenInclusive(float bound1, float bound2, float testVal)
 	{
-
+		if (bound1 > bound2)
+			return testVal >= bound2 && testVal <= bound1;
+		else
+			return testVal >= bound1 && testVal <= bound2;
 	}
 };

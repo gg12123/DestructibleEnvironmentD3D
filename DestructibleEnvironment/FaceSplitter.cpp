@@ -145,11 +145,10 @@ void FaceSplitter::SplitCommon(Face& toSplit)
 SplitFaceRegion& FaceSplitter::CreateNextReion(FaceRelationshipWithOtherShape inOrOut) // pass in weather the region is in or outside
 {
 	auto& region = m_RegionPool->Recycle();
-
-	m_CurrentPerimeterPoly->EnsureCorrectWindingDirection();
 	region.Init(*m_CurrentPerimeterPoly, inOrOut);
 
 	m_CurrentPerimeterPoly = &m_PolyPool->Recycle();
+
 	return region;
 }
 
@@ -256,6 +255,9 @@ void FaceSplitter::CreateSplitFaceRegions()
 	while (sap)
 	{
 		ProcessPointsAcrossFaceOnly(*sap);
+
+		m_CurrentPerimeterPoly->EnsureCorrectWindingDirection();
+
 		m_ContainedRegions.emplace_back(&CreateNextReion(InOrOutForContainedRegion(*sap)));
 		m_CurrentVisitId++;
 		sap = GetNextStartAcrossPoint();
@@ -361,6 +363,7 @@ int FaceSplitter::NextPerimeterIndex(int index)
 FaceRelationshipWithOtherShape FaceSplitter::InOrOutForPerminRegion(const ToBeNewPoint& sep)
 {
 	auto nextAlongEdge = m_PerimeterPoints[NextPerimeterIndex(sep.Index)];
+
 	return (Vector2::Dot(nextAlongEdge->Position - sep.Position, sep.FaceNormal) < 0.0f) ?
 		FaceRelationshipWithOtherShape::InIntersection :
 		FaceRelationshipWithOtherShape::NotInIntersection;
@@ -369,12 +372,7 @@ FaceRelationshipWithOtherShape FaceSplitter::InOrOutForPerminRegion(const ToBeNe
 // the sap was inserted into the current perim poly at index 0
 FaceRelationshipWithOtherShape FaceSplitter::InOrOutForContainedRegion(const ToBeNewPoint& sap)
 {
-	auto a = m_CurrentPerimeterPoly->CalculateSignedArea();
-
-	// TODO - not sure if this is the right way around.
-	auto polyEdgeNormal = Polygon2::AreaGivesCorrectWinding(a) ?
-		m_CurrentPerimeterPoly->GetNormalAt(0) : 
-		-m_CurrentPerimeterPoly->GetNormalAt(0);
+	auto polyEdgeNormal = m_CurrentPerimeterPoly->GetNormalAt(0);
 
 	return Vector2::Dot(sap.FaceNormal, polyEdgeNormal) > 0.0f ?
 		FaceRelationshipWithOtherShape::InIntersection :
