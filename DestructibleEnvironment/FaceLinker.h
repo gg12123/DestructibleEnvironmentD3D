@@ -7,7 +7,7 @@
 class FaceLinker
 {
 public:
-	void SetPerFaceData(std::vector<PerFaceSplitData>& perFaceData)
+	void SetPerFaceData(const std::vector<PerFaceSplitData>& perFaceData)
 	{
 		m_PerFaceData = &perFaceData;
 	}
@@ -68,6 +68,9 @@ private:
 			{
 				auto& other = **itFace;
 
+				if (&other == &toLink)
+					continue;
+
 				if (!CanLink(toLinksRelationship, perFaceData[other.GetIdForSplitter()].RelationshipWithOtherShape))
 					continue;
 
@@ -110,5 +113,5 @@ private:
 		}
 	}
 
-	std::vector<PerFaceSplitData>* m_PerFaceData = nullptr;
+	const std::vector<PerFaceSplitData>* m_PerFaceData = nullptr;
 };

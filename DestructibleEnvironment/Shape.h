@@ -93,6 +93,11 @@ public:
 		m_Faces.emplace_back(&f);
 	}
 
+	void AddPoint(const Vector3& p)
+	{
+		m_CachedPoints.emplace_back(p);
+	}
+
 	void OnAllFacesAdded(Transform& refTran) // faces are in the ref transforms local space
 	{
 		auto c = CalculateCentre();
