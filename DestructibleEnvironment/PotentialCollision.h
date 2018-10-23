@@ -3,61 +3,52 @@
 #include "Transform.h"
 #include "ArrayWrapper.h"
 #include "Constants.h"
+#include "Face.h"
 
 class PotentialCollision
 {
 public:
-	float CalculateRequiredSeperation() const
+	PotentialCollision(const Vector3& edgeP0, const Vector3& edgeP1, const Vector3& collPointWorld, const Face& piercedFace)
 	{
-		auto points = m_OthersTransformedPoints->GetData();
-		auto count = m_OthersTransformedPoints->GetCurrCount();
-
-		auto mostInside = MathU::Infinity;
-
-		for (auto i = 0; i < count; i++)
-		{
-			auto comp = Vector3::Dot(points[i] - m_PointOnOwner, m_Normal);
-
-			if (comp < mostInside)
-				mostInside = comp;
-		}
-
-		return fabs(mostInside);
+		m_PiercingEdgeP0 = edgeP0;
+		m_PiercingEdgeP1 = edgeP1;
+		m_CollPointWorld = collPointWorld;
+		m_PiercedFace = &piercedFace;
 	}
 
-	Vector3 GetNormalWorldSpace() const
+	float CalculateRequiredSeperationWhenMovingEdge(const Vector3 collNormalWorld) const
 	{
-		return m_OwnerTransform->ToWorldDirection(m_Normal);
+
 	}
 
-	Vector3 GetPointWorldSpace() const
+	float CalculateRequiredSeperationWhenMovingFace(const Vector3 collNormalWorld) const
 	{
-		return m_OwnerTransform->ToWorldPosition(m_PointOnOwner);
+
 	}
 
-	const Vector3& GetPointLocal() const
+	Vector3 GetWorldCollNormal() const
 	{
-		return m_PointOnOwner;
+		auto& t = GetTransformOfPiercedFace();
+		return t.ToWorldDirection(m_PiercedFace->GetNormal());
 	}
 
-	const Vector3& GetNormalLocal() const
+	const Vector3& GetCollPointWorld() const
 	{
-		return m_Normal;
+		return m_CollPointWorld;
 	}
 
-	void Init(const Vector3& pointLocal, const Vector3& normalLocal,
-			 ArrayWrapper<Vector3, Constants::MaxNumPoints>& otherPoints, Transform& activeTransform)
+	// the responder can use to to work out what direction to put the normal in etc.
+	Transform& GetTransformOfPiercedFace() const
 	{
-		m_PointOnOwner = pointLocal;
-		m_Normal = normalLocal;
-		m_OthersTransformedPoints = &otherPoints;
-		m_OwnerTransform = &activeTransform;
+		return m_PiercedFace->GetShape().GetTransform();
 	}
 
 private:
-	Vector3 m_PointOnOwner;
-	Vector3 m_Normal;
+	// in pierced faces space
+	Vector3 m_PiercingEdgeP0;
+	Vector3 m_PiercingEdgeP1;
 
-	ArrayWrapper<Vector3, Constants::MaxNumPoints>* m_OthersTransformedPoints;
-	Transform* m_OwnerTransform;
+	Vector3 m_CollPointWorld;
+
+	const Face* m_PiercedFace;
 };

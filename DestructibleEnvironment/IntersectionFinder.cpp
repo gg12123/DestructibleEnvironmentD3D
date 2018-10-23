@@ -11,9 +11,10 @@ bool IntersectionFinder::LineIsIntersectedWithFace(const Face& face, const Vecto
 	return false;
 }
 
-void IntersectionFinder::FindFaceEdgeIntersections(const std::vector<Vector3>& transformedPoints, const std::vector<int>& edgeIndexes, Face& face, std::vector<FaceEdgeIntersection<Vector3>>& inters)
+void IntersectionFinder::FindFaceEdgeIntersections(const std::vector<Vector3>& transformedPoints, Face& faceEdges, Face& face, std::vector<FaceEdgeIntersection<Vector3>>& inters)
 {
 	Vector3 intPoint;
+	auto& edgeIndexes = faceEdges.GetSharedPoints();
 	auto c = edgeIndexes.size();
 
 	for (auto i = 0U; i < c; i++)
@@ -22,7 +23,7 @@ void IntersectionFinder::FindFaceEdgeIntersections(const std::vector<Vector3>& t
 		auto& p1 = transformedPoints[edgeIndexes[(i + 1) % c]];
 
 		if (LineIsIntersectedWithFace(face, p0, p1, intPoint))
-			inters.emplace_back(FaceEdgeIntersection<Vector3>(face, i, m_ActiveTransform->ToWorldPosition(intPoint)));
+			inters.emplace_back(FaceEdgeIntersection<Vector3>(face, faceEdges, i, m_ActiveTransform->ToWorldPosition(intPoint)));
 	}
 }
 
@@ -30,11 +31,11 @@ void IntersectionFinder::FindFaceEdgeIntersections(Face& face1, Face& face2, std
 {
 	// testing faces 1s edges against face 2
 	m_ActiveTransform = &m_Shape2->GetTransform();
-	FindFaceEdgeIntersections(m_Shape1sTransformedPoints, face1.GetSharedPoints(), face2, inters);
+	FindFaceEdgeIntersections(m_Shape1sTransformedPoints, face1, face2, inters);
 
 	// testing face 2s edges against face 1
 	m_ActiveTransform = &m_Shape1->GetTransform();
-	FindFaceEdgeIntersections(m_Shape2sTransformedPoints, face2.GetSharedPoints(), face1, inters);
+	FindFaceEdgeIntersections(m_Shape2sTransformedPoints, face2, face1, inters);
 }
 
 void IntersectionFinder::FindFaceFaceIntersection(Face& face1, Face& face2, std::vector<FaceFaceIntersection<Vector3>>& inters)

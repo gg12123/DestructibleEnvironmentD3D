@@ -98,7 +98,7 @@ public:
 		return m_CachedPoints;
 	}
 
-	auto& GetShape()
+	Shape& GetShape() const
 	{
 		return *m_OwnerShape;
 	}

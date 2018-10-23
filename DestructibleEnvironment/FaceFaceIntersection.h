@@ -8,12 +8,15 @@ class FaceEdgeIntersection
 {
 public:
 	Face * PiercedFace;
+	Face * OtherFace;
+
 	int PiercingEdge;
 	Tvec Position;
 
-	FaceEdgeIntersection(Face& f, int pe, Tvec pos)
+	FaceEdgeIntersection(Face& f, Face& o, int pe, Tvec pos)
 	{
-		PiercedFace = f;
+		PiercedFace = &f;
+		OtherFace = &o;
 		PiercingEdge = pe;
 		Position = pos;
 	}

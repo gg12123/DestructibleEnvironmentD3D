@@ -18,10 +18,20 @@ public:
 
 	static bool LineIsIntersectedWithFace(const Face& face, const Vector3& lineP0, const Vector3& lineP1, Vector3& intPoint);
 
+	const auto& GetShape1sTransformedPoints() const
+	{
+		return m_Shape1sTransformedPoints;
+	}
+
+	const auto& GetShape2sTransformedPoints() const
+	{
+		return m_Shape2sTransformedPoints;
+	}
+
 private:
 	void CommonInit(Shape& shape1, Shape& shape2);
 
-	void FindFaceEdgeIntersections(const std::vector<Vector3>& transformedPoints, const std::vector<int>& edgeIndexes, Face& face, std::vector<FaceEdgeIntersection<Vector3>>& inters);
+	void FindFaceEdgeIntersections(const std::vector<Vector3>& transformedPoints, Face& faceEdges, Face& face, std::vector<FaceEdgeIntersection<Vector3>>& inters);
 	void FindFaceEdgeIntersections(Face& face1, Face& face2, std::vector<FaceEdgeIntersection<Vector3>>& inters);
 	void FindFaceFaceIntersection(Face& face1, Face& face2, std::vector<FaceFaceIntersection<Vector3>>& inters);
 	void FindFaceFaceIntersections(std::vector<FaceFaceIntersection<Vector3>>& inters);
