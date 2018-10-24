@@ -1,32 +1,20 @@
 #pragma once
 #include <memory>
 #include "Vector3.h"
-#include "PoolOfRecyclables.h"
-#include "CollisionData.h"
+#include "PotentialCollision.h"
 
 class PhysicsObject;
 
 class CollisionResponder
 {
 public:
-	CollisionResponder()
-	{
-		std::function<std::unique_ptr<Impulse>()> creator = []()
-		{
-			return std::unique_ptr<Impulse>(new Impulse());
-		};
-
-		m_ImpulseDataPool = std::unique_ptr<PoolOfRecyclables<std::unique_ptr<Impulse>>>
-			(new PoolOfRecyclables<std::unique_ptr<Impulse>>(30, creator));
-	}
-
-	void Reset()
-	{
-		m_ImpulseDataPool->Reset();
-	}
-
-	void CalculateResponse(const CollisionData& collData, PhysicsObject& body1, PhysicsObject& body2);
+	void CalculateResponse(const std::vector<PotentialCollision>& potColls, PhysicsObject& body1, PhysicsObject& body2);
 
 private:
-	std::unique_ptr<PoolOfRecyclables<std::unique_ptr<Impulse>>> m_ImpulseDataPool;
+	bool CalculateCollisionPointAndNormal(const std::vector<PotentialCollision>& potColls, Vector3& normal1To2, Vector3& point);
+	float CalculateRequiredSeperation(const std::vector<PotentialCollision>& potColls, const Vector3& finalNormal1To2);
+	Vector3 CalculateAverageNormal(const std::vector<PotentialCollision>& potColls);
+
+	PhysicsObject * m_Body1 = nullptr;
+	PhysicsObject * m_Body2 = nullptr;
 };
