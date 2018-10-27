@@ -5,6 +5,7 @@
 #include "PoolOfRecyclables.h"
 #include "ConvexPolyCreator.h"
 #include "FaceRelationshipWithOtherShape.h"
+#include "Face.h"
 
 class SplitFaceRegion
 {
@@ -116,6 +117,43 @@ private:
 		}
 	}
 
+	void GenerateMapToOverlaidOuterEdge(const Polygon2& outerPoly, const Polygon2& intersectionPoly)
+	{
+		m_MapToOverlaidOuterEdge.clear();
+		for (int i = 0; i < m_Intersection.GetPointCount(); i++)
+			m_MapToOverlaidOuterEdge.emplace_back(-1);
+
+		auto lineIntsProcessed = 0;
+		auto currLineIntIndex = 0;
+
+		while (lineIntsProcessed < m_LineIntDetails.size())
+		{
+			auto& intDetais = m_LineIntDetails[currLineIntIndex];
+			if (intDetais.EnteringPoly == &outerPoly)
+			{
+				auto indexInIntersection = intDetais.PointIndexInIntersection;
+				auto indexInOuter = intDetais.EdgeOnEnteringPoly;
+
+				auto endIndexInIntersection = m_LineIntDetails[(currLineIntIndex + 1) & m_LineIntDetails.size()].PointIndexInIntersection;
+
+				while (indexInIntersection != endIndexInIntersection)
+				{
+					m_MapToOverlaidOuterEdge[indexInIntersection] = indexInOuter;
+
+					indexInOuter = outerPoly.NextIndex(indexInOuter);
+					indexInIntersection = intersectionPoly.NextIndex(indexInIntersection);
+				}
+
+				lineIntsProcessed += 2;
+				currLineIntIndex = (currLineIntIndex + 2) % m_LineIntDetails.size();
+			}
+			else
+			{
+				currLineIntIndex = (currLineIntIndex + 1) % m_LineIntDetails.size();
+			}
+		}
+	}
+
 	void SplitToCovexPoly(const Polygon2& splitterPoly, Polygon2IntersectionFinder& intFinder, Polygon2Splitter& splitter, PoolOfRecyclables<Polygon2>& polyPool)
 	{
 		m_ForOutput.clear();
@@ -124,9 +162,11 @@ private:
 			auto& myPoly = **it;
 
 			m_Intersection.Clear();
-			if (intFinder.FindIntersection(splitterPoly, myPoly, m_Intersection))
+			m_LineIntDetails.clear();
+			if (intFinder.FindIntersection(splitterPoly, myPoly, m_Intersection, m_LineIntDetails))
 			{
-				splitter.Split(myPoly, m_Intersection, m_ForOutput, polyPool);
+				GenerateMapToOverlaidOuterEdge(myPoly, m_Intersection);
+				splitter.Split(myPoly, m_Intersection, m_MapToOverlaidOuterEdge, m_ForOutput, polyPool);
 			}
 			else
 			{
@@ -144,4 +184,7 @@ private:
 	std::vector<Polygon2*> m_ForOutput;
 
 	FaceRelationshipWithOtherShape m_InOrOut;
+
+	std::vector<LineIntersectionDetails> m_LineIntDetails;
+	std::vector<int> m_MapToOverlaidOuterEdge;
 };

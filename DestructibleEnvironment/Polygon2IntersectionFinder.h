@@ -4,6 +4,19 @@
 #include "MathU.h"
 #include "Polygon2.h"
 
+class LineIntersectionDetails
+{
+public:
+	const Polygon2* EnteringPoly;
+	int EdgeOnEnteringPoly;
+	int PointIndexInIntersection;
+
+	LineIntersectionDetails(const Polygon2& enteringPoly, int edgeOnEntering, int pointIndexInIntersection)
+	{
+			
+	}
+};
+
 class PolyIntersectionPoint
 {
 public:
@@ -42,7 +55,7 @@ class Polygon2IntersectionFinder
 {
 public:
 	// inputs must be convex
-	bool FindIntersection(const Polygon2& poly1, const Polygon2& poly2, Polygon2& intersection)
+	bool FindIntersection(const Polygon2& poly1, const Polygon2& poly2, Polygon2& intersection, std::vector<LineIntersectionDetails>& lineIntDetails)
 	{
 		if (!poly1.BoundsOverlapWith(poly2))
 			return false;
@@ -51,7 +64,7 @@ public:
 
 		if (FindInitialIntersectionPoint(poly1, poly2))
 		{
-			FindIntersectionOfOverlappingPolys();
+			FindIntersectionOfOverlappingPolys(lineIntDetails);
 			return true;
 		}
 
@@ -97,12 +110,16 @@ private:
 		return c == PointInPolyCase::Outside;
 	}
 
-	void FindIntersectionOfOverlappingPolys()
+	void FindIntersectionOfOverlappingPolys(std::vector<LineIntersectionDetails>& lineIntDetails)
 	{
 		auto startIntPoint = m_CurrentIntersectionPoint;
 		do
 		{
 			m_Intersection->Add(m_CurrentIntersectionPoint.Position);
+
+			lineIntDetails.emplace_back(LineIntersectionDetails(*m_CurrentIntersectionPoint.ActivePoly,
+				m_CurrentIntersectionPoint.EdgeOnActivePoly,
+				m_Intersection->GetPointCount() - 1));
 
 			Vector2 nextCastPoint;
 			auto edgeForNextCast = AddInsidePoints(nextCastPoint);
