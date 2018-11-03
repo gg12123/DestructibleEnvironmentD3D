@@ -3,12 +3,12 @@
 #pragma once
 
 #include "Vector3.h"
+#include "ShapePoint.h"
 #include <assert.h>
 #include <vector>
 
-class Point;
-class Shape;
-class NewPointsGetter;
+class Face;
+class SplitShapeEdge;
 
 /**
  * 
@@ -18,50 +18,43 @@ class ShapeEdge
 public:
 	ShapeEdge();
 
-	ShapeEdge(Point& p1, Point& p2)
+	void RegisterFace(const Face& f, int index)
 	{
-		m_EdgeP1 = &p1;
-		m_EdgeP2 = &p2;
+
 	}
 
-	~ShapeEdge();
-
-	void AddPoint(Point &p)
+	ShapePoint& GetStart(const Face& requester) const
 	{
-		if (m_EdgeP1 == nullptr)
-		{
-			m_EdgeP1 = &p;
-		}
-		else if (m_EdgeP2 == nullptr)
-		{
-			m_EdgeP2 = &p;
-		}
-		else
-		{
-			assert(false);
-		}
+
 	}
 
-	void Cache(std::vector<int>& edgePoints);
-
-	void Split(const Vector3& P0, const Vector3& n, NewPointsGetter& newPoints, Shape& shapeAbove, Shape& shapeBelow);
-
-	Point* GetEdgeP1() const
+	ShapePoint& GetEnd(const Face& requester) const
 	{
-		return m_EdgeP1;
+
 	}
 
-	Point* GetEdgeP2() const
+	int GetIndex(const Face& requester) const
 	{
-		return m_EdgeP2;
+
 	}
 
-	float RegisterLengthWithPoints() const;
+	Vector3 GetDirection(const Face& requester) const
+	{
+
+	}
+
+	SplitShapeEdge& GetSplitEdge() const
+	{
+
+	}
 
 private:
-	void SplitInHalf(NewPointsGetter& newPoints, const Vector3& x, Shape& shapeAbove, Shape& shapeBelow);
-	void SplitAtEnd(NewPointsGetter& newPoints, Shape& shapeAbove, Shape& shapeBelow);
+	const Face* m_Face1 = nullptr;
+	const Face* m_Face2 = nullptr;
 
-	Point* m_EdgeP1;
-	Point* m_EdgeP2;
+	int m_IndexInFace1;
+	int m_IndexInFace2;
+
+	const ShapePoint* m_P0;
+	const ShapePoint* m_P1;
 };

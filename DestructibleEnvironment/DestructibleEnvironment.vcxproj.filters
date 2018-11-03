@@ -157,9 +157,6 @@
     <ClCompile Include="ShapeEdge.cpp">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClCompile>
-    <ClCompile Include="Point.cpp">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClCompile>
     <ClCompile Include="DynamicGridSquare.cpp">
       <Filter>Physics\CollisionStuff</Filter>
     </ClCompile>
@@ -173,6 +170,9 @@
       <Filter>Physics\CollisionStuff</Filter>
     </ClCompile>
     <ClCompile Include="ShapeSplitter.cpp">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClCompile>
+    <ClCompile Include="ShapePoint.cpp">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClCompile>
   </ItemGroup>
@@ -312,9 +312,6 @@
     <ClInclude Include="SplitInfo.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
-    <ClInclude Include="Point.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
     <ClInclude Include="GridPartition.h">
       <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
@@ -397,6 +394,27 @@
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="CubeFacesCreator.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="ShapePoint.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="CutPathElement.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="FacesCutPath.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="FacesCutPathIterator.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="SplitShapeEdge.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="FacesOriginalPointsIterator.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="FacesPointsIterator.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
   </ItemGroup>

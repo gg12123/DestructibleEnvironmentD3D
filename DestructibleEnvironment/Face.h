@@ -11,6 +11,8 @@
 #include <memory>
 
 class Shape;
+class ShapeEdge;
+class ShapePoint;
 
 class LinkedNeighbour
 {
@@ -58,6 +60,11 @@ public:
 	}
 
 	Vector3 ToShapeSpacePosition(const Vector2& faceSpacePos) const
+	{
+
+	}
+
+	void AddPoint(ShapePoint& point, const Vector3& dirToNext, ShapeEdge& edgeToNext)
 	{
 
 	}
