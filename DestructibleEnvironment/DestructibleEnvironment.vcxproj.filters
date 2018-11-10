@@ -417,6 +417,15 @@
     <ClInclude Include="FacesPointsIterator.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
+    <ClInclude Include="MapToFacesCutPath.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="MapToShapePointOnReversedFace.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="MapToNewEdges.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">

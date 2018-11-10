@@ -48,6 +48,11 @@ public:
 
 	}
 
+	bool IsSplit() const
+	{
+
+	}
+
 private:
 	const Face* m_Face1 = nullptr;
 	const Face* m_Face2 = nullptr;

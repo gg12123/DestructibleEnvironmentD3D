@@ -2,6 +2,7 @@
 #include <vector>
 #include "CutPathElement.h"
 #include "Vector3.h"
+#include "MapToShapePointOnReversedFace.h"
 
 class FacesCutPath
 {
@@ -41,6 +42,28 @@ public:
 	{
 		auto c = m_CutPath->size();
 		return (curr + travelDir + c) % c;
+	}
+
+	bool SetBeenUsedToGenInsideFace()
+	{
+
+	}
+
+	bool SetBeenUsedToGetOutsideFace()
+	{
+
+	}
+
+	template<FaceRelationshipWithOtherShape inside>
+	static inline ShapePoint& GetNewPointFromCpPoint(ShapePoint& pIn, const MapToShapePointOnReversedFace& map)
+	{
+		return pIn;
+	}
+
+	template<>
+	static inline ShapePoint& GetNewPointFromCpPoint<FaceRelationshipWithOtherShape::NotInIntersection>(ShapePoint& pIn, const MapToShapePointOnReversedFace& map)
+	{
+		return map.GetPointOnReversedFace(pIn);
 	}
 
 private:

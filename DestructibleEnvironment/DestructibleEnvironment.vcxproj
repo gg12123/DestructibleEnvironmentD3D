@@ -218,6 +218,9 @@
     <ClInclude Include="FacesCutPathIterator.h" />
     <ClInclude Include="FacesOriginalPointsIterator.h" />
     <ClInclude Include="FacesPointsIterator.h" />
+    <ClInclude Include="MapToFacesCutPath.h" />
+    <ClInclude Include="MapToNewEdges.h" />
+    <ClInclude Include="MapToShapePointOnReversedFace.h" />
     <ClInclude Include="PerFaceSplitData.h" />
     <ClInclude Include="PointInPolyCase.h" />
     <ClInclude Include="Polygon2.h" />

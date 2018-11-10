@@ -4,11 +4,13 @@
 #include "ShapePoint.h"
 #include "SplitShapeEdge.h"
 #include "ShapeEdge.h"
+#include "MapToShapePointOnReversedFace.h"
+#include "MapToNewEdges.h"
 
 class FacesCutPathIterator
 {
 public:
-	// maybe template this for the mapped version
+	template<FaceRelationshipWithOtherShape inOrOut>
 	void IteratePath(const FacesCutPath& cp, const ShapePoint& start)
 	{
 		CalculateTravelParams(cp, start);
@@ -16,10 +18,15 @@ public:
 		auto curr = m_StartIndex;
 		while (curr != m_EndIndex)
 		{
+			auto nextIndex = cp.GetNextIndex(curr, m_TravelDir);
+
 			auto& cpe = cp.GetElement(curr);
 
-			m_NewFace->AddPoint(cpe.GetPoint(), cp.GetDirToNext(curr, m_TravelDir), ); // get edge between cpe point and next cp point
-			curr = cp.GetNextIndex(curr, m_TravelDir);
+			auto& cpPoint = FacesCutPath::GetNewPointFromCpPoint<inOrOut>(cpe.GetPoint(), *m_MapToReversed);
+			auto& nextCpPoint = FacesCutPath::GetNewPointFromCpPoint<inOrOut>(cp.GetElement(nextIndex).GetPoint(), *m_MapToReversed);
+
+			m_NewFace->AddPoint(cpPoint, cp.GetDirToNext(curr, m_TravelDir), m_MapToEdges->GetNewEdge(cpPoint, nextCpPoint));
+			curr = nextIndex;
 		}
 
 		auto& endCpe = cp.GetElement(curr);
@@ -30,7 +37,8 @@ public:
 		auto& nextPoint = splitEdge.GetNext(endCpe.GetPoint(), piercingEdge.GetEnd(*m_OriginalFace));
 		auto dir = piercingEdge.GetDirection(*m_OriginalFace);
 
-		m_NewFace->AddPoint(endCpe.GetPoint(), dir, ); // get edge between endCpe point and nextPoint
+		auto& endCpPoint = FacesCutPath::GetNewPointFromCpPoint<inOrOut>(endCpe.GetPoint(), *m_MapToReversed);
+		m_NewFace->AddPoint(endCpPoint, dir, m_MapToEdges->GetNewEdge(endCpPoint, nextPoint));
 
 		m_NextPoint = &nextPoint;
 		m_EndPiercingEdge = &piercingEdge;
@@ -44,6 +52,18 @@ public:
 	ShapeEdge& GetEndEdge()
 	{
 		return *m_EndPiercingEdge;
+	}
+
+	void InitMaps(const MapToShapePointOnReversedFace& map, const MapToNewEdges& edgeMap)
+	{
+		m_MapToEdges = &edgeMap;
+		m_MapToReversed = &map;
+	}
+
+	void InitFaces(const Face& orig, Face& newFace)
+	{
+		m_OriginalFace = &orig;
+		m_NewFace = &newFace;
 	}
 
 private:
@@ -65,8 +85,8 @@ private:
 		}
 	}
 
-	Face * m_NewFace;
-	Face* m_OriginalFace;
+	Face * m_NewFace = nullptr;
+	const Face* m_OriginalFace = nullptr;
 
 	int m_StartIndex;
 	int m_EndIndex;
@@ -74,4 +94,7 @@ private:
 
 	ShapePoint * m_NextPoint;
 	ShapeEdge * m_EndPiercingEdge;
+
+	const MapToShapePointOnReversedFace* m_MapToReversed = nullptr;
+	const MapToNewEdges* m_MapToEdges = nullptr;
 };
