@@ -4,6 +4,7 @@
 
 #include "Vector3.h"
 #include "ShapePoint.h"
+#include "ObjectWithHash.h"
 #include <assert.h>
 #include <vector>
 
@@ -13,12 +14,12 @@ class SplitShapeEdge;
 /**
  * 
  */
-class ShapeEdge
+class ShapeEdge : public ObjectWithHash<ShapeEdge>
 {
 public:
 	ShapeEdge();
 
-	void RegisterFace(const Face& f, int index)
+	void RegisterFace(Face& f, int index)
 	{
 
 	}
@@ -53,9 +54,19 @@ public:
 
 	}
 
+	Face& GetFace1() const
+	{
+		return *m_Face1;
+	}
+
+	Face& GetFace2() const
+	{
+		return *m_Face1;
+	}
+
 private:
-	const Face* m_Face1 = nullptr;
-	const Face* m_Face2 = nullptr;
+	Face* m_Face1 = nullptr;
+	Face* m_Face2 = nullptr;
 
 	int m_IndexInFace1;
 	int m_IndexInFace2;

@@ -10,4 +10,9 @@ public:
 	{
 
 	}
+
+	void AddPath(const Face& facesExitedOrEntered, const ShapePoint& pointOnCp, FacesCutPath& fcp)
+	{
+
+	}
 };

@@ -66,6 +66,11 @@ public:
 		return map.GetPointOnReversedFace(pIn);
 	}
 
+	void Init(int first, int final, const std::vector<CutPathElement>& cp)
+	{
+
+	}
+
 private:
 
 	int m_FirstIndex;

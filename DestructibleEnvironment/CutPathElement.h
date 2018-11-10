@@ -39,13 +39,17 @@ public:
 		return m_DirFromPrev;
 	}
 
+	Vector3 GetIntPoint() const
+	{
+		
+	}
+
 private:
 	Face* m_PiercedFace;
 	Face* m_FaceEntered;
 	Face* m_FaceExited;
 
 	ShapeEdge* m_PiercingEdge;
-
 	ShapePoint* m_Point;
 
 	Vector3 m_DirFromPrev;

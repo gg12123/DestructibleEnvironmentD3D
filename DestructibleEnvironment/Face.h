@@ -7,6 +7,7 @@
 #include "FaceFaceIntersection.h"
 #include "Polygon2.h"
 #include "PoolOfRecyclables.h"
+#include "ObjectWithHash.h"
 #include <vector>
 #include <memory>
 
@@ -14,34 +15,17 @@ class Shape;
 class ShapeEdge;
 class ShapePoint;
 
-class LinkedNeighbour
+struct FaceEdgeCaseResult
 {
-public:
-	LinkedNeighbour(Face& neighbour, int edgeOnNeighbour)
-	{
-		m_Neighbour = &neighbour;
-		m_EdgeOnNeighbour = edgeOnNeighbour;
-	}
-
-	Face& GetNeighbour() const
-	{
-		return *m_Neighbour;
-	}
-
-	int GetEdgeOnNeighbour() const
-	{
-		return m_EdgeOnNeighbour;
-	}
-
-private:
-	Face * m_Neighbour;
-	int m_EdgeOnNeighbour;
+	ShapeEdge* Edge;
+	Vector3 IntPoint;
+	float Distance;
 };
 
 /**
  * 
  */
-class Face
+class Face : public ObjectWithHash<Face>
 {
 public:
 	Face()
@@ -78,6 +62,10 @@ public:
 	{
 		return m_Normal;
 	}
+
+	Vector3 GetEdgeNormal(const ShapeEdge& edge) const;
+
+	FaceEdgeCaseResult CastToEdgeInside(const Vector3& origin, const Vector3& dir);
 
 	Vector3 GetNormalWorld() const
 	{

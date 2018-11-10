@@ -209,8 +209,10 @@
     <ClInclude Include="ConstantBufferInputTypes.h" />
     <ClInclude Include="ConvexPolyCreator.h" />
     <ClInclude Include="CubeFacesCreator.h" />
+    <ClInclude Include="CutPathCreator.h" />
     <ClInclude Include="CutPathElement.h" />
     <ClInclude Include="CutShapeCreator.h" />
+    <ClInclude Include="EdgeFaceIntersection.h" />
     <ClInclude Include="FaceIterator.h" />
     <ClInclude Include="FaceLinker.h" />
     <ClInclude Include="FaceRelationshipWithOtherShape.h" />
@@ -221,6 +223,7 @@
     <ClInclude Include="MapToFacesCutPath.h" />
     <ClInclude Include="MapToNewEdges.h" />
     <ClInclude Include="MapToShapePointOnReversedFace.h" />
+    <ClInclude Include="ObjectWithHash.h" />
     <ClInclude Include="PerFaceSplitData.h" />
     <ClInclude Include="PointInPolyCase.h" />
     <ClInclude Include="Polygon2.h" />
