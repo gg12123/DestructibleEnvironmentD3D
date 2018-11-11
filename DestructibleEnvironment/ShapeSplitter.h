@@ -10,6 +10,7 @@
 #include "CutPathCreator.h"
 #include "IntersectionFinder.h"
 #include "FaceIterator.h"
+#include "ReversedGeometryCreator.h"
 
 class ShapeSplitter
 {
@@ -75,17 +76,14 @@ private:
 		m_FaceIterator.CreateShapes(m_NewOutsideFaces, newShapes, FaceRelationshipWithOtherShape::NotInIntersection);
 	}
 
-	void CreateReversedFace(const Face& f)
-	{
-
-	}
-
 	void CreateReversedFaces(const Shape& cutShape)
 	{
-		for (auto it = m_NewInsideFaces.begin(); it != m_NewInsideFacesFromCutShape.end(); it++)
-		{
-			// create reveserd
-		}
+		auto& cps = m_CutPathCreator.GetCutPaths();
+		for (auto it = cps.Begin(); it != cps.End(); it++)
+			m_Reverser.CreateReversedCutPath(*it);
+
+		for (auto it = m_NewInsideFacesFromCutShape.begin(); it != m_NewInsideFacesFromCutShape.end(); it++)
+			m_Reverser.CreateReversedFace(**it);
 
 		auto& faces = cutShape.GetFaces();
 		for (auto it = faces.begin(); it != faces.end(); it++)
@@ -97,7 +95,7 @@ private:
 				// assigned by the face iterator when it created the inside shape. Hence the face
 				// is inside and needs reversing.
 
-				// create reversed
+				m_Reverser.CreateReversedFace(f);
 			}
 		}
 	}
@@ -136,6 +134,7 @@ private:
 	CutPathCreator m_CutPathCreator;
 	IntersectionFinder m_IntersectionFinder;
 	FaceIterator m_FaceIterator;
+	ReversedGeometryCreator m_Reverser;
 
 	std::vector<EdgeFaceIntersection> m_Intersections;
 

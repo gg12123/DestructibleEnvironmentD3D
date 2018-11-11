@@ -265,6 +265,7 @@
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="PhysicsObject.h" />
     <ClInclude Include="PhysicsTime.h" />
+    <ClInclude Include="ReversedGeometryCreator.h" />
     <ClInclude Include="ShapeEdgesCreator.h" />
     <ClInclude Include="ShapePoint.h" />
     <ClInclude Include="Polygon2IntersectionFinder.h" />

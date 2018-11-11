@@ -4,7 +4,12 @@
 class MapToShapePointOnReversedFace
 {
 public:
-	ShapePoint & GetPointOnReversedFace(ShapePoint& p) const
+	ShapePoint & GetPointOnReversedFace(const ShapePoint& p) const
+	{
+
+	}
+
+	void Add(const ShapePoint& from, ShapePoint& to)
 	{
 
 	}

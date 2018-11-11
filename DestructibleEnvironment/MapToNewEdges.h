@@ -5,7 +5,7 @@
 class MapToNewEdges
 {
 public:
-	ShapeEdge & GetNewEdge(const ShapePoint& p0, const ShapePoint& p1)
+	ShapeEdge & GetNewEdge(const ShapePoint& p0, const ShapePoint& p1) const
 	{
 
 	}

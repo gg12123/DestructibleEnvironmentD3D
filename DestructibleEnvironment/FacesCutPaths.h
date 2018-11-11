@@ -9,6 +9,7 @@
 #include "Face.h"
 #include "ShapeEdge.h"
 #include "MapToFacesCutPath.h"
+#include "ShapePoint.h"
 
 class FacesCutPaths
 {
@@ -67,8 +68,14 @@ private:
 		fcp.Init(first, final, cp);
 		m_Paths.emplace_back(&fcp);
 
-		m_MapToFCP->AddPath(*m_Face, cp[first].GetPoint(), fcp);
-		m_MapToFCP->AddPath(*m_Face, cp[final].GetPoint(), fcp);
+		auto& pFirst = cp[first].GetPoint();
+		auto& pFinal = cp[final].GetPoint();
+
+		pFirst.TryAssignHash();
+		pFinal.TryAssignHash();
+
+		m_MapToFCP->AddPath(*m_Face, pFirst, fcp);
+		m_MapToFCP->AddPath(*m_Face, pFinal, fcp);
 	}
 
 	std::vector<FacesCutPath*> m_Paths;

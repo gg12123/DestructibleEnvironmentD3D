@@ -13,7 +13,7 @@ public:
 	}
 
 	// called by the reversing code
-	void CreateEdge(ShapePoint& p0, ShapePoint& p1)
+	void CreateEdge(const ShapePoint& p0, const ShapePoint& p1)
 	{
 
 	}
@@ -21,6 +21,11 @@ public:
 	const auto& GetMapToNewEdges() const
 	{
 		return m_MapToEdges;
+	}
+
+	bool EdgeExistsBetween(const ShapePoint& p0, const ShapePoint& p1) const
+	{
+
 	}
 
 private:

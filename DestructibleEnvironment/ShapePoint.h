@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Vector3.h"
+#include "ObjectWithHash.h"
 #include <vector>
 #include <assert.h>
 
@@ -11,7 +12,7 @@ class Shape;
 /**
  * 
  */
-class ShapePoint
+class ShapePoint : public ObjectWithHash<ShapePoint>
 {
 public:
 
