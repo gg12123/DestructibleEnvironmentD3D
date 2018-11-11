@@ -8,7 +8,7 @@
 #include "PointInPolyCase.h"
 #include <vector>
 
-class Point;
+class ShapePoint;
 class ShapeEdge;
 class Face;
 
@@ -93,31 +93,19 @@ public:
 		m_Faces.emplace_back(&f);
 	}
 
-	void AddPoint(const Vector3& p)
-	{
-		m_CachedPoints.emplace_back(p);
-	}
-
 	void OnAllFacesAdded(Transform& refTran) // faces are in the ref transforms local space
 	{
+		CollectPointsAndEdges();
+
 		auto c = CalculateCentre();
 
-		ReCentreFaces(c);
+		ReCentre(c);
+		InitFaces();
 
 		GetTransform().SetPosition(refTran.ToWorldPosition(c));
 		GetTransform().SetRotation(refTran.GetRotation());
 
 		SetDirty();
-	}
-
-	int RegisterPoint(const Vector3& point)
-	{
-		// TODO
-		// add to cached points only if the point in unique.
-		// return the index
-
-		m_CachedPoints.emplace_back(point);
-		return m_CachedPoints.size() - 1;
 	}
 
 private:
@@ -128,13 +116,20 @@ private:
 
 	Vector3 CalculateSplitPlaneNormal(const Vector3& P0);
 	Vector3 CalculateCentre();
-	void ReCentreFaces(const Vector3& centre);
+	void ReCentre(const Vector3& centre);
+	void CollectPointsAndEdges();
+	void TryCollectPoint(ShapePoint& p);
+	void TryCollectEdge(ShapeEdge& p);
+	void InitFaces();
 
 	int m_RequiredNumVerts;
 	int m_RequiredNumIndicies;
 
 	std::vector<Face*> m_Faces;
-	std::vector<Vector3> m_CachedPoints; // faces have indicies that key into here
+	std::vector<Vector3> m_CachedPoints;
+	std::vector<ShapePoint*> m_PointObjects;
+	std::vector<ShapeEdge*> m_EdgeObjects;
+	std::vector<int> m_EdgeIndexes;
 
 	Transform m_Transform;
 	Bounds m_LocalBounds;

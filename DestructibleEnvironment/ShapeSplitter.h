@@ -100,6 +100,17 @@ private:
 		}
 	}
 
+	void InitNewShapes(Shape& original, std::vector<Shape*>& newShapes)
+	{
+		// Must copy the transform.
+		// Copy is needed becasue the original shape is re-used in the
+		// new shapes.
+		auto t = original.GetTransform();
+
+		for (auto it = newShapes.begin(); it != newShapes.end(); it++)
+			(*it)->OnAllFacesAdded(t);
+	}
+
 public:
 	ShapeSplitter()
 	{

@@ -106,11 +106,6 @@ public:
 		return m_FacePoly;
 	}
 
-	const auto& GetSharedPoints() const
-	{
-		return m_ToSharedPoints;
-	}
-
 	void Clear()
 	{
 
@@ -123,13 +118,13 @@ public:
 
 	}
 
+	void OnSplittingFinished(Shape& owner);
+
 private:
 	void InitFaceCoOrdinateSystem(const Vector3& origin);
 
 
 	// all points related collections must be parralel.
-
-	std::vector<int> m_ToSharedPoints;
 	std::vector<Vector3> m_CachedPoints;
 	std::vector<Vector3> m_EdgeDirections;
 	std::vector<ShapePoint*> m_PointObjects;

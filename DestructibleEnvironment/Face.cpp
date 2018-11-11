@@ -3,7 +3,7 @@
 #include "Face.h"
 #include "ShapeEdge.h"
 #include "Shape.h"
-#include "Point.h"
+#include "ShapePoint.h"
 #include "NewPointsGetter.h"
 
 bool Face::PointIsInsideFace(const Vector3& pointShapesSpace) const
@@ -11,60 +11,29 @@ bool Face::PointIsInsideFace(const Vector3& pointShapesSpace) const
 	return m_FacePoly.PointIsInsideAssumingConvex(ToFaceSpacePosition(pointShapesSpace)) == PointInPolyCase::Inside;
 }
 
-void Face::RegisterIntersection(const FaceFaceIntersection<Vector3>& inter)
-{
-	auto& t = m_OwnerShape->GetTransform();
-
-	auto& faceEdge1 = inter.Intersection1;
-	auto& faceEdge2 = inter.Intersection2;
-
-	auto p1 = ToFaceSpacePosition(t.ToLocalPosition(faceEdge1.Position));
-	auto p2 = ToFaceSpacePosition(t.ToLocalPosition(faceEdge2.Position));
-
-	m_Intersections.emplace_back(FaceFaceIntersection<Vector2>(*inter.Face1, *inter.Face2,
-		FaceEdgeIntersection<Vector2>(*faceEdge1.PiercedFace, faceEdge1.PiercingEdge, p1),
-		FaceEdgeIntersection<Vector2>(*faceEdge2.PiercedFace, faceEdge2.PiercingEdge, p2)));
-}
-
-void Face::ReCentre(const Vector3& centre, Shape& owner)
+void Face::OnSplittingFinished(Shape& owner)
 {
 	m_OwnerShape = &owner;
-	m_ToSharedPoints.clear();
+
+	m_CachedPoints.clear();
 	m_FacePoly.Clear();
+	InitFaceCoOrdinateSystem(m_PointObjects[0]->GetPoint());
 
-	m_CachedPoints[0] -= centre;
-
-	InitFaceCoOrdinateSystem(m_CachedPoints[0]);
-	m_FacePoly.Add(Vector2::Zero());
-	m_ToSharedPoints.emplace_back(owner.RegisterPoint(m_CachedPoints[0]));
-
-	for (auto i = 1U; i < m_CachedPoints.size(); i++)
+	for (auto i = 0U; i < m_PointObjects.size(); i++)
 	{
-		m_CachedPoints[i] -= centre;
-		m_FacePoly.Add(ToFaceSpacePosition(m_CachedPoints[i]));
-		m_ToSharedPoints.emplace_back(owner.RegisterPoint(m_CachedPoints[i]));
-	}
-}
+		auto& po = (*m_PointObjects[i]);
+		auto& eo = (*m_EdgeObjects[i]);
 
-void Face::AddLink(int edgeOnSelf, Face& link, int linksEdge)
-{
-	if (!AlreadyLinkedTo(link, edgeOnSelf))
-	{
-		m_LinkedFaces->At(edgeOnSelf).emplace_back(LinkedNeighbour(link, linksEdge));
-		link.m_LinkedFaces->At(linksEdge).emplace_back(LinkedNeighbour(*this, edgeOnSelf));
-	}
-}
+		auto& p = po.GetPoint();
 
-void Face::DetachLinks()
-{
-	for (auto it1 = m_LinkedFaces->Begin(); it1 != m_LinkedFaces->End(); it1++)
-	{
-		auto& links = *it1;
-		for (auto it2 = links.begin(); it2 != links.end(); it2++)
-		{
-			auto& linkedNeighbour = *it2;
-			linkedNeighbour.GetNeighbour().RemoveLink(*this, linkedNeighbour.GetEdgeOnNeighbour());
-		}
+		m_CachedPoints.emplace_back(p);
+		m_FacePoly.Add(ToFaceSpacePosition(p));
+
+		po.ResetHash();
+		po.SetBeenCollected(false);
+
+		eo.ResetHash();
+		eo.SetBeenCollected(false);
 	}
-	m_LinkedFaces->Reset();
+	ResetHash();
 }
