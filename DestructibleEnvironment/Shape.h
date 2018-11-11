@@ -21,7 +21,7 @@ public:
 
 	virtual ~Shape();
 
-	const auto& GetFaces()
+	const auto& GetFaces() const
 	{
 		return m_Faces;
 	}

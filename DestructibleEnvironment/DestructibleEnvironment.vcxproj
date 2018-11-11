@@ -218,8 +218,10 @@
     <ClInclude Include="FaceRelationshipWithOtherShape.h" />
     <ClInclude Include="FacesCutPath.h" />
     <ClInclude Include="FacesCutPathIterator.h" />
+    <ClInclude Include="FacesCutPaths.h" />
     <ClInclude Include="FacesOriginalPointsIterator.h" />
     <ClInclude Include="FacesPointsIterator.h" />
+    <ClInclude Include="MapToFaceRelationship.h" />
     <ClInclude Include="MapToFacesCutPath.h" />
     <ClInclude Include="MapToNewEdges.h" />
     <ClInclude Include="MapToShapePointOnReversedFace.h" />
@@ -263,6 +265,7 @@
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="PhysicsObject.h" />
     <ClInclude Include="PhysicsTime.h" />
+    <ClInclude Include="ShapeEdgesCreator.h" />
     <ClInclude Include="ShapePoint.h" />
     <ClInclude Include="Polygon2IntersectionFinder.h" />
     <ClInclude Include="Polygon2Splitter.h" />
@@ -306,7 +309,6 @@
     <ClCompile Include="DynamicGridSquare.cpp" />
     <ClCompile Include="DynamicMesh.cpp" />
     <ClCompile Include="Face.cpp" />
-    <ClCompile Include="FaceSplitter.cpp" />
     <ClCompile Include="GameControlledDynamicBody.cpp" />
     <ClCompile Include="GameTheadToPhysicsThreadAction.cpp" />
     <ClCompile Include="IntersectionFinder.cpp" />

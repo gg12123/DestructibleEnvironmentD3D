@@ -64,6 +64,11 @@ public:
 		return *m_Face1;
 	}
 
+	Face& GetOther(const Face& f) const
+	{
+
+	}
+
 private:
 	Face* m_Face1 = nullptr;
 	Face* m_Face2 = nullptr;

@@ -2,26 +2,23 @@
 #include <array>
 #include <vector>
 #include <stack>
+#include <assert.h>
 #include "Shape.h"
 #include "Face.h"
 #include "PerFaceSplitData.h"
+#include "MapToFaceRelationship.h"
 
 class FaceIterator
 {
 public:
-
 	void SetShapeToUseNext(Shape& s)
 	{
 		m_ShapeToUseNext = &s;
 	}
 
-	void SetPerFaceData(std::vector<PerFaceSplitData>& perFaceData)
+	void CreateShapes(const std::vector<Face*>& faces, std::vector<Shape*>& newShapes, FaceRelationshipWithOtherShape relationship)
 	{
-		m_PerFaceData = &perFaceData;
-	}
-
-	void CreateShapes(const std::vector<Face*>& faces, std::vector<Shape*>& newShapes)
-	{
+		m_CurrRelationship = relationship;
 		auto root = FindNextRootFace(faces);
 
 		while (root)
@@ -31,7 +28,25 @@ public:
 		}
 	}
 
+	const MapToFaceRelationship& GetMapToFaceRelationship() const
+	{
+		return m_Map;
+	}
+
 private:
+	bool FaceIsVisited(const Face& f) const
+	{
+		// TODO - using the hash like this is not very safe.
+		return f.HashIsAssigned();
+	}
+
+	void Visit(Face& f)
+	{
+		assert(!FaceIsVisited(f));
+		f.AssignHash();
+		m_Map.SetRelationship(f, m_CurrRelationship);
+	}
+
 	Shape & GetNextShapeToUse()
 	{
 		auto s = m_ShapeToUseNext;
@@ -47,9 +62,8 @@ private:
 	Shape& CreateShape(Face& rootFace)
 	{
 		auto& newShape = GetNextShapeToUse();
-		auto& perFaceData = *m_PerFaceData;
 
-		auto rootsRelationship = perFaceData[rootFace.GetIdForSplitter()].RelationshipWithOtherShape;
+		auto rootsRelationship = m_Map.GetRelationship(rootFace);
 
 		newShape.Clear();
 		m_FaceStack.push(&rootFace);
@@ -59,26 +73,22 @@ private:
 			auto& next = *m_FaceStack.top();
 			m_FaceStack.pop();
 
-			auto id = next.GetIdForSplitter();
-			auto& nextsData = perFaceData[id];
-
-			nextsData.Visited = true;
+			Visit(next);
 			newShape.AddFace(next);
+			
+			auto& edges = next.GetEdgeObjects();
 
-			if (nextsData.RelationshipWithOtherShape != FaceRelationshipWithOtherShape::Unkown)
-				assert(nextsData.RelationshipWithOtherShape == rootsRelationship);
-
-			nextsData.RelationshipWithOtherShape = rootsRelationship;
-
-			auto& links = next.GetLinkedFaces();
-			for (auto it1 = links.Begin(); it1 != links.End(); it1++)
+			for (auto it = edges.begin(); it != edges.end(); it++)
 			{
-				auto& edgesLinks = *it1;
-				for (auto it2 = edgesLinks.begin(); it2 != edgesLinks.end(); it2++)
+				auto& other = (*it)->GetOther(next);
+
+				if (!FaceIsVisited(other))
 				{
-					auto& linkedFace = (*it2).GetNeighbour();
-					if (!perFaceData[linkedFace.GetIdForSplitter()].Visited)
-						m_FaceStack.push(&linkedFace);
+					m_FaceStack.push(&other);
+				}
+				else
+				{
+					assert(m_Map.GetRelationship(other) == m_CurrRelationship);
 				}
 			}
 		}
@@ -87,18 +97,21 @@ private:
 
 	Face* FindNextRootFace(const std::vector<Face*>& faces)
 	{
-		auto& perFaceData = *m_PerFaceData;
-
 		for (auto it = faces.begin(); it != faces.end(); it++)
 		{
 			auto face = *it;
-			if (!perFaceData[face->GetIdForSplitter()].Visited)
+			if (!FaceIsVisited(*face))
+			{
+				Visit(*face);
 				return face;
+			}
 		}
 		return nullptr;
 	}
 
 	Shape * m_ShapeToUseNext = nullptr;
-	std::vector<PerFaceSplitData>* m_PerFaceData = nullptr;
+
 	std::stack<Face*> m_FaceStack;
+	MapToFaceRelationship m_Map;
+	FaceRelationshipWithOtherShape m_CurrRelationship;
 };

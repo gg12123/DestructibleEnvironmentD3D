@@ -54,6 +54,16 @@ public:
 
 	}
 
+	bool BeenUsedToGenInsideFace() const
+	{
+
+	}
+
+	bool BeenUsedToGenOutsideFace() const
+	{
+
+	}
+
 	template<FaceRelationshipWithOtherShape inside>
 	static inline ShapePoint& GetNewPointFromCpPoint(ShapePoint& pIn, const MapToShapePointOnReversedFace& map)
 	{

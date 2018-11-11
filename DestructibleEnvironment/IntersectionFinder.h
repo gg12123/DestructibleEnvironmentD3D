@@ -2,6 +2,7 @@
 #include <vector>
 #include "Vector3.h"
 #include "FaceFaceIntersection.h"
+#include "EdgeFaceIntersection.h"
 
 class Face;
 class Shape;
@@ -10,6 +11,8 @@ class Transform;
 class IntersectionFinder
 {
 public:
+	void FindEdgeFaceIntersections(Shape& shape1, Shape& shape2, std::vector<EdgeFaceIntersection>& inters);
+
 	// for splitting
 	void FindFaceFaceIntersections(Shape& shape1, Shape& shape2, std::vector<FaceFaceIntersection<Vector3>>& inters);
 

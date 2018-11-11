@@ -163,9 +163,6 @@
     <ClCompile Include="DynamicGridPartition.cpp">
       <Filter>Physics\CollisionStuff</Filter>
     </ClCompile>
-    <ClCompile Include="FaceSplitter.cpp">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClCompile>
     <ClCompile Include="IntersectionFinder.cpp">
       <Filter>Physics\CollisionStuff</Filter>
     </ClCompile>
@@ -434,6 +431,15 @@
     </ClInclude>
     <ClInclude Include="ObjectWithHash.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="FacesCutPaths.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="ShapeEdgesCreator.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="MapToFaceRelationship.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

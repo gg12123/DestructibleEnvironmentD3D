@@ -9,4 +9,9 @@ public:
 	{
 
 	}
+
+	void AddNewEdge(const ShapePoint& p0, const ShapePoint& p1, ShapeEdge& edge)
+	{
+
+	}
 };
