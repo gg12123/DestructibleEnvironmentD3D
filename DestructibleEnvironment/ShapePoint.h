@@ -15,6 +15,10 @@ class Shape;
 class ShapePoint : public ObjectWithHash<ShapePoint>
 {
 public:
+	ShapePoint(const Vector3& p)
+	{
+		m_Point = p;
+	}
 
 	void SetBeenCollected(bool val)
 	{

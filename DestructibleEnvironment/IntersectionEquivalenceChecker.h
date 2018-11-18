@@ -106,7 +106,7 @@ public:
 			auto& inter = *it;
 			auto dist = (inter.GetIntPoint() - edgeP0).MagnitudeSqr();
 
-			if (dist > distLow && dist < distHigh)
+			if (dist >= distLow && dist <= distHigh)
 			{
 				auto dot = Vector3::Dot(dir, inter.GetFace().GetNormal());
 

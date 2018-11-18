@@ -1,13 +1,21 @@
 #pragma once
 #include "Vector3.h"
-
-class Face;
-class ShapePoint;
-class ShapeEdge;
+#include "ShapePoint.h"
+#include "Face.h"
+#include "ShapeEdge.h"
 
 class CutPathElement
 {
 public:
+	CutPathElement(const FaceEdgeCaseResult& castRes, Face& faceExited, Face& facePierced, const Vector3& dirFromPrev)
+	{
+		m_PiercingEdge = castRes.Edge;
+		m_FaceExited = &faceExited;
+		m_PiercedFace = &facePierced;
+		m_FaceEntered = &m_PiercingEdge->GetOther(*m_FaceExited);
+		m_DirFromPrev = dirFromPrev;
+	}
+
 	int GetIndexInSplitEdge() const
 	{
 		return m_IndexInSplitEdge;
@@ -50,7 +58,7 @@ public:
 
 	Vector3 GetIntPoint() const
 	{
-		
+		return m_Point->GetPoint();
 	}
 
 private:

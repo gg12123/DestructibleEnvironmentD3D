@@ -20,7 +20,11 @@ public:
 		auto i = startIndex;
 		while (!edges[i]->IsSplit())
 		{
-			m_NewFace->AddPoint(*points[i], dirs[i], *edges[i]);
+			auto& edge = *edges[i];
+
+			edge.DeRegisterFace(*m_OriginalFace);
+
+			m_NewFace->AddPoint(*points[i], dirs[i], edge);
 			i = m_OriginalFace->NextPointIndex(i);
 		}
 

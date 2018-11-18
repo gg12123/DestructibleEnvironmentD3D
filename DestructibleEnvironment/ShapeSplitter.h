@@ -126,10 +126,6 @@ private:
 	}
 
 public:
-	ShapeSplitter()
-	{
-	}
-
 	void Split(const Vector3& splitPoint, const Vector3& splitNormal, Shape& originalShape, std::vector<Shape*>& newShapes)
 	{
 		ResetHashCounters();

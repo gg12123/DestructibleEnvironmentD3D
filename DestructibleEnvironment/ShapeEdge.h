@@ -28,6 +28,11 @@ public:
 
 	}
 
+	void DeRegisterFace(const Face& f)
+	{
+
+	}
+
 	const ShapePoint& GetP0() const
 	{
 		return *m_P0;

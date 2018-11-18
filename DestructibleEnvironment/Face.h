@@ -20,6 +20,16 @@ struct FaceEdgeCaseResult
 	ShapeEdge* Edge;
 	Vector3 IntPoint;
 	float Distance;
+
+	FaceEdgeCaseResult(ShapeEdge& edge, const Vector3 intPoint, float dist) : IntPoint(intPoint), Distance(dist)
+	{
+		Edge = &edge;
+	}
+
+	FaceEdgeCaseResult() : IntPoint(Vector3::Zero()), Distance(MathU::Infinity)
+	{
+		Edge = nullptr;
+	}
 };
 
 /**
@@ -48,10 +58,7 @@ public:
 
 	}
 
-	void AddPoint(ShapePoint& point, const Vector3& dirToNext, ShapeEdge& edgeToNext)
-	{
-
-	}
+	void AddPoint(ShapePoint& point, const Vector3& dirToNext, ShapeEdge& edgeToNext);
 
 	void SetNormal(const Vector3& normal)
 	{
@@ -64,12 +71,11 @@ public:
 	}
 
 	Vector3 GetEdgeNormal(const ShapeEdge& edge) const;
+	Vector3 GetEdgeNormal(int index) const;
 
 	FaceEdgeCaseResult CastToEdgeInside(const Vector3& origin, const Vector3& dir);
 
-	Vector3 GetNormalWorld() const
-	{
-	}
+	Vector3 GetNormalWorld() const;
 
 	auto GetPlaneP0() const
 	{
@@ -106,23 +112,26 @@ public:
 		return m_FacePoly;
 	}
 
-	void Clear()
-	{
-
-	}
-
 	bool PointIsInsideFace(const Vector3& pointShapesSpace) const;
 
 	int NextPointIndex(int index) const
 	{
-
+		return (index + 1) % m_CachedPoints.size();
 	}
 
 	void OnSplittingFinished(Shape& owner);
 
+	void Clear()
+	{
+		m_CachedPoints.clear();
+		m_EdgeDirections.clear();
+		m_PointObjects.clear();
+		m_EdgeObjects.clear();
+		m_FacePoly.Clear();
+	}
+
 private:
 	void InitFaceCoOrdinateSystem(const Vector3& origin);
-
 
 	// all points related collections must be parralel.
 	std::vector<Vector3> m_CachedPoints;

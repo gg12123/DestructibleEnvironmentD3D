@@ -20,51 +20,7 @@ public:
 class Polygon2
 {
 public:
-	void EnsureCorrectWindingDirection()
-	{
-		if (!AreaGivesCorrectWinding(CalculateSignedArea()))
-		{
-
-		}
-	}
-
 	float CalculateSignedArea() const
-	{
-
-	}
-
-	static bool AreaGivesCorrectWinding(float a)
-	{
-		// polys must be clockwise
-		// negative area implies clockwise
-		return a < 0.0f;
-	}
-
-	void RayCastAllEdges(const Vector2& origin, const Vector2& dir, std::vector<EdgeCastHit>& hitPoints) const
-	{
-		RayCastAllEdges(origin, dir, -1, hitPoints);
-	}
-
-	void RayCastAllEdges(const Vector2& origin, const Vector2& dir, int edgeMask, std::vector<EdgeCastHit>& hitPoints) const
-	{
-		auto count = m_Points.size();
-		auto pEnd = origin + 100.0f * dir; //TODO ....
-
-		for (auto i = 0U; i < count; i++)
-		{
-			if (i == edgeMask)
-				continue;
-
-			auto& p0 = m_Points[i];
-			auto& p1 = m_Points[(i + 1) % count];
-
-			Vector2 intPoint;
-			if (Vector2::LinesIntersect(p0, p1, origin, pEnd, intPoint))
-				hitPoints.emplace_back(EdgeCastHit(intPoint, i));
-		}
-	}
-
-	bool BoundsOverlapWith(const Polygon2& other) const
 	{
 
 	}
@@ -148,7 +104,7 @@ public:
 
 	Vector2 GetNormalAt(int index) const
 	{
-		// this points to outside the poly - assuing the winding of the poly is correct.
+		// this points to outside the poly - assuming the winding of the poly is correct.
 	}
 
 	Vector2 GetCentre() const

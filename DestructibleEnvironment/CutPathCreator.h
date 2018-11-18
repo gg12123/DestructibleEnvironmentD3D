@@ -83,11 +83,11 @@ private:
 
 		if (res0.Distance < res1.Distance)
 		{
-
+			return CutPathElement(res0, piercedFace, faceEntered, castDir);
 		}
 		else
 		{
-
+			return CutPathElement(res1, faceEntered, piercedFace, castDir);
 		}
 	}
 
@@ -146,7 +146,7 @@ public:
 
 	bool FaceIsSplit(const Face& f)
 	{
-		if (f.HashIsAssigned() && f.GetHash() < m_FacesCutPathCollections->NumRecycled())
+		if (f.HashIsAssigned() && (f.GetHash() < m_FacesCutPathCollections->NumRecycled()))
 			return true;
 
 		return false;
