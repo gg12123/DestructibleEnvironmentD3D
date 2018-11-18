@@ -8,6 +8,15 @@ class ShapeEdge;
 class CutPathElement
 {
 public:
+	int GetIndexInSplitEdge() const
+	{
+		return m_IndexInSplitEdge;
+	}
+
+	void SetIndexInSplitEdge(int index)
+	{
+		m_IndexInSplitEdge = index;
+	}
 
 	Face & GetPiercedFace() const
 	{
@@ -53,4 +62,6 @@ private:
 	ShapePoint* m_Point;
 
 	Vector3 m_DirFromPrev;
+
+	int m_IndexInSplitEdge = -1;
 };

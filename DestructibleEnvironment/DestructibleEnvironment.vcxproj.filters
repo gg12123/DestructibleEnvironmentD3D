@@ -172,6 +172,9 @@
     <ClCompile Include="ShapePoint.cpp">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClCompile>
+    <ClCompile Include="SplitShapeEdge.cpp">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -442,6 +445,12 @@
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="ReversedGeometryCreator.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="IntersectionEquivalenceChecker.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="CutPathIntersectionsHandler.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
   </ItemGroup>

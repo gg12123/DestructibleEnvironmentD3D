@@ -211,6 +211,7 @@
     <ClInclude Include="CubeFacesCreator.h" />
     <ClInclude Include="CutPathCreator.h" />
     <ClInclude Include="CutPathElement.h" />
+    <ClInclude Include="CutPathIntersectionsHandler.h" />
     <ClInclude Include="CutShapeCreator.h" />
     <ClInclude Include="EdgeFaceIntersection.h" />
     <ClInclude Include="FaceIterator.h" />
@@ -221,6 +222,7 @@
     <ClInclude Include="FacesCutPaths.h" />
     <ClInclude Include="FacesOriginalPointsIterator.h" />
     <ClInclude Include="FacesPointsIterator.h" />
+    <ClInclude Include="IntersectionEquivalenceChecker.h" />
     <ClInclude Include="MapToFaceRelationship.h" />
     <ClInclude Include="MapToFacesCutPath.h" />
     <ClInclude Include="MapToNewEdges.h" />
@@ -334,6 +336,7 @@
     <ClCompile Include="ShapeEdge.cpp" />
     <ClCompile Include="ShapeProxy.cpp" />
     <ClCompile Include="ShapeSplitter.cpp" />
+    <ClCompile Include="SplitShapeEdge.cpp" />
     <ClCompile Include="StaticShapeProxy.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>

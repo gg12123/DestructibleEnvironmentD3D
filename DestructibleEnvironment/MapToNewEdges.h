@@ -5,6 +5,11 @@
 class MapToNewEdges
 {
 public:
+	bool EdgeExistsBetween(const ShapePoint& p0, const ShapePoint& p1) const
+	{
+
+	}
+
 	ShapeEdge & GetNewEdge(const ShapePoint& p0, const ShapePoint& p1) const
 	{
 

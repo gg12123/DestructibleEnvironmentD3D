@@ -34,7 +34,7 @@ public:
 		auto& piercingEdge = endCpe.GetPiercingEdge();
 		auto& splitEdge = piercingEdge.GetSplitEdge();
 
-		auto& nextPoint = splitEdge.GetNext(endCpe.GetPoint(), piercingEdge.GetEnd(*m_OriginalFace));
+		auto& nextPoint = splitEdge.GetNext(endCpe, piercingEdge.GetEnd(*m_OriginalFace));
 		auto dir = piercingEdge.GetDirection(*m_OriginalFace);
 
 		auto& endCpPoint = FacesCutPath::GetNewPointFromCpPoint<inOrOut>(endCpe.GetPoint(), *m_MapToReversed);

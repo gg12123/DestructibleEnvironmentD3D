@@ -60,6 +60,11 @@ public:
 		return sqrt(x * x + y * y + z * z);
 	}
 
+	float MagnitudeSqr() const
+	{
+		return (x * x + y * y + z * z);
+	}
+
 	Vector3 InDirectionOf(const Vector3& refDir) const
 	{
 		auto& thisRef = *this;

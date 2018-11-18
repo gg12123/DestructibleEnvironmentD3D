@@ -10,42 +10,17 @@
 #include "ShapeEdge.h"
 #include "MapToFacesCutPath.h"
 #include "FacesCutPaths.h"
+#include "CutPathIntersectionsHandler.h"
 
 class CutPathCreator
 {
 private:
-	bool IntersectionIsAlreadyUsed(const EdgeFaceIntersection& inter)
-	{
-		auto& pe = inter.GetEdge();
-
-		if (pe.HashIsAssigned())
-		{
-			auto& piercedFaces = m_UsedIntersections->At(pe.GetHash());
-			return std::find(piercedFaces.begin(), piercedFaces.end(), &inter.GetFace()) != piercedFaces.end();
-		}
-		return false;
-	}
-
-	bool FindNextWellDefinedIntersection(const std::vector<EdgeFaceIntersection>& intersections, int& index)
-	{
-
-	}
-
 	void MapFaceToFCPCollection(Face& f)
 	{
 		if (!f.HashIsAssigned())
 		{
 			f.AssignHash();
 			m_FacesCutPathCollections->Recycle().Init(f);
-		}
-	}
-
-	void MapToUsedIntersections(ShapeEdge& piercingEdge)
-	{
-		if (!piercingEdge.HashIsAssigned())
-		{
-			piercingEdge.AssignHash();
-			m_UsedIntersections->Recycle().clear();
 		}
 	}
 
@@ -60,9 +35,6 @@ private:
 
 		m_FacesCutPathCollections->At(entered.GetHash()).AddFirst(indexInPath);
 		m_FacesCutPathCollections->At(exited.GetHash()).AddFinal(indexInPath, *m_FacesCutPathObjects, path);
-
-		MapToUsedIntersections(pe);
-		m_UsedIntersections->At(pe.GetHash()).emplace_back(&cpe.GetPiercedFace());
 	}
 
 	void AddNewCPEToPath(const CutPathElement& cpe, std::vector<CutPathElement>& path)
@@ -124,12 +96,16 @@ private:
 		return (&cpe1.GetPiercedFace() == &cpe2.GetPiercedFace()) && (&cpe1.GetPiercingEdge() == &cpe2.GetPiercingEdge());
 	}
 
-	void GeneratePath(const EdgeFaceIntersection& inter)
+	bool GeneratePath(const EdgeFaceIntersection& inter)
 	{
-		auto& path = m_CutPaths->Recycle().clear();
+		auto& path = m_CutPaths->Recycle();
+		path.clear();
 
 		auto startCpe = CreateInitialCPE(inter);
 		auto cpe = CastToNext(startCpe);
+
+		if (!m_IntersectionsHandler.NewCutPathElementReached(cpe))
+			return false;
 
 		AddNewCPEToPath(startCpe, path);
 
@@ -137,15 +113,25 @@ private:
 		{
 			AddNewCPEToPath(cpe, path);
 			cpe = CastToNext(cpe);
+
+			if (!m_IntersectionsHandler.NewCutPathElementReached(cpe))
+				return false;
 		}
+		return true;
 	}
 
 public:
-	void GeneratePaths(const std::vector<EdgeFaceIntersection>& intersections)
+	// Input should only contain intersections of cut shape edges with original shape faces
+	bool GeneratePaths(std::vector<EdgeFaceIntersection>& intersections, const Shape& originalShape)
 	{
-		int index;
-		while (FindNextWellDefinedIntersection(intersections, index))
-			GeneratePath(intersections[index]);
+		m_IntersectionsHandler.Init(intersections, originalShape);
+
+		EdgeFaceIntersection inter;
+		while (m_IntersectionsHandler.GetNextStartIntersection(inter))
+			if (!GeneratePath(inter))
+				return false;
+
+		return true;
 	}
 
 	const auto& GetFacesCutPathCollections() const
@@ -167,11 +153,10 @@ public:
 	}
 
 private:
-	std::unique_ptr<PoolOfRecyclables<std::vector<Face*>>> m_UsedIntersections; // Keyed by piercing edge. Values are the pierced faces.
-
 	std::unique_ptr<PoolOfRecyclables<FacesCutPath>> m_FacesCutPathObjects;
 	std::unique_ptr<PoolOfRecyclables<std::vector<CutPathElement>>> m_CutPaths;
 	std::unique_ptr<PoolOfRecyclables<FacesCutPaths>> m_FacesCutPathCollections; // keyed by face
 
 	MapToFacesCutPath m_MapToFCPs;
+	CutPathIntersectionsHandler m_IntersectionsHandler;
 };

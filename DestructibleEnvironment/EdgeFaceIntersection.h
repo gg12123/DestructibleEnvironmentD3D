@@ -7,6 +7,18 @@ class ShapeEdge;
 class EdgeFaceIntersection
 {
 public:
+	EdgeFaceIntersection()
+	{
+		m_FacePierced = nullptr;
+		m_PiercingEdge = nullptr;
+	}
+
+	EdgeFaceIntersection(Face& facePierced, ShapeEdge& piercingEdge)
+	{
+		m_FacePierced = &facePierced;
+		m_PiercingEdge = &piercingEdge;
+	}
+
 	Face & GetFace() const
 	{
 		return *m_FacePierced;
@@ -20,6 +32,16 @@ public:
 	const auto& GetIntPoint() const
 	{
 		return m_IntPoint;
+	}
+
+	bool operator ==(const EdgeFaceIntersection& rhs) const
+	{
+		return m_FacePierced == rhs.m_FacePierced && m_PiercingEdge == rhs.m_PiercingEdge;
+	}
+
+	bool operator !=(const EdgeFaceIntersection& rhs) const
+	{
+		return !(*this == rhs);
 	}
 
 private:

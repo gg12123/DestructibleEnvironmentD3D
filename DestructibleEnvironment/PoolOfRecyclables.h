@@ -45,12 +45,12 @@ public:
 		return m_Curr;
 	}
 
-	auto Begin() const
+	std::vector<T>::iterator Begin() const
 	{
 		return m_Contents.begin();
 	}
 
-	auto End() const
+	std::vector<T>::iterator End() const
 	{
 		return m_CurrEnd;
 	}

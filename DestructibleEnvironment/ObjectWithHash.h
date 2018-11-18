@@ -9,6 +9,11 @@ public:
 		NextHash = 0;
 	}
 
+	static int GetNumHashesAssigned()
+	{
+		return NextHash;
+	}
+
 	void ResetHash()
 	{
 		m_Hash = UnAssignedHash;
@@ -27,10 +32,7 @@ public:
 	void TryAssignHash()
 	{
 		if (!HashIsAssigned())
-		{
-			m_Hash = NextHash;
-			NextHash++;
-		}
+			AssignHash();
 	}
 
 	void AssignHash()

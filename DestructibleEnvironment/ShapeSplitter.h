@@ -111,6 +111,20 @@ private:
 			(*it)->OnAllFacesAdded(t);
 	}
 
+	void FindIntersections(Shape& originalShape, Shape& cutShape)
+	{
+		// TODO - dont need to find all the intersections
+		m_Intersections.clear();
+		m_IntersectionFinder.FindEdgeFaceIntersections(originalShape, cutShape, m_Intersections);
+
+		m_IntersectionsCutShapeEdges.clear();
+		for (auto it = m_Intersections.begin(); it != m_Intersections.end(); it++)
+		{
+			if (&it->GetFace().GetShape() == &originalShape)
+				m_IntersectionsCutShapeEdges.emplace_back(*it);
+		}
+	}
+
 public:
 	ShapeSplitter()
 	{
@@ -122,10 +136,8 @@ public:
 
 		auto& cutShape = m_CutShapeCreator.Create(originalShape.GetTransform(), splitPoint, splitNormal);
 
-		m_Intersections.clear();
-		m_IntersectionFinder.FindEdgeFaceIntersections(originalShape, cutShape, m_Intersections);
-
-		m_CutPathCreator.GeneratePaths(m_Intersections);
+		FindIntersections(originalShape, cutShape);
+		m_CutPathCreator.GeneratePaths(m_IntersectionsCutShapeEdges, originalShape);;
 
 		CreateEdgesFromCPs();
 
@@ -148,6 +160,7 @@ private:
 	ReversedGeometryCreator m_Reverser;
 
 	std::vector<EdgeFaceIntersection> m_Intersections;
+	std::vector<EdgeFaceIntersection> m_IntersectionsCutShapeEdges;
 
 	std::vector<Face*> m_NewInsideFacesFromCutShape;
 
