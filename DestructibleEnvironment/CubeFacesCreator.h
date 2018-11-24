@@ -94,13 +94,15 @@ private:
 public:
 	CubeFacesCreator()
 	{
-		m_Face0 = { 1, 0, 3 };
-		m_Face1 = { 1, 3, 2 };
+		m_Face0 = { 1, 0, 3, 2 };
+		m_Face1 = { 0, 4, 7, 3 };
+		m_Face2 = { 3, 7, 6, 2 };
+		m_Face3 = { 2, 6, 5, 1 };
 
-		m_Face2 = { 0, 4, 7, 3 };
-		m_Face3 = { 3, 7, 6, 2 };
-		m_Face4 = { 2, 6, 5, 1 };
-		m_Face5 = { 1, 5, 4, 0 };
+		// { 1, 5, 4, 0 } broken in 2
+		m_Face4 = { 1, 5, 4 };
+		m_Face5 = { 4, 0, 1 };
+
 		m_Face6 = { 4, 5, 6, 7 };
 	}
 
@@ -115,11 +117,11 @@ private:
 	std::array<ShapePoint*, CutShapeNumPoints> m_Points;
 	TwoDArray<CutShapeNumPoints, CutShapeNumPoints, ShapeEdge*> m_Edges;
 
-	std::array<int, FaceNumPoints - 1> m_Face0;
-	std::array<int, FaceNumPoints - 1> m_Face1;
+	std::array<int, FaceNumPoints> m_Face0;
+	std::array<int, FaceNumPoints> m_Face1;
 	std::array<int, FaceNumPoints> m_Face2;
 	std::array<int, FaceNumPoints> m_Face3;
-	std::array<int, FaceNumPoints> m_Face4;
-	std::array<int, FaceNumPoints> m_Face5;
+	std::array<int, FaceNumPoints - 1> m_Face4;
+	std::array<int, FaceNumPoints - 1> m_Face5;
 	std::array<int, FaceNumPoints> m_Face6;
 };

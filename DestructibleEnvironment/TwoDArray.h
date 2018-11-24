@@ -18,6 +18,11 @@ public:
 		return m_Data[Index(row, col)];
 	}
 
+	const T& Get(int row, int col) const
+	{
+		return m_Data[Index(row, col)];
+	}
+
 private:
 	int Index(int row, int col)
 	{

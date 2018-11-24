@@ -9,16 +9,17 @@ class FacesCutPath
 public:
 	const CutPathElement& GetElement(int index) const
 	{
-		auto& cp = *m_CutPath;
-		return cp[index];
+		return (*m_CutPath)[index];
 	}
 
 	const CutPathElement& GetFirstElement() const
 	{
+		return GetElement(m_FirstIndex);
 	}
 
 	const CutPathElement& GetFinalElement() const
 	{
+		return GetElement(m_FinalIndex);
 	}
 
 	int GetFirstIndex() const
@@ -46,22 +47,22 @@ public:
 
 	bool SetBeenUsedToGenInsideFace()
 	{
-
+		m_BeenUsedToGenInside = true;
 	}
 
 	bool SetBeenUsedToGetOutsideFace()
 	{
-
+		m_BeenUsedToGenOutside = true;
 	}
 
 	bool BeenUsedToGenInsideFace() const
 	{
-
+		return m_BeenUsedToGenInside;
 	}
 
 	bool BeenUsedToGenOutsideFace() const
 	{
-
+		return m_BeenUsedToGenOutside;
 	}
 
 	template<FaceRelationshipWithOtherShape inside>
@@ -78,13 +79,20 @@ public:
 
 	void Init(int first, int final, const std::vector<CutPathElement>& cp)
 	{
+		m_FirstIndex = first;
+		m_FinalIndex = final;
+		m_CutPath = &cp;
 
+		m_BeenUsedToGenInside = false;
+		m_BeenUsedToGenOutside = false;
 	}
 
 private:
-
 	int m_FirstIndex;
 	int m_FinalIndex;
+
+	bool m_BeenUsedToGenInside;
+	bool m_BeenUsedToGenOutside;
 
 	const std::vector<CutPathElement>* m_CutPath;
 };

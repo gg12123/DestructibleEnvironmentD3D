@@ -13,7 +13,7 @@
 Shape & Physics::AddStaticRigidbody(StaticShapeProxy& proxy)
 {
 	auto body = std::unique_ptr<StaticBody>(new StaticBody()); // pool
-	InitialShapeCreator::Create(*body, proxy.GetInitialWidth(), proxy.GetInitialHeight(), proxy.GetTransform());
+	m_ShapeCreator.Create(*body, proxy.GetInitialWidth(), proxy.GetInitialHeight(), proxy.GetTransform());
 
 	auto& toRet = *body;
 
@@ -28,7 +28,7 @@ Shape & Physics::AddStaticRigidbody(StaticShapeProxy& proxy)
 Rigidbody & Physics::AddDynamicRigidbody(DynamicBodyProxy& proxy)
 {
 	auto body = std::unique_ptr<Rigidbody>(new Rigidbody()); // pool
-	InitialShapeCreator::Create(*body, proxy.GetInitialWidth(), proxy.GetInitialHeight(), proxy.GetTransform());
+	m_ShapeCreator.Create(*body, proxy.GetInitialWidth(), proxy.GetInitialHeight(), proxy.GetTransform());
 
 	auto& b = *body;
 

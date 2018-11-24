@@ -26,12 +26,38 @@ public:
 
 	void RegisterFace(Face& f, int indexOfThisEdgeInTheFace)
 	{
+		if (!m_Face1)
+		{
+			m_Face1 = &f;
+			m_IndexInFace1 = indexOfThisEdgeInTheFace;
+			return;
+		}
 
+		if (!m_Face2)
+		{
+			m_Face2 = &f;
+			m_IndexInFace2 = indexOfThisEdgeInTheFace;
+			return;
+		}
+
+		assert(false);
 	}
 
 	void DeRegisterFace(const Face& f)
 	{
+		if (&f == m_Face1)
+		{
+			m_Face1 = nullptr;
+			return;
+		}
 
+		if (&f == m_Face2)
+		{
+			m_Face2 = nullptr;
+			return;
+		}
+
+		assert(false);
 	}
 
 	const ShapePoint& GetP0() const
@@ -46,22 +72,28 @@ public:
 
 	ShapePoint& GetStart(const Face& requester) const
 	{
-		// use index in face
+		return *requester.GetPointObjects()[GetIndex(requester)];
 	}
 
 	ShapePoint& GetEnd(const Face& requester) const
 	{
-		// use index in face
+		return *requester.GetPointObjects()[requester.NextPointIndex(GetIndex(requester))];
 	}
 
-	int GetIndex(const Face& requester) const
+	int GetIndex(const Face& f) const
 	{
+		if (&f == m_Face1)
+			return m_IndexInFace1;
 
+		if (&f == m_Face2)
+			return m_IndexInFace2;
+
+		assert(false);
 	}
 
 	Vector3 GetDirection(const Face& requester) const
 	{
-
+		return requester.GetEdgeDirections()[GetIndex(requester)];
 	}
 
 	SplitShapeEdge& GetSplitEdge() const
@@ -91,7 +123,13 @@ public:
 
 	Face& GetOther(const Face& f) const
 	{
+		if (&f == m_Face1)
+			return *m_Face2;
 
+		if (&f == m_Face2)
+			return *m_Face1;
+
+		assert(false);
 	}
 
 	void SetBeenCollected(bool val)
@@ -109,9 +147,15 @@ public:
 		return m_DirFromP0ToP1;
 	}
 
-	ShapePoint* GetConnection(const ShapeEdge& other)
+	const ShapePoint* GetConnection(const ShapeEdge& other) const
 	{
+		if (m_P0 == other.m_P0 || m_P0 == other.m_P1)
+			return m_P0;
 
+		if (m_P1 == other.m_P0 || m_P1 == other.m_P1)
+			return m_P1;
+
+		return nullptr;
 	}
 
 private:

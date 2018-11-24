@@ -119,6 +119,11 @@ public:
 		return (index + 1) % m_CachedPoints.size();
 	}
 
+	int PreviousPointIndex(int index) const
+	{
+		return (index - 1 + m_CachedPoints.size()) % m_CachedPoints.size();
+	}
+
 	void OnSplittingFinished(Shape& owner);
 
 	void Clear()

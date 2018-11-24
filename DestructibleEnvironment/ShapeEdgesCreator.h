@@ -19,8 +19,9 @@ private:
 
 			auto& p0 = cp[i].GetPoint();
 			auto& p1 = cp[nextI].GetPoint();
+			auto& dir = cp[nextI].GetDirFromPrev();
 
-			CreateEdge(p0, p1);
+			CreateEdge(p0, p1, dir);
 
 			auto& pe = cp[i].GetPiercingEdge();
 
@@ -41,9 +42,10 @@ private:
 		{
 			it->OnAllElementsAdded();
 			auto& sePoints = it->GetPointsSortedFromP0();
+			auto dir = it->GetEdge().GetDirFromP0ToP1();
 
 			for (auto i = 0U; i < sePoints.size() - 1U; i++)
-				CreateEdge(*sePoints[i], *sePoints[i + 1U]);
+				CreateEdge(*sePoints[i], *sePoints[i + 1U], dir);
 		}
 	}
 
@@ -55,9 +57,9 @@ public:
 	}
 
 	// called by the reversing code
-	void CreateEdge(const ShapePoint& p0, const ShapePoint& p1)
+	void CreateEdge(const ShapePoint& p0, const ShapePoint& p1, const Vector3& dirToP1)
 	{
-		auto& edge = *(new ShapeEdge(p0, p1)); // TODO - pool
+		auto& edge = *(new ShapeEdge(p0, p1, dirToP1)); // TODO - pool
 		m_MapToEdges.AddNewEdge(p0, p1, edge);
 	}
 
@@ -73,7 +75,7 @@ public:
 
 	void ClearMap()
 	{
-
+		m_MapToEdges.Clear();
 	}
 
 private:

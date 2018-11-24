@@ -40,6 +40,11 @@ public:
 		return m_PointsSortedFromP0;
 	}
 
+	const auto& GetEdge() const
+	{
+		return *m_Edge;
+	}
+
 	const ShapePoint & GetP0() const;
 	const ShapePoint & GetP1() const;
 

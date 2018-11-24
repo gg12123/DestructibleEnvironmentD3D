@@ -1,8 +1,9 @@
 #pragma once
+#include <vector>
 #include "Vector3.h"
 #include "PhysicsEngine.h"
 #include "GameThreadToPhysicsThreadAction.h"
-#include <vector>
+#include "InitialShapeCreator.h"
 
 class Shape;
 class ShapeProxy;
@@ -46,6 +47,7 @@ private:
 	std::vector<GameControlledDynamicBody*> m_GameControlledProxies;
 
 	PhysicsEngine m_Engine;
+	InitialShapeCreator m_ShapeCreator;
 
 	World* m_World;
 };
