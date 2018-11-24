@@ -13,10 +13,11 @@ public:
 		m_PiercingEdge = nullptr;
 	}
 
-	EdgeFaceIntersection(Face& facePierced, ShapeEdge& piercingEdge)
+	EdgeFaceIntersection(Face& facePierced, ShapeEdge& piercingEdge, const Vector3& intPoint)
 	{
 		m_FacePierced = &facePierced;
 		m_PiercingEdge = &piercingEdge;
+		m_IntPoint = intPoint;
 	}
 
 	Face & GetFace() const

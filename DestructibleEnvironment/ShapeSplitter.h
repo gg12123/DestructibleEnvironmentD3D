@@ -115,7 +115,7 @@ private:
 	{
 		// TODO - dont need to find all the intersections
 		m_Intersections.clear();
-		m_IntersectionFinder.FindEdgeFaceIntersections(originalShape, cutShape, m_Intersections);
+		m_IntersectionFinder.FindEdgeFaceIntersectionsLocalToFaces(originalShape, cutShape, m_Intersections);
 
 		m_IntersectionsCutShapeEdges.clear();
 		for (auto it = m_Intersections.begin(); it != m_Intersections.end(); it++)

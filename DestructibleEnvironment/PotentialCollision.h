@@ -4,10 +4,34 @@
 #include "ArrayWrapper.h"
 #include "Constants.h"
 #include "Face.h"
+#include "UpdatableBound.h"
 
 class PotentialCollision
 {
+private:
+	UpdatableBound<float> CalculateFacePointsBounds(const Vector3& n) const
+	{
+		UpdatableBound<float> b;
+
+		auto& points = m_PiercedFace->GetCachedPoints();
+		for (auto it = points.begin(); it != points.end(); it++)
+			b.Update(Vector3::Dot(*it, n));
+
+		return b;
+	}
+
+	UpdatableBound<float> CalculateEdgePointsBounds(const Vector3& n) const
+	{
+		UpdatableBound<float> b;
+
+		b.Update(Vector3::Dot(m_PiercingEdgeP0, n));
+		b.Update(Vector3::Dot(m_PiercingEdgeP1, n));
+
+		return b;
+	}
+
 public:
+	// the edge is in the faces space
 	PotentialCollision(const Vector3& edgeP0, const Vector3& edgeP1, const Vector3& collPointWorld, const Face& piercedFace)
 	{
 		m_PiercingEdgeP0 = edgeP0;
@@ -18,12 +42,22 @@ public:
 
 	float CalculateRequiredSeperationWhenMovingEdge(const Vector3 collNormalWorld) const
 	{
+		auto nLocal = GetTransformOfPiercedFace().ToLocalDirection(collNormalWorld);
 
+		auto f = CalculateFacePointsBounds(nLocal);
+		auto e = CalculateEdgePointsBounds(nLocal);
+
+		return f.GetMax() - e.GetMin();
 	}
 
 	float CalculateRequiredSeperationWhenMovingFace(const Vector3 collNormalWorld) const
 	{
+		auto nLocal = GetTransformOfPiercedFace().ToLocalDirection(collNormalWorld);
 
+		auto f = CalculateFacePointsBounds(nLocal);
+		auto e = CalculateEdgePointsBounds(nLocal);
+
+		return e.GetMax() - f.GetMin();
 	}
 
 	Vector3 GetWorldCollNormal() const

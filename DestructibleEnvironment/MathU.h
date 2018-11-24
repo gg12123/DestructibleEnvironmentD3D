@@ -1,14 +1,14 @@
 #pragma once
 #include <math.h>
+#include <limits>
 
 class MathU
 {
 public:
 	static constexpr float Pi = 3.14159265358979323846f;
-	static constexpr float Infinity = FLT_MAX;
-	static constexpr float NegativeInfinity = FLT_MIN;
-	static constexpr int32 IntMax = INT32_MAX;
-	static constexpr float SmallNumber = 0.0001f;
+	static constexpr float Infinity = std::numeric_limits<float>::max();
+	static constexpr float NegativeInfinity = std::numeric_limits<float>::lowest();
+	static constexpr int32 IntMax = std::numeric_limits<int32>::max();
 
 	static inline float ToRadians(float degrees)
 	{

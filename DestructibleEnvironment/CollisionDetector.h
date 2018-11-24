@@ -11,13 +11,14 @@ class Transform;
 class CollisionDetector
 {
 public:
+	// TODO - the shapes should be const
 	bool FindCollision(Shape& shape1, Shape& shape2, std::vector<PotentialCollision>& detectedColls);
 
 private:
-	PotentialCollision ToPotentialCollision(const FaceEdgeIntersection<Vector3>& inter);
+	PotentialCollision ToPotentialCollision(const EdgeFaceIntersection& inter);
 
 	IntersectionFinder m_IntersectionFinder;
-	std::vector<FaceEdgeIntersection<Vector3>> m_FoundIntersections;
+	std::vector<EdgeFaceIntersection> m_FoundIntersections;
 
 	Shape* m_Shape1;
 	Shape* m_Shape2;

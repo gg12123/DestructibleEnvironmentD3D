@@ -26,9 +26,19 @@ public:
 		return m_Faces;
 	}
 
-	const auto& GetCachedPoints()
+	const auto& GetCachedPoints() const
 	{
 		return m_CachedPoints;
+	}
+
+	const auto& GetEdgeIndexes() const
+	{
+		return m_EdgeIndexes;
+	}
+
+	const auto& GetEdgeObjects() const
+	{
+		return m_EdgeObjects;
 	}
 
 	auto& GetLocalBounds()
@@ -81,6 +91,9 @@ public:
 	{
 		m_Faces.clear();
 		m_CachedPoints.clear();
+		m_EdgeObjects.clear();
+		m_EdgeIndexes.clear();
+		m_PointObjects.clear();
 	}
 
 	void AddFace(Face& f)

@@ -293,6 +293,7 @@
     <ClInclude Include="ToBeNewPoint.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TwoDArray.h" />
+    <ClInclude Include="UpdatableBound.h" />
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="Vertex.h" />
