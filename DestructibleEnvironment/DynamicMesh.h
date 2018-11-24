@@ -3,7 +3,6 @@
 #include "Entity.h"
 #include "Vertex.h"
 #include "D3DBuffers.h"
-#include "ArrayWrapper.h"
 #include "Constants.h"
 
 class DynamicMesh : public Entity, IMeshRenderer
@@ -11,29 +10,16 @@ class DynamicMesh : public Entity, IMeshRenderer
 public:
 	void Render(Renderer& renderer) override;
 
-	int GetVertCount() const
-	{
-		return m_CurrVertCount;
-	}
-
-	int GetIndexCount() const
-	{
-		return m_CurrVertCount;
-	}
-
 protected:
-	void SetVertCount(int count);
-	void SetIndexCount(int count);
-
 	auto& MapVertexBuffer()
 	{
-		m_VertexMemory.Clear();
+		m_VertexMemory.clear();
 		return m_VertexMemory;
 	}
 
 	auto& MapIndexBuffer()
 	{
-		m_IndexMemory.Clear();
+		m_IndexMemory.clear();
 		return m_IndexMemory;
 	}
 
@@ -41,16 +27,18 @@ protected:
 	void UnMapIndexBuffer();
 
 private:
+	void SetVertCount(int count);
+	void SetIndexCount(int count);
+
 	void LazyRegister();
 
-	static ArrayWrapper<Vertex, Constants::MaxNumVerts> m_VertexMemory;
-	static ArrayWrapper<unsigned short, Constants::MaxNumIndicies> m_IndexMemory;
-
-	int m_CurrVertCount = 0;
-	int m_CurrIndexCount = 0;
+	static std::vector<Vertex> m_VertexMemory;
+	static std::vector<unsigned short> m_IndexMemory;
 
 	D3DBuffers::BufferPtr m_VertexBuffer = D3DBuffers::NullBufferPtr();
 	D3DBuffers::BufferPtr m_IndexBuffer = D3DBuffers::NullBufferPtr();
+
+	int m_CurrIndexCount;
 
 	bool m_Registerd = false;
 };

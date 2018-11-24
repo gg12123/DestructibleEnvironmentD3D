@@ -35,22 +35,20 @@ void PhysicsEngine::DoCollisionDetection()
 	auto dynamicCount = m_DynamicBodies.size();
 	auto staticCount = m_StaticBodies.size();
 
-	m_CollisionResponder.Reset();
-
 	for (auto i = 0U; i < dynamicCount; i++)
 	{
 		auto& bodyi = *m_DynamicBodies[i];
 
 		for (auto j = i + 1; j < dynamicCount; j++)
 		{
-			if (m_CollisionDetector.FindCollision(bodyi, *m_DynamicBodies[j], m_CollData))
-				m_CollisionResponder.CalculateResponse(m_CollData, bodyi, *m_DynamicBodies[j]);
+			if (m_CollisionDetector.FindCollision(bodyi, *m_DynamicBodies[j], m_PotentialCollisions))
+				m_CollisionResponder.CalculateResponse(m_PotentialCollisions, bodyi, *m_DynamicBodies[j]);
 		}
 
 		for (auto j = 0U; j < staticCount; j++)
 		{
-			if (m_CollisionDetector.FindCollision(bodyi, *m_StaticBodies[j], m_CollData))
-				m_CollisionResponder.CalculateResponse(m_CollData, bodyi, *m_StaticBodies[j]);
+			if (m_CollisionDetector.FindCollision(bodyi, *m_StaticBodies[j], m_PotentialCollisions))
+				m_CollisionResponder.CalculateResponse(m_PotentialCollisions, bodyi, *m_StaticBodies[j]);
 		}
 	}
 }
@@ -77,23 +75,26 @@ void PhysicsEngine::ProcessSplits()
 		{
 			auto& s = *it;
 		
-			auto newBody = std::unique_ptr<Rigidbody>(new Rigidbody()); // from pool
-		
 			auto& toSplit = *s.ToSplit;
+
+			m_NewBodiesFromSplit.clear();
+			m_Splitter.Split(s.CauseImpulse.WorldCollisionPoint, s.CauseImpulse.WorldImpulse.Normalized(), toSplit, m_NewBodiesFromSplit);
 		
-			if (toSplit.Split(s.CauseImpulse->WorldCollisionPoint, *newBody))
+			// TODO - this is a bit messy. The first entry in the list
+			// is the original shape so no need to add it to the world etc.
+			for (auto i = 1U; i < m_NewBodiesFromSplit.size(); i++)
 			{
-				newBody->CopyVelocity(toSplit);
-		
-				newBody->CalculateMotionProperties();
-				toSplit.CalculateMotionProperties();
-		
-				m_BodiesAdded.emplace_back(newBody.get());
-				m_DynamicBodies.emplace_back(std::move(newBody));
+				auto newBody = m_NewBodiesFromSplit[i];
+				m_BodiesAdded.emplace_back(newBody);
+				m_DynamicBodies.emplace_back(std::unique_ptr<Rigidbody>(newBody));
 			}
-			else
+
+			// The original will copy velocity from itself but that doesnt really matter
+			for (auto it = m_NewBodiesFromSplit.begin(); it != m_NewBodiesFromSplit.end(); it++)
 			{
-				// return new body to pool
+				auto& newBody = **it;
+				newBody.CopyVelocity(toSplit);
+				newBody.CalculateMotionProperties();
 			}
 		}
 	}

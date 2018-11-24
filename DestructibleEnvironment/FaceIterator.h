@@ -8,31 +8,9 @@
 #include "PerFaceSplitData.h"
 #include "MapToFaceRelationship.h"
 
+template<class Tshape>
 class FaceIterator
 {
-public:
-	void SetShapeToUseNext(Shape& s)
-	{
-		m_ShapeToUseNext = &s;
-	}
-
-	void CreateShapes(const std::vector<Face*>& faces, std::vector<Shape*>& newShapes, FaceRelationshipWithOtherShape relationship)
-	{
-		m_CurrRelationship = relationship;
-		auto root = FindNextRootFace(faces);
-
-		while (root)
-		{
-			newShapes.emplace_back(&CreateShape(*root));
-			root = FindNextRootFace(faces);
-		}
-	}
-
-	const MapToFaceRelationship& GetMapToFaceRelationship() const
-	{
-		return m_Map;
-	}
-
 private:
 	bool FaceIsVisited(const Face& f) const
 	{
@@ -47,7 +25,7 @@ private:
 		m_Map.SetRelationship(f, m_CurrRelationship);
 	}
 
-	Shape & GetNextShapeToUse()
+	Tshape & GetNextShapeToUse()
 	{
 		auto s = m_ShapeToUseNext;
 		if (s)
@@ -56,10 +34,10 @@ private:
 			return *s;
 		}
 		// get one from pool
-		return *(new Shape());
+		return *(new Tshape());
 	}
 
-	Shape& CreateShape(Face& rootFace)
+	Tshape& CreateShape(Face& rootFace)
 	{
 		auto& newShape = GetNextShapeToUse();
 
@@ -75,7 +53,7 @@ private:
 
 			Visit(next);
 			newShape.AddFace(next);
-			
+
 			auto& edges = next.GetEdgeObjects();
 
 			for (auto it = edges.begin(); it != edges.end(); it++)
@@ -109,7 +87,31 @@ private:
 		return nullptr;
 	}
 
-	Shape * m_ShapeToUseNext = nullptr;
+public:
+	void SetShapeToUseNext(Tshape& s)
+	{
+		m_ShapeToUseNext = &s;
+	}
+
+	void CreateShapes(const std::vector<Face*>& faces, std::vector<Tshape*>& newShapes, FaceRelationshipWithOtherShape relationship)
+	{
+		m_CurrRelationship = relationship;
+		auto root = FindNextRootFace(faces);
+
+		while (root)
+		{
+			newShapes.emplace_back(&CreateShape(*root));
+			root = FindNextRootFace(faces);
+		}
+	}
+
+	const MapToFaceRelationship& GetMapToFaceRelationship() const
+	{
+		return m_Map;
+	}
+
+private:
+	Tshape * m_ShapeToUseNext = nullptr;
 
 	std::stack<Face*> m_FaceStack;
 	MapToFaceRelationship m_Map;

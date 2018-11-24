@@ -21,6 +21,8 @@ PotentialCollision CollisionDetector::ToPotentialCollision(const EdgeFaceInterse
 
 bool CollisionDetector::FindCollision(Shape& shape1, Shape& shape2, std::vector<PotentialCollision>& detectedColls)
 {
+	detectedColls.clear();
+
 	m_FoundIntersections.clear();
 	m_IntersectionFinder.FindEdgeFaceIntersections(shape1, shape2, m_FoundIntersections);
 

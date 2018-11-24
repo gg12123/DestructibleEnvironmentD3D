@@ -2,8 +2,8 @@
 #include "DynamicMesh.h"
 #include "World.h"
 
-ArrayWrapper<Vertex, Constants::MaxNumVerts> DynamicMesh::m_VertexMemory;
-ArrayWrapper<unsigned short, Constants::MaxNumIndicies> DynamicMesh::m_IndexMemory;
+std::vector<Vertex> DynamicMesh::m_VertexMemory;
+std::vector<unsigned short> DynamicMesh::m_IndexMemory;
 
 void DynamicMesh::Render(Renderer& renderer)
 {
@@ -26,19 +26,19 @@ void DynamicMesh::LazyRegister()
 void DynamicMesh::UnMapIndexBuffer()
 {
 	LazyRegister();
-	GetWorld().GetRenderer().InsertIntoBuffer(m_IndexBuffer.get(), m_IndexMemory.GetData(), m_CurrIndexCount);
+	SetIndexCount(m_IndexMemory.size());
+	GetWorld().GetRenderer().InsertIntoBuffer(m_IndexBuffer.get(), m_IndexMemory.data(), m_IndexMemory.size());
 }
 
 void DynamicMesh::UnMapVertexBuffer()
 {
 	LazyRegister();
-	GetWorld().GetRenderer().InsertIntoBuffer(m_VertexBuffer.get(), m_VertexMemory.GetData(), m_CurrVertCount);
+	SetVertCount(m_VertexMemory.size());
+	GetWorld().GetRenderer().InsertIntoBuffer(m_VertexBuffer.get(), m_VertexMemory.data(), m_VertexMemory.size());
 }
 
 void DynamicMesh::SetVertCount(int count)
 {
-	// TODO - only switch buffer if current one is too small
-
 	assert(count < Constants::MaxNumVerts);
 
 	auto& b = GetWorld().GetRenderer().GetBuffers();
@@ -47,14 +47,10 @@ void DynamicMesh::SetVertCount(int count)
 		b.ReturnVertexBuffer(std::move(m_VertexBuffer));
 
 	m_VertexBuffer = b.GetVertexBuffer(count);
-
-	m_CurrVertCount = count;
 }
 
 void DynamicMesh::SetIndexCount(int count)
 {
-	// TODO - only switch buffer if current one is too small
-
 	assert(count < Constants::MaxNumIndicies);
 
 	auto& b = GetWorld().GetRenderer().GetBuffers();
@@ -63,6 +59,5 @@ void DynamicMesh::SetIndexCount(int count)
 		b.ReturnIndexBuffer(std::move(m_IndexBuffer));
 
 	m_IndexBuffer = b.GetIndexBuffer(count);
-
 	m_CurrIndexCount = count;
 }

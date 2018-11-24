@@ -11,6 +11,7 @@
 #include "CollisionDetector.h"
 #include "CollisionResponder.h"
 #include "FixedTimeStepTime.h"
+#include "ShapeSplitter.h"
 
 class PhysicsEngine
 {
@@ -54,7 +55,7 @@ public:
 	void StopRunning()
 	{
 		m_Running = false;
-		m_SafeToSync = false; // do this so it doesnt get stuck waiting for flag to be cleared when game thread is finished.
+		m_SafeToSync = false; // Do this so it doesnt get stuck waiting for flag to be cleared when game thread is finished.
 
 		if (m_Thread.joinable())
 			m_Thread.join();
@@ -73,11 +74,11 @@ private:
 	std::atomic<bool> m_Running = true;
 	std::atomic<bool> m_SafeToSync = false;
 
-	// the game thread fills this during collision detection, i.e. the sync phase.
+	// The game thread fills this during collision detection, i.e. the sync phase.
 	// the actions are executed at the start of updateBodies().
 	std::vector<std::unique_ptr<IGameTheadToPhysicsThreadAction>> m_GameToPhysicsActions;
 
-	// this is filled with the bodies added by the physics engine (due to splits) during UpdateBodies().
+	// This is filled with the bodies added by the physics engine (due to splits) during UpdateBodies().
 	// the game thread creates proxies and clears the list at the next sync phase
 	std::vector<Rigidbody*> m_BodiesAdded;
 
@@ -88,7 +89,10 @@ private:
 
 	CollisionDetector m_CollisionDetector;
 	CollisionResponder m_CollisionResponder;
-	CollisionData m_CollData;
+	std::vector<PotentialCollision> m_PotentialCollisions;
+
+	ShapeSplitter<Rigidbody> m_Splitter;
+	std::vector<Rigidbody*> m_NewBodiesFromSplit;
 
 	FixedTimeStepTime m_Time;
 

@@ -63,21 +63,10 @@ void Shape::CollectPointsAndEdges()
 
 Vector3 Shape::CalculateCentre()
 {
-	// calculate by looping over point objects
-}
+	auto c = Vector3::Zero();
 
-void Shape::InitRequiredVertAndIndexCounts()
-{
-	m_RequiredNumVerts = 0;
-	m_RequiredNumIndicies = 0;
-
-	for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
-	{
-		auto numVerts = (*it)->GetCachedPoints().size();
-
-		m_RequiredNumVerts += numVerts;
-		m_RequiredNumIndicies += 3 * (numVerts - 2);
-	}
+	for (auto it = m_PointObjects.begin(); it != m_PointObjects.end(); it++)
+		c += (*it)->GetPoint();
 }
 
 Vector3 Shape::CalculateSplitPlaneNormal(const Vector3& P0)

@@ -66,21 +66,8 @@ public:
 		m_Dirty = false;
 	}
 
-	int GetRequiredVertexCount() const
-	{
-		return m_RequiredNumVerts;
-	}
-
-	int GetRequiredIndexCount() const
-	{
-		return m_RequiredNumIndicies;
-	}
-
-	void InitRequiredVertAndIndexCounts();
-
 	void UpdateWorldBounds(RadiusBoundsType)
 	{
-		m_WorldBounds.ConstrcutFromCentreAndRadius(m_Transform.GetPosition(), m_BoundingRadius);
 	}
 
 	void UpdateWorldBounds(AABBBoundsType)
@@ -138,9 +125,6 @@ private:
 	void TryCollectEdge(ShapeEdge& p);
 	void InitFaces();
 
-	int m_RequiredNumVerts;
-	int m_RequiredNumIndicies;
-
 	std::vector<Face*> m_Faces;
 	std::vector<Vector3> m_CachedPoints;
 	std::vector<ShapePoint*> m_PointObjects;
@@ -152,7 +136,4 @@ private:
 	Bounds m_WorldBounds;
 
 	bool m_Dirty = true;
-
-	// float m_TotalEdgeLength = 0.0f; // TODO - work this back in somehow
-	float m_BoundingRadius;
 };

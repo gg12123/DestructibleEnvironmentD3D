@@ -12,6 +12,7 @@
 #include "FaceIterator.h"
 #include "ReversedGeometryCreator.h"
 
+template<class Tshape>
 class ShapeSplitter
 {
 private:
@@ -65,13 +66,13 @@ private:
 		}
 	}
 
-	void CreateNewInsideShapes(Shape& original, std::vector<Shape*>& newShapes)
+	void CreateNewInsideShapes(Shape& original, std::vector<Tshape*>& newShapes)
 	{
 		m_FaceIterator.SetShapeToUseNext(original);
 		m_FaceIterator.CreateShapes(m_NewInsideFaces, newShapes, FaceRelationshipWithOtherShape::InIntersection);
 	}
 
-	void CreateNewOutsideShapes(std::vector<Shape*>& newShapes)
+	void CreateNewOutsideShapes(std::vector<Tshape*>& newShapes)
 	{
 		m_FaceIterator.CreateShapes(m_NewOutsideFaces, newShapes, FaceRelationshipWithOtherShape::NotInIntersection);
 	}
@@ -126,11 +127,11 @@ private:
 	}
 
 public:
-	void Split(const Vector3& splitPoint, const Vector3& splitNormal, Shape& originalShape, std::vector<Shape*>& newShapes)
+	void Split(const Vector3& splitPointWorld, const Vector3& splitNormalWorld, Shape& originalShape, std::vector<Tshape*>& newShapes)
 	{
 		ResetHashCounters();
 
-		auto& cutShape = m_CutShapeCreator.Create(originalShape.GetTransform(), splitPoint, splitNormal);
+		auto& cutShape = m_CutShapeCreator.Create(originalShape.GetTransform(), splitPointWorld, splitNormalWorld);
 
 		FindIntersections(originalShape, cutShape);
 
@@ -166,7 +167,7 @@ private:
 	ShapeEdgesCreator m_EdgesCreator;
 	CutPathCreator m_CutPathCreator;
 	IntersectionFinder m_IntersectionFinder;
-	FaceIterator m_FaceIterator;
+	FaceIterator<Tshape> m_FaceIterator;
 	ReversedGeometryCreator m_Reverser;
 
 	std::vector<EdgeFaceIntersection> m_Intersections;

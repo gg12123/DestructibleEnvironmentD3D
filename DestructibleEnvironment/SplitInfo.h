@@ -1,17 +1,16 @@
 #pragma once
+#include "CollisionData.h"
 
 class Rigidbody;
-class Impulse;
 
 class SplitInfo
 {
 public:
-	SplitInfo(Rigidbody& toSplit, Impulse& cause)
+	SplitInfo(Rigidbody& toSplit, const Impulse& cause) : CauseImpulse(cause)
 	{
 		ToSplit = &toSplit;
-		CauseImpulse = &cause;
 	}
 
 	Rigidbody * ToSplit;
-	Impulse* CauseImpulse;
+	Impulse CauseImpulse;
 };

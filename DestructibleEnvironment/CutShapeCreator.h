@@ -25,12 +25,13 @@ private:
 	}
 
 public:
-
-	// split point and normal must be in the to split transforms space
-	Shape & Create(Transform& toSplitsTransform, const Vector3& splitPoint, const Vector3& splitNormal)
+	Shape & Create(Transform& toSplitsTransform, const Vector3& splitPointWorld, const Vector3& splitNormalWorld)
 	{
 		m_CutShape.Clear();
 		m_CutShape.GetTransform().SetEqualTo(toSplitsTransform);
+
+		auto splitPoint = toSplitsTransform.ToLocalPosition(splitPointWorld);
+		auto splitNormal = toSplitsTransform.ToLocalDirection(splitNormalWorld);
 
 		auto M = CalculateCutShapesTransform(toSplitsTransform, splitPoint, splitNormal);
 
