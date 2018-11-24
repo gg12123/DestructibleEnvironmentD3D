@@ -17,13 +17,14 @@ class SplitShapeEdge;
 class ShapeEdge : public ObjectWithHash<ShapeEdge>
 {
 public:
-	ShapeEdge(const ShapePoint& p0, const ShapePoint& p1)
+	ShapeEdge(const ShapePoint& p0, const ShapePoint& p1, const Vector3& dirFromP0ToP1)
 	{
 		m_P0 = &p0;
 		m_P1 = &p1;
+		m_DirFromP0ToP1 = dirFromP0ToP1;
 	}
 
-	void RegisterFace(Face& f, int index)
+	void RegisterFace(Face& f, int indexOfThisEdgeInTheFace)
 	{
 
 	}

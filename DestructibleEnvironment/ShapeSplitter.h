@@ -133,9 +133,14 @@ public:
 		auto& cutShape = m_CutShapeCreator.Create(originalShape.GetTransform(), splitPoint, splitNormal);
 
 		FindIntersections(originalShape, cutShape);
-		m_CutPathCreator.GeneratePaths(m_IntersectionsCutShapeEdges, originalShape);;
+
+		if (!m_CutPathCreator.GeneratePaths(m_IntersectionsCutShapeEdges, originalShape))
+			assert(false); // TODO - abort properly if this returns false
 
 		CreateEdgesFromCPs();
+
+		// Now get the stuff from original shape that needs returning to the pool. But dont return
+		// it until the end of the split.
 
 		CreateNewInsideFaces(cutShape);
 		CreateNewInsideShapes(originalShape, newShapes);
@@ -144,6 +149,15 @@ public:
 
 		CreateNewOutsideFaces(originalShape);
 		CreateNewOutsideShapes(newShapes);
+
+		InitNewShapes(originalShape, newShapes);
+
+		// TODO - to clean up, loop through everything on the cut shape and if it has not
+		// been assigned to one of the new shapes (check owner shape property), it must be
+		// returned to the pool. Also any faces and edges on the original shape that got split
+		// must be returned. All points on the original shape are re-used. To check if an
+		// edge is split, use the reference to split edge. To check if a face is split, use
+		// the cut path creator.
 	}
 
 private:

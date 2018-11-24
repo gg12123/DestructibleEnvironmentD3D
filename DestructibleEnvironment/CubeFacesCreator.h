@@ -7,148 +7,119 @@
 #include "Matrix.h"
 #include "FaceLinker.h"
 
-class ShapeFaceCreator
-{
-public:
-	ShapeFaceCreator(const std::vector<Vector3>& points, const std::vector<int>& indexes)
-	{
-		InitFace(m_BaseFace, points, indexes, CalculateNormal(points), Matrix4::Indentity());
-	}
-
-	Face& GetBaseFace()
-	{
-		return m_BaseFace;
-	}
-
-	Face& Create(const Matrix4& M, std::vector<Face*>& toNewFace)
-	{
-		m_JustCreated = new Face();
-		InitFace(*m_JustCreated, m_BaseFace.GetCachedPoints(), m_BaseFace.GetSharedPoints(), m_BaseFace.GetNormal(), Matrix4::Indentity());
-
-		toNewFace[m_BaseFace.GetIdForSplitter()] = m_JustCreated;
-
-		return *m_JustCreated;
-	}
-
-	void LinkJustCreated(const std::vector<Face*>& toNewFace)
-	{
-		auto& basesLinks = m_BaseFace.GetLinkedFaces();
-		for (auto i = 0U; i < basesLinks.NumRecycled(); i++)
-		{
-			auto& edgeLinks = basesLinks.At(i);
-			for (auto it2 = edgeLinks.begin(); it2 != edgeLinks.end(); it2++)
-			{
-				auto& linkedNeighbour = *it2;
-				auto newlyCreatedNeighbour = toNewFace[linkedNeighbour.GetNeighbour().GetIdForSplitter()];
-				m_JustCreated->AddLink(i, *newlyCreatedNeighbour, linkedNeighbour.GetEdgeOnNeighbour());
-			}
-		}
-	}
-
-private:
-	Vector3 CalculateNormal(const std::vector<Vector3>& points)
-	{
-		auto& p0 = points[0];
-		auto& p1 = points[1];
-		auto& p2 = points[2];
-
-		return Vector3::Cross(p0 - p1, p2 - p1).Normalized();
-	}
-
-	void InitFace(Face& face, const std::vector<Vector3>& points, const std::vector<int>& indexes, const Vector3& normal, const Matrix4& M)
-	{
-		face.StartAddingCenteredPoints(normal, M * points[0], indexes[0]);
-
-		for (auto i = 1U; i < points.size(); i++)
-			face.AddCenteredPoint(M * points[i], indexes[i]);
-	}
-
-	Face m_BaseFace;
-	Face* m_JustCreated = nullptr;
-};
-
 class CubeFacesCreator
 {
-public:
-	CubeFacesCreator()
+private:
+	static constexpr int CutShapeNumPoints = 8;
+	static constexpr int FaceNumPoints = 4;
+
+	// TODO - pool
+
+	void CreatePoints(const Matrix4& M)
 	{
 		auto s = Vector3(1.0f, 1.0f, 1.0f);
 
-		auto P0 = Vector3(s.x, s.y, s.z);
-		auto P1 = Vector3(-s.x, s.y, s.z);
-		auto P2 = Vector3(-s.x, s.y, -s.z);
-		auto P3 = Vector3(s.x, s.y, -s.z);
+		m_Points[0] = new ShapePoint(M * Vector3(s.x, s.y, s.z));
+		m_Points[1] = new ShapePoint(M * Vector3(-s.x, s.y, s.z));
+		m_Points[2] = new ShapePoint(M * Vector3(-s.x, s.y, -s.z));
+		m_Points[3] = new ShapePoint(M * Vector3(s.x, s.y, -s.z));
 
-		auto P4 = Vector3(s.x, -s.y, s.z);
-		auto P5 = Vector3(-s.x, -s.y, s.z);
-		auto P6 = Vector3(-s.x, -s.y, -s.z);
-		auto P7 = Vector3(s.x, -s.y, -s.z);
-
-		m_FaceCreators.emplace_back(ShapeFaceCreator({ P1, P0, P3, P2 }, { 1, 0, 3, 2 }));
-		m_FaceCreators.emplace_back(ShapeFaceCreator({ P0, P4, P7, P3 }, { 0, 4, 7, 3 }));
-		m_FaceCreators.emplace_back(ShapeFaceCreator({ P3, P7, P6, P2 }, { 3, 7, 6, 2 }));
-		m_FaceCreators.emplace_back(ShapeFaceCreator({ P2, P6, P5, P1 }, { 2, 6, 5, 1 }));
-		m_FaceCreators.emplace_back(ShapeFaceCreator({ P1, P5, P4, P0 }, { 1, 5, 4, 0 }));
-		m_FaceCreators.emplace_back(ShapeFaceCreator({ P4, P5, P6, P7 }, { 4, 5, 6, 7 }));
-
-		LinkBaseFaces();
-
-		for (auto i = 0U; i < 6; i++)
-			m_ToNewFaces.emplace_back(nullptr);
-
-		m_SharedPoints.emplace_back(P0);
-		m_SharedPoints.emplace_back(P1);
-		m_SharedPoints.emplace_back(P2);
-		m_SharedPoints.emplace_back(P3);
-		m_SharedPoints.emplace_back(P4);
-		m_SharedPoints.emplace_back(P5);
-		m_SharedPoints.emplace_back(P6);
-		m_SharedPoints.emplace_back(P7);
+		m_Points[4] = new ShapePoint(M * Vector3(s.x, -s.y, s.z));
+		m_Points[5] = new ShapePoint(M * Vector3(-s.x, -s.y, s.z));
+		m_Points[6] = new ShapePoint(M * Vector3(-s.x, -s.y, -s.z));
+		m_Points[7] = new ShapePoint(M * Vector3(s.x, -s.y, -s.z));
 	}
 
-	// split point and normal must be in the ref transforms space
+	void CreateEdges()
+	{
+		CreateEdge(0, 1);
+		CreateEdge(1, 2);
+		CreateEdge(2, 3);
+		CreateEdge(3, 0);
+
+		CreateEdge(4, 5);
+		CreateEdge(5, 6);
+		CreateEdge(6, 7);
+		CreateEdge(7, 4);
+
+		CreateEdge(0, 4);
+		CreateEdge(3, 7);
+		CreateEdge(1, 5);
+		CreateEdge(2, 6);
+	}
+
+	Vector3 DirToNext(int p, int pNext)
+	{
+		return (m_Points[pNext]->GetPoint() - m_Points[p]->GetPoint()).Normalized();
+	}
+
+	void CreateEdge(int p, int pNext)
+	{
+		auto edge = *(new ShapeEdge(*m_Points[p], *m_Points[pNext], DirToNext(p, pNext)));
+
+		m_Edges.Get(p, pNext) = &edge;
+		m_Edges.Get(pNext, p) = &edge;
+	}
+
+	ShapeEdge& EdgeToNext(int p, int pNext)
+	{
+		return *m_Edges.Get(p, pNext);
+	}
+
+	template<int numPoints>
+	Face& CreateFace(const std::array<int, numPoints>& pointIndexes)
+	{
+		auto f = *(new Face());
+
+		for (auto i = 0U; i < numPoints; i++)
+		{
+			auto nextI = (i + 1) % numPoints;
+
+			f.AddPoint(*m_Points[i], DirToNext(i, nextI), EdgeToNext(i, nextI));
+		}
+		return f;
+	}
+
+	void CreateFaces(Shape& shape)
+	{
+		shape.AddFace(CreateFace(m_Face0));
+		shape.AddFace(CreateFace(m_Face1));
+		shape.AddFace(CreateFace(m_Face2));
+		shape.AddFace(CreateFace(m_Face3));
+		shape.AddFace(CreateFace(m_Face4));
+		shape.AddFace(CreateFace(m_Face5));
+		shape.AddFace(CreateFace(m_Face6));
+	}
+
+public:
+	CubeFacesCreator()
+	{
+		m_Face0 = { 1, 0, 3 };
+		m_Face1 = { 1, 3, 2 };
+
+		m_Face2 = { 0, 4, 7, 3 };
+		m_Face3 = { 3, 7, 6, 2 };
+		m_Face4 = { 2, 6, 5, 1 };
+		m_Face5 = { 1, 5, 4, 0 };
+		m_Face6 = { 4, 5, 6, 7 };
+	}
+
 	void CreateFaces(Shape& shape, const Matrix4& M)
 	{
-		shape.ClearFaces();
-
-		for (auto it = m_FaceCreators.begin(); it != m_FaceCreators.end(); it++)
-			shape.AddFace((*it).Create(M, m_ToNewFaces));
-
-		for (auto it = m_FaceCreators.begin(); it != m_FaceCreators.end(); it++)
-			(*it).LinkJustCreated(m_ToNewFaces);
-
-		auto& faces = shape.GetFaces();
-	}
-
-	Vector3 GetSharedPoint(int index, const Matrix4& M)
-	{
-		return M * m_SharedPoints[index];
+		CreatePoints(M);
+		CreateEdges();
+		CreateFaces(shape);
 	}
 
 private:
-	void LinkBaseFaces()
-	{
-		std::vector<Face*> basesFaces;
-		std::vector<PerFaceSplitData> splitData; // TODO - decouple this from splitting
+	std::array<ShapePoint*, CutShapeNumPoints> m_Points;
+	TwoDArray<CutShapeNumPoints, CutShapeNumPoints, ShapeEdge*> m_Edges;
 
-		basesFaces.reserve(6);
-		splitData.reserve(6);
-
-		for (auto i = 0U; i < m_FaceCreators.size(); i++)
-		{
-			auto& baseFace = m_FaceCreators[i].GetBaseFace();
-
-			baseFace.SetIdForSplitter(i);
-			basesFaces.emplace_back(&baseFace);
-			splitData.emplace_back(PerFaceSplitData(FaceRelationshipWithOtherShape::InIntersection)); // in or out relationship is ok - maybe not unkown though
-		}
-
-		FaceLinker linker;
-		linker.SetPerFaceData(splitData);
-		linker.Link(basesFaces, basesFaces);
-	}
-
-	std::vector<ShapeFaceCreator> m_FaceCreators;
-	std::vector<Face*> m_ToNewFaces;
-	std::vector<Vector3> m_SharedPoints;
+	std::array<int, FaceNumPoints - 1> m_Face0;
+	std::array<int, FaceNumPoints - 1> m_Face1;
+	std::array<int, FaceNumPoints> m_Face2;
+	std::array<int, FaceNumPoints> m_Face3;
+	std::array<int, FaceNumPoints> m_Face4;
+	std::array<int, FaceNumPoints> m_Face5;
+	std::array<int, FaceNumPoints> m_Face6;
 };

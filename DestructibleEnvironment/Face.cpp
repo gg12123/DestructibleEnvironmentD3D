@@ -17,7 +17,7 @@ void  Face::AddPoint(ShapePoint& point, const Vector3& dirToNext, ShapeEdge& edg
 	m_EdgeObjects.emplace_back(&edgeToNext);
 	m_EdgeDirections.emplace_back(dirToNext);
 
-	edgeToNext.RegisterFace(*this);
+	edgeToNext.RegisterFace(*this, m_EdgeObjects.size() - 1);
 }
 
 void Face::OnSplittingFinished(Shape& owner)

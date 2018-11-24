@@ -8,7 +8,7 @@
 class CutPathIntersectionsHandler
 {
 private:
-	void UseIntersection(const EdgeFaceIntersection& interToUse)
+	void RemoveEquivalentIntersections(const EdgeFaceIntersection& interReached)
 	{
 		m_IntersForCPStartOther.clear();
 
@@ -16,7 +16,7 @@ private:
 		{
 			auto& inter = *it;
 
-			if ((inter != interToUse) && !m_EquivalenceChecker.AreEquivalent(inter, interToUse))
+			if ((inter != interReached) && !m_EquivalenceChecker.AreEquivalent(inter, interReached))
 				m_IntersForCPStartOther.emplace_back(inter);
 		}
 
@@ -26,6 +26,16 @@ private:
 	EdgeFaceIntersection ToInteresection(const CutPathElement& element)
 	{
 		return EdgeFaceIntersection(element.GetPiercedFace(), element.GetPiercingEdge());
+	}
+
+	bool IntersectionsAlreadyReached(const EdgeFaceIntersection& inter) const
+	{
+		for (auto it = m_ReachedIntersections.begin(); it != m_ReachedIntersections.end(); it++)
+		{
+			if (m_EquivalenceChecker.AreEquivalent(inter, *it))
+				return true;
+		}
+		return false;
 	}
 
 public:
@@ -38,6 +48,8 @@ public:
 		m_IntersForCPStart.swap(inters);
 
 		m_OriginalShape = &origShape;
+
+		m_ReachedIntersections.clear();
 	}
 
 	bool GetNextStartIntersection(EdgeFaceIntersection& nextStart)
@@ -45,7 +57,8 @@ public:
 		if (m_IntersForCPStart.size() > 0)
 		{
 			nextStart = m_IntersForCPStart[0];
-			UseIntersection(nextStart);
+			RemoveEquivalentIntersections(nextStart);
+			m_ReachedIntersections.emplace_back(nextStart);
 			return true;
 		}
 		return false;
@@ -55,20 +68,29 @@ public:
 	{
 		auto inter = ToInteresection(element);
 
+		if (inter == m_CurrStartIntersection)
+			return true;
+
+		if (IntersectionsAlreadyReached(inter))
+			return false;
+
 		if (&inter.GetFace().GetShape() == m_OriginalShape)
 		{
 			if ((inter != m_CurrStartIntersection) && m_EquivalenceChecker.AreEquivalent(inter, m_CurrStartIntersection))
 				return false; // TODO - this can be corrected for.
 
-			UseIntersection(inter);
-			
+			RemoveEquivalentIntersections(inter);
 		}
+
+		m_ReachedIntersections.emplace_back(inter);
 		return true;
 	}
 
 private:
 	std::vector<EdgeFaceIntersection> m_IntersForCPStart;
 	std::vector<EdgeFaceIntersection> m_IntersForCPStartOther;
+
+	std::vector<EdgeFaceIntersection> m_ReachedIntersections;
 
 	EdgeFaceIntersection m_CurrStartIntersection;
 	IntersectionEquivalenceChecker m_EquivalenceChecker;

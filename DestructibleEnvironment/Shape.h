@@ -77,11 +77,6 @@ public:
 	{
 	}
 
-	void ClearFaces()
-	{
-		m_Faces.clear();
-	}
-
 	void Clear()
 	{
 		m_Faces.clear();
@@ -105,6 +100,14 @@ public:
 		GetTransform().SetPosition(refTran.ToWorldPosition(c));
 		GetTransform().SetRotation(refTran.GetRotation());
 
+		SetDirty();
+	}
+
+	// Call this one when re-centring is not required
+	void OnAllFacesAdded()
+	{
+		CollectPointsAndEdges();
+		InitFaces();
 		SetDirty();
 	}
 
