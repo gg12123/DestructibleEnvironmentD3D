@@ -66,7 +66,7 @@ private:
 		}
 	}
 
-	void CreateNewInsideShapes(Shape& original, std::vector<Tshape*>& newShapes)
+	void CreateNewInsideShapes(Tshape& original, std::vector<Tshape*>& newShapes)
 	{
 		m_FaceIterator.SetShapeToUseNext(original);
 		m_FaceIterator.CreateShapes(m_NewInsideFaces, newShapes, FaceRelationshipWithOtherShape::InIntersection);
@@ -101,7 +101,7 @@ private:
 		}
 	}
 
-	void InitNewShapes(Shape& original, std::vector<Shape*>& newShapes)
+	void InitNewShapes(Shape& original, std::vector<Tshape*>& newShapes)
 	{
 		// Must copy the transform.
 		// Copy is needed becasue the original shape is re-used in the
@@ -127,7 +127,7 @@ private:
 	}
 
 public:
-	void Split(const Vector3& splitPointWorld, const Vector3& splitNormalWorld, Shape& originalShape, std::vector<Tshape*>& newShapes)
+	void Split(const Vector3& splitPointWorld, const Vector3& splitNormalWorld, Tshape& originalShape, std::vector<Tshape*>& newShapes)
 	{
 		ResetHashCounters();
 

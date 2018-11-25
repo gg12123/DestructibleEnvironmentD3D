@@ -5,7 +5,6 @@
 #include <assert.h>
 #include "Shape.h"
 #include "Face.h"
-#include "PerFaceSplitData.h"
 #include "MapToFaceRelationship.h"
 
 template<class Tshape>

@@ -4,11 +4,10 @@
 #include "ShapeEdge.h"
 #include "Shape.h"
 #include "ShapePoint.h"
-#include "NewPointsGetter.h"
 
-bool Face::PointIsInsideFace(const Vector3& pointShapesSpace) const
+bool Face::PointIsOnFace(const Vector3& pointShapesSpace) const
 {
-	return m_FacePoly.PointIsInsideAssumingConvex(ToFaceSpacePosition(pointShapesSpace)) == PointInPolyCase::Inside;
+	return m_FacePoly.PointIsInsideOrOnEdge(ToFaceSpacePosition(pointShapesSpace));
 }
 
 void  Face::AddPoint(ShapePoint& point, const Vector3& dirToNext, ShapeEdge& edgeToNext)
@@ -52,6 +51,19 @@ Vector3 Face::GetEdgeNormal(const ShapeEdge& edge) const
 	return GetEdgeNormal(edge.GetIndex(*this));
 }
 
+Vector3 Face::GetEdgeNormal(int index) const
+{
+	// Dont use the poly directly becasue the poly may
+	// have coincident points.
+
+	auto dirFaceSpace = ToFaceSpaceDirection(m_EdgeDirections[index]);
+	
+	// TODO - is this the correct rotation direction?
+	auto normalFaceSpace = Vector2(-dirFaceSpace.y, dirFaceSpace.x);
+
+	return ToShapeSpaceDirection(normalFaceSpace);
+}
+
 FaceEdgeCaseResult Face::CastToEdgeInside(const Vector3& origin, const Vector3& dir)
 {
 	auto origin2 = ToFaceSpacePosition(origin);
@@ -75,4 +87,5 @@ FaceEdgeCaseResult Face::CastToEdgeInside(const Vector3& origin, const Vector3& 
 				res = FaceEdgeCaseResult(*m_EdgeObjects[i], ToShapeSpacePosition(intPoint), dist);
 		}
 	}
+	return res;
 }

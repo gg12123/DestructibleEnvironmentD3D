@@ -24,7 +24,7 @@ public:
 	}
 
 private:
-	int Index(int row, int col)
+	int Index(int row, int col) const
 	{
 		return (row * NumCols + col);
 	}

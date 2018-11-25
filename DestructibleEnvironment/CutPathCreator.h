@@ -68,6 +68,8 @@ private:
 		auto& faceExited = piercingEdge.GetFace2();
 
 		auto firstDirFromPrev = DirectionOut(piercedFace, faceExited, piercingEdge);
+
+		return CutPathElement(faceExited, piercedFace, piercingEdge, firstDirFromPrev);
 	}
 
 	CutPathElement CastToNext(const CutPathElement& curr)

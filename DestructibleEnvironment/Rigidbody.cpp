@@ -4,9 +4,9 @@
 
 void Rigidbody::CalculateInertia()
 {
-	auto& points = GetPoints();
+	auto& points = GetCachedPoints();
 
-	auto m = GetMass() / GetTotalEdgeLength();
+	auto m = GetMass();
 
 	auto Ixx = 0.0f;
 	auto Iyy = 0.0f;
@@ -18,7 +18,7 @@ void Rigidbody::CalculateInertia()
 
 	for (auto it = points.begin(); it != points.end(); it++)
 	{
-		auto P = (*it)->GetPointWeighted();
+		auto P = (*it);
 
 		Ixx += (P.y * P.y + P.z * P.z) * m;
 		Iyy += (P.x * P.x + P.z * P.z) * m;

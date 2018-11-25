@@ -17,7 +17,7 @@ class SplitShapeEdge;
 class ShapeEdge : public ObjectWithHash<ShapeEdge>
 {
 public:
-	ShapeEdge(const ShapePoint& p0, const ShapePoint& p1, const Vector3& dirFromP0ToP1)
+	ShapeEdge(ShapePoint& p0, ShapePoint& p1, const Vector3& dirFromP0ToP1)
 	{
 		m_P0 = &p0;
 		m_P1 = &p1;
@@ -60,25 +60,18 @@ public:
 		assert(false);
 	}
 
-	const ShapePoint& GetP0() const
+	ShapePoint& GetP0() const
 	{
 		return *m_P0;
 	}
 
-	const ShapePoint& GetP1() const
+	ShapePoint& GetP1() const
 	{
 		return *m_P1;
 	}
 
-	ShapePoint& GetStart(const Face& requester) const
-	{
-		return *requester.GetPointObjects()[GetIndex(requester)];
-	}
-
-	ShapePoint& GetEnd(const Face& requester) const
-	{
-		return *requester.GetPointObjects()[requester.NextPointIndex(GetIndex(requester))];
-	}
+	ShapePoint& GetStart(const Face& requester) const;
+	ShapePoint& GetEnd(const Face& requester) const;
 
 	int GetIndex(const Face& f) const
 	{
@@ -89,12 +82,10 @@ public:
 			return m_IndexInFace2;
 
 		assert(false);
+		return -1;
 	}
 
-	Vector3 GetDirection(const Face& requester) const
-	{
-		return requester.GetEdgeDirections()[GetIndex(requester)];
-	}
+	Vector3 GetDirection(const Face& requester) const;
 
 	SplitShapeEdge& GetSplitEdge() const
 	{
@@ -130,6 +121,7 @@ public:
 			return *m_Face1;
 
 		assert(false);
+		return *m_Face1;
 	}
 
 	void SetBeenCollected(bool val)
@@ -165,8 +157,8 @@ private:
 	int m_IndexInFace1;
 	int m_IndexInFace2;
 
-	const ShapePoint* m_P0 = nullptr;
-	const ShapePoint* m_P1 = nullptr;
+	ShapePoint* m_P0 = nullptr;
+	ShapePoint* m_P1 = nullptr;
 
 	SplitShapeEdge* m_SplitEdge = nullptr;
 

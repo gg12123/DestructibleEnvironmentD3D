@@ -1,9 +1,7 @@
 #pragma once
 
 #include "Vector3.h"
-#include "FinalFaceCreator.h"
 #include "Transform.h"
-#include "NewPointsGetter.h"
 #include "Bounds.h"
 #include "PointInPolyCase.h"
 #include <vector>

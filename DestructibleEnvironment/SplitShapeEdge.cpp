@@ -1,13 +1,14 @@
+#include "pch.h"
 #include "SplitShapeEdge.h"
 #include "ShapeEdge.h"
 #include "ShapePoint.h"
 
-const ShapePoint & SplitShapeEdge::GetP0() const
+ShapePoint & SplitShapeEdge::GetP0() const
 {
 	return m_Edge->GetP0();
 }
 
-const ShapePoint & SplitShapeEdge::GetP1() const
+ShapePoint & SplitShapeEdge::GetP1() const
 {
 	return m_Edge->GetP1();
 }

@@ -42,6 +42,7 @@ private:
 			return m_OriginalFace->NextPointIndex(startPointIndex);
 		}
 		assert(false);
+		return -1;
 	}
 
 	template<FaceRelationshipWithOtherShape inside>
@@ -57,7 +58,7 @@ private:
 	}
 
 	template<FaceRelationshipWithOtherShape inOrOut>
-	void Iterate(const ShapePoint& sp)
+	void Iterate(ShapePoint& sp)
 	{
 		auto iteratingCp = true;
 

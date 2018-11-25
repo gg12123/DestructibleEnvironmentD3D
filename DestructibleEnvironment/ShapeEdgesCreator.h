@@ -57,7 +57,7 @@ public:
 	}
 
 	// called by the reversing code
-	void CreateEdge(const ShapePoint& p0, const ShapePoint& p1, const Vector3& dirToP1)
+	void CreateEdge(ShapePoint& p0, ShapePoint& p1, const Vector3& dirToP1)
 	{
 		auto& edge = *(new ShapeEdge(p0, p1, dirToP1)); // TODO - pool
 		m_MapToEdges.AddNewEdge(p0, p1, edge);

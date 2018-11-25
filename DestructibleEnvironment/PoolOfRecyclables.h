@@ -6,7 +6,7 @@ template<class T>
 class PoolOfRecyclables
 {
 public:
-	PoolOfRecyclables(uint32 initialSize, std::function<T()> creator) : m_Creator(std::move(creator))
+	PoolOfRecyclables(int initialSize, std::function<T()> creator) : m_Creator(std::move(creator))
 	{
 		m_Contents.reserve(initialSize);
 
@@ -27,7 +27,7 @@ public:
 
 		m_Curr++;
 		
-		if (m_Curr < m_Contents.size())
+		if (m_Curr < static_cast<int>(m_Contents.size()))
 		{
 			m_CurrEnd = Begin();
 			std::advance(m_CurrEnd, m_Curr);
@@ -45,17 +45,33 @@ public:
 		return m_Curr;
 	}
 
-	std::vector<T>::iterator Begin() const
+	auto Begin() const
 	{
 		return m_Contents.begin();
 	}
 
-	std::vector<T>::iterator End() const
+	auto Begin()
+	{
+		return m_Contents.begin();
+	}
+
+	auto End() const
 	{
 		return m_CurrEnd;
 	}
 
-	T& At(uint32 index) const
+	auto End()
+	{
+		return m_CurrEnd;
+	}
+
+	auto& At(int index) const
+	{
+		assert(index < m_Curr);
+		return m_Contents[index];
+	}
+
+	auto& At(int index)
 	{
 		assert(index < m_Curr);
 		return m_Contents[index];
@@ -64,6 +80,6 @@ public:
 private:
 	std::function<T()> m_Creator;
 	std::vector<T> m_Contents;
-	uint32 m_Curr;
+	int m_Curr;
 	typename std::vector<T>::iterator m_CurrEnd;
 };

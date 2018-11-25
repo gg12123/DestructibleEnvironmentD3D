@@ -67,6 +67,8 @@ Vector3 Shape::CalculateCentre()
 
 	for (auto it = m_PointObjects.begin(); it != m_PointObjects.end(); it++)
 		c += (*it)->GetPoint();
+
+	return c;
 }
 
 Vector3 Shape::CalculateSplitPlaneNormal(const Vector3& P0)

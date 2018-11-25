@@ -198,7 +198,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
-    <ClInclude Include="ArrayWrapper.h" />
     <ClInclude Include="BodyCollectionBounds.h" />
     <ClInclude Include="Bounds.h" />
     <ClInclude Include="Camera.h" />
@@ -207,7 +206,6 @@
     <ClInclude Include="CollisionResponder.h" />
     <ClInclude Include="Common\DeviceResources.h" />
     <ClInclude Include="ConstantBufferInputTypes.h" />
-    <ClInclude Include="ConvexPolyCreator.h" />
     <ClInclude Include="CubeFacesCreator.h" />
     <ClInclude Include="CutPathCreator.h" />
     <ClInclude Include="CutPathElement.h" />
@@ -215,7 +213,6 @@
     <ClInclude Include="CutShapeCreator.h" />
     <ClInclude Include="EdgeFaceIntersection.h" />
     <ClInclude Include="FaceIterator.h" />
-    <ClInclude Include="FaceLinker.h" />
     <ClInclude Include="FaceRelationshipWithOtherShape.h" />
     <ClInclude Include="FacesCutPath.h" />
     <ClInclude Include="FacesCutPathIterator.h" />
@@ -228,7 +225,6 @@
     <ClInclude Include="MapToNewEdges.h" />
     <ClInclude Include="MapToShapePointOnReversedFace.h" />
     <ClInclude Include="ObjectWithHash.h" />
-    <ClInclude Include="PerFaceSplitData.h" />
     <ClInclude Include="PointInPolyCase.h" />
     <ClInclude Include="Polygon2.h" />
     <ClInclude Include="D3DBuffers.h" />
@@ -240,14 +236,10 @@
     <ClInclude Include="Content\SampleFpsTextRenderer.h" />
     <ClInclude Include="Content\ShaderStructures.h" />
     <ClInclude Include="DynamicBodyProxy.h" />
-    <ClInclude Include="DynamicGridPartition.h" />
-    <ClInclude Include="DynamicGridSquare.h" />
     <ClInclude Include="DynamicMesh.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Face.h" />
-    <ClInclude Include="FaceFaceIntersection.h" />
     <ClInclude Include="FaceSplitter.h" />
-    <ClInclude Include="FinalFaceCreator.h" />
     <ClInclude Include="FixedTimeStepTime.h" />
     <ClInclude Include="GameControlledDynamicBody.h" />
     <ClInclude Include="GameThreadToPhysicsThreadAction.h" />
@@ -260,8 +252,6 @@
     <ClInclude Include="Loggers.h" />
     <ClInclude Include="MathU.h" />
     <ClInclude Include="Matrix.h" />
-    <ClInclude Include="NewEdgePointsCotainer.h" />
-    <ClInclude Include="NewPointsGetter.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Physics.h" />
     <ClInclude Include="PhysicsEngine.h" />
@@ -270,8 +260,6 @@
     <ClInclude Include="ReversedGeometryCreator.h" />
     <ClInclude Include="ShapeEdgesCreator.h" />
     <ClInclude Include="ShapePoint.h" />
-    <ClInclude Include="Polygon2IntersectionFinder.h" />
-    <ClInclude Include="Polygon2Splitter.h" />
     <ClInclude Include="Pool.h" />
     <ClInclude Include="PoolOfRecyclables.h" />
     <ClInclude Include="PotentialCollision.h" />
@@ -284,13 +272,11 @@
     <ClInclude Include="ShapeEdge.h" />
     <ClInclude Include="ShapeProxy.h" />
     <ClInclude Include="ShapeSplitter.h" />
-    <ClInclude Include="SplitFaceRegion.h" />
     <ClInclude Include="SplitInfo.h" />
     <ClInclude Include="SplitShapeEdge.h" />
     <ClInclude Include="StaticBody.h" />
     <ClInclude Include="StaticShapeProxy.h" />
     <ClInclude Include="StringU.h" />
-    <ClInclude Include="ToBeNewPoint.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TwoDArray.h" />
     <ClInclude Include="UpdatableBound.h" />
@@ -309,15 +295,12 @@
     <ClCompile Include="Content\SampleFpsTextRenderer.cpp" />
     <ClCompile Include="Content\Sample3DSceneRenderer.cpp" />
     <ClCompile Include="DynamicBodyProxy.cpp" />
-    <ClCompile Include="DynamicGridPartition.cpp" />
-    <ClCompile Include="DynamicGridSquare.cpp" />
     <ClCompile Include="DynamicMesh.cpp" />
     <ClCompile Include="Face.cpp" />
     <ClCompile Include="GameControlledDynamicBody.cpp" />
     <ClCompile Include="GameTheadToPhysicsThreadAction.cpp" />
     <ClCompile Include="IntersectionFinder.cpp" />
     <ClCompile Include="Light.cpp" />
-    <ClCompile Include="NewPointsGetter.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -336,9 +319,9 @@
     <ClCompile Include="Shape.cpp" />
     <ClCompile Include="ShapeEdge.cpp" />
     <ClCompile Include="ShapeProxy.cpp" />
-    <ClCompile Include="ShapeSplitter.cpp" />
     <ClCompile Include="SplitShapeEdge.cpp" />
     <ClCompile Include="StaticShapeProxy.cpp" />
+    <ClCompile Include="Vector2.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>

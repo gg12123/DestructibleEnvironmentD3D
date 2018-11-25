@@ -20,14 +20,10 @@ public:
 class Polygon2
 {
 public:
-	float CalculateSignedArea() const
+	bool PointIsInsideOrOnEdge(const Vector2& p) const
 	{
-
-	}
-
-	PointInPolyCase PointIsInsideAssumingConvex(const Vector2& p) const
-	{
-
+		auto c = PointIsInside(p);
+		return c == PointInPolyCase::Inside || c == PointInPolyCase::OnBoundary;
 	}
 
 	PointInPolyCase PointIsInside(const Vector2& p) const
@@ -95,28 +91,6 @@ public:
 	{
 		auto s = m_Points.size();
 		return (index - 1 + s) % s;
-	}
-
-	Vector2 GetDirectionAt(int index) const
-	{
-
-	}
-
-	Vector2 GetNormalAt(int index) const
-	{
-		// this points to outside the poly - assuming the winding of the poly is correct.
-	}
-
-	Vector2 GetCentre() const
-	{
-
-	}
-
-	// returns a negative number for clockwise and a positive number for anti-clockwise
-	float CalculateWindingAt(int index)
-	{
-		auto& p = m_Points[index];
-		return -Vector2::Cross2D(p - m_Points[PreviousIndex(index)], m_Points[NextIndex(index)] - p);
 	}
 
 private:

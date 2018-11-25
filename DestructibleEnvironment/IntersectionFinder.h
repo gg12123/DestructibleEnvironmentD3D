@@ -41,6 +41,4 @@ private:
 
 	Transform* m_ActiveTransform;
 	Transform m_IdentityTransform;
-
-	std::vector<FaceEdgeIntersection<Vector3>> m_FaceEdgeIntersections;
 };

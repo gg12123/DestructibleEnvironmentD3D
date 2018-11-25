@@ -47,3 +47,7 @@ private:
 
 	int m_Hash = UnAssignedHash;
 };
+
+
+template<class T>
+int ObjectWithHash<T>::NextHash;

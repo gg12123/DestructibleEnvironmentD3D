@@ -3,6 +3,7 @@
 #include "CutPathElement.h"
 #include "Vector3.h"
 #include "MapToShapePointOnReversedFace.h"
+#include "FaceRelationshipWithOtherShape.h"
 
 class FacesCutPath
 {
@@ -45,12 +46,12 @@ public:
 		return (curr + travelDir + c) % c;
 	}
 
-	bool SetBeenUsedToGenInsideFace()
+	void SetBeenUsedToGenInsideFace()
 	{
 		m_BeenUsedToGenInside = true;
 	}
 
-	bool SetBeenUsedToGetOutsideFace()
+	void SetBeenUsedToGetOutsideFace()
 	{
 		m_BeenUsedToGenOutside = true;
 	}

@@ -3,6 +3,7 @@
 #include "Shape.h"
 #include "MathU.h"
 #include "Transform.h"
+#include "ShapeEdge.h"
 
 PotentialCollision CollisionDetector::ToPotentialCollision(const EdgeFaceIntersection& inter)
 {

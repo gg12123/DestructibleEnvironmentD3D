@@ -21,7 +21,7 @@ public:
 		m_Elements.emplace_back(cpe);
 	}
 
-	const ShapePoint & GetNext(const CutPathElement& middleCurr, const ShapePoint& towards) const
+	ShapePoint & GetNext(const CutPathElement& middleCurr, const ShapePoint& towards) const
 	{
 		assert(&towards == &GetP0() || &towards == &GetP1());
 
@@ -29,7 +29,7 @@ public:
 		return *m_PointsSortedFromP0[i];
 	}
 
-	const ShapePoint & GetNext(const ShapePoint& endCurr) const
+	ShapePoint & GetNext(const ShapePoint& endCurr) const
 	{
 		assert(&endCurr == &GetP0() || &endCurr == &GetP1());
 		return &endCurr == &GetP0() ? *m_PointsSortedFromP0[1] : *m_PointsSortedFromP0[m_PointsSortedFromP0.size() - 1U];
@@ -45,13 +45,13 @@ public:
 		return *m_Edge;
 	}
 
-	const ShapePoint & GetP0() const;
-	const ShapePoint & GetP1() const;
+	ShapePoint & GetP0() const;
+	ShapePoint & GetP1() const;
 
 	void OnAllElementsAdded();
 
 private:
-	std::vector<const ShapePoint*> m_PointsSortedFromP0;
+	std::vector<ShapePoint*> m_PointsSortedFromP0;
 	std::vector<CutPathElement> m_Elements;
 	const ShapeEdge* m_Edge = nullptr;
 };

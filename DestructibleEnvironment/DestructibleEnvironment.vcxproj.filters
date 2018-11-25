@@ -148,32 +148,23 @@
     <ClCompile Include="Face.cpp">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClCompile>
-    <ClCompile Include="NewPointsGetter.cpp">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClCompile>
     <ClCompile Include="Shape.cpp">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClCompile>
     <ClCompile Include="ShapeEdge.cpp">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClCompile>
-    <ClCompile Include="DynamicGridSquare.cpp">
-      <Filter>Physics\CollisionStuff</Filter>
-    </ClCompile>
-    <ClCompile Include="DynamicGridPartition.cpp">
-      <Filter>Physics\CollisionStuff</Filter>
-    </ClCompile>
     <ClCompile Include="IntersectionFinder.cpp">
       <Filter>Physics\CollisionStuff</Filter>
-    </ClCompile>
-    <ClCompile Include="ShapeSplitter.cpp">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClCompile>
     <ClCompile Include="ShapePoint.cpp">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClCompile>
     <ClCompile Include="SplitShapeEdge.cpp">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector2.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -237,9 +228,6 @@
     <ClInclude Include="Pool.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="ArrayWrapper.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Vector3.h">
       <Filter>Utils</Filter>
     </ClInclude>
@@ -294,13 +282,7 @@
     <ClInclude Include="Face.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
-    <ClInclude Include="FinalFaceCreator.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
     <ClInclude Include="InitialShapeCreator.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="NewPointsGetter.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="Shape.h">
@@ -313,12 +295,6 @@
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="GridPartition.h">
-      <Filter>Physics\CollisionStuff</Filter>
-    </ClInclude>
-    <ClInclude Include="DynamicGridSquare.h">
-      <Filter>Physics\CollisionStuff</Filter>
-    </ClInclude>
-    <ClInclude Include="DynamicGridPartition.h">
       <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
     <ClInclude Include="LastCheckedAgainst.h">
@@ -339,16 +315,7 @@
     <ClInclude Include="Loggers.h">
       <Filter>Debuging</Filter>
     </ClInclude>
-    <ClInclude Include="FaceFaceIntersection.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
     <ClInclude Include="FaceSplitter.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="NewEdgePointsCotainer.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="ToBeNewPoint.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="IntersectionFinder.h">
@@ -357,20 +324,8 @@
     <ClInclude Include="Vector2.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Polygon2Splitter.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
     <ClInclude Include="Polygon2.h">
       <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Polygon2IntersectionFinder.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="SplitFaceRegion.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="ConvexPolyCreator.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="FaceRelationshipWithOtherShape.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
@@ -379,12 +334,6 @@
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="PointInPolyCase.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="PerFaceSplitData.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="FaceLinker.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="FaceIterator.h">

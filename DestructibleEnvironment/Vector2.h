@@ -142,10 +142,3 @@ inline bool Vector2::RayIntersectsLine(const Vector2& origin, const Vector2& dir
 	}
 	return false;
 }
-
-Vector2 Vector2::Normalized() const
-{
-	auto mag = Magnitude();
-	assert(mag > 0.0f);
-	return *this / mag;
-}

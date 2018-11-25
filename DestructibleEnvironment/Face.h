@@ -4,9 +4,7 @@
 
 #include "Vector3.h"
 #include "Vector2.h"
-#include "FaceFaceIntersection.h"
 #include "Polygon2.h"
-#include "PoolOfRecyclables.h"
 #include "ObjectWithHash.h"
 #include <vector>
 #include <memory>
@@ -32,30 +30,67 @@ struct FaceEdgeCaseResult
 	}
 };
 
+class FaceCoOrdinateSystem
+{
+public:
+	void Init(const Vector3& faceNormal, const Vector3& pointOnFace)
+	{
+		m_Origin = pointOnFace;
+		m_XDir = Vector3::OrthogonalDirection(faceNormal);
+		m_YDir = Vector3::Cross(faceNormal, m_XDir);
+	}
+
+	Vector2 ToFaceSpaceDirection(const Vector3& shapesSpaceDir) const
+	{
+		return Vector2(Vector3::Dot(shapesSpaceDir, m_XDir), Vector3::Dot(shapesSpaceDir, m_YDir));
+	}
+
+	Vector2 ToFaceSpacePosition(const Vector3& shapesSpacePos) const
+	{
+		auto p = shapesSpacePos - m_Origin;
+		return Vector2(Vector3::Dot(p, m_XDir), Vector3::Dot(p, m_YDir));
+	}
+
+	Vector3 ToShapeSpaceDirection(const Vector2& faceSpaceDir) const
+	{
+		return faceSpaceDir.x * m_XDir + faceSpaceDir.y * m_YDir;
+	}
+
+	Vector3 ToShapeSpacePosition(const Vector2& faceSpacePos) const
+	{
+		return m_Origin + faceSpacePos.x * m_XDir + faceSpacePos.y * m_YDir;
+	}
+
+private:
+	Vector3 m_XDir;
+	Vector3 m_YDir;
+	Vector3 m_Origin;
+};
+
 /**
  * 
  */
 class Face : public ObjectWithHash<Face>
 {
 public:
-	Face()
-	{
-		// allocate space in vectors
-	}
-
 	Vector2 ToFaceSpaceDirection(const Vector3& shapesSpaceDir) const
 	{
-
+		return m_FaceSpace.ToFaceSpaceDirection(shapesSpaceDir);
 	}
 
 	Vector2 ToFaceSpacePosition(const Vector3& shapesSpacePos) const
 	{
+		return m_FaceSpace.ToFaceSpacePosition(shapesSpacePos);
+	}
 
+	Vector3 ToShapeSpaceDirection(const Vector2& faceSpaceDir) const
+	{
+		return m_FaceSpace.ToShapeSpaceDirection(faceSpaceDir);
 	}
 
 	Vector3 ToShapeSpacePosition(const Vector2& faceSpacePos) const
 	{
-
+		return m_FaceSpace.ToShapeSpacePosition(faceSpacePos);
 	}
 
 	void AddPoint(ShapePoint& point, const Vector3& dirToNext, ShapeEdge& edgeToNext);
@@ -74,8 +109,6 @@ public:
 	Vector3 GetEdgeNormal(int index) const;
 
 	FaceEdgeCaseResult CastToEdgeInside(const Vector3& origin, const Vector3& dir);
-
-	Vector3 GetNormalWorld() const;
 
 	auto GetPlaneP0() const
 	{
@@ -112,7 +145,7 @@ public:
 		return m_FacePoly;
 	}
 
-	bool PointIsInsideFace(const Vector3& pointShapesSpace) const;
+	bool PointIsOnFace(const Vector3& pointShapesSpace) const;
 
 	int NextPointIndex(int index) const
 	{
@@ -136,7 +169,10 @@ public:
 	}
 
 private:
-	void InitFaceCoOrdinateSystem(const Vector3& origin);
+	void InitFaceCoOrdinateSystem(const Vector3& origin)
+	{
+		m_FaceSpace.Init(m_Normal, origin);
+	}
 
 	// all points related collections must be parralel.
 	std::vector<Vector3> m_CachedPoints;
@@ -148,4 +184,6 @@ private:
 	Polygon2 m_FacePoly;
 
 	Vector3 m_Normal;
+
+	FaceCoOrdinateSystem m_FaceSpace;
 };

@@ -25,7 +25,7 @@ private:
 
 	EdgeFaceIntersection ToInteresection(const CutPathElement& element)
 	{
-		return EdgeFaceIntersection(element.GetPiercedFace(), element.GetPiercingEdge());
+		return EdgeFaceIntersection(element.GetPiercedFace(), element.GetPiercingEdge(), element.GetIntPoint());
 	}
 
 	bool IntersectionsAlreadyReached(const EdgeFaceIntersection& inter) const
@@ -42,8 +42,6 @@ public:
 	// all inersections found between cut shape edges and original shape faces
 	void Init(std::vector<EdgeFaceIntersection>& inters, const Shape& origShape)
 	{
-		m_EquivalenceChecker.SetIntersections(inters);
-
 		m_IntersForCPStart.clear();
 		m_IntersForCPStart.swap(inters);
 

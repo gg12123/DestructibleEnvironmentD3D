@@ -7,7 +7,7 @@ class UpdatableBound
 public:
 	UpdatableBound()
 	{
-		m_Min = std::numeric_limits<T>::max();
+		m_Min = (std::numeric_limits<T>::max)();
 		m_Max = std::numeric_limits<T>::lowest();
 	}
 

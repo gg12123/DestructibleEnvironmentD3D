@@ -15,7 +15,7 @@ public:
 
 	bool EdgeExistsBetween(const ShapePoint& p0, const ShapePoint& p1) const
 	{
-		m_Edges.Get(p0.GetHash(), p1.GetHash());
+		return m_Edges.Get(p0.GetHash(), p1.GetHash());
 	}
 
 	ShapeEdge & GetNewEdge(const ShapePoint& p0, const ShapePoint& p1) const

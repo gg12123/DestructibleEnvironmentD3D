@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "IntersectionFinder.h"
 #include "Face.h"
 #include "Shape.h"
@@ -15,7 +16,7 @@ bool IntersectionFinder::EdgeIsIntersectedWithFace(const Face& face, const Vecto
 	if (Vector3::Dot(edgeP0 - p0, n) * Vector3::Dot(edgeP1 - p0, n) <= 0.0f)
 	{
 		if (Vector3::LinePlaneIntersection(face.GetPlaneP0(), face.GetNormal(), edgeP0, edgeP1, intPoint))
-			return face.PointIsInsideFace(intPoint);
+			return face.PointIsOnFace(intPoint);
 	}
 
 	return false;

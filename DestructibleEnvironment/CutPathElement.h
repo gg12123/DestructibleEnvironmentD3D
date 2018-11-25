@@ -16,6 +16,15 @@ public:
 		m_DirFromPrev = dirFromPrev;
 	}
 
+	CutPathElement(Face& faceExited, Face& facePierced, ShapeEdge& piercingEdge, const Vector3& dirFromPrev)
+	{
+		m_PiercingEdge = &piercingEdge;
+		m_FaceExited = &faceExited;
+		m_PiercedFace = &facePierced;
+		m_FaceEntered = &m_PiercingEdge->GetOther(*m_FaceExited);
+		m_DirFromPrev = dirFromPrev;
+	}
+
 	int GetIndexInSplitEdge() const
 	{
 		return m_IndexInSplitEdge;

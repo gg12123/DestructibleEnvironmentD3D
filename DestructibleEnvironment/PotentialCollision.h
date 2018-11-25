@@ -1,10 +1,10 @@
 #pragma once
 #include "Vector3.h"
 #include "Transform.h"
-#include "ArrayWrapper.h"
 #include "Constants.h"
 #include "Face.h"
 #include "UpdatableBound.h"
+#include "Shape.h"
 
 class PotentialCollision
 {

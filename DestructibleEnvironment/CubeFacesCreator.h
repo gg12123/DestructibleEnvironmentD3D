@@ -1,11 +1,12 @@
 #pragma once
 #include <vector>
+#include <array>
 #include "Shape.h"
 #include "Face.h"
 #include "Vector3.h"
 #include "Transform.h"
 #include "Matrix.h"
-#include "FaceLinker.h"
+#include "TwoDArray.h"
 
 class CubeFacesCreator
 {
@@ -69,7 +70,7 @@ private:
 	template<int numPoints>
 	Face& CreateFace(const std::array<int, numPoints>& pointIndexes)
 	{
-		auto f = *(new Face());
+		auto& f = *(new Face());
 
 		for (auto i = 0U; i < numPoints; i++)
 		{
