@@ -45,6 +45,7 @@ public:
 	static inline bool InfinateLinesIntersect(const Vector2& aP0, const Vector2& aP1, const Vector2& bP0, const Vector2& bP1, float& aU, float& bU);
 	static inline bool LinesIntersect(const Vector2& aP0, const Vector2& aP1, const Vector2& bP0, const Vector2& bP1, Vector2& intPoint);
 	static inline bool RayIntersectsLine(const Vector2& origin, const Vector2& dir, const Vector2& P0, const Vector2& P1, Vector2& intPoint);
+	static inline bool InfinateLineIntersectsLine(const Vector2& infP0, const Vector2& infP1, const Vector2& P0, const Vector2& P1, Vector2& intPoint);
 	static inline float Cross2D(const Vector2& u, const Vector2& v);
 };
 
@@ -139,6 +140,17 @@ inline bool Vector2::RayIntersectsLine(const Vector2& origin, const Vector2& dir
 	{
 		intPoint = rayP0 + aU * (rayP1 - rayP0);
 		return aU >= 0.0f && bU >= 0.0f && bU <= 1.0f;
+	}
+	return false;
+}
+
+inline bool Vector2::InfinateLineIntersectsLine(const Vector2& infP0, const Vector2& infP1, const Vector2& P0, const Vector2& P1, Vector2& intPoint)
+{
+	float aU, bU;
+	if (InfinateLinesIntersect(infP0, infP1, P0, P1, aU, bU))
+	{
+		intPoint = infP0 + aU * (infP1 - infP0);
+		return bU >= 0.0f && bU <= 1.0f;
 	}
 	return false;
 }

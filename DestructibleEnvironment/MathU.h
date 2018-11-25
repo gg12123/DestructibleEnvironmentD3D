@@ -53,4 +53,9 @@ public:
 		else
 			return testVal >= bound1 && testVal <= bound2;
 	}
+
+	static inline float Abs(float val)
+	{
+		return fabs(val);
+	}
 };

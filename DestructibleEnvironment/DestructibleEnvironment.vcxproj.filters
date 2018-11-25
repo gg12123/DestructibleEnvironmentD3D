@@ -405,6 +405,9 @@
     <ClInclude Include="UpdatableBound.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="FaceOrderingComparator.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">

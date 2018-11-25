@@ -115,6 +115,11 @@ public:
 		return m_CachedPoints[0];
 	}
 
+	Vector3 GetCentre() const
+	{
+		return ToShapeSpacePosition(m_FacePoly.GetCentre());
+	}
+
 	const auto& GetCachedPoints() const
 	{
 		return m_CachedPoints;
@@ -140,7 +145,7 @@ public:
 		return *m_OwnerShape;
 	}
 
-	const auto& GetFacePoly()
+	const auto& GetFacePoly() const
 	{
 		return m_FacePoly;
 	}

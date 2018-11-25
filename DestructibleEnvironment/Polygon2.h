@@ -72,14 +72,21 @@ public:
 		return m_Points;
 	}
 
+	auto GetCentre() const
+	{
+		return m_SumOfPoints / static_cast<float>(m_Points.size());
+	}
+
 	void Clear()
 	{
 		m_Points.clear();
+		m_SumOfPoints = Vector2::Zero();
 	}
 
 	void Add(const Vector2& p)
 	{
 		m_Points.emplace_back(p);
+		m_SumOfPoints += p;
 	}
 
 	int NextIndex(int index) const
@@ -100,4 +107,5 @@ private:
 	}
 
 	std::vector<Vector2> m_Points;
+	Vector2 m_SumOfPoints;
 };
