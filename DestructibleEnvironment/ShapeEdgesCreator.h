@@ -3,15 +3,16 @@
 #include "ShapeEdge.h"
 #include "SplitShapeEdge.h"
 #include "MapToNewEdges.h"
+#include "MapToShapePointOnReversedFace.h"
 #include "CutPathElement.h"
 #include "PoolOfRecyclables.h"
 
 class ShapeEdgesCreator
 {
 private:
-	void CreateEdgesAlongCutPath(const std::vector<CutPathElement>& cp)
+	void CreateEdgesAlongCutPathImp(const std::vector<CutPathElement>& cp)
 	{
-		m_SplitEdgesPool->Recycle();
+		m_SplitEdgesPool->Reset();
 
 		for (auto i = 0U; i < cp.size(); i++)
 		{
@@ -36,24 +37,65 @@ private:
 		}
 	}
 
-	void CreateEdgesAlongSplitEdges()
+	ShapePoint& GetShapePoint(const SplitShapeEdge& edge, ShapePoint& p, bool inside)
 	{
-		for (auto it = m_SplitEdgesPool->Begin(); it != m_SplitEdgesPool->End(); it++)
-		{
-			it->OnAllElementsAdded();
-			auto& sePoints = it->GetPointsSortedFromP0();
-			auto dir = it->GetEdge().GetDirFromP0ToP1();
+		if (inside)
+			return p;
 
-			for (auto i = 0U; i < sePoints.size() - 1U; i++)
-				CreateEdge(*sePoints[i], *sePoints[i + 1U], dir);
+		if (&p == &edge.GetP0() || &p == &edge.GetP1())
+			return p;
+
+		return m_MapToRev->GetPointOnReversedFace(p);
+	}
+
+	void CreateEdgesAlongSplitEdge(bool inside, const SplitShapeEdge& edge)
+	{
+		auto create = inside ? edge.FirstEdgeFromP0IsInside() : edge.FirstEdgeFromP0IsOutside();
+		auto& sePoints = edge.GetPointsSortedFromP0();
+		auto dir = edge.GetEdge().GetDirFromP0ToP1();
+
+		for (auto i = 0U; i < sePoints.size() - 1U; i++)
+		{
+			if (create)
+			{
+				auto& p0 = GetShapePoint(edge, *sePoints[i], inside);
+				auto& p1 = GetShapePoint(edge, *sePoints[i + 1U], inside);
+
+				CreateEdge(p0, p1, dir);
+			}
+
+			create = !create;
 		}
 	}
 
-public:
-	void CreateEdges(const std::vector<CutPathElement>& cp)
+	void InitSplitEdges()
 	{
-		CreateEdgesAlongCutPath(cp);
-		CreateEdgesAlongSplitEdges();
+		for (auto it = m_SplitEdgesPool->Begin(); it != m_SplitEdgesPool->End(); it++)
+			it->OnAllElementsAdded();
+	}
+
+	void CreateEdgesAlongSplitEdges(bool inside)
+	{
+		for (auto it = m_SplitEdgesPool->Begin(); it != m_SplitEdgesPool->End(); it++)
+			CreateEdgesAlongSplitEdge(inside, *it);
+	}
+
+public:
+	void CreateEdgesAlongCutPath(const std::vector<CutPathElement>& cp)
+	{
+		CreateEdgesAlongCutPathImp(cp);
+		InitSplitEdges();
+	}
+
+	void CreateInsideEdges()
+	{
+		CreateEdgesAlongSplitEdges(true);
+	}
+
+	void CreateOutsideEdges(const MapToShapePointOnReversedFace& mapToRev)
+	{
+		m_MapToRev = &mapToRev;
+		CreateEdgesAlongSplitEdges(false);
 	}
 
 	// called by the reversing code
@@ -81,4 +123,5 @@ public:
 private:
 	MapToNewEdges m_MapToEdges;
 	std::unique_ptr<PoolOfRecyclables<SplitShapeEdge>> m_SplitEdgesPool;
+	const MapToShapePointOnReversedFace* m_MapToRev = nullptr;
 };

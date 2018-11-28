@@ -4,15 +4,21 @@
 #include "Vector3.h"
 #include "FacesCutPaths.h"
 #include "FacesPointsIterator.h"
+#include "ConcaveFace.h"
+#include "ShapeEdgesCreator.h"
 
 class FaceSplitter
 {
 private:
-	void InitFaces(const FacesCutPaths& paths, std::vector<Face*>& newFaces)
+	void InitFaces(const FacesCutPaths& paths)
 	{
-		auto newFace = new Face(); //TODO - pool
-		m_Iterator.InitFaces(paths.GetFace(), *newFace);
-		newFaces.emplace_back(newFace);
+		m_ConcaveFace.Clear();
+		m_Iterator.InitFaces(paths.GetFace(), m_ConcaveFace);
+	}
+
+	void CreateTriangleFaces(const FacesCutPaths& paths, std::vector<Face*>& newFaces)
+	{
+		m_ConcaveFace.Triangulate(paths.GetFace(), newFaces);
 	}
 
 public:
@@ -27,8 +33,9 @@ public:
 
 			if (!fcp.BeenUsedToGenInsideFace())
 			{
-				InitFaces(paths, newFaces);
+				InitFaces(paths);
 				m_Iterator.IterateInside(fcp);
+				CreateTriangleFaces(paths, newFaces);
 			}
 		}
 	}
@@ -44,16 +51,18 @@ public:
 
 			if (!fcp.BeenUsedToGenOutsideFace())
 			{
-				InitFaces(paths, newFaces);
+				InitFaces(paths);
 				m_Iterator.IterateOutside(fcp);
+				CreateTriangleFaces(paths, newFaces);
 			}
 		}
 	}
 
-	void InitMaps(const MapToShapePointOnReversedFace& map, const MapToNewEdges& edgeMap, const MapToFacesCutPath& mapToFcp)
+	void InitMaps(const MapToShapePointOnReversedFace& map, ShapeEdgesCreator& edgesCreator, const MapToFacesCutPath& mapToFcp)
 	{
-		m_Iterator.InitMaps(map, edgeMap, mapToFcp);
+		m_Iterator.InitMaps(map, edgesCreator.GetMapToNewEdges(), mapToFcp);
 	}
 private:
 	FacesPointsIterator m_Iterator;
+	ConcaveFace m_ConcaveFace;
 };

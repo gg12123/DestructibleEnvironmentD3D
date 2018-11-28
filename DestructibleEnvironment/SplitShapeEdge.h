@@ -45,6 +45,16 @@ public:
 		return *m_Edge;
 	}
 
+	bool FirstEdgeFromP0IsInside() const
+	{
+
+	}
+
+	bool FirstEdgeFromP0IsOutside() const
+	{
+		return !FirstEdgeFromP0IsInside();
+	}
+
 	ShapePoint & GetP0() const;
 	ShapePoint & GetP1() const;
 

@@ -3,6 +3,7 @@
 #include "FacesCutPathIterator.h"
 #include "MapToFacesCutPath.h"
 #include "FaceRelationshipWithOtherShape.h"
+#include "ConcaveFace.h"
 
 class FacesPointsIterator
 {
@@ -108,7 +109,7 @@ public:
 		m_CPIterator.InitMaps(map, edgeMap);
 	}
 
-	void InitFaces(const Face& orig, Face& newFace)
+	void InitFaces(const Face& orig, ConcaveFace& newFace)
 	{
 		m_OriginalFace = &orig;
 		m_OPIterator.InitFaces(orig, newFace);

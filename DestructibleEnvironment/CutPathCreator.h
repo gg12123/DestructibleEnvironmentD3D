@@ -154,6 +154,11 @@ public:
 		return false;
 	}
 
+	const auto& GetMapToFacesCutPaths()
+	{
+		return m_MapToFCPs;
+	}
+
 private:
 	std::unique_ptr<PoolOfRecyclables<FacesCutPath>> m_FacesCutPathObjects;
 	std::unique_ptr<PoolOfRecyclables<std::vector<CutPathElement>>> m_CutPaths;

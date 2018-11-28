@@ -28,7 +28,17 @@ private:
 		auto& cps = m_CutPathCreator.GetCutPaths();
 
 		for (auto it = cps.Begin(); it != cps.End(); it++)
-			m_EdgesCreator.CreateEdges(*it);
+			m_EdgesCreator.CreateEdgesAlongCutPath(*it);
+	}
+
+	void CreateInsideEdgesFromSplitEdges()
+	{
+		m_EdgesCreator.CreateInsideEdges();
+	}
+
+	void CreateOutsideEdgesFromSplitEdges()
+	{
+		m_EdgesCreator.CreateOutsideEdges(m_Reverser.GetMapToReversed());
 	}
 
 	void CreateNewInsideFaces(const Shape& cutShape)
@@ -50,6 +60,11 @@ private:
 					m_NewInsideFacesFromCutShape.emplace_back(m_NewInsideFaces[i]);
 			}
 		}
+	}
+
+	void InitFaceSplitter()
+	{
+		m_FaceSplitter.InitMaps(m_Reverser.GetMapToReversed(), m_EdgesCreator, m_CutPathCreator.GetMapToFacesCutPaths());
 	}
 
 	void CreateNewOutsideFaces(const Shape& originalShape)
@@ -77,7 +92,7 @@ private:
 		m_FaceIterator.CreateShapes(m_NewOutsideFaces, newShapes, FaceRelationshipWithOtherShape::NotInIntersection);
 	}
 
-	void CreateReversedFaces(const Shape& cutShape)
+	void CreateReversedGeometry(const Shape& cutShape)
 	{
 		auto& cps = m_CutPathCreator.GetCutPaths();
 		for (auto it = cps.Begin(); it != cps.End(); it++)
@@ -139,14 +154,18 @@ public:
 			assert(false); // TODO - abort properly if this returns false
 
 		CreateEdgesFromCPs();
+		CreateInsideEdgesFromSplitEdges();
 
 		// Now get the stuff from original shape that needs returning to the pool. But dont return
 		// it until the end of the split.
 
+		InitFaceSplitter();
+
 		CreateNewInsideFaces(cutShape);
 		CreateNewInsideShapes(originalShape, newShapes);
 
-		CreateReversedFaces(cutShape);
+		CreateReversedGeometry(cutShape);
+		CreateOutsideEdgesFromSplitEdges();
 
 		CreateNewOutsideFaces(originalShape);
 		CreateNewOutsideShapes(newShapes);

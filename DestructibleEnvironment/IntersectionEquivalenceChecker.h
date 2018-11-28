@@ -9,15 +9,9 @@
 class IntersectionEquivalenceChecker
 {
 private:
-	bool IntersectionPointsAreEqual(const EdgeFaceIntersection& inter1, const EdgeFaceIntersection& inter2) const
+	bool FacesAreConnected(const Face& f1, const Face& f2) const
 	{
-		// TODO - this is not vert robust. A better approach would be to check the distance
-		// as travelled along the shape that owns the faces.
 
-		// But the best would not involve an arbitrary tolerance.
-
-		static constexpr float equalTol = 0.00001f;
-		return (inter1.GetIntPoint() - inter2.GetIntPoint()).Magnitude() <= equalTol;
 	}
 
 	bool MakesPotentialEdgeEdgeIntersection(const EdgeFaceIntersection& inter1, const EdgeFaceIntersection& inter2) const
@@ -59,7 +53,7 @@ public:
 	bool AreEquivalent(const EdgeFaceIntersection& inter1, const EdgeFaceIntersection& inter2) const
 	{
 		if (MakesPotentialEdgeEdgeIntersection(inter1, inter2) || ImplyContradictoryInformationAboutPoint(inter1, inter2))
-			return IntersectionPointsAreEqual(inter1, inter2);
+			return FacesAreConnected(inter1.GetFace(), inter2.GetFace()); // TODO - may also need to check if the faces obscure eachother with respect to the edge directions.
 
 		return false;
 	}
