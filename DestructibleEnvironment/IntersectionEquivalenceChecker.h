@@ -53,7 +53,7 @@ public:
 	bool AreEquivalent(const EdgeFaceIntersection& inter1, const EdgeFaceIntersection& inter2) const
 	{
 		if (MakesPotentialEdgeEdgeIntersection(inter1, inter2) || ImplyContradictoryInformationAboutPoint(inter1, inter2))
-			return FacesAreConnected(inter1.GetFace(), inter2.GetFace()); // TODO - may also need to check if the faces obscure eachother with respect to the edge directions.
+			return FacesAreConnected(inter1.GetFace(), inter2.GetFace()); // TODO - may also need to check if the faces overlay eachother with respect to the edge directions.
 
 		return false;
 	}

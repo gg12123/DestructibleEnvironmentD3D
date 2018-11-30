@@ -64,4 +64,5 @@ private:
 	std::vector<ShapePoint*> m_PointsSortedFromP0;
 	std::vector<CutPathElement> m_Elements;
 	const ShapeEdge* m_Edge = nullptr;
+	bool m_FirstEdgeFromP0IsInside;
 };

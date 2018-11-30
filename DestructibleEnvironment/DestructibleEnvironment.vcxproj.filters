@@ -411,6 +411,9 @@
     <ClInclude Include="ConcaveFace.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
+    <ClInclude Include="CollectionU.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">

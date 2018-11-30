@@ -28,7 +28,7 @@ private:
 		return EdgeFaceIntersection(element.GetPiercedFace(), element.GetPiercingEdge(), element.GetIntPoint());
 	}
 
-	bool IntersectionsAlreadyReached(const EdgeFaceIntersection& inter) const
+	bool IntersectionAlreadyReached(const EdgeFaceIntersection& inter) const
 	{
 		for (auto it = m_ReachedIntersections.begin(); it != m_ReachedIntersections.end(); it++)
 		{
@@ -69,9 +69,6 @@ public:
 		if (inter == m_CurrStartIntersection)
 			return true;
 
-		if (IntersectionsAlreadyReached(inter))
-			return false;
-
 		if (&inter.GetFace().GetShape() == m_OriginalShape)
 		{
 			if ((inter != m_CurrStartIntersection) && m_EquivalenceChecker.AreEquivalent(inter, m_CurrStartIntersection))
@@ -79,6 +76,9 @@ public:
 
 			RemoveEquivalentIntersections(inter);
 		}
+
+		if (IntersectionAlreadyReached(inter))
+			return false;
 
 		m_ReachedIntersections.emplace_back(inter);
 		return true;

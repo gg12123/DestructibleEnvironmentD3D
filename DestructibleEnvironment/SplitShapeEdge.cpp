@@ -16,6 +16,8 @@ ShapePoint & SplitShapeEdge::GetP1() const
 
 static bool Element0IsBeforeElement1(const Vector3& rayOrigin, const Vector3& rayDir, const CutPathElement& element0, const CutPathElement& element1)
 {
+	static FaceOrderingComparator faceOrderComparer;
+
 	auto dist0 = (rayOrigin - element0.GetIntPoint()).MagnitudeSqr();
 	auto dist1 = (rayOrigin - element1.GetIntPoint()).MagnitudeSqr();
 
@@ -23,11 +25,19 @@ static bool Element0IsBeforeElement1(const Vector3& rayOrigin, const Vector3& ra
 	if (MathU::Abs(dist0 - dist1) > 0.001f)
 		return dist0 < dist1;
 
-	FaceOrderingComparator comparer;
-	return comparer.FaceAIsBeforeFaceB(element0.GetPiercedFace(), element1.GetPiercedFace(), rayDir);
+	auto order = faceOrderComparer.CompareFaces(element0.GetPiercedFace(), element1.GetPiercedFace(), rayDir);
+
+	if (order == FaceOrder::FaceAOverlaysB)
+		return true;
+
+	if (order == FaceOrder::FaceBOverlaysA)
+		return false;
+
+	// TODO - this can be recovered from.
+	assert(false);
 }
 
-static ShapePoint& RemoveClosest(std::vector<CutPathElement>& elements, const Vector3& rayOrigin, const Vector3& rayDir)
+static auto GetClosest(std::vector<CutPathElement>& elements, const Vector3& rayOrigin, const Vector3& rayDir)
 {
 	auto itOfClosest = elements.begin();
 
@@ -36,10 +46,7 @@ static ShapePoint& RemoveClosest(std::vector<CutPathElement>& elements, const Ve
 		if (Element0IsBeforeElement1(rayOrigin, rayDir, *it, *itOfClosest))
 			itOfClosest = it;
 	}
-
-	auto& closestPoint = itOfClosest->GetPoint();
-	elements.erase(itOfClosest);
-	return closestPoint;
+	return itOfClosest;
 }
 
 void SplitShapeEdge::OnAllElementsAdded()
@@ -53,8 +60,19 @@ void SplitShapeEdge::OnAllElementsAdded()
 
 	m_PointsSortedFromP0.emplace_back(&p0);
 
+	auto first = GetClosest(m_Elements, origin, dir);
+
+	m_FirstEdgeFromP0IsInside = Vector3::Dot(m_Edge->GetDirFromP0ToP1(), first->GetPiercedFace().GetNormal()) > 0.0f;
+
+	m_PointsSortedFromP0.emplace_back(&first->GetPoint());
+	m_Elements.erase(first);
+
 	while (m_Elements.size() > 0U)
-		m_PointsSortedFromP0.emplace_back(&RemoveClosest(m_Elements, origin, dir));
+	{
+		auto closest = GetClosest(m_Elements, origin, dir);
+		m_PointsSortedFromP0.emplace_back(&closest->GetPoint());
+		m_Elements.erase(closest);
+	}
 
 	m_PointsSortedFromP0.emplace_back(&GetP1());
 }

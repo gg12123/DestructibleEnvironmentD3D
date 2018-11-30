@@ -201,6 +201,7 @@
     <ClInclude Include="BodyCollectionBounds.h" />
     <ClInclude Include="Bounds.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CollectionU.h" />
     <ClInclude Include="CollisionData.h" />
     <ClInclude Include="CollisionDetector.h" />
     <ClInclude Include="CollisionResponder.h" />

@@ -5,6 +5,107 @@
 #include "ShapePoint.h"
 #include "ShapeEdge.h"
 #include "Vector3.h"
+#include "Vector2.h"
+#include "Polygon2.h"
+#include "CollectionU.h"
+
+template<class T>
+class Triangulator
+{
+private:
+	int GetNext(int curr)
+	{
+		return CollectionU::GetNextIndex(m_CurrPoly, curr);
+	}
+
+	int GetPrevious(int curr)
+	{
+		return CollectionU::GetPrevIndex(m_CurrPoly, curr);
+	}
+
+	const Vector2& GetPoint(int indexInCurr)
+	{
+		return m_AllPoints[m_CurrPoly[indexInCurr]];
+	}
+
+	bool TriangleCanBeClipped(int corner)
+	{
+		auto prev = GetPrevious(corner);
+		auto next = GetNext(corner);
+
+		m_Poly.Clear();
+		m_Poly.Add(GetPoint(prev));
+		m_Poly.Add(GetPoint(corner));
+		m_Poly.Add(GetPoint(next));
+
+		for (auto i = GetNext(next); i != prev; i = GetNext(i))
+		{
+			auto& p = GetPoint(i);
+
+			if (m_Poly.PointIsInsideOrOnEdge(p))
+				return false;
+		}
+		return true;
+	}
+
+	void Clip(int corner)
+	{
+		auto i0 = m_CurrPoly[GetPrevious(corner)];
+		auto i1 = m_CurrPoly[corner];
+		auto i2 = m_CurrPoly[GetNext(corner)];
+
+		m_Responder.OnTriangle(i0, i1, i2);
+	}
+
+	int FindNextToClip()
+	{
+		for (auto i = 0U; i < m_CurrPoly.size(); i++)
+		{
+			if (TriangleCanBeClipped(i))
+				return i;
+		}
+		assert(false);
+		return -1;
+	}
+
+	void ClipNext()
+	{
+		auto toClip = FindNextToClip();
+
+		Clip(toClip);
+		m_CurrPoly.erase(m_CurrPoly.begin() + toClip);
+	}
+
+public:
+	void Clear()
+	{
+		m_CurrPoly.clear();
+		m_AllPoints.clear();
+	}
+
+	void AddPoint(const Vector2& p)
+	{
+		m_AllPoints.emplace_back(p);
+		m_CurrPoly.emplace_back(m_CurrPoly.size());
+	}
+
+	void Triangulate(T& responder)
+	{
+		m_Responder = &responder;
+
+		while (m_CurrPoly.size() > 3U)
+			ClipNext();
+
+		Clip(0);
+	}
+
+private:
+	std::vector<Vector2> m_AllPoints;
+	std::vector<int> m_CurrPoly;
+
+	Polygon2 m_Poly;
+	T* m_Responder;
+};
 
 class ConcaveFace
 {
@@ -16,14 +117,32 @@ private:
 			(*it)->DeRegisterFace(orig);
 	}
 
+	ShapeEdge& GetEdgeBetween(int i0, int i1)
+	{
+		if (i0 == CollectionU::GetPrevIndex(m_Points, i1))
+			return *m_Edges[i0];
+
+		if (i1 == CollectionU::GetPrevIndex(m_Points, i0))
+			return *m_Edges[i1];
+
+		auto& p0 = *m_Points[i0];
+		auto& p1 = *m_Points[i1];
+
+		if (!m_NewEdges->EdgeExistsBetween(p0, p1))
+			m_NewEdges->CreateEdge(p0, p1, Vector3::Zero());
+
+		return m_NewEdges->GetMapToNewEdges().GetNewEdge(p0, p1);
+	}
+
 	Face& CreateFace(int i0, int i1, int i2)
 	{
-		// The indexs key into the vectors.
+		auto& f = *(new Face()); // TODO - pool
 
-		// If, for example, i1 is next of i0, then the edge between i0 and i1 can come from the vectors.
-		// Otherwise, it may need to be created and put into the map, or just gotten from the map.
+		f.AddPoint(*m_Points[i0], Vector3::Zero(), GetEdgeBetween(i0, i1));
+		f.AddPoint(*m_Points[i1], Vector3::Zero(), GetEdgeBetween(i1, i2));
+		f.AddPoint(*m_Points[i2], Vector3::Zero(), GetEdgeBetween(i2, i0));
 
-		// Two of the edges will be in the vectors, I think, so calculate the third direction from these two directions in a stable way.
+		return f;
 	}
 
 public:
@@ -32,6 +151,7 @@ public:
 		m_Points.clear();
 		m_Edges.clear();
 		m_Dirs.clear();
+		m_Triangulator.Clear();
 	}
 
 	void AddPoint(ShapePoint& point, const Vector3& dirToNext, ShapeEdge& edgeToNext)
@@ -43,7 +163,14 @@ public:
 
 	void Triangulate(const Face& original, std::vector<Face*>& triangleFaces)
 	{
+		m_TriangleFaces = &triangleFaces;
 		DetachOriginalFace(original);
+		m_Triangulator.Triangulate(*this);
+	}
+
+	void OnTriangle(int i0, int i1, int i2)
+	{
+		m_TriangleFaces->emplace_back(&CreateFace(i0, i1, i2));
 	}
 
 	void Init(ShapeEdgesCreator& edges)
@@ -57,4 +184,7 @@ private:
 	std::vector<ShapePoint*> m_Points;
 	std::vector<ShapeEdge*> m_Edges;
 	std::vector<Vector3> m_Dirs;
+
+	std::vector<Face*>* m_TriangleFaces;
+	Triangulator<ConcaveFace> m_Triangulator;
 };

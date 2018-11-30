@@ -98,7 +98,7 @@ public:
 		CreateEdgesAlongSplitEdges(false);
 	}
 
-	// called by the reversing code
+	// called by the reversing and triangulation code
 	void CreateEdge(ShapePoint& p0, ShapePoint& p1, const Vector3& dirToP1)
 	{
 		auto& edge = *(new ShapeEdge(p0, p1, dirToP1)); // TODO - pool
