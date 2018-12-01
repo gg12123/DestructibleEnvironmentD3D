@@ -47,7 +47,7 @@ public:
 
 	bool FirstEdgeFromP0IsInside() const
 	{
-
+		return m_FirstEdgeFromP0IsInside;
 	}
 
 	bool FirstEdgeFromP0IsOutside() const

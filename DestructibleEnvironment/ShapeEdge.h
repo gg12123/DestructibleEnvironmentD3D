@@ -150,6 +150,17 @@ public:
 		return nullptr;
 	}
 
+	void ReplacePoint(const ShapePoint& existing, ShapePoint& newPoint)
+	{
+		if (&existing == m_P0)
+			m_P0 = &newPoint;
+
+		if (&existing == m_P1)
+			m_P1 = &newPoint;
+
+		assert(false);
+	}
+
 private:
 	Face* m_Face1 = nullptr;
 	Face* m_Face2 = nullptr;
@@ -164,5 +175,5 @@ private:
 
 	bool m_BeenCollectedByShape = false;
 
-	Vector3 m_DirFromP0ToP1; // Must be set at initialisation - not safe to calculate because P0 and P1 can be coincident.
+	Vector3 m_DirFromP0ToP1;
 };

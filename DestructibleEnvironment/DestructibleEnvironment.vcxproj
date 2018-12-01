@@ -223,6 +223,7 @@
     <ClInclude Include="FacesOriginalPointsIterator.h" />
     <ClInclude Include="FacesPointsIterator.h" />
     <ClInclude Include="IntersectionEquivalenceChecker.h" />
+    <ClInclude Include="IterationAboutShape.h" />
     <ClInclude Include="MapToFaceRelationship.h" />
     <ClInclude Include="MapToFacesCutPath.h" />
     <ClInclude Include="MapToNewEdges.h" />
@@ -275,6 +276,7 @@
     <ClInclude Include="ShapeEdge.h" />
     <ClInclude Include="ShapeProxy.h" />
     <ClInclude Include="ShapeSplitter.h" />
+    <ClInclude Include="SmallEdgeRemover.h" />
     <ClInclude Include="SplitInfo.h" />
     <ClInclude Include="SplitShapeEdge.h" />
     <ClInclude Include="StaticBody.h" />

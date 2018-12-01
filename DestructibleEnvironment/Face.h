@@ -1,13 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
+#include <vector>
+#include <memory>
 
+#include "CollectionU.h"
 #include "Vector3.h"
 #include "Vector2.h"
 #include "Polygon2.h"
 #include "ObjectWithHash.h"
-#include <vector>
-#include <memory>
 
 class Shape;
 class ShapeEdge;
@@ -154,12 +155,12 @@ public:
 
 	int NextPointIndex(int index) const
 	{
-		return (index + 1) % m_CachedPoints.size();
+		return CollectionU::GetNextIndex(m_CachedPoints, index);
 	}
 
 	int PreviousPointIndex(int index) const
 	{
-		return (index - 1 + m_CachedPoints.size()) % m_CachedPoints.size();
+		return CollectionU::GetPrevIndex(m_CachedPoints, index);
 	}
 
 	void OnSplittingFinished(Shape& owner);
@@ -172,6 +173,15 @@ public:
 		m_EdgeObjects.clear();
 		m_FacePoly.Clear();
 	}
+
+	void ReplaceEdge(const ShapeEdge& existing, ShapeEdge& newEdge)
+	{
+		auto it = std::find(m_EdgeObjects.begin(), m_EdgeObjects.end(), &existing);
+		assert(it != m_EdgeObjects.end());
+		*it = &newEdge;
+	}
+
+	void RefreshPointObjects();
 
 private:
 	void InitFaceCoOrdinateSystem(const Vector3& origin)

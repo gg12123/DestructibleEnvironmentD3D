@@ -64,6 +64,13 @@ Vector3 Face::GetEdgeNormal(int index) const
 	return ToShapeSpaceDirection(normalFaceSpace);
 }
 
+void Face::RefreshPointObjects()
+{
+	m_PointObjects.clear();
+	for (auto it = m_EdgeObjects.begin(); it != m_EdgeObjects.end(); it++)
+		m_PointObjects.emplace_back(&(*it)->GetStart(*this));
+}
+
 FaceEdgeCaseResult Face::CastToEdgeInside(const Vector3& origin, const Vector3& dir)
 {
 	auto origin2 = ToFaceSpacePosition(origin);

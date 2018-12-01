@@ -5,13 +5,22 @@
 #include "Vector3.h"
 #include "MathU.h"
 #include "ShapePoint.h"
+#include "CollectionU.h"
 
 class IntersectionEquivalenceChecker
 {
 private:
 	bool FacesAreConnected(const Face& f1, const Face& f2) const
 	{
+		auto& f1Points = f1.GetPointObjects();
+		auto& f2Points = f2.GetPointObjects();
 
+		for (auto it = f1Points.begin(); it != f1Points.end(); it++)
+		{
+			if (CollectionU::Contains(f2Points, *it))
+				return true;
+		}
+		return false;
 	}
 
 	bool MakesPotentialEdgeEdgeIntersection(const EdgeFaceIntersection& inter1, const EdgeFaceIntersection& inter2) const

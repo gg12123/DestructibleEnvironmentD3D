@@ -54,7 +54,7 @@ private:
 		auto i1 = m_CurrPoly[corner];
 		auto i2 = m_CurrPoly[GetNext(corner)];
 
-		m_Responder.OnTriangle(i0, i1, i2);
+		m_Responder->OnTriangle(i0, i1, i2);
 	}
 
 	int FindNextToClip()

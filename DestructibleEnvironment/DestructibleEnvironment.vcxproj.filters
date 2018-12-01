@@ -414,6 +414,12 @@
     <ClInclude Include="CollectionU.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="IterationAboutShape.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="SmallEdgeRemover.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">

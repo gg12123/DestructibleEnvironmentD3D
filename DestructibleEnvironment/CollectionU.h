@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 
 class CollectionU
 {
@@ -14,5 +15,11 @@ public:
 	{
 		auto c = coll.size();
 		return (curr - 1 + c) % c;
+	}
+
+	template<class Tcollec, class Tval>
+	static inline bool Contains(const Tcollec& collec, const Tval& val)
+	{
+		return std::find(collec.cbegin(), collec.cend(), val) != collec.cend();
 	}
 };
