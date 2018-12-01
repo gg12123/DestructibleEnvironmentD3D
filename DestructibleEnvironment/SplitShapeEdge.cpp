@@ -33,7 +33,8 @@ static bool Element0IsBeforeElement1(const Vector3& rayOrigin, const Vector3& ra
 	if (order == FaceOrder::FaceBOverlaysA)
 		return false;
 
-	// TODO - this can be recovered from.
+	// TODO - this can be recovered from if the order is no overlay.
+	// Not sure what to do if it is unkown though
 	assert(false);
 }
 

@@ -52,8 +52,15 @@ private:
 public:
 	bool AreEquivalent(const EdgeFaceIntersection& inter1, const EdgeFaceIntersection& inter2) const
 	{
+		if (inter1 == inter2)
+			return true;
+
+		// TODO - this is not completely acurate. If the faces are not connected, the intersections could
+		// still be equivalent. It just depends on what other intersections has been detected. So may need
+		// to consider all detected intersections.
+
 		if (MakesPotentialEdgeEdgeIntersection(inter1, inter2) || ImplyContradictoryInformationAboutPoint(inter1, inter2))
-			return FacesAreConnected(inter1.GetFace(), inter2.GetFace()); // TODO - may also need to check if the faces overlay eachother with respect to the edge directions.
+			return FacesAreConnected(inter1.GetFace(), inter2.GetFace());
 
 		return false;
 	}

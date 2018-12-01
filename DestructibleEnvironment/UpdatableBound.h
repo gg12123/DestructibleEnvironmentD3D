@@ -1,5 +1,6 @@
 #pragma once
 #include <limits>
+#include "MathU.h"
 
 template<class T>
 class UpdatableBound
@@ -28,6 +29,11 @@ public:
 	const T& GetMax() const
 	{
 		return m_Max;
+	}
+
+	bool Overlaps(const UpdatableBound<T>& other) const
+	{
+		return (m_Max > other.m_Min) && (other.m_Max > m_Min);
 	}
 
 private:
