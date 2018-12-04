@@ -22,4 +22,10 @@ public:
 	{
 		return std::find(collec.cbegin(), collec.cend(), val) != collec.cend();
 	}
+
+	template<class Tcollec, class Tval>
+	static inline void Remove(Tcollec& collec, const Tval& val)
+	{
+		collec.erase(std::find(collec.begin(), collec.end(), val));
+	}
 };

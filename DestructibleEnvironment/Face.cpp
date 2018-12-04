@@ -7,7 +7,7 @@
 
 bool Face::PointIsOnFace(const Vector3& pointShapesSpace) const
 {
-	return m_FacePoly.PointIsInsideOrOnEdge(ToFaceSpacePosition(pointShapesSpace));
+	return m_FacePoly.PointIsInsideConvexMethod(ToFaceSpacePosition(pointShapesSpace));
 }
 
 void  Face::AddPoint(ShapePoint& point, const Vector3& dirToNext, ShapeEdge& edgeToNext)

@@ -23,6 +23,7 @@ private:
 		// TODO - retrun e0 and f to the pool.
 	}
 
+public:
 	void RemoveEdge(ShapeEdge& toRemove)
 	{
 		m_EdgesAboutPoint0.clear();
@@ -58,8 +59,6 @@ private:
 
 		// TODO - retrun p0 and p1 to the pool
 	}
-
-public:
 
 private:
 	std::vector<ShapeEdge*> m_EdgesAboutPoint0;

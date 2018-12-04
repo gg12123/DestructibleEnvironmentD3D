@@ -20,13 +20,14 @@ public:
 class Polygon2
 {
 public:
-	bool PointIsInsideOrOnEdge(const Vector2& p) const
+
+	bool PointIsInsideConvexMethod(const Vector2& p) const
 	{
-		auto c = PointIsInside(p);
-		return c == PointInPolyCase::Inside || c == PointInPolyCase::OnBoundary;
+		assert(false);
+		return false;
 	}
 
-	PointInPolyCase PointIsInside(const Vector2& p) const
+	bool PointIsInsideWindingMethod(const Vector2& p) const
 	{
 		auto wn = 0;
 		auto c = m_Points.size();
@@ -36,15 +37,9 @@ public:
 			auto next = (i + 1) % c;
 			auto amountLeft = AmountLeft(m_Points[i], m_Points[next], p);
 
-			if (amountLeft == 0.0f)
-			{
-				if (MathU::IsBetweenInclusive(m_Points[i].x, m_Points[next].x, p.x))
-					return PointInPolyCase::OnBoundary;
-			}
-
 			if ((m_Points[next].y  > p.y) && (m_Points[i].y <= p.y)) // upward crossing
 			{ 
-				if (amountLeft > 0.0f)
+				if (amountLeft >= 0.0f)
 					wn++;
 			}
 			else if ((m_Points[next].y <= p.y) && (m_Points[i].y > p.y)) // downward crossing
@@ -54,7 +49,7 @@ public:
 			}
 		}
 
-		return (wn == 0) ? PointInPolyCase::Outside : PointInPolyCase::Inside;
+		return (wn != 0);
 	}
 
 	auto GetPointCount() const

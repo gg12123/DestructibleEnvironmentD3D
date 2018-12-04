@@ -5,6 +5,7 @@
 #include "Face.h"
 #include "Random.h"
 #include "IntersectionFinder.h"
+#include "SmallEdgeRemover.h"
 
 Shape::~Shape()
 {
@@ -33,6 +34,37 @@ void Shape::TryCollectEdge(ShapeEdge& e)
 		m_EdgeIndexes.emplace_back(e.GetP1().GetIndexInShape());
 
 		e.SetBeenCollected(true);
+	}
+}
+
+void Shape::RemoveSmallEdges()
+{
+	static SmallEdgeRemover edgeRemover;
+	static constexpr float minEdgeLength = 0.001f;
+	static constexpr float minEdgeLengthSqr = minEdgeLength * minEdgeLength;
+
+	for (auto itFace = m_Faces.begin(); itFace != m_Faces.end(); itFace++)
+	{
+		auto& edges = (*itFace)->GetEdgeObjects();
+
+		for (auto itEdge = edges.begin(); itEdge != edges.end(); itEdge++)
+		{
+			auto& e = **itEdge;
+
+			if ((e.GetP0().GetPoint() - e.GetP1().GetPoint()).MagnitudeSqr() <= minEdgeLengthSqr)
+			{
+				auto f1 = *itFace;
+				auto f2 = &e.GetOther(*f1);
+
+				edgeRemover.RemoveEdge(e);
+
+				m_Faces.erase(itFace);
+				m_Faces.erase(std::find(itFace, m_Faces.end(), f2));
+
+				// Only need to decrement by 1 because f2 is further up the list that f1.
+				itFace--;
+			}
+		}
 	}
 }
 

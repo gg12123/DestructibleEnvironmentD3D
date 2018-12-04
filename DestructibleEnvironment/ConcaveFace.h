@@ -42,7 +42,8 @@ private:
 		{
 			auto& p = GetPoint(i);
 
-			if (m_Poly.PointIsInsideOrOnEdge(p))
+			// Use the winding method because it works when points are coincident (I think),
+			if (m_Poly.PointIsInsideWindingMethod(p))
 				return false;
 		}
 		return true;

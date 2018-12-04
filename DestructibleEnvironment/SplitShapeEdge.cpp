@@ -36,6 +36,7 @@ static bool Element0IsBeforeElement1(const Vector3& rayOrigin, const Vector3& ra
 	// TODO - this can be recovered from if the order is no overlay.
 	// Not sure what to do if it is unkown though
 	assert(false);
+	return false;
 }
 
 static auto GetClosest(std::vector<CutPathElement>& elements, const Vector3& rayOrigin, const Vector3& rayDir)

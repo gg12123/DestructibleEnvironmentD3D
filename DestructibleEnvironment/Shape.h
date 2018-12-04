@@ -88,6 +88,7 @@ public:
 
 	void OnAllFacesAdded(Transform& refTran) // faces are in the ref transforms local space
 	{
+		RemoveSmallEdges();
 		CollectPointsAndEdges();
 
 		auto c = CalculateCentre();
@@ -104,6 +105,8 @@ public:
 	// Call this one when re-centring is not required
 	void OnAllFacesAdded()
 	{
+		// Dont think I need to remove small edges here because this is not
+		// called by the splitting algorithm.
 		CollectPointsAndEdges();
 		InitFaces();
 		SetDirty();
@@ -119,6 +122,7 @@ private:
 	Vector3 CalculateCentre();
 	void ReCentre(const Vector3& centre);
 	void CollectPointsAndEdges();
+	void RemoveSmallEdges();
 	void TryCollectPoint(ShapePoint& p);
 	void TryCollectEdge(ShapeEdge& p);
 	void InitFaces();
