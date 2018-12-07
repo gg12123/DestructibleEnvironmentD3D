@@ -39,6 +39,11 @@ public:
 		return m_EdgeObjects;
 	}
 
+	const auto& GetPointObjects() const
+	{
+		return m_PointObjects;
+	}
+
 	auto& GetLocalBounds()
 	{
 		return m_LocalBounds;

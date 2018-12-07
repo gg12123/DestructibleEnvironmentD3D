@@ -201,6 +201,7 @@
     <ClInclude Include="BodyCollectionBounds.h" />
     <ClInclude Include="Bounds.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CleanIntersectionFinder.h" />
     <ClInclude Include="CollectionU.h" />
     <ClInclude Include="CollisionData.h" />
     <ClInclude Include="CollisionDetector.h" />
@@ -213,6 +214,7 @@
     <ClInclude Include="CutPathElement.h" />
     <ClInclude Include="CutPathIntersectionsHandler.h" />
     <ClInclude Include="CutShapeCreator.h" />
+    <ClInclude Include="EdgeEdgeRelationship.h" />
     <ClInclude Include="EdgeFaceIntersection.h" />
     <ClInclude Include="FaceIterator.h" />
     <ClInclude Include="FaceOrderingComparator.h" />
@@ -227,6 +229,7 @@
     <ClInclude Include="MapToFaceRelationship.h" />
     <ClInclude Include="MapToFacesCutPath.h" />
     <ClInclude Include="MapToNewEdges.h" />
+    <ClInclude Include="MapToPointPlaneRelationship.h" />
     <ClInclude Include="MapToShapePointOnReversedFace.h" />
     <ClInclude Include="ObjectWithHash.h" />
     <ClInclude Include="PointInPolyCase.h" />
