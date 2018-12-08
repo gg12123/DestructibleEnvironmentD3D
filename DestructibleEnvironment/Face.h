@@ -153,12 +153,12 @@ public:
 
 	int NextPointIndex(int index) const
 	{
-		return CollectionU::GetNextIndex(m_CachedPoints, index);
+		return CollectionU::GetNextIndex(m_PointObjects, index);
 	}
 
 	int PreviousPointIndex(int index) const
 	{
-		return CollectionU::GetPrevIndex(m_CachedPoints, index);
+		return CollectionU::GetPrevIndex(m_PointObjects, index);
 	}
 
 	void OnSplittingFinished(Shape& owner);

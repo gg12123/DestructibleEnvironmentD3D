@@ -46,7 +46,7 @@ public:
 
 	Face& GetFaceExited(int index) const
 	{
-		auto prev = CollectionU::GetNextIndex(m_Intersections, index);
+		auto prev = CollectionU::GetPrevIndex(m_Intersections, index);
 		return GetFaceExitedOrEntered(index, prev);
 	}
 

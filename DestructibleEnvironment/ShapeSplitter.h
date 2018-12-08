@@ -94,6 +94,8 @@ private:
 
 	void CreateReversedGeometry(const Shape& cutShape)
 	{
+		m_Reverser.Init(m_EdgesCreator);
+
 		auto& cps = m_CutPathCreator.GetCutPaths();
 		for (auto it = cps.Begin(); it != cps.End(); it++)
 			m_Reverser.CreateReversedCutPath(*it);

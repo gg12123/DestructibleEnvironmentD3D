@@ -25,7 +25,7 @@ public:
 	{
 		assert(&towards == &GetP0() || &towards == &GetP1());
 
-		auto i = &towards == &GetP0() ? middleCurr.GetIndexInSplitEdge() + 1 : middleCurr.GetIndexInSplitEdge() - 1;
+		auto i = &towards == &GetP0() ? middleCurr.GetIndexInSplitEdge() - 1 : middleCurr.GetIndexInSplitEdge() + 1;
 		return *m_PointsSortedFromP0[i];
 	}
 

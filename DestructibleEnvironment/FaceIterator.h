@@ -39,16 +39,17 @@ private:
 	Tshape& CreateShape(Face& rootFace)
 	{
 		auto& newShape = GetNextShapeToUse();
-
-		auto rootsRelationship = m_Map.GetRelationship(rootFace);
-
 		newShape.Clear();
+
 		m_FaceStack.push(&rootFace);
 
 		while (!m_FaceStack.empty())
 		{
 			auto& next = *m_FaceStack.top();
 			m_FaceStack.pop();
+
+			if (FaceIsVisited(next))
+				continue;
 
 			Visit(next);
 			newShape.AddFace(next);
@@ -78,10 +79,8 @@ private:
 		{
 			auto face = *it;
 			if (!FaceIsVisited(*face))
-			{
-				Visit(*face);
 				return face;
-			}
+
 		}
 		return nullptr;
 	}

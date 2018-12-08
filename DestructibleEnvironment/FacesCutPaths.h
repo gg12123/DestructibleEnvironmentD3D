@@ -46,7 +46,11 @@ public:
 		m_Indexs.emplace_back(index);
 
 		if (m_Indexs.size() >= 2U)
+		{
 			CreatePath(cutPaths, cp);
+			m_Indexs.erase(m_Indexs.end() - 1);
+			m_Indexs.erase(m_Indexs.end() - 1);
+		}
 	}
 
 	void ForceCreateWhenFinalWasAddedBeforeFirst(PoolOfRecyclables<FacesCutPath>& cutPaths, const std::vector<CutPathElement>& cp)

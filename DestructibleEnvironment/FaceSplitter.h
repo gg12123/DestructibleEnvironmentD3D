@@ -12,7 +12,7 @@ class FaceSplitter
 private:
 	void InitFaces(const FacesCutPaths& paths)
 	{
-		m_ConcaveFace.Init(paths.GetFace());
+		m_ConcaveFace.Init(paths.GetFace(), *m_EdgesCreator);
 		m_Iterator.InitFaces(paths.GetFace(), m_ConcaveFace);
 	}
 
@@ -60,9 +60,11 @@ public:
 
 	void InitMaps(const MapToShapePointOnReversedFace& map, ShapeEdgesCreator& edgesCreator, const MapToFacesCutPath& mapToFcp)
 	{
+		m_EdgesCreator = &edgesCreator;
 		m_Iterator.InitMaps(map, edgesCreator.GetMapToNewEdges(), mapToFcp);
 	}
 private:
 	FacesPointsIterator m_Iterator;
 	ConcaveFace m_ConcaveFace;
+	ShapeEdgesCreator* m_EdgesCreator = nullptr;
 };

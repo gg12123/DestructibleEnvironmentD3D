@@ -9,8 +9,9 @@ class ReversedGeometryCreator
 private:
 	ShapePoint& CreatePointCommon(const ShapePoint& from)
 	{
-		auto p = new ShapePoint(from); // TODO - get form pool
+		auto p = new ShapePoint(from.GetPoint()); // TODO - get form pool
 		m_MapToReversed.Add(from, *p);
+		p->AssignHash();
 		return *p;
 	}
 
@@ -57,7 +58,7 @@ public:
 
 		for (auto i = 0U; i < points.size(); i++)
 		{
-			auto next = face.NextPointIndex(i);
+			auto next = CollectionU::GetNextIndex(points, i);
 
 			auto& p0 = TryCreatePointOnReversed(*points[i]);
 			auto& p1 = TryCreatePointOnReversed(*points[next]);
@@ -71,12 +72,14 @@ public:
 
 		for (int i = points.size() - 1; i >= 0; i--)
 		{
-			int prev = face.PreviousPointIndex(i);
+			int prev = CollectionU::GetPrevIndex(points, i);
 
-			auto& p = m_MapToReversed.GetPointOnReversedFace(*points[i]);
-			auto& e = m_EdgeCreator->GetMapToNewEdges().GetNewEdge(p, *points[prev]);
+			auto& pRev0 = m_MapToReversed.GetPointOnReversedFace(*points[i]);
+			auto& pRev1 = m_MapToReversed.GetPointOnReversedFace(*points[prev]);
 
-			reversedFace->AddPoint(p, e);
+			auto& e = m_EdgeCreator->GetMapToNewEdges().GetNewEdge(pRev0, pRev1);
+
+			reversedFace->AddPoint(pRev0, e);
 		}
 	}
 

@@ -31,10 +31,10 @@ public:
 		auto& se = edges[i]->GetSplitEdge();
 		auto& np = FacesCutPath::GetNewPointFromCpPoint<inOrOut>(se.GetNext(*points[i]), *m_MapToReversed);
 
-		auto endOp = *points[i];
+		auto& endOp = *points[i];
 		m_NewFace->AddPoint(endOp, m_MapToEdges->GetNewEdge(endOp, np));
 
-		return np;
+		return FacesCutPath::GetNewPointFromCpPoint<FaceRelationshipWithOtherShape::InIntersection>(se.GetNext(*points[i]), *m_MapToReversed);
 	}
 
 	void InitMaps(const MapToShapePointOnReversedFace& map, const MapToNewEdges& edgeMap)

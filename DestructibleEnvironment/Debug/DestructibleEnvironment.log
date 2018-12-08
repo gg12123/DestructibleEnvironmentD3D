@@ -1,14 +1,21 @@
 ﻿  App.cpp
   Camera.cpp
+  CollisionDetector.cpp
+  CollisionResponder.cpp
   DestructibleEnvironmentMain.cpp
   DynamicBodyProxy.cpp
   DynamicMesh.cpp
+  Face.cpp
   GameControlledDynamicBody.cpp
   GameTheadToPhysicsThreadAction.cpp
+  IntersectionFinder.cpp
   Light.cpp
   Physics.cpp
   PhysicsEngine.cpp
+  Shape.cpp
+  ShapeEdge.cpp
   ShapeProxy.cpp
+  SplitShapeEdge.cpp
   StaticShapeProxy.cpp
   World.cpp
 c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.14.26428\include\xmemory0(920): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned short', possible loss of data (compiling source file ShapeProxy.cpp)

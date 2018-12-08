@@ -111,13 +111,6 @@ private:
 class ConcaveFace
 {
 private:
-	void DetachOriginalFace(const Face& orig)
-	{
-		auto edges = orig.GetEdgeObjects();
-		for (auto it = edges.begin(); it != edges.end(); it++)
-			(*it)->DeRegisterFace(orig);
-	}
-
 	ShapeEdge& GetEdgeBetween(int i0, int i1)
 	{
 		if (i0 == CollectionU::GetPrevIndex(m_Points, i1))
@@ -149,12 +142,13 @@ private:
 	}
 
 public:
-	void Init(const Face& originalFace)
+	void Init(const Face& originalFace, ShapeEdgesCreator& edges)
 	{
 		m_Points.clear();
 		m_Edges.clear();
 		m_Triangulator.Clear();
 		m_OriginalFace = &originalFace;
+		m_NewEdges = &edges;
 	}
 
 	void AddPoint(ShapePoint& point, ShapeEdge& edgeToNext)
@@ -168,18 +162,12 @@ public:
 	{
 		m_Normal = m_OriginalFace->GetNormal();
 		m_TriangleFaces = &triangleFaces;
-		DetachOriginalFace(*m_OriginalFace);
 		m_Triangulator.Triangulate(*this);
 	}
 
 	void OnTriangle(int i0, int i1, int i2)
 	{
 		m_TriangleFaces->emplace_back(&CreateFace(i0, i1, i2));
-	}
-
-	void Init(ShapeEdgesCreator& edges)
-	{
-		m_NewEdges = &edges;
 	}
 
 private:
