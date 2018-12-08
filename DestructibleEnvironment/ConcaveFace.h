@@ -130,7 +130,7 @@ private:
 		auto& p1 = *m_Points[i1];
 
 		if (!m_NewEdges->EdgeExistsBetween(p0, p1))
-			m_NewEdges->CreateEdge(p0, p1, Vector3::Zero());
+			m_NewEdges->CreateEdge(p0, p1);
 
 		return m_NewEdges->GetMapToNewEdges().GetNewEdge(p0, p1);
 	}
@@ -139,9 +139,9 @@ private:
 	{
 		auto& f = *(new Face()); // TODO - pool
 
-		f.AddPoint(*m_Points[i0], Vector3::Zero(), GetEdgeBetween(i0, i1));
-		f.AddPoint(*m_Points[i1], Vector3::Zero(), GetEdgeBetween(i1, i2));
-		f.AddPoint(*m_Points[i2], Vector3::Zero(), GetEdgeBetween(i2, i0));
+		f.AddPoint(*m_Points[i0], GetEdgeBetween(i0, i1));
+		f.AddPoint(*m_Points[i1], GetEdgeBetween(i1, i2));
+		f.AddPoint(*m_Points[i2], GetEdgeBetween(i2, i0));
 
 		return f;
 	}
@@ -151,15 +151,13 @@ public:
 	{
 		m_Points.clear();
 		m_Edges.clear();
-		m_Dirs.clear();
 		m_Triangulator.Clear();
 	}
 
-	void AddPoint(ShapePoint& point, const Vector3& dirToNext, ShapeEdge& edgeToNext)
+	void AddPoint(ShapePoint& point, ShapeEdge& edgeToNext)
 	{
 		m_Points.emplace_back(&point);
 		m_Edges.emplace_back(&edgeToNext);
-		m_Dirs.emplace_back(dirToNext);
 	}
 
 	void Triangulate(const Face& original, std::vector<Face*>& triangleFaces)
@@ -184,7 +182,6 @@ private:
 
 	std::vector<ShapePoint*> m_Points;
 	std::vector<ShapeEdge*> m_Edges;
-	std::vector<Vector3> m_Dirs;
 
 	std::vector<Face*>* m_TriangleFaces;
 	Triangulator<ConcaveFace> m_Triangulator;

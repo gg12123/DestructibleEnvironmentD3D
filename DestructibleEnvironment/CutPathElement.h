@@ -7,22 +7,12 @@
 class CutPathElement
 {
 public:
-	CutPathElement(const FaceEdgeCaseResult& castRes, Face& faceExited, Face& facePierced, const Vector3& dirFromPrev)
-	{
-		m_PiercingEdge = castRes.Edge;
-		m_FaceExited = &faceExited;
-		m_PiercedFace = &facePierced;
-		m_FaceEntered = &m_PiercingEdge->GetOther(*m_FaceExited);
-		m_DirFromPrev = dirFromPrev;
-	}
-
-	CutPathElement(Face& faceExited, Face& facePierced, ShapeEdge& piercingEdge, const Vector3& dirFromPrev)
+	CutPathElement(Face& faceExited, Face& facePierced, ShapeEdge& piercingEdge)
 	{
 		m_PiercingEdge = &piercingEdge;
 		m_FaceExited = &faceExited;
 		m_PiercedFace = &facePierced;
 		m_FaceEntered = &m_PiercingEdge->GetOther(*m_FaceExited);
-		m_DirFromPrev = dirFromPrev;
 	}
 
 	int GetIndexInSplitEdge() const
@@ -60,11 +50,6 @@ public:
 		return *m_Point;
 	}
 
-	const Vector3& GetDirFromPrev() const
-	{
-		return m_DirFromPrev;
-	}
-
 	Vector3 GetIntPoint() const
 	{
 		return m_Point->GetPoint();
@@ -77,8 +62,6 @@ private:
 
 	ShapeEdge* m_PiercingEdge;
 	ShapePoint* m_Point;
-
-	Vector3 m_DirFromPrev;
 
 	int m_IndexInSplitEdge = -1;
 };

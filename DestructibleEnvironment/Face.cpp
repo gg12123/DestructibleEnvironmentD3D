@@ -10,11 +10,10 @@ bool Face::PointIsOnFace(const Vector3& pointShapesSpace) const
 	return m_FacePoly.PointIsInsideConvexMethod(ToFaceSpacePosition(pointShapesSpace));
 }
 
-void  Face::AddPoint(ShapePoint& point, const Vector3& dirToNext, ShapeEdge& edgeToNext)
+void  Face::AddPoint(ShapePoint& point, ShapeEdge& edgeToNext)
 {
 	m_PointObjects.emplace_back(&point);
 	m_EdgeObjects.emplace_back(&edgeToNext);
-	m_EdgeDirections.emplace_back(dirToNext);
 
 	edgeToNext.RegisterFace(*this, m_EdgeObjects.size() - 1);
 }
@@ -53,15 +52,17 @@ Vector3 Face::GetEdgeNormal(const ShapeEdge& edge) const
 
 Vector3 Face::GetEdgeNormal(int index) const
 {
-	// Dont use the poly directly becasue the poly may
-	// have coincident points.
+	return ToShapeSpaceDirection(m_FacePoly.GetNormalAt(index));
+}
 
-	auto dirFaceSpace = ToFaceSpaceDirection(m_EdgeDirections[index]);
-	
-	// TODO - is this the correct rotation direction?
-	auto normalFaceSpace = Vector2(-dirFaceSpace.y, dirFaceSpace.x);
+Vector3 Face::GetEdgeDirection(const ShapeEdge& edge) const
+{
+	return GetEdgeDirection(edge.GetIndex(*this));
+}
 
-	return ToShapeSpaceDirection(normalFaceSpace);
+Vector3 Face::GetEdgeDirection(int index) const
+{
+	return (m_CachedPoints[NextPointIndex(index)] - m_CachedPoints[index]).Normalized();
 }
 
 void Face::RefreshPointObjects()

@@ -25,7 +25,7 @@ public:
 			auto& cpPoint = FacesCutPath::GetNewPointFromCpPoint<inOrOut>(cpe.GetPoint(), *m_MapToReversed);
 			auto& nextCpPoint = FacesCutPath::GetNewPointFromCpPoint<inOrOut>(cp.GetElement(nextIndex).GetPoint(), *m_MapToReversed);
 
-			m_NewFace->AddPoint(cpPoint, cp.GetDirToNext(curr, m_TravelDir), m_MapToEdges->GetNewEdge(cpPoint, nextCpPoint));
+			m_NewFace->AddPoint(cpPoint, m_MapToEdges->GetNewEdge(cpPoint, nextCpPoint));
 			curr = nextIndex;
 		}
 
@@ -35,10 +35,9 @@ public:
 		auto& splitEdge = piercingEdge.GetSplitEdge();
 
 		auto& nextPoint = splitEdge.GetNext(endCpe, piercingEdge.GetEnd(*m_OriginalFace));
-		auto dir = piercingEdge.GetDirection(*m_OriginalFace);
-
 		auto& endCpPoint = FacesCutPath::GetNewPointFromCpPoint<inOrOut>(endCpe.GetPoint(), *m_MapToReversed);
-		m_NewFace->AddPoint(endCpPoint, dir, m_MapToEdges->GetNewEdge(endCpPoint, nextPoint));
+
+		m_NewFace->AddPoint(endCpPoint, m_MapToEdges->GetNewEdge(endCpPoint, nextPoint));
 
 		m_NextPoint = &nextPoint;
 		m_EndPiercingEdge = &piercingEdge;

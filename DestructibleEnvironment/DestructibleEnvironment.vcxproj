@@ -225,6 +225,7 @@
     <ClInclude Include="FacesOriginalPointsIterator.h" />
     <ClInclude Include="FacesPointsIterator.h" />
     <ClInclude Include="IntersectionEquivalenceChecker.h" />
+    <ClInclude Include="IntersectionLoop.h" />
     <ClInclude Include="IterationAboutShape.h" />
     <ClInclude Include="MapToFaceRelationship.h" />
     <ClInclude Include="MapToFacesCutPath.h" />

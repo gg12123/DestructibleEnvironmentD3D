@@ -33,12 +33,12 @@ public:
 		return m_FinalIndex;
 	}
 
-	Vector3 GetDirToNext(int index, int travelDir) const
-	{
-		return travelDir == 1 ?
-			GetElement(GetNextIndex(index, travelDir)).GetDirFromPrev() :
-			-GetElement(index).GetDirFromPrev();
-	}
+	//Vector3 GetDirToNext(int index, int travelDir) const
+	//{
+	//	return travelDir == 1 ?
+	//		GetElement(GetNextIndex(index, travelDir)).GetDirFromPrev() :
+	//		-GetElement(index).GetDirFromPrev();
+	//}
 
 	int GetNextIndex(int curr, int travelDir) const
 	{

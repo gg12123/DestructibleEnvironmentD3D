@@ -17,6 +17,7 @@
   ShapeProxy.cpp
   SplitShapeEdge.cpp
   StaticShapeProxy.cpp
+c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\shapeedge.h(138): warning C4172: returning address of local variable or temporary
   World.cpp
 c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.14.26428\include\xmemory0(920): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned short', possible loss of data (compiling source file ShapeProxy.cpp)
   c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.14.26428\include\vector(951): note: see reference to function template instantiation 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,unsigned int&>(_Alloc &,_Objty *const ,unsigned int &)' being compiled
@@ -43,6 +44,6 @@ c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.1
           [
               _Ty=unsigned short
           ]
-  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\cutpathcreator.h(23): note: see reference to class template instantiation 'PoolOfRecyclables<FacesCutPaths>' being compiled (compiling source file ShapeProxy.cpp)
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\cutpathcreator.h(24): note: see reference to class template instantiation 'PoolOfRecyclables<FacesCutPaths>' being compiled (compiling source file ShapeProxy.cpp)
   c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\shapeedgescreator.h(15): note: see reference to class template instantiation 'PoolOfRecyclables<SplitShapeEdge>' being compiled (compiling source file ShapeProxy.cpp)
   DestructibleEnvironment.vcxproj -> C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\DestructibleEnvironment.exe

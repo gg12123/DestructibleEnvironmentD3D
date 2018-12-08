@@ -16,7 +16,6 @@ public:
 	{
 		auto& edges = m_OriginalFace->GetEdgeObjects();
 		auto& points = m_OriginalFace->GetPointObjects();
-		auto& dirs = m_OriginalFace->GetEdgeDirections();
 
 		auto i = startIndex;
 		while (!edges[i]->IsSplit())
@@ -25,7 +24,7 @@ public:
 
 			edge.DeRegisterFace(*m_OriginalFace);
 
-			m_NewFace->AddPoint(*points[i], dirs[i], edge);
+			m_NewFace->AddPoint(*points[i], edge);
 			i = m_OriginalFace->NextPointIndex(i);
 		}
 
@@ -33,7 +32,7 @@ public:
 		auto& np = FacesCutPath::GetNewPointFromCpPoint<inOrOut>(se.GetNext(*points[i]), *m_MapToReversed);
 
 		auto endOp = *points[i];
-		m_NewFace->AddPoint(endOp, dirs[i], m_MapToEdges->GetNewEdge(endOp, np));
+		m_NewFace->AddPoint(endOp, m_MapToEdges->GetNewEdge(endOp, np));
 
 		return np;
 	}

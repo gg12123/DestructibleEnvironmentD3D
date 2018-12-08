@@ -17,11 +17,10 @@ class SplitShapeEdge;
 class ShapeEdge : public ObjectWithHash<ShapeEdge>
 {
 public:
-	ShapeEdge(ShapePoint& p0, ShapePoint& p1, const Vector3& dirFromP0ToP1)
+	ShapeEdge(ShapePoint& p0, ShapePoint& p1)
 	{
 		m_P0 = &p0;
 		m_P1 = &p1;
-		m_DirFromP0ToP1 = dirFromP0ToP1;
 	}
 
 	void RegisterFace(Face& f, int indexOfThisEdgeInTheFace)
@@ -134,9 +133,9 @@ public:
 		return m_BeenCollectedByShape;
 	}
 
-	const Vector3& GetDirFromP0ToP1() const
+	Vector3 GetDirFromP0ToP1() const
 	{
-		return m_DirFromP0ToP1;
+		return (m_P1->GetPoint() - m_P0->GetPoint()).Normalized();
 	}
 
 	const ShapePoint* GetConnection(const ShapeEdge& other) const
@@ -179,6 +178,4 @@ private:
 	SplitShapeEdge* m_SplitEdge = nullptr;
 
 	bool m_BeenCollectedByShape = false;
-
-	Vector3 m_DirFromP0ToP1;
 };

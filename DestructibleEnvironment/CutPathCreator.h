@@ -11,6 +11,7 @@
 #include "MapToFacesCutPath.h"
 #include "FacesCutPaths.h"
 #include "CutPathIntersectionsHandler.h"
+#include "IntersectionLoop.h"
 
 class CutPathCreator
 {
@@ -43,97 +44,24 @@ private:
 		ProcessNewCPE(cpe, path.size() - 1, path);
 	}
 
-	Vector3 DirDefinedByFaces(const Face& f1, const Face& f2)
-	{
-		return Vector3::Cross(f1.GetNormal(), f2.GetNormal()).Normalized();
-	}
-
-	Vector3 DirectionOut(const Face& piercedFace, const Face& face, const ShapeEdge& piercingEdge)
-	{
-		return DirDefinedByFaces(piercedFace, face).InDirectionOf(face.GetEdgeNormal(piercingEdge));
-	}
-
-	Vector3 DirectionIn(const Face& piercedFace, const Face& face, const ShapeEdge& piercingEdge)
-	{
-		return DirDefinedByFaces(piercedFace, face).InDirectionOf(-face.GetEdgeNormal(piercingEdge));
-	}
-
-	CutPathElement CreateInitialCPE(const EdgeFaceIntersection& inter)
-	{
-		auto& piercedFace = inter.GetFace();
-		auto& piercingEdge = inter.GetEdge();
-
-		// arbitrarily choose face entered and face exited
-		auto& faceEntered = piercingEdge.GetFace1();
-		auto& faceExited = piercingEdge.GetFace2();
-
-		auto firstDirFromPrev = DirectionOut(piercedFace, faceExited, piercingEdge);
-
-		return CutPathElement(faceExited, piercedFace, piercingEdge, firstDirFromPrev);
-	}
-
-	CutPathElement CastToNext(const CutPathElement& curr)
-	{
-		auto& piercedFace = curr.GetPiercedFace();
-		auto& faceEntered = curr.GetFaceEntered();
-
-		auto castDir = DirectionIn(piercedFace, faceEntered, curr.GetPiercingEdge());
-		auto origin = curr.GetIntPoint();
-
-		auto res0 = piercedFace.CastToEdgeInside(origin, castDir);
-		auto res1 = faceEntered.CastToEdgeInside(origin, castDir);
-
-		if (res0.Distance < res1.Distance)
-		{
-			return CutPathElement(res0, piercedFace, faceEntered, castDir);
-		}
-		else
-		{
-			return CutPathElement(res1, faceEntered, piercedFace, castDir);
-		}
-	}
-
-	bool AreEqual(const CutPathElement& cpe1, const CutPathElement& cpe2)
-	{
-		return (&cpe1.GetPiercedFace() == &cpe2.GetPiercedFace()) && (&cpe1.GetPiercingEdge() == &cpe2.GetPiercingEdge());
-	}
-
-	bool GeneratePath(const EdgeFaceIntersection& inter)
+	void GeneratePath(const IntersectionLoop& loop)
 	{
 		auto& path = m_CutPaths->Recycle();
 		path.clear();
 
-		auto startCpe = CreateInitialCPE(inter);
-		auto cpe = CastToNext(startCpe);
+		auto c = loop.GetCount();
 
-		if (!m_IntersectionsHandler.NewCutPathElementReached(cpe))
-			return false;
-
-		AddNewCPEToPath(startCpe, path);
-
-		while (!AreEqual(startCpe, cpe))
-		{
-			AddNewCPEToPath(cpe, path);
-			cpe = CastToNext(cpe);
-
-			if (!m_IntersectionsHandler.NewCutPathElementReached(cpe))
-				return false;
-		}
-		return true;
+		for (auto i = 0; i < c; i++)
+			AddNewCPEToPath(CutPathElement(loop.GetFaceExited(i), loop.GetPiercedFace(i), loop.GetPiercingEdge(i)), path);
 	}
 
 public:
-	// Input should only contain intersections of cut shape edges with original shape faces
-	bool GeneratePaths(std::vector<EdgeFaceIntersection>& intersections, const Shape& originalShape)
+	void GeneratePaths(std::vector<IntersectionLoop*>& intersectionLoops)
 	{
-		m_IntersectionsHandler.Init(intersections, originalShape);
+		m_CutPaths->Reset();
 
-		EdgeFaceIntersection inter;
-		while (m_IntersectionsHandler.GetNextStartIntersection(inter))
-			if (!GeneratePath(inter))
-				return false;
-
-		return true;
+		for (auto loop : intersectionLoops)
+			GeneratePath(*loop);
 	}
 
 	const auto& GetFacesCutPathCollections() const
@@ -165,5 +93,4 @@ private:
 	std::unique_ptr<PoolOfRecyclables<FacesCutPaths>> m_FacesCutPathCollections; // keyed by face
 
 	MapToFacesCutPath m_MapToFCPs;
-	CutPathIntersectionsHandler m_IntersectionsHandler;
 };

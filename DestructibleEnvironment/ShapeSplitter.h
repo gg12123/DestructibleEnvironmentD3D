@@ -8,7 +8,7 @@
 #include "ShapeEdgesCreator.h"
 #include "FaceSplitter.h"
 #include "CutPathCreator.h"
-#include "IntersectionFinder.h"
+#include "CleanIntersectionFinder.h"
 #include "FaceIterator.h"
 #include "ReversedGeometryCreator.h"
 
@@ -127,18 +127,10 @@ private:
 			(*it)->OnAllFacesAdded(t);
 	}
 
-	void FindIntersections(Shape& originalShape, Shape& cutShape)
+	bool FindIntersections(const Shape& originalShape, const Shape& cutShape)
 	{
-		// TODO - dont need to find all the intersections
 		m_Intersections.clear();
-		m_IntersectionFinder.FindEdgeFaceIntersectionsLocalToFaces(originalShape, cutShape, m_Intersections);
-
-		m_IntersectionsCutShapeEdges.clear();
-		for (auto it = m_Intersections.begin(); it != m_Intersections.end(); it++)
-		{
-			if (&it->GetFace().GetShape() == &originalShape)
-				m_IntersectionsCutShapeEdges.emplace_back(*it);
-		}
+		return m_IntersectionFinder.FindCleanIntersections(cutShape, originalShape, m_Intersections);
 	}
 
 public:
@@ -148,10 +140,10 @@ public:
 
 		auto& cutShape = m_CutShapeCreator.Create(originalShape.GetTransform(), splitPointWorld, splitNormalWorld);
 
-		FindIntersections(originalShape, cutShape);
+		// TODO - abort nicely if this returns false.
+		assert(FindIntersections(originalShape, cutShape));
 
-		if (!m_CutPathCreator.GeneratePaths(m_IntersectionsCutShapeEdges, originalShape))
-			assert(false); // TODO - abort properly if this returns false
+		m_CutPathCreator.GeneratePaths(m_Intersections);
 
 		CreateEdgesFromCPs();
 		CreateInsideEdgesFromSplitEdges();
@@ -185,12 +177,11 @@ private:
 	FaceSplitter m_FaceSplitter;
 	ShapeEdgesCreator m_EdgesCreator;
 	CutPathCreator m_CutPathCreator;
-	IntersectionFinder m_IntersectionFinder;
 	FaceIterator<Tshape> m_FaceIterator;
 	ReversedGeometryCreator m_Reverser;
 
-	std::vector<EdgeFaceIntersection> m_Intersections;
-	std::vector<EdgeFaceIntersection> m_IntersectionsCutShapeEdges;
+	CleanIntersectionFinder m_IntersectionFinder;
+	std::vector<IntersectionLoop*> m_Intersections;
 
 	std::vector<Face*> m_NewInsideFacesFromCutShape;
 

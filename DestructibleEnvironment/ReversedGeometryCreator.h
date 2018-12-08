@@ -44,17 +44,16 @@ public:
 		for (auto i = 1U; i < cp.size(); i++)
 		{
 			curr = &CreatePointOnReversed(cp[i].GetPoint());
-			m_EdgeCreator->CreateEdge(*prev, *curr, cp[i].GetDirFromPrev());
+			m_EdgeCreator->CreateEdge(*prev, *curr);
 			prev = curr;
 		}
 
-		m_EdgeCreator->CreateEdge(*curr, *first, cp[0].GetDirFromPrev());
+		m_EdgeCreator->CreateEdge(*curr, *first);
 	}
 
 	void CreateReversedFace(const Face& face)
 	{
 		auto& points = face.GetPointObjects();
-		auto& dirs = face.GetEdgeDirections();
 
 		for (auto i = 0U; i < points.size(); i++)
 		{
@@ -64,7 +63,7 @@ public:
 			auto& p1 = TryCreatePointOnReversed(*points[next]);
 
 			if (!m_EdgeCreator->EdgeExistsBetween(p0, p1))
-				m_EdgeCreator->CreateEdge(p0, p1, dirs[i]);
+				m_EdgeCreator->CreateEdge(p0, p1);
 		}
 
 		// TODO - pool
@@ -76,9 +75,8 @@ public:
 
 			auto& p = m_MapToReversed.GetPointOnReversedFace(*points[i]);
 			auto& e = m_EdgeCreator->GetMapToNewEdges().GetNewEdge(p, *points[prev]);
-			auto d = -dirs[prev];
 
-			reversedFace->AddPoint(p, d, e);
+			reversedFace->AddPoint(p, e);
 		}
 	}
 

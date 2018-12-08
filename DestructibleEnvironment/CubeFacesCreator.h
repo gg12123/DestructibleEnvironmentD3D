@@ -63,7 +63,7 @@ private:
 	void CreateEdge(int p, int pNext)
 	{
 		// TODO - get from pool
-		auto edge = *(new ShapeEdge(*m_Points[p], *m_Points[pNext], DirToNext(p, pNext)));
+		auto edge = *(new ShapeEdge(*m_Points[p], *m_Points[pNext]));
 
 		m_Edges.Get(p, pNext) = &edge;
 		m_Edges.Get(pNext, p) = &edge;
@@ -84,7 +84,7 @@ private:
 		{
 			auto nextI = (i + 1) % numPoints;
 
-			f.AddPoint(*m_Points[i], DirToNext(i, nextI), EdgeToNext(i, nextI));
+			f.AddPoint(*m_Points[i], EdgeToNext(i, nextI));
 		}
 		return f;
 	}

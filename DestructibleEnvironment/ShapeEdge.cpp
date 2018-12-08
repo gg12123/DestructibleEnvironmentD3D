@@ -17,5 +17,5 @@ ShapePoint& ShapeEdge::GetEnd(const Face& requester) const
 
 Vector3 ShapeEdge::GetDirection(const Face& requester) const
 {
-	return requester.GetEdgeDirections()[GetIndex(requester)];
+	return requester.GetEdgeDirection(GetIndex(requester));
 }

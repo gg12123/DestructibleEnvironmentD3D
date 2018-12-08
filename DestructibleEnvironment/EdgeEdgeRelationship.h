@@ -70,6 +70,10 @@ private:
 	}
 
 public:
+	EdgeEdgeRelationship()
+	{
+	}
+
 	EdgeEdgeRelationship(const ShapeEdge& piercingEdge, const ShapeEdge& edgeFaces, const MapToPointPlaneRelationship& mapToPointPlane)
 	{
 		m_Face1 = &edgeFaces.GetFace1();

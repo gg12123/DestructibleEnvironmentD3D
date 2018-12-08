@@ -62,6 +62,17 @@ public:
 		return m_Points[index];
 	}
 
+	Vector2 GetNormalAt(int index) const
+	{
+		auto d = GetDirectionAt(index);
+		return Vector2(-d.y, d.x); // TODO - is this the right rotation direction?
+	}
+
+	Vector2 GetDirectionAt(int index) const
+	{
+		return (m_Points[NextIndex(index)] - m_Points[index]).Normalized();
+	}
+
 	const auto& GetPoints() const
 	{
 		return m_Points;

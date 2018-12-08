@@ -10,6 +10,8 @@
 #include "Constants.h"
 #include "CollectionU.h"
 #include "PoolOfRecyclables.h"
+#include "TwoDArray.h"
+#include "IntersectionLoop.h"
 
 class IntersectionsByPiercingEdge
 {
@@ -63,20 +65,6 @@ public:
 private:
 	std::vector<int> m_IndexsWithIntersections;
 	std::array<std::vector<EdgeFaceIntersection>, Constants::MaxNumEdges> m_Intersections; // This is keyed by cut shape edges so could use less memory.
-};
-
-class IntersectionLoop
-{
-public:
-	void AddIntersection(const EdgeFaceIntersection& inter)
-	{
-
-	}
-
-	void Clear()
-	{
-
-	}
 };
 
 class IntersectionLinker
@@ -146,7 +134,6 @@ private:
 	}
 
 public:
-
 	bool FindLoop(IntersectionLoop& loop, IntersectionsByPiercingEdge& intersByEdge, const EdgeFaceIntersection& startInter)
 	{
 		m_CurrLoop = &loop;
@@ -167,6 +154,8 @@ public:
 			intersByEdge.RemoveIntersection(currStart);
 
 		} while (currStart != startInter);
+
+		return true;
 	}
 
 private:
@@ -179,20 +168,46 @@ class CleanIntersectionFinder
 private:
 	const EdgeEdgeRelationship& GetEdgeEdgeRelationship(const ShapeEdge& edgeFaces, const ShapeEdge& piercingEdge) const
 	{
+		return m_EdgeEdgeRelationships.Get(edgeFaces.GetHash(), piercingEdge.GetHash());
+	}
 
+	void SetEdgeEdgeRelationship(const ShapeEdge& edgeFaces, const ShapeEdge& piercingEdge, const EdgeEdgeRelationship& r)
+	{
+		m_EdgeEdgeRelationships.Get(edgeFaces.GetHash(), piercingEdge.GetHash()) = r;
 	}
 
 	void DeterminePointPlaneRelationships(const std::vector<ShapePoint*>& points, const std::vector<Face*>& faces)
 	{
+		for (auto f : faces)
+		{
+			auto n = f->GetNormal();
+			auto p0 = f->GetPlaneP0();
 
+			for (auto p : points)
+			{
+				auto comp = Vector3::Dot((p->GetPoint() - p0), n);
+				auto r = comp >= 0.0f ? PointPlaneRelationship::PointsAbove : PointPlaneRelationship::PointsBelow;
+
+				m_PointPlaneRelationshipMap.SetRelationship(*f, *p, r);
+			}
+		}
 	}
 
 	void DetermineEdgeEdgeRelationships(const std::vector<ShapeEdge*>& piercedFacesEdges, const std::vector<ShapeEdge*>& piercingEdges)
 	{
+		for (auto pfep : piercedFacesEdges)
+		{
+			auto& pfe = *pfep;
 
+			for (auto pep : piercingEdges)
+			{
+				auto& pe = *pep;
+				SetEdgeEdgeRelationship(pfe, pe, EdgeEdgeRelationship(pe, pfe, m_PointPlaneRelationshipMap));
+			}
+		}
 	}
 
-	void FindIntersection(const Face& face, const ShapeEdge& piercingEdge)
+	void FindIntersection(Face& face, ShapeEdge& piercingEdge)
 	{
 		auto& facesEdges = face.GetEdgeObjects();
 
@@ -202,7 +217,10 @@ private:
 				return;
 		}
 
-		// register the intersection
+		Vector3 intPoint;
+		assert(Vector3::LinePlaneIntersection(face.GetPlaneP0(), face.GetNormal(), piercingEdge.GetP0().GetPoint(), piercingEdge.GetP1().GetPoint(), intPoint));
+
+		m_Intersections.RegisterIntersection(EdgeFaceIntersection(face, piercingEdge, intPoint));
 	}
 
 	void FindIntersections(const std::vector<Face*>& faces, const std::vector<ShapeEdge*>& piercingEdges)
@@ -250,12 +268,52 @@ private:
 		return true;
 	}
 
+	template<class T>
+	void AssignHashes(const std::vector<T*>& objs)
+	{
+		for (auto o : objs)
+			o->AssignHash();
+	}
+
+	template<class T>
+	void UnAssignHashes(const std::vector<T*>& objs)
+	{
+		for (auto o : objs)
+			o->ResetHash();
+	}
+
+	void AssignHashes(const Shape& shapeEdges, const Shape& shapeFaces)
+	{
+		Face::ResetNextHashCounter();
+		ShapeEdge::ResetNextHashCounter();
+		ShapePoint::ResetNextHashCounter();
+
+		AssignHashes(shapeEdges.GetEdgeObjects());
+		AssignHashes(shapeEdges.GetPointObjects());
+
+		AssignHashes(shapeFaces.GetEdgeObjects());
+		AssignHashes(shapeFaces.GetFaces());
+	}
+
+	void UnAssignHashes(const Shape& shapeEdges, const Shape& shapeFaces)
+	{
+		UnAssignHashes(shapeEdges.GetEdgeObjects());
+		UnAssignHashes(shapeEdges.GetPointObjects());
+
+		UnAssignHashes(shapeFaces.GetEdgeObjects());
+		UnAssignHashes(shapeFaces.GetFaces());
+	}
+
 public:
+	CleanIntersectionFinder()
+	{
+	}
+
 	// Both shapes must have the same local space.
 	// Loops are recycled so must be used before the next call.
 	bool FindCleanIntersections(const Shape& shapeEdges, const Shape& shapeFaces, std::vector<IntersectionLoop*>& loops)
 	{
-		// assign hashes
+		AssignHashes(shapeEdges, shapeFaces);
 
 		DeterminePointPlaneRelationships(shapeEdges.GetPointObjects(), shapeFaces.GetFaces());
 		DetermineEdgeEdgeRelationships(shapeFaces.GetEdgeObjects(), shapeEdges.GetEdgeObjects());
@@ -273,7 +331,7 @@ public:
 			m_Intersections.Clear();
 		}
 
-		// un-assign hashes
+		UnAssignHashes(shapeEdges, shapeFaces);
 		return valid;
 	}
 
@@ -281,4 +339,6 @@ private:
 	IntersectionsByPiercingEdge m_Intersections;
 	IntersectionLinker m_Linker;
 	std::unique_ptr<PoolOfRecyclables<IntersectionLoop>> m_IntersectionLoops;
+	MapToPointPlaneRelationship m_PointPlaneRelationshipMap;
+	TwoDArray<Constants::MaxNumEdges, Constants::MaxNumEdges, EdgeEdgeRelationship> m_EdgeEdgeRelationships;
 };
