@@ -45,7 +45,10 @@ public:
 
 	void RegisterIntersection(const EdgeFaceIntersection& inter)
 	{
-		m_Intersections[inter.GetEdge().GetHash()].emplace_back(inter);
+		auto index = inter.GetEdge().GetHash();
+
+		m_Intersections[index].emplace_back(inter);
+		m_IndexsWithIntersections.emplace_back(index);
 	}
 
 	void Clear()
@@ -75,7 +78,7 @@ private:
 		return CollectionU::Contains(targets, curr);
 	}
 
-	EdgeFaceIntersection CastToNext(const EdgeFaceIntersection& curr, Face& travelFace, Face& currOtherFace) const
+	EdgeFaceIntersection CastToNext(const EdgeFaceIntersection& curr, Face& travelFace, Face& currOtherFace, const std::vector<EdgeFaceIntersection>& targets) const
 	{
 		auto& ownerOfEdge = curr.GetEdge().IsAttachedTo(travelFace) ? travelFace : currOtherFace;
 
@@ -87,16 +90,18 @@ private:
 		castDir /= mag;
 
 		auto hitTravelFace = travelFace.CastToEdgeInside(castOrigin, castDir);
-		auto hitOtherFace = currOtherFace.CastToEdgeInside(castOrigin, castDir);
+		auto travelImpliedIntersection = EdgeFaceIntersection(currOtherFace, *hitTravelFace.Edge, hitTravelFace.IntPoint);
 
-		return hitTravelFace.Distance < hitOtherFace.Distance ?
-			EdgeFaceIntersection(currOtherFace, *hitTravelFace.Edge, hitTravelFace.IntPoint) :
-			EdgeFaceIntersection(travelFace, *hitOtherFace.Edge, hitOtherFace.IntPoint);
+		if (TargetReached(targets, travelImpliedIntersection))
+			return travelImpliedIntersection;
+
+		auto hitOtherFace = currOtherFace.CastToEdgeInside(castOrigin, castDir);
+		return EdgeFaceIntersection(travelFace, *hitOtherFace.Edge, hitOtherFace.IntPoint);
 	}
 
 	bool LinkToNext(const EdgeFaceIntersection& start, Face& travelFace, const std::vector<EdgeFaceIntersection>& targets, EdgeFaceIntersection& nextStart)
 	{
-		// TODO - this is fairly likly to fail. Need to use something like A*.
+		// TODO - This is fairly likly to fail. Need to use something like A*.
 
 		auto curr = start;
 		auto currOtherFace = &start.GetFace();
@@ -104,7 +109,7 @@ private:
 
 		while (!targetReached)
 		{
-			curr = CastToNext(curr, travelFace, *currOtherFace);
+			curr = CastToNext(curr, travelFace, *currOtherFace, targets);
 			targetReached = TargetReached(targets, curr);
 
 			auto& currEdge = curr.GetEdge();
@@ -119,7 +124,6 @@ private:
 			}
 			m_CurrLoop->AddIntersection(curr);
 		}
-
 		nextStart = curr;
 		return true;
 	}
@@ -151,6 +155,7 @@ public:
 				return false;
 
 			currStart = nextStart;
+			currTravelFace = &currStart.GetEdge().GetOther(*currTravelFace);
 			intersByEdge.RemoveIntersection(currStart);
 
 		} while (currStart != startInter);
@@ -297,6 +302,10 @@ private:
 
 	void UnAssignHashes(const Shape& shapeEdges, const Shape& shapeFaces)
 	{
+		Face::ResetNextHashCounter();
+		ShapeEdge::ResetNextHashCounter();
+		ShapePoint::ResetNextHashCounter();
+
 		UnAssignHashes(shapeEdges.GetEdgeObjects());
 		UnAssignHashes(shapeEdges.GetPointObjects());
 
@@ -307,6 +316,8 @@ private:
 public:
 	CleanIntersectionFinder()
 	{
+		m_IntersectionLoops = std::unique_ptr<PoolOfRecyclables<IntersectionLoop>>(
+			new PoolOfRecyclables<IntersectionLoop>(3));
 	}
 
 	// Both shapes must have the same local space.

@@ -15,11 +15,8 @@ public:
 	bool FindCollision(Shape& shape1, Shape& shape2, std::vector<PotentialCollision>& detectedColls);
 
 private:
-	PotentialCollision ToPotentialCollision(const EdgeFaceIntersection& inter);
+	PotentialCollision ToPotentialCollision(const EdgeFaceIntersection& inter, const Shape& shape1);
 
 	IntersectionFinder m_IntersectionFinder;
 	std::vector<EdgeFaceIntersection> m_FoundIntersections;
-
-	Shape* m_Shape1;
-	Shape* m_Shape2;
 };

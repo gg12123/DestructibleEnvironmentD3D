@@ -51,12 +51,18 @@ private:
 
 		auto c = loop.GetCount();
 
+		auto& firstFacePierced = loop.GetPiercedFace(0);
+		auto& firstFaceExited = loop.GetFaceExited(0);
+
 		for (auto i = 0; i < c; i++)
-			AddNewCPEToPath(CutPathElement(loop.GetFaceExited(i), loop.GetPiercedFace(i), loop.GetPiercingEdge(i)), path);
+			AddNewCPEToPath(CutPathElement(loop.GetFaceExited(i), loop.GetPiercedFace(i), loop.GetPiercingEdge(i), loop.GetIntPoint(i)), path);
+
+		m_FacesCutPathCollections->At(firstFacePierced.GetHash()).ForceCreateWhenFinalWasAddedBeforeFirst(*m_FacesCutPathObjects, path);
+		m_FacesCutPathCollections->At(firstFaceExited.GetHash()).ForceCreateWhenFinalWasAddedBeforeFirst(*m_FacesCutPathObjects, path);
 	}
 
 public:
-	void GeneratePaths(std::vector<IntersectionLoop*>& intersectionLoops)
+	void GeneratePaths(const std::vector<IntersectionLoop*>& intersectionLoops)
 	{
 		m_CutPaths->Reset();
 
@@ -69,7 +75,7 @@ public:
 		return *m_FacesCutPathCollections;
 	}
 
-	const auto& GetCutPaths() const
+	auto& GetCutPaths() const
 	{
 		return *m_CutPaths;
 	}
@@ -85,6 +91,23 @@ public:
 	const auto& GetMapToFacesCutPaths()
 	{
 		return m_MapToFCPs;
+	}
+
+	CutPathCreator()
+	{
+		m_FacesCutPathObjects =
+			std::unique_ptr<PoolOfRecyclables<FacesCutPath>>(new PoolOfRecyclables<FacesCutPath>(10));
+
+		m_CutPaths =
+			std::unique_ptr<PoolOfRecyclables<std::vector<CutPathElement>>>(new PoolOfRecyclables<std::vector<CutPathElement>>(3));
+
+		auto c = [this]()
+		{
+			return FacesCutPaths(m_MapToFCPs);
+		};
+
+		m_FacesCutPathCollections =
+			std::unique_ptr<PoolOfRecyclables<FacesCutPaths>>(new PoolOfRecyclables<FacesCutPaths>(10, c));
 	}
 
 private:

@@ -63,7 +63,7 @@ private:
 	void CreateEdge(int p, int pNext)
 	{
 		// TODO - get from pool
-		auto edge = *(new ShapeEdge(*m_Points[p], *m_Points[pNext]));
+		auto& edge = *(new ShapeEdge(*m_Points[p], *m_Points[pNext]));
 
 		m_Edges.Get(p, pNext) = &edge;
 		m_Edges.Get(pNext, p) = &edge;
@@ -75,34 +75,37 @@ private:
 	}
 
 	template<int numPoints>
-	Face& CreateFace(const std::array<int, numPoints>& pointIndexes)
+	Face& CreateFace(const std::array<int, numPoints>& pointIndexes, const Vector3& normal)
 	{
 		// TODO - get from pool
 		auto& f = *(new Face());
 
 		for (auto i = 0U; i < numPoints; i++)
 		{
-			auto nextI = (i + 1) % numPoints;
+			auto j = pointIndexes[i];
+			auto k = pointIndexes[(i + 1) % numPoints];
 
-			f.AddPoint(*m_Points[i], EdgeToNext(i, nextI));
+			f.AddPoint(*m_Points[j], EdgeToNext(j, k));
 		}
+		f.SetNormal(normal);
+
 		return f;
 	}
 
 	void CreateFaces(Shape& shape)
 	{
-		shape.AddFace(CreateFace(m_Face0));
-		shape.AddFace(CreateFace(m_Face1));
-		shape.AddFace(CreateFace(m_Face2));
-		shape.AddFace(CreateFace(m_Face3));
-		shape.AddFace(CreateFace(m_Face4));
-		shape.AddFace(CreateFace(m_Face5));
-		shape.AddFace(CreateFace(m_Face6));
-		shape.AddFace(CreateFace(m_Face7));
-		shape.AddFace(CreateFace(m_Face8));
-		shape.AddFace(CreateFace(m_Face9));
-		shape.AddFace(CreateFace(m_Face10));
-		shape.AddFace(CreateFace(m_Face11));
+		shape.AddFace(CreateFace(m_Face0, Vector3::Up()));
+		shape.AddFace(CreateFace(m_Face1, Vector3::Up()));
+		shape.AddFace(CreateFace(m_Face2, Vector3::Right()));
+		shape.AddFace(CreateFace(m_Face3, Vector3::Right()));
+		shape.AddFace(CreateFace(m_Face4, -Vector3::Foward()));
+		shape.AddFace(CreateFace(m_Face5, -Vector3::Foward()));
+		shape.AddFace(CreateFace(m_Face6, -Vector3::Right()));
+		shape.AddFace(CreateFace(m_Face7, -Vector3::Right()));
+		shape.AddFace(CreateFace(m_Face8, Vector3::Foward()));
+		shape.AddFace(CreateFace(m_Face9, Vector3::Foward()));
+		shape.AddFace(CreateFace(m_Face10, -Vector3::Up()));
+		shape.AddFace(CreateFace(m_Face11, -Vector3::Up()));
 	}
 
 public:

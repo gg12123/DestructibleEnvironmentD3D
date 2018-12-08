@@ -16,9 +16,9 @@ public:
 		m_Edge = &edge;
 	}
 
-	void AddElement(const CutPathElement& cpe)
+	void AddElement(CutPathElement& cpe)
 	{
-		m_Elements.emplace_back(cpe);
+		m_Elements.emplace_back(&cpe);
 	}
 
 	ShapePoint & GetNext(const CutPathElement& middleCurr, const ShapePoint& towards) const
@@ -32,7 +32,7 @@ public:
 	ShapePoint & GetNext(const ShapePoint& endCurr) const
 	{
 		assert(&endCurr == &GetP0() || &endCurr == &GetP1());
-		return &endCurr == &GetP0() ? *m_PointsSortedFromP0[1] : *m_PointsSortedFromP0[m_PointsSortedFromP0.size() - 1U];
+		return &endCurr == &GetP0() ? *m_PointsSortedFromP0[1] : *m_PointsSortedFromP0[m_PointsSortedFromP0.size() - 2u];
 	}
 
 	const auto& GetPointsSortedFromP0() const
@@ -62,7 +62,7 @@ public:
 
 private:
 	std::vector<ShapePoint*> m_PointsSortedFromP0;
-	std::vector<CutPathElement> m_Elements;
+	std::vector<CutPathElement*> m_Elements;
 	const ShapeEdge* m_Edge = nullptr;
 	bool m_FirstEdgeFromP0IsInside;
 };

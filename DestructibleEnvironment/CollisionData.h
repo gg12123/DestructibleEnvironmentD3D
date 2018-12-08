@@ -4,15 +4,15 @@
 class Impulse
 {
 public:
-	Impulse(const Vector3& worldImpulse, const Vector3& worldCollPoint, float impact)
+	Impulse(const Vector3& worldImpulse, const Vector3& worldCollPoint, float impact) : 
+		WorldImpulse(worldImpulse),
+		WorldCollisionPoint(worldCollPoint),
+		Impact(impact)
 	{
-		WorldImpulse = worldImpulse;
-		WorldCollisionPoint = worldCollPoint;
-		Impact = impact;
 	}
 
-	Vector3 WorldImpulse;
-	Vector3 WorldCollisionPoint;
+	const Vector3 WorldImpulse;
+	const Vector3 WorldCollisionPoint;
 
-	float Impact;
+	const float Impact;
 };

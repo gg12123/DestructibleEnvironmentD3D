@@ -55,6 +55,11 @@ public:
 		return m_Intersections.size();
 	}
 
+	Vector3 GetIntPoint(int index) const
+	{
+		return m_Intersections[index].GetIntPoint();
+	}
+
 private:
 	std::vector<EdgeFaceIntersection> m_Intersections;
 };

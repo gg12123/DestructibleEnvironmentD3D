@@ -12,13 +12,13 @@ class FaceSplitter
 private:
 	void InitFaces(const FacesCutPaths& paths)
 	{
-		m_ConcaveFace.Clear();
+		m_ConcaveFace.Init(paths.GetFace());
 		m_Iterator.InitFaces(paths.GetFace(), m_ConcaveFace);
 	}
 
 	void CreateTriangleFaces(const FacesCutPaths& paths, std::vector<Face*>& newFaces)
 	{
-		m_ConcaveFace.Triangulate(paths.GetFace(), newFaces);
+		m_ConcaveFace.Triangulate(newFaces);
 	}
 
 public:

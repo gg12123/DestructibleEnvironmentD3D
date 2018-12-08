@@ -113,7 +113,7 @@ inline bool Vector2::InfinateLinesIntersect(const Vector2& aP0, const Vector2& a
 	if (denom != 0.0f)
 	{
 		aU = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom;
-		bU = ((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denom;
+		bU = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denom;
 		return true;
 	}
 	return false;

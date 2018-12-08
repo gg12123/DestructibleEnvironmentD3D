@@ -14,12 +14,12 @@ private:
 	Matrix4 CalculateCutShapesTransform(Transform& toSplitsTransform, const Vector3& splitPoint, const Vector3& splitNormal)
 	{
 		auto sZ = 100.0f;
-		auto r = Random::Range(0.0f, 0.5f);
+		auto r = 0.0f; // Random::Range(0.0f, 0.5f);
 
 		auto A = r * splitPoint;
 		auto C = A + sZ * splitNormal;
 
-		auto q = Quaternion::LookRotation(-splitNormal, Vector3::OrthogonalDirection(splitNormal));
+		auto q = Quaternion::Identity(); // Quaternion::LookRotation(-splitNormal, Vector3::OrthogonalDirection(splitNormal));
 
 		return Matrix4::FromTranslation(C) * Matrix4::FromRotation(q) * Matrix4::FromScale(sZ, sZ, sZ);
 	}

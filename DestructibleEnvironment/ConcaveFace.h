@@ -143,27 +143,32 @@ private:
 		f.AddPoint(*m_Points[i1], GetEdgeBetween(i1, i2));
 		f.AddPoint(*m_Points[i2], GetEdgeBetween(i2, i0));
 
+		f.SetNormal(m_Normal);
+
 		return f;
 	}
 
 public:
-	void Clear()
+	void Init(const Face& originalFace)
 	{
 		m_Points.clear();
 		m_Edges.clear();
 		m_Triangulator.Clear();
+		m_OriginalFace = &originalFace;
 	}
 
 	void AddPoint(ShapePoint& point, ShapeEdge& edgeToNext)
 	{
 		m_Points.emplace_back(&point);
 		m_Edges.emplace_back(&edgeToNext);
+		m_Triangulator.AddPoint(m_OriginalFace->ToFaceSpacePosition(point.GetPoint()));
 	}
 
-	void Triangulate(const Face& original, std::vector<Face*>& triangleFaces)
+	void Triangulate(std::vector<Face*>& triangleFaces)
 	{
+		m_Normal = m_OriginalFace->GetNormal();
 		m_TriangleFaces = &triangleFaces;
-		DetachOriginalFace(original);
+		DetachOriginalFace(*m_OriginalFace);
 		m_Triangulator.Triangulate(*this);
 	}
 
@@ -185,4 +190,7 @@ private:
 
 	std::vector<Face*>* m_TriangleFaces;
 	Triangulator<ConcaveFace> m_Triangulator;
+
+	Vector3 m_Normal;
+	const Face* m_OriginalFace = nullptr;
 };

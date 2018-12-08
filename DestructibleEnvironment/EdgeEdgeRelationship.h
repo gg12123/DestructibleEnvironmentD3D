@@ -111,7 +111,8 @@ public:
 	{
 		if (&face == m_Face1)
 			return m_ImpliesIntersectionForFace1;
-		else if (&face == m_Face2)
+		
+		if (&face == m_Face2)
 			return m_ImpliesIntersectionForFace2;
 
 		assert(false);

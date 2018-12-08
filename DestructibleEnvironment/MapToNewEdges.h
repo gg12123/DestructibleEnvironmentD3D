@@ -20,7 +20,9 @@ public:
 
 	ShapeEdge & GetNewEdge(const ShapePoint& p0, const ShapePoint& p1) const
 	{
-		return *m_Edges.Get(p0.GetHash(), p1.GetHash());
+		auto e = m_Edges.Get(p0.GetHash(), p1.GetHash());
+		assert(e);
+		return *e;
 	}
 
 	void AddNewEdge(const ShapePoint& p0, const ShapePoint& p1, ShapeEdge& edge)

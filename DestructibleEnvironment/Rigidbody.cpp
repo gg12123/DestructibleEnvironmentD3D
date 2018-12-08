@@ -66,7 +66,7 @@ void Rigidbody::ApplyImpulses(std::vector<SplitInfo>& splits)
 
 	for  (auto it = m_Impulses.begin(); it != m_Impulses.end(); it++)
 	{
-		auto& imp = **it;
+		auto& imp = *it;
 		auto impact = imp.Impact;
 
 		ApplyImpulse(imp);

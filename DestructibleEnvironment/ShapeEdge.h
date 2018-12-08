@@ -108,7 +108,7 @@ public:
 
 	Face& GetFace2() const
 	{
-		return *m_Face1;
+		return *m_Face2;
 	}
 
 	Face& GetOther(const Face& f) const

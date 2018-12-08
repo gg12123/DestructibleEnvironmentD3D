@@ -69,7 +69,7 @@ void PhysicsEngine::ProcessSplits()
 {
 	static auto constexpr doSplits = true;
 
-	if (doSplits && (m_DynamicBodies.size() < 10))
+	if (doSplits && (m_DynamicBodies.size() < 2))
 	{
 		for (auto it = m_Splits.begin(); it != m_Splits.end(); it++)
 		{

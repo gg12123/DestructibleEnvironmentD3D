@@ -84,6 +84,7 @@ public:
 		m_EdgeObjects.clear();
 		m_EdgeIndexes.clear();
 		m_PointObjects.clear();
+		m_LocalBounds.Reset();
 	}
 
 	void AddFace(Face& f)
@@ -107,13 +108,14 @@ public:
 		SetDirty();
 	}
 
-	// Call this one when re-centring is not required
+	// For when the centre is at the local origin.
 	void OnAllFacesAdded()
 	{
-		// Dont think I need to remove small edges here because this is not
-		// called by the splitting algorithm.
 		CollectPointsAndEdges();
+
+		ReCentre(Vector3::Zero());
 		InitFaces();
+
 		SetDirty();
 	}
 
@@ -123,7 +125,6 @@ private:
 		m_Dirty = true;
 	}
 
-	Vector3 CalculateSplitPlaneNormal(const Vector3& P0);
 	Vector3 CalculateCentre();
 	void ReCentre(const Vector3& centre);
 	void CollectPointsAndEdges();

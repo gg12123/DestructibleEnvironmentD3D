@@ -18,7 +18,9 @@ public:
 
 		shape.Clear();
 		m_FacesCreator.CreateFaces(shape, M);
+
 		shape.GetTransform().SetEqualTo(transform);
+		shape.OnAllFacesAdded();
 	}
 
 private:

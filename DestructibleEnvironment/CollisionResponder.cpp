@@ -77,9 +77,10 @@ float CollisionResponder::CalculateRequiredSeperation(const std::vector<Potentia
 	{
 		auto& coll = *it;
 
-		// need to move body 2 in the direction of the normal so if the face
+		// Need to move body 2 in the direction of the normal so if the face
 		// is from body 2, we need to move the face in the direction of the normal,
-		// otherwise we need to move the edge.
+		// and if the edge is from body 2, we need to move the edge in the direction
+		// of the normal.
 		auto toSep = &coll.GetTransformOfPiercedFace() == body2Transform ?
 			coll.CalculateRequiredSeperationWhenMovingFace(finalNormal1To2) :
 			coll.CalculateRequiredSeperationWhenMovingEdge(finalNormal1To2);

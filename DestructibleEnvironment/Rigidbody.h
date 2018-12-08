@@ -9,9 +9,9 @@
 class Rigidbody : public PhysicsObject, public LastCheckedAgainst<Rigidbody*>
 {
 public:
-	void AddImpulse(Impulse& impulse) override
+	void AddImpulse(const Impulse& impulse) override
 	{
-		m_Impulses.emplace_back(&impulse);
+		m_Impulses.emplace_back(impulse);
 	}
 
 	void AddToRequiredToSeperate(const Vector3& toSep) override
@@ -90,7 +90,7 @@ private:
 	void ApplyImpulse(const Impulse& impulse);
 	void CalculateInertia();
 
-	std::vector<Impulse*> m_Impulses;
+	std::vector<Impulse> m_Impulses;
 
 	Vector3 m_VelocityWorld;
 	Vector3 m_AngularVelocityWorld;

@@ -10,8 +10,12 @@ public:
 	{
 		m_Contents.reserve(initialSize);
 
-		for (auto i = 0U; i < initialSize; i++)
+		for (auto i = 0; i < initialSize; i++)
 			m_Contents.emplace_back(m_Creator());
+	}
+
+	PoolOfRecyclables(int initialSize) : PoolOfRecyclables(initialSize, []() { return T(); })
+	{
 	}
 
 	void Reset()

@@ -40,7 +40,7 @@ public:
 		m_PiercedFace = &piercedFace;
 	}
 
-	float CalculateRequiredSeperationWhenMovingEdge(const Vector3 collNormalWorld) const
+	float CalculateRequiredSeperationWhenMovingEdge(const Vector3& collNormalWorld) const
 	{
 		auto nLocal = GetTransformOfPiercedFace().ToLocalDirection(collNormalWorld);
 
@@ -50,7 +50,7 @@ public:
 		return f.GetMax() - e.GetMin();
 	}
 
-	float CalculateRequiredSeperationWhenMovingFace(const Vector3 collNormalWorld) const
+	float CalculateRequiredSeperationWhenMovingFace(const Vector3& collNormalWorld) const
 	{
 		auto nLocal = GetTransformOfPiercedFace().ToLocalDirection(collNormalWorld);
 

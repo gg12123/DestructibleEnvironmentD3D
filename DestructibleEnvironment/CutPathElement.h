@@ -7,12 +7,13 @@
 class CutPathElement
 {
 public:
-	CutPathElement(Face& faceExited, Face& facePierced, ShapeEdge& piercingEdge)
+	CutPathElement(Face& faceExited, Face& facePierced, ShapeEdge& piercingEdge, const Vector3& intPoint)
 	{
 		m_PiercingEdge = &piercingEdge;
 		m_FaceExited = &faceExited;
 		m_PiercedFace = &facePierced;
 		m_FaceEntered = &m_PiercingEdge->GetOther(*m_FaceExited);
+		m_Point = new ShapePoint(intPoint); // TODO - pool
 	}
 
 	int GetIndexInSplitEdge() const

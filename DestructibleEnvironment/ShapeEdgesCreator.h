@@ -10,7 +10,7 @@
 class ShapeEdgesCreator
 {
 private:
-	void CreateEdgesAlongCutPathImp(const std::vector<CutPathElement>& cp)
+	void CreateEdgesAlongCutPathImp(std::vector<CutPathElement>& cp)
 	{
 		m_SplitEdgesPool->Reset();
 
@@ -52,6 +52,9 @@ private:
 		auto create = inside ? edge.FirstEdgeFromP0IsInside() : edge.FirstEdgeFromP0IsOutside();
 		auto& sePoints = edge.GetPointsSortedFromP0();
 
+		edge.GetP0().TryAssignHash();
+		edge.GetP1().TryAssignHash();
+
 		for (auto i = 0U; i < sePoints.size() - 1U; i++)
 		{
 			if (create)
@@ -78,7 +81,7 @@ private:
 	}
 
 public:
-	void CreateEdgesAlongCutPath(const std::vector<CutPathElement>& cp)
+	void CreateEdgesAlongCutPath(std::vector<CutPathElement>& cp)
 	{
 		CreateEdgesAlongCutPathImp(cp);
 		InitSplitEdges();
@@ -115,6 +118,11 @@ public:
 	void ClearMap()
 	{
 		m_MapToEdges.Clear();
+	}
+
+	ShapeEdgesCreator()
+	{
+		m_SplitEdgesPool = std::unique_ptr<PoolOfRecyclables<SplitShapeEdge>>(new PoolOfRecyclables<SplitShapeEdge>(20));
 	}
 
 private:

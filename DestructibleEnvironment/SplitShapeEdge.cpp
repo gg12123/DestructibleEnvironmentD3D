@@ -39,13 +39,13 @@ static bool Element0IsBeforeElement1(const Vector3& rayOrigin, const Vector3& ra
 	return false;
 }
 
-static auto GetClosest(std::vector<CutPathElement>& elements, const Vector3& rayOrigin, const Vector3& rayDir)
+static auto GetClosest(std::vector<CutPathElement*>& elements, const Vector3& rayOrigin, const Vector3& rayDir)
 {
 	auto itOfClosest = elements.begin();
 
 	for (auto it = elements.begin() + 1; it != elements.end(); it++)
 	{
-		if (Element0IsBeforeElement1(rayOrigin, rayDir, *it, *itOfClosest))
+		if (Element0IsBeforeElement1(rayOrigin, rayDir, **it, **itOfClosest))
 			itOfClosest = it;
 	}
 	return itOfClosest;
@@ -64,15 +64,17 @@ void SplitShapeEdge::OnAllElementsAdded()
 
 	auto first = GetClosest(m_Elements, origin, dir);
 
-	m_FirstEdgeFromP0IsInside = Vector3::Dot(m_Edge->GetDirFromP0ToP1(), first->GetPiercedFace().GetNormal()) > 0.0f;
+	m_FirstEdgeFromP0IsInside = Vector3::Dot(m_Edge->GetDirFromP0ToP1(), (*first)->GetPiercedFace().GetNormal()) > 0.0f;
 
-	m_PointsSortedFromP0.emplace_back(&first->GetPoint());
+	(*first)->SetIndexInSplitEdge(1);
+	m_PointsSortedFromP0.emplace_back(&(*first)->GetPoint());
 	m_Elements.erase(first);
 
 	while (m_Elements.size() > 0U)
 	{
 		auto closest = GetClosest(m_Elements, origin, dir);
-		m_PointsSortedFromP0.emplace_back(&closest->GetPoint());
+		m_PointsSortedFromP0.emplace_back(&(*closest)->GetPoint());
+		(*closest)->SetIndexInSplitEdge(m_PointsSortedFromP0.size() - 1u);
 		m_Elements.erase(closest);
 	}
 

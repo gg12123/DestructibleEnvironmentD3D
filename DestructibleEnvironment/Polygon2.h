@@ -20,11 +20,17 @@ public:
 class Polygon2
 {
 public:
-
 	bool PointIsInsideConvexMethod(const Vector2& p) const
 	{
-		assert(false);
-		return false;
+		for (auto i = 0u; i < m_Points.size(); i++)
+		{
+			auto n = GetNormalAt(i);
+			auto comp = Vector2::Dot(p - m_Points[i], GetNormalAt(i));
+
+			if (comp > 0.0f)
+				return false;
+		}
+		return true;
 	}
 
 	bool PointIsInsideWindingMethod(const Vector2& p) const
@@ -65,7 +71,7 @@ public:
 	Vector2 GetNormalAt(int index) const
 	{
 		auto d = GetDirectionAt(index);
-		return Vector2(-d.y, d.x); // TODO - is this the right rotation direction?
+		return Vector2(d.y, -d.x); // TODO - is this the right rotation direction?
 	}
 
 	Vector2 GetDirectionAt(int index) const

@@ -103,25 +103,19 @@ Vector3 Shape::CalculateCentre()
 	return c;
 }
 
-Vector3 Shape::CalculateSplitPlaneNormal(const Vector3& P0)
-{
-	auto index = Random::Range(0, m_CachedPoints.size());
-	auto p = Random::Range(0.0f, 0.5f) * m_CachedPoints[index];
-
-	auto toP0 = Vector3::Normalize(P0 - p);
-
-	return Vector3::ProjectOnPlane(toP0, Vector3(-toP0.y, -toP0.z, toP0.x)).Normalized();
-}
-
 void Shape::ReCentre(const Vector3& centre)
 {
 	m_CachedPoints.clear();
+	m_LocalBounds.Reset();
 
 	for (auto it = m_PointObjects.begin(); it != m_PointObjects.end(); it++)
 	{
 		auto& p = **it;
 		p.ReCentre(centre);
-		m_CachedPoints.emplace_back(p.GetPoint());
+
+		auto point = p.GetPoint();
+		m_CachedPoints.emplace_back(point);
+		m_LocalBounds.Update(point);
 	}
 }
 

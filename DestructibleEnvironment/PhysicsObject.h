@@ -11,7 +11,7 @@ public:
 		m_InertiaInverse = Matrix3::Indentity();
 	}
 
-	virtual void AddImpulse(Impulse& impulse)
+	virtual void AddImpulse(const Impulse& impulse)
 	{
 	}
 

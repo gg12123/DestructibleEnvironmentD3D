@@ -6,11 +6,10 @@ class Rigidbody;
 class SplitInfo
 {
 public:
-	SplitInfo(Rigidbody& toSplit, const Impulse& cause) : CauseImpulse(cause)
+	SplitInfo(Rigidbody& toSplit, const Impulse& cause) : CauseImpulse(cause), ToSplit(&toSplit)
 	{
-		ToSplit = &toSplit;
 	}
 
-	Rigidbody * ToSplit;
-	Impulse CauseImpulse;
+	Rigidbody * const ToSplit;
+	const Impulse CauseImpulse;
 };
