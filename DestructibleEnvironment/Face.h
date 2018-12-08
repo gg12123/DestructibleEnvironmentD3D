@@ -109,7 +109,7 @@ public:
 	Vector3 GetEdgeNormal(const ShapeEdge& edge) const;
 	Vector3 GetEdgeNormal(int index) const;
 
-	FaceEdgeCaseResult CastToEdgeInside(const Vector3& origin, const Vector3& dir);
+	FaceEdgeCaseResult CastToEdgeInside(const Vector3& origin, const Vector3& dir) const;
 
 	auto GetPlaneP0() const
 	{

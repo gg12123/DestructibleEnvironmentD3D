@@ -161,6 +161,11 @@ public:
 		assert(false);
 	}
 
+	bool IsAttachedTo(const Face& f)
+	{
+		return (&f == m_Face1) || (&f == m_Face2);
+	}
+
 private:
 	Face* m_Face1 = nullptr;
 	Face* m_Face2 = nullptr;

@@ -71,7 +71,7 @@ void Face::RefreshPointObjects()
 		m_PointObjects.emplace_back(&(*it)->GetStart(*this));
 }
 
-FaceEdgeCaseResult Face::CastToEdgeInside(const Vector3& origin, const Vector3& dir)
+FaceEdgeCaseResult Face::CastToEdgeInside(const Vector3& origin, const Vector3& dir) const
 {
 	auto origin2 = ToFaceSpacePosition(origin);
 	auto dir2 = ToFaceSpaceDirection(dir);
