@@ -18,6 +18,20 @@ void  Face::AddPoint(ShapePoint& point, ShapeEdge& edgeToNext)
 	edgeToNext.RegisterFace(*this, m_EdgeObjects.size() - 1);
 }
 
+void Face::ReplaceEdge(const ShapeEdge& existing, ShapeEdge& newEdge)
+{
+	for (auto i = 0u; i < m_EdgeObjects.size(); i++)
+	{
+		if (m_EdgeObjects[i] == &existing)
+		{
+			m_EdgeObjects[i] = &newEdge;
+			newEdge.RegisterFace(*this, i);
+			return;
+		}
+	}
+	assert(false);
+}
+
 void Face::OnSplittingFinished(Shape& owner)
 {
 	m_OwnerShape = &owner;
@@ -65,11 +79,15 @@ Vector3 Face::GetEdgeDirection(int index) const
 	return (m_CachedPoints[NextPointIndex(index)] - m_CachedPoints[index]).Normalized();
 }
 
-void Face::RefreshPointObjects()
+void Face::ReplacePointObjects(const ShapePoint& oldP0, const ShapePoint& oldP1, ShapePoint& replacement)
 {
-	m_PointObjects.clear();
-	for (auto it = m_EdgeObjects.begin(); it != m_EdgeObjects.end(); it++)
-		m_PointObjects.emplace_back(&(*it)->GetStart(*this));
+	for (auto it = m_PointObjects.begin(); it != m_PointObjects.end(); it++)
+	{
+		auto p = *it;
+
+		if (&oldP0 == p || &oldP1 == p)
+			*it = &replacement;
+	}
 }
 
 FaceEdgeCaseResult Face::CastToEdgeInside(const Vector3& origin, const Vector3& dir) const

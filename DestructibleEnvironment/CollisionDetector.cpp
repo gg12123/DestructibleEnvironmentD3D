@@ -5,7 +5,7 @@
 #include "Transform.h"
 #include "ShapeEdge.h"
 
-PotentialCollision CollisionDetector::ToPotentialCollision(const EdgeFaceIntersection& inter, const Shape& shape1)
+PotentialCollision CollisionDetector::ToPotentialCollision(const EdgeFaceIntersection& inter, const Shape& shape1, const Shape& shape2)
 {
 	auto& edge = inter.GetEdge();
 	auto& shapeEdges = edge.GetFace1().GetShape();
@@ -30,7 +30,7 @@ bool CollisionDetector::FindCollision(Shape& shape1, Shape& shape2, std::vector<
 	if (m_FoundIntersections.size() > 0U)
 	{
 		for (auto it = m_FoundIntersections.begin(); it != m_FoundIntersections.end(); it++)
-			detectedColls.emplace_back(ToPotentialCollision(*it, shape1));
+			detectedColls.emplace_back(ToPotentialCollision(*it, shape1, shape2));
 
 		return true;
 	}

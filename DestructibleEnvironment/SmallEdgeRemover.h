@@ -18,6 +18,7 @@ private:
 
 		auto& e0SideFace = e0.GetOther(f);
 
+		e1.DeRegisterFace(f);
 		e0SideFace.ReplaceEdge(e0, e1);
 
 		// TODO - retrun e0 and f to the pool.
@@ -49,13 +50,21 @@ public:
 
 		// Collapse the faces either side of the small edge
 
+		auto removedFace1 = &toRemove.GetFace1();
+		auto removedFace2 = &toRemove.GetFace2();
+
 		CollapseFace(toRemove.GetFace1(), toRemove);
 		CollapseFace(toRemove.GetFace2(), toRemove);
 
 		// Make the faces grab the new point
 
 		for (auto it = m_FacesAboutPoints.begin(); it != m_FacesAboutPoints.end(); it++)
-			(*it)->RefreshPointObjects(); // This will make the collapsed faces refresh thier point objects but that doesnt really matter.
+		{
+			auto f = *it;
+
+			if (f != removedFace1 && f != removedFace2)
+				f->ReplacePointObjects(p0, p1, newPoint);
+		}
 
 		// TODO - retrun p0 and p1 to the pool
 	}

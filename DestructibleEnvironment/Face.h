@@ -171,14 +171,9 @@ public:
 		m_FacePoly.Clear();
 	}
 
-	void ReplaceEdge(const ShapeEdge& existing, ShapeEdge& newEdge)
-	{
-		auto it = std::find(m_EdgeObjects.begin(), m_EdgeObjects.end(), &existing);
-		assert(it != m_EdgeObjects.end());
-		*it = &newEdge;
-	}
+	void ReplaceEdge(const ShapeEdge& existing, ShapeEdge& newEdge);
 
-	void RefreshPointObjects();
+	void ReplacePointObjects(const ShapePoint& oldP0, const ShapePoint& oldP1, ShapePoint& replacement);
 
 private:
 	void InitFaceCoOrdinateSystem(const Vector3& origin)

@@ -81,6 +81,8 @@ public:
 
 			reversedFace->AddPoint(pRev0, e);
 		}
+
+		reversedFace->SetNormal(-face.GetNormal());
 	}
 
 	void Init(ShapeEdgesCreator& edgeCreator)

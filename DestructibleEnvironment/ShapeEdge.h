@@ -152,10 +152,16 @@ public:
 	void ReplacePoint(const ShapePoint& existing, ShapePoint& newPoint)
 	{
 		if (&existing == m_P0)
+		{
 			m_P0 = &newPoint;
+			return;
+		}
 
 		if (&existing == m_P1)
+		{
 			m_P1 = &newPoint;
+			return;
+		}
 
 		assert(false);
 	}

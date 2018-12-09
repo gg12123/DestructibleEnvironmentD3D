@@ -43,9 +43,10 @@ void Shape::RemoveSmallEdges()
 	static constexpr float minEdgeLength = 0.001f;
 	static constexpr float minEdgeLengthSqr = minEdgeLength * minEdgeLength;
 
-	for (auto itFace = m_Faces.begin(); itFace != m_Faces.end(); itFace++)
+	for (auto itFace = m_Faces.begin(); itFace != m_Faces.end();)
 	{
 		auto& edges = (*itFace)->GetEdgeObjects();
+		auto removed = false;
 
 		for (auto itEdge = edges.begin(); itEdge != edges.end(); itEdge++)
 		{
@@ -58,13 +59,20 @@ void Shape::RemoveSmallEdges()
 
 				edgeRemover.RemoveEdge(e);
 
-				m_Faces.erase(itFace);
-				m_Faces.erase(std::find(itFace, m_Faces.end(), f2));
+				itFace = m_Faces.erase(itFace);
 
-				// Only need to decrement by 1 because f2 is further up the list that f1.
-				itFace--;
+				if (*itFace == f2)
+					itFace = m_Faces.erase(itFace);
+				else
+					m_Faces.erase(std::find(itFace, m_Faces.end(), f2));
+
+				removed = true;
+				break;
 			}
 		}
+
+		if (!removed)
+			itFace++;
 	}
 }
 
@@ -89,6 +97,8 @@ void Shape::CollectPointsAndEdges()
 			TryCollectPoint(*points[nextI]);
 
 			TryCollectEdge(*edges[i]);
+
+			assert(edges[i]->IsAttachedTo(face));
 		}
 	}
 }
@@ -100,7 +110,7 @@ Vector3 Shape::CalculateCentre()
 	for (auto it = m_PointObjects.begin(); it != m_PointObjects.end(); it++)
 		c += (*it)->GetPoint();
 
-	return c;
+	return c / static_cast<float>(m_PointObjects.size());
 }
 
 void Shape::ReCentre(const Vector3& centre)
