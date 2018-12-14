@@ -14,6 +14,18 @@ private:
 		PointsBelow
 	};
 
+	struct DWithChosenFace
+	{
+		const Face const* FBc;
+		const Vector3 D;
+
+		DWithChosenFace(const Face& fBc, const Vector3& d) :
+			FBc(&fBc),
+			D(d)
+		{
+		}
+	};
+
 	bool IsInsideCornerEdge(const ShapeEdge& edge) const
 	{
 		auto& faceEdge = edge.GetFace1();
@@ -69,15 +81,98 @@ private:
 		return EdgeRelationshipWithFace::PointsBelow;
 	}
 
+	Vector3 AssertDExists(const Face& fBi, const Face& fA0) const
+	{
+		auto d = Vector3::Cross(fBi.GetNormal(), fA0.GetNormal());
+		auto mag = d.Magnitude();
+		assert(mag > 0.0f);
+		return d / mag;
+	}
+
+	DWithChosenFace CalculateD(const ShapeEdge& eB, const Face& fA0, const Vector3& eAN) const
+	{
+		auto& fB0 = eB.GetFace1();
+		auto& fB1 = eB.GetFace2();
+
+		auto d0 = AssertDExists(fB0, fA0).InDirectionOf(fB0.GetEdgeNormal(eB));
+		auto d1 = AssertDExists(fB1, fA0).InDirectionOf(fB1.GetEdgeNormal(eB));;
+
+		return MathU::Abs(Vector3::Dot(d0, eAN)) > MathU::Abs(Vector3::Dot(d1, eAN)) ?
+			DWithChosenFace(fB0, d0) :
+			DWithChosenFace(fB1, d1);
+	}
+
+	bool FBcIntersectionImplied(const DWithChosenFace& d, const Vector3& eAN, bool X) const
+	{
+		auto dot = Vector3::Dot(d.D, eAN);
+		assert(dot != 0.0f);
+
+		if ((dot < 0.0f && X) || (dot > 0.0f && !X))
+			return false;
+
+		return true;
+	}
+
 public:
 	EdgeEdgeRelationship()
 	{
+	}
+
+	EdgeEdgeRelationship(const ShapeEdge& edgeFaces,
+		const ShapeEdge& piercingEdge,
+		const Face& bridgedByEdgeFaces,
+		bool intersectionImpliedForBridgedFace,
+		const MapToPointPlaneRelationship& mapToPointPlane)
+	{
+		auto& eB = edgeFaces;
+		auto& eA = piercingEdge;
+
+		auto& fA0 = bridgedByEdgeFaces;
+		auto& fA1 = eA.GetOther(fA0);
+
+		auto relationshipWithFA0 = GetEdgeFaceRelationship(eB, fA0, mapToPointPlane);
+		auto relationshipWithFA1 = GetEdgeFaceRelationship(eB, fA1, mapToPointPlane);
+
+		if (relationshipWithFA0 == EdgeRelationshipWithFace::Mixed && relationshipWithFA1 == EdgeRelationshipWithFace::Mixed)
+		{
+			auto eAN = fA0.GetEdgeNormal(eA);
+			auto d = CalculateD(eB, fA0, eAN);
+
+			auto& fBc = *d.FBc;
+			auto& fBOther = eB.GetOther(fBc);
+
+			auto intersectionImpliedForFBc = FBcIntersectionImplied(d, eAN, intersectionImpliedForBridgedFace);
+
+			auto& pA0 = eA.GetP0();
+
+			auto intersectionImpliedForFBOther = mapToPointPlane.GetRelationship(eB.GetFace1(), pA0) == mapToPointPlane.GetRelationship(eB.GetFace2(), pA0) ?
+				!intersectionImpliedForFBc :
+				intersectionImpliedForFBc;
+
+			m_Face1 = &fBc;
+			m_ImpliesIntersectionForFace1 = intersectionImpliedForFBc;
+
+			m_Face2 = &fBOther;
+			m_ImpliesIntersectionForFace2 = intersectionImpliedForFBOther;
+		}
+		else
+		{
+			m_Face1 = &eB.GetFace1();
+			m_Face2 = &eB.GetFace2();
+
+			m_ImpliesIntersectionForFace1 = false;
+			m_ImpliesIntersectionForFace2 = false;
+		}
+
+		m_IsConstrained = false;
+		m_PiercingEdge = &eA;
 	}
 
 	EdgeEdgeRelationship(const ShapeEdge& piercingEdge, const ShapeEdge& edgeFaces, const MapToPointPlaneRelationship& mapToPointPlane)
 	{
 		m_Face1 = &edgeFaces.GetFace1();
 		m_Face2 = &edgeFaces.GetFace2();
+		m_PiercingEdge = &piercingEdge;
 
 		auto relationshipWithFace1 = GetEdgeFaceRelationship(piercingEdge, *m_Face1, mapToPointPlane);
 		auto relationshipWithFace2 = GetEdgeFaceRelationship(piercingEdge, *m_Face2, mapToPointPlane);
@@ -86,14 +181,18 @@ public:
 		{
 			m_ImpliesIntersectionForFace1 = ImpliesIntersection(relationshipWithFace2, edgeFaces);
 			m_ImpliesIntersectionForFace2 = false;
+			m_IsConstrained = true;
 		}
 		else if (relationshipWithFace2 == EdgeRelationshipWithFace::Mixed && relationshipWithFace1 != EdgeRelationshipWithFace::Mixed)
 		{
 			m_ImpliesIntersectionForFace2 = ImpliesIntersection(relationshipWithFace1, edgeFaces);
 			m_ImpliesIntersectionForFace1 = false;
+			m_IsConstrained = true;
 		}
 		else if (relationshipWithFace1 == EdgeRelationshipWithFace::Mixed && relationshipWithFace2 == EdgeRelationshipWithFace::Mixed)
 		{
+			m_IsConstrained = false;
+
 			m_ImpliesIntersectionForFace1 = IntersectionWithPlaneImpliesIntersectionWithFace(*m_Face1, edgeFaces, piercingEdge);
 
 			auto& p0 = piercingEdge.GetP0();
@@ -103,6 +202,7 @@ public:
 		}
 		else
 		{
+			m_IsConstrained = false;
 			m_ImpliesIntersectionForFace1 = m_ImpliesIntersectionForFace2 = false;
 		}
 	}
@@ -119,10 +219,32 @@ public:
 		return false;
 	}
 
+	const Face* GetBridgedFace(const MapToPointPlaneRelationship& mapToPointPlane) const
+	{
+		auto r1 = GetEdgeFaceRelationship(*m_PiercingEdge, *m_Face1, mapToPointPlane);
+		if (r1 == EdgeRelationshipWithFace::Mixed)
+			return m_Face1;
+
+		auto r2 = GetEdgeFaceRelationship(*m_PiercingEdge, *m_Face2, mapToPointPlane);
+		if (r2 == EdgeRelationshipWithFace::Mixed)
+			return m_Face2;
+
+		return nullptr;
+	}
+
+	bool IsConstrained() const
+	{
+		return m_IsConstrained;
+	}
+
 private:
 	const Face* m_Face1;
 	const Face* m_Face2;
 
 	bool m_ImpliesIntersectionForFace1;
 	bool m_ImpliesIntersectionForFace2;
+
+	const ShapeEdge* m_PiercingEdge;
+
+	bool m_IsConstrained;
 };

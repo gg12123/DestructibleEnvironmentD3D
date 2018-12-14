@@ -181,6 +181,56 @@ private:
 		m_EdgeEdgeRelationships.Get(edgeFaces.GetHash(), piercingEdge.GetHash()) = r;
 	}
 
+	EdgeEdgeRelationship MakeConsistentRelationship(const EdgeEdgeRelationship& rConstrained, const ShapeEdge& piercingEdge, const ShapeEdge& edgeFaces)
+	{
+		auto& bridged = *rConstrained.GetBridgedFace(m_PointPlaneRelationshipMap);
+		return EdgeEdgeRelationship(edgeFaces, piercingEdge, bridged, rConstrained.ImpliesIntersectionFor(bridged), m_PointPlaneRelationshipMap);
+	}
+
+	void InitConsistentEdgeEdgeRelationship(const ShapeEdge& peInConstrined, const ShapeEdge& efInConstrined, const EdgeEdgeRelationship& rConstrained)
+	{
+		SetEdgeEdgeRelationship(efInConstrined, peInConstrined, rConstrained);
+		SetEdgeEdgeRelationship(peInConstrined, efInConstrined, MakeConsistentRelationship(rConstrained, efInConstrined, peInConstrined));
+	}
+
+	void InitEdgeEdgeRelationship(const ShapeEdge& e0, const ShapeEdge& e1)
+	{
+		auto r0 = EdgeEdgeRelationship(e0, e1, m_PointPlaneRelationshipMap);
+		auto r1 = EdgeEdgeRelationship(e1, e0, m_PointPlaneRelationshipMap);
+
+		if (r0.IsConstrained() && r1.IsConstrained())
+		{
+			SetEdgeEdgeRelationship(e1, e0, r0);
+			SetEdgeEdgeRelationship(e0, e1, r1);
+		}
+		else if (r0.IsConstrained())
+		{
+			InitConsistentEdgeEdgeRelationship(e0, e1, r0);
+		}
+		else if (r1.IsConstrained())
+		{
+			InitConsistentEdgeEdgeRelationship(e1, e0, r1);
+		}
+		else
+		{
+			auto b0 = r0.GetBridgedFace(m_PointPlaneRelationshipMap);
+			auto b1 = r1.GetBridgedFace(m_PointPlaneRelationshipMap);
+			if (b0)
+			{
+				InitConsistentEdgeEdgeRelationship(e0, e1, r0);
+			}
+			else if (b1)
+			{
+				InitConsistentEdgeEdgeRelationship(e1, e0, r1);
+			}
+			else
+			{
+				SetEdgeEdgeRelationship(e1, e0, r0);
+				SetEdgeEdgeRelationship(e0, e1, r1);
+			}
+		}
+	}
+
 	void DeterminePointPlaneRelationships(const std::vector<ShapePoint*>& points, const std::vector<Face*>& faces)
 	{
 		for (auto f : faces)
@@ -198,16 +248,15 @@ private:
 		}
 	}
 
-	void DetermineEdgeEdgeRelationships(const std::vector<ShapeEdge*>& piercedFacesEdges, const std::vector<ShapeEdge*>& piercingEdges)
+	void DetermineEdgeEdgeRelationships(const std::vector<ShapeEdge*>& edgesA, const std::vector<ShapeEdge*>& edgesB)
 	{
-		for (auto pfep : piercedFacesEdges)
+		for (auto edgeAp : edgesA)
 		{
-			auto& pfe = *pfep;
+			auto& a = *edgeAp;
 
-			for (auto pep : piercingEdges)
+			for (auto edgeBp : edgesB)
 			{
-				auto& pe = *pep;
-				SetEdgeEdgeRelationship(pfe, pe, EdgeEdgeRelationship(pe, pfe, m_PointPlaneRelationshipMap));
+				InitEdgeEdgeRelationship(a, *edgeBp);
 			}
 		}
 	}
