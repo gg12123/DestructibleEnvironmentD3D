@@ -12,160 +12,145 @@
 #include "PoolOfRecyclables.h"
 #include "TwoDArray.h"
 #include "IntersectionLoop.h"
+#include "TriangleArray.h"
 
-class IntersectionsByPiercingEdge
+class FaceFaceInteraction
 {
+public:
+	FaceFaceInteraction()
+	{
+		Reset();
+	}
+
+	void Reset()
+	{
+		m_IntersRegistered = 0;
+		m_IsUsed = false;
+	}
+
+	void Register(const EdgeFaceIntersection& inter)
+	{
+		assert(m_IntersRegistered < 2);
+
+		if (m_IntersRegistered == 0)
+		{
+			m_Inter1 = inter;
+		}
+		else
+		{
+			m_Inter2 = inter;
+		}
+
+		m_IntersRegistered++;
+	}
+
+	const auto& GetInter1() const
+	{
+		return m_Inter1;
+	}
+
+	const auto& GetInter2() const
+	{
+		return m_Inter2;
+	}
+
+	bool IsUsed() const
+	{
+		return m_IsUsed;
+	}
+
+private:
+	EdgeFaceIntersection m_Inter1;
+	EdgeFaceIntersection m_Inter2;
+	int m_IntersRegistered;
+	bool m_IsUsed;
+};
+
+class MapToFaceFaceInteractions
+{
+private:
+	struct InteractionSlot
+	{
+		const int Row;
+		const int Col;
+
+		InteractionSlot(int row, int col) : Row(row), Col(col)
+		{
+		}
+	};
+
+	void RegisterIntersection(const EdgeFaceIntersection& inter, const Face& faceA, const Face& faceB)
+	{
+		auto row = faceA.GetHash();
+		auto col = faceB.GetHash();
+
+		m_Interactions.Get(row, col).Register(inter);
+		m_SlotsWithInters.emplace_back(InteractionSlot(row, col));
+	}
 
 public:
-	const auto& GetIntersections(const ShapeEdge& edge) const
-	{
-		return m_Intersections[edge.GetHash()];
-	}
-
-	bool GetAnyIntersection(EdgeFaceIntersection& inter) const
-	{
-		for (auto& index : m_IndexsWithIntersections)
-		{
-			if (m_Intersections[index].size() > 0u)
-			{
-				inter = m_Intersections[index][0];
-				return true;
-			}
-		}
-		return false;
-	}
-
-	void RemoveIntersection(const EdgeFaceIntersection& inter)
-	{
-		CollectionU::Remove(m_Intersections[inter.GetEdge().GetHash()], inter);
-
-		// No point removing the index from 'indexs with intersections' becuase I
-		// think it will slow things down.
-	}
-
 	void RegisterIntersection(const EdgeFaceIntersection& inter)
 	{
-		auto index = inter.GetEdge().GetHash();
+		auto& pf = inter.GetFace();
+		auto& pe = inter.GetEdge();
 
-		m_Intersections[index].emplace_back(inter);
-		m_IndexsWithIntersections.emplace_back(index);
+		RegisterIntersection(inter, pf, pe.GetFace1());
+		RegisterIntersection(inter, pf, pe.GetFace2());
 	}
 
 	void Clear()
 	{
-		for (auto& index : m_IndexsWithIntersections)
-			m_Intersections[index].clear();
+		for (auto& slot : m_SlotsWithInters)
+			m_Interactions.Get(slot.Row, slot.Col).Reset();
 
-		m_IndexsWithIntersections.clear();
+		m_SlotsWithInters.clear();
 	}
 
-	// For when the caller knows that it has removed all the intersections
-	void ClearFast()
+	FaceFaceInteraction* GetUnUsedInteraction()
 	{
-		m_IndexsWithIntersections.clear();
+		for (auto& slot : m_SlotsWithInters)
+		{
+			auto& interac = m_Interactions.Get(slot.Row, slot.Col);
+			if (!interac.IsUsed())
+				&interac;
+		}
+		return nullptr;
 	}
 
 private:
-	std::vector<int> m_IndexsWithIntersections;
-	std::array<std::vector<EdgeFaceIntersection>, Constants::MaxNumEdges> m_Intersections; // This is keyed by cut shape edges so could use less memory.
+	TriangleArray<Constants::MaxNumFaces, FaceFaceInteraction> m_Interactions;
+	std::vector<InteractionSlot> m_SlotsWithInters;
 };
 
 class IntersectionLinker
 {
 private:
-	bool TargetReached(const std::vector<EdgeFaceIntersection>& targets, const EdgeFaceIntersection& curr) const
-	{
-		return CollectionU::Contains(targets, curr);
-	}
-
-	EdgeFaceIntersection CastToNext(const EdgeFaceIntersection& curr, Face& travelFace, Face& currOtherFace, const std::vector<EdgeFaceIntersection>& targets) const
-	{
-		auto& ownerOfEdge = curr.GetEdge().IsAttachedTo(travelFace) ? travelFace : currOtherFace;
-
-		auto castOrigin = curr.GetIntPoint();
-		auto castDir = Vector3::Cross(travelFace.GetNormal(), currOtherFace.GetNormal()).InDirectionOf(-ownerOfEdge.GetEdgeNormal(curr.GetEdge()));
-
-		auto mag = castDir.Magnitude();
-		assert(mag > 0.0f);
-		castDir /= mag;
-
-		auto hitTravelFace = travelFace.CastToEdgeInside(castOrigin, castDir);
-		auto travelImpliedIntersection = EdgeFaceIntersection(currOtherFace, *hitTravelFace.Edge, hitTravelFace.IntPoint);
-
-		if (TargetReached(targets, travelImpliedIntersection))
-			return travelImpliedIntersection;
-
-		auto hitOtherFace = currOtherFace.CastToEdgeInside(castOrigin, castDir);
-		return EdgeFaceIntersection(travelFace, *hitOtherFace.Edge, hitOtherFace.IntPoint);
-	}
-
-	bool LinkToNext(const EdgeFaceIntersection& start, Face& travelFace, const std::vector<EdgeFaceIntersection>& targets, EdgeFaceIntersection& nextStart)
-	{
-		// TODO - This is fairly likly to fail. Need to use something like A*.
-
-		auto curr = start;
-		auto currOtherFace = &start.GetFace();
-		auto targetReached = false;
-
-		while (!targetReached)
-		{
-			curr = CastToNext(curr, travelFace, *currOtherFace, targets);
-			targetReached = TargetReached(targets, curr);
-
-			auto& currEdge = curr.GetEdge();
-			if (currEdge.IsAttachedTo(*currOtherFace))
-			{
-				currOtherFace = &currEdge.GetOther(*currOtherFace);
-			}
-			else
-			{
-				if (!targetReached)
-					return false;
-			}
-			m_CurrLoop->AddIntersection(curr);
-		}
-		nextStart = curr;
-		return true;
-	}
-
-	void FindTargetIntersections(const Face& travelFace, IntersectionsByPiercingEdge& intersByEdge, std::vector<EdgeFaceIntersection>& targets)
-	{
-		for (auto edge : travelFace.GetEdgeObjects())
-		{
-			for (auto& inter : intersByEdge.GetIntersections(*edge))
-				targets.emplace_back(inter);
-		}
-	}
 
 public:
-	bool FindLoop(IntersectionLoop& loop, IntersectionsByPiercingEdge& intersByEdge, const EdgeFaceIntersection& startInter)
+	IntersectionLinker()
 	{
-		m_CurrLoop = &loop;
+		m_IntersectionLoops = std::unique_ptr<PoolOfRecyclables<IntersectionLoop>>(
+			new PoolOfRecyclables<IntersectionLoop>(3));
+	}
 
-		auto currStart = startInter;
-		auto currTravelFace = &currStart.GetEdge().GetFace1();
+	bool FindLoops(std::vector<IntersectionLoop*>& loops)
+	{
+		
+	}
 
-		do
-		{
-			m_Targets.clear();
-			FindTargetIntersections(*currTravelFace, intersByEdge, m_Targets);
+	void RegisterIntersection(const EdgeFaceIntersection& inter)
+	{
+		m_FaceFaceInteractions.RegisterIntersection(inter);
+	}
 
-			static EdgeFaceIntersection nextStart;
-			if (!LinkToNext(currStart, *currTravelFace, m_Targets, nextStart))
-				return false;
-
-			currStart = nextStart;
-			currTravelFace = &currStart.GetEdge().GetOther(*currTravelFace);
-			intersByEdge.RemoveIntersection(currStart);
-
-		} while (currStart != startInter);
-
-		return true;
+	void Clear()
+	{
+		m_FaceFaceInteractions.Clear();
 	}
 
 private:
-	IntersectionLoop * m_CurrLoop = nullptr;
-	std::vector<EdgeFaceIntersection> m_Targets;
+	MapToFaceFaceInteractions m_FaceFaceInteractions;
+	std::unique_ptr<PoolOfRecyclables<IntersectionLoop>> m_IntersectionLoops;
 };
 
 class CleanIntersectionFinder
@@ -274,7 +259,7 @@ private:
 		Vector3 intPoint;
 		assert(Vector3::LinePlaneIntersection(face.GetPlaneP0(), face.GetNormal(), piercingEdge.GetP0().GetPoint(), piercingEdge.GetP1().GetPoint(), intPoint));
 
-		m_Intersections.RegisterIntersection(EdgeFaceIntersection(face, piercingEdge, intPoint));
+		m_Linker.RegisterIntersection(EdgeFaceIntersection(face, piercingEdge, intPoint));
 	}
 
 	void FindIntersections(const std::vector<Face*>& faces, const std::vector<ShapeEdge*>& piercingEdges)
@@ -284,42 +269,9 @@ private:
 				FindIntersection(*f, *e);
 	}
 
-	int IntersectionCount(const Face& f) const
-	{
-		auto c = 0;
-
-		for (auto e : f.GetEdgeObjects())
-			c += m_Intersections.GetIntersections(*e).size();
-
-		return c;
-	}
-
-	bool ValidateIntersections(const std::vector<Face*>& facesWithPiercingEdges) const
-	{
-		for (auto f : facesWithPiercingEdges)
-		{
-			if ((IntersectionCount(*f) % 2) != 0)
-				return false;
-		}
-		return true;
-	}
-
 	bool LinkIntersections(std::vector<IntersectionLoop*>& loops)
 	{
-		m_IntersectionLoops->Reset();
-		EdgeFaceIntersection loopStart;
-
-		while (m_Intersections.GetAnyIntersection(loopStart))
-		{
-			auto& loop = m_IntersectionLoops->Recycle();
-			loop.Clear();
-
-			if (!m_Linker.FindLoop(loop, m_Intersections, loopStart))
-				return false;
-
-			loops.emplace_back(&loop);
-		}
-		return true;
+		return m_Linker.FindLoops(loops);
 	}
 
 	template<class T>
@@ -336,69 +288,64 @@ private:
 			o->ResetHash();
 	}
 
-	void AssignHashes(const Shape& shapeEdges, const Shape& shapeFaces)
+	void AssignHashes(const Shape& s)
 	{
-		Face::ResetNextHashCounter();
-		ShapeEdge::ResetNextHashCounter();
-		ShapePoint::ResetNextHashCounter();
 
-		AssignHashes(shapeEdges.GetEdgeObjects());
-		AssignHashes(shapeEdges.GetPointObjects());
-
-		AssignHashes(shapeFaces.GetEdgeObjects());
-		AssignHashes(shapeFaces.GetFaces());
 	}
 
-	void UnAssignHashes(const Shape& shapeEdges, const Shape& shapeFaces)
+	void UnAssignHashes(const Shape& s)
+	{
+
+	}
+
+	void AssignHashes(const Shape& shapeA, const Shape& shapeB)
 	{
 		Face::ResetNextHashCounter();
 		ShapeEdge::ResetNextHashCounter();
 		ShapePoint::ResetNextHashCounter();
 
-		UnAssignHashes(shapeEdges.GetEdgeObjects());
-		UnAssignHashes(shapeEdges.GetPointObjects());
+		AssignHashes(shapeA);
+		AssignHashes(shapeB);
+	}
 
-		UnAssignHashes(shapeFaces.GetEdgeObjects());
-		UnAssignHashes(shapeFaces.GetFaces());
+	void UnAssignHashes(const Shape& shapeA, const Shape& shapeB)
+	{
+		Face::ResetNextHashCounter();
+		ShapeEdge::ResetNextHashCounter();
+		ShapePoint::ResetNextHashCounter();
+
+		UnAssignHashes(shapeA);
+		UnAssignHashes(shapeB);
 	}
 
 public:
 	CleanIntersectionFinder()
 	{
-		m_IntersectionLoops = std::unique_ptr<PoolOfRecyclables<IntersectionLoop>>(
-			new PoolOfRecyclables<IntersectionLoop>(3));
 	}
 
 	// Both shapes must have the same local space.
 	// Loops are recycled so must be used before the next call.
-	bool FindCleanIntersections(const Shape& shapeEdges, const Shape& shapeFaces, std::vector<IntersectionLoop*>& loops)
+	bool FindCleanIntersections(const Shape& shapeA, const Shape& shapeB, std::vector<IntersectionLoop*>& loops)
 	{
-		AssignHashes(shapeEdges, shapeFaces);
+		AssignHashes(shapeA, shapeB);
 
-		DeterminePointPlaneRelationships(shapeEdges.GetPointObjects(), shapeFaces.GetFaces());
-		DetermineEdgeEdgeRelationships(shapeFaces.GetEdgeObjects(), shapeEdges.GetEdgeObjects());
-		FindIntersections(shapeFaces.GetFaces(), shapeEdges.GetEdgeObjects());
+		DeterminePointPlaneRelationships(shapeA.GetPointObjects(), shapeB.GetFaces());
+		DeterminePointPlaneRelationships(shapeB.GetPointObjects(), shapeA.GetFaces());
 
-		auto valid = false;
+		DetermineEdgeEdgeRelationships(shapeB.GetEdgeObjects(), shapeA.GetEdgeObjects());
 
-		if (ValidateIntersections(shapeEdges.GetFaces()) && LinkIntersections(loops))
-		{
-			m_Intersections.ClearFast();
-			valid = true;
-		}
-		else
-		{
-			m_Intersections.Clear();
-		}
+		FindIntersections(shapeA.GetFaces(), shapeB.GetEdgeObjects());
+		FindIntersections(shapeB.GetFaces(), shapeA.GetEdgeObjects());
 
-		UnAssignHashes(shapeEdges, shapeFaces);
+		auto valid = LinkIntersections(loops);
+		m_Linker.Clear();
+		UnAssignHashes(shapeA, shapeB);
+
 		return valid;
 	}
 
 private:
-	IntersectionsByPiercingEdge m_Intersections;
 	IntersectionLinker m_Linker;
-	std::unique_ptr<PoolOfRecyclables<IntersectionLoop>> m_IntersectionLoops;
 	MapToPointPlaneRelationship m_PointPlaneRelationshipMap;
 	TwoDArray<Constants::MaxNumEdges, Constants::MaxNumEdges, EdgeEdgeRelationship> m_EdgeEdgeRelationships;
 };

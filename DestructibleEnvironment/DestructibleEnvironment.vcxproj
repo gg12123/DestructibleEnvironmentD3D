@@ -287,6 +287,7 @@
     <ClInclude Include="StaticShapeProxy.h" />
     <ClInclude Include="StringU.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="TriangleArray.h" />
     <ClInclude Include="TwoDArray.h" />
     <ClInclude Include="UpdatableBound.h" />
     <ClInclude Include="Vector2.h" />
