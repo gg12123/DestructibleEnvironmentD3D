@@ -24,5 +24,5 @@ public:
 	}
 
 private:
-	TwoDArray<Constants::MaxNumFaces, Constants::MaxNumPoints, PointPlaneRelationship> m_Map;
+	TwoDArray<2 * Constants::MaxNumFaces, 2 * Constants::MaxNumPoints, PointPlaneRelationship> m_Map;
 };

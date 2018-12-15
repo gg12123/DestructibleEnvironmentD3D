@@ -16,7 +16,7 @@ private:
 
 	struct DWithChosenFace
 	{
-		const Face const* FBc;
+		const Face * const FBc;
 		const Vector3 D;
 
 		DWithChosenFace(const Face& fBc, const Vector3& d) :
@@ -94,8 +94,8 @@ private:
 		auto& fB0 = eB.GetFace1();
 		auto& fB1 = eB.GetFace2();
 
-		auto d0 = AssertDExists(fB0, fA0).InDirectionOf(fB0.GetEdgeNormal(eB));
-		auto d1 = AssertDExists(fB1, fA0).InDirectionOf(fB1.GetEdgeNormal(eB));;
+		auto d0 = AssertDExists(fB0, fA0).InDirectionOf(-fB0.GetEdgeNormal(eB));
+		auto d1 = AssertDExists(fB1, fA0).InDirectionOf(-fB1.GetEdgeNormal(eB));;
 
 		return MathU::Abs(Vector3::Dot(d0, eAN)) > MathU::Abs(Vector3::Dot(d1, eAN)) ?
 			DWithChosenFace(fB0, d0) :
@@ -130,10 +130,13 @@ public:
 		auto& fA0 = bridgedByEdgeFaces;
 		auto& fA1 = eA.GetOther(fA0);
 
-		auto relationshipWithFA0 = GetEdgeFaceRelationship(eB, fA0, mapToPointPlane);
-		auto relationshipWithFA1 = GetEdgeFaceRelationship(eB, fA1, mapToPointPlane);
+		auto& fB0 = eB.GetFace1();
+		auto& fB1 = eB.GetFace2();
 
-		if (relationshipWithFA0 == EdgeRelationshipWithFace::Mixed && relationshipWithFA1 == EdgeRelationshipWithFace::Mixed)
+		auto relationshipWithFB0 = GetEdgeFaceRelationship(eA, fB0, mapToPointPlane);
+		auto relationshipWithFB1 = GetEdgeFaceRelationship(eA, fB1, mapToPointPlane);
+
+		if (relationshipWithFB0 == EdgeRelationshipWithFace::Mixed && relationshipWithFB1 == EdgeRelationshipWithFace::Mixed)
 		{
 			auto eAN = fA0.GetEdgeNormal(eA);
 			auto d = CalculateD(eB, fA0, eAN);
@@ -145,7 +148,7 @@ public:
 
 			auto& pA0 = eA.GetP0();
 
-			auto intersectionImpliedForFBOther = mapToPointPlane.GetRelationship(eB.GetFace1(), pA0) == mapToPointPlane.GetRelationship(eB.GetFace2(), pA0) ?
+			auto intersectionImpliedForFBOther = mapToPointPlane.GetRelationship(fB0, pA0) == mapToPointPlane.GetRelationship(fB1, pA0) ?
 				!intersectionImpliedForFBc :
 				intersectionImpliedForFBc;
 
@@ -157,6 +160,8 @@ public:
 		}
 		else
 		{
+			assert(relationshipWithFB0 != EdgeRelationshipWithFace::Mixed && relationshipWithFB1 != EdgeRelationshipWithFace::Mixed);
+
 			m_Face1 = &eB.GetFace1();
 			m_Face2 = &eB.GetFace2();
 

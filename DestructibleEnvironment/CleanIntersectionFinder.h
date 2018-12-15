@@ -24,15 +24,16 @@ public:
 
 	void Reset()
 	{
-		m_IntersRegistered = 0;
+		m_NumIntersRegistered = 0;
 		m_IsUsed = false;
+		m_Face1 = m_Face2 = nullptr;
 	}
 
 	void Register(const EdgeFaceIntersection& inter)
 	{
-		assert(m_IntersRegistered < 2);
+		assert(m_NumIntersRegistered < 2);
 
-		if (m_IntersRegistered == 0)
+		if (m_NumIntersRegistered == 0)
 		{
 			m_Inter1 = inter;
 		}
@@ -41,7 +42,13 @@ public:
 			m_Inter2 = inter;
 		}
 
-		m_IntersRegistered++;
+		m_NumIntersRegistered++;
+	}
+
+	void SetFaces(const Face& f1, const Face& f2)
+	{
+		m_Face1 = &f1;
+		m_Face2 = &f2;
 	}
 
 	const auto& GetInter1() const
@@ -59,11 +66,43 @@ public:
 		return m_IsUsed;
 	}
 
+	void MarkUsed()
+	{
+		m_IsUsed = true;
+	}
+
+	int NumIntersRegistered() const
+	{
+		return m_NumIntersRegistered;
+	}
+	
+	bool Contains(const EdgeFaceIntersection& inter) const
+	{
+		return inter == m_Inter1 || inter == m_Inter2;
+	}
+
+	bool IsComplete() const
+	{
+		return m_NumIntersRegistered == 2;
+	}
+
+	auto& GetFace1() const
+	{
+		return *m_Face1;
+	}
+
+	auto& GetFace2() const
+	{
+		return *m_Face2;
+	}
+
 private:
 	EdgeFaceIntersection m_Inter1;
 	EdgeFaceIntersection m_Inter2;
-	int m_IntersRegistered;
+	int m_NumIntersRegistered;
 	bool m_IsUsed;
+	const Face* m_Face1 = nullptr;
+	const Face* m_Face2 = nullptr;
 };
 
 class MapToFaceFaceInteractions
@@ -84,8 +123,14 @@ private:
 		auto row = faceA.GetHash();
 		auto col = faceB.GetHash();
 
-		m_Interactions.Get(row, col).Register(inter);
-		m_SlotsWithInters.emplace_back(InteractionSlot(row, col));
+		auto& interac = m_Interactions.Get(row, col);
+		interac.Register(inter);
+
+		if (interac.NumIntersRegistered() == 1)
+		{
+			m_SlotsWithInters.emplace_back(InteractionSlot(row, col));
+			interac.SetFaces(faceA, faceB);
+		}
 	}
 
 public:
@@ -112,9 +157,14 @@ public:
 		{
 			auto& interac = m_Interactions.Get(slot.Row, slot.Col);
 			if (!interac.IsUsed())
-				&interac;
+				return &interac;
 		}
 		return nullptr;
+	}
+
+	auto& GetInteraction(const Face& faceA, const Face& faceB)
+	{
+		return m_Interactions.Get(faceA.GetHash(), faceB.GetHash());
 	}
 
 private:
@@ -125,6 +175,56 @@ private:
 class IntersectionLinker
 {
 private:
+	EdgeFaceIntersection GetNextIntPoint(const FaceFaceInteraction& prevR, const FaceFaceInteraction& currR) const
+	{
+		return prevR.Contains(currR.GetInter1()) ? currR.GetInter2() : currR.GetInter1();
+	}
+
+	FaceFaceInteraction& GetNextInteration(const FaceFaceInteraction& prevR, const FaceFaceInteraction& currR)
+	{
+		auto endIntPoint = GetNextIntPoint(prevR, currR);
+
+		auto& face1 = endIntPoint.GetFace();
+
+		auto& e = endIntPoint.GetEdge();
+		auto& oldFace = e.IsAttachedTo(currR.GetFace1()) ? currR.GetFace1() : currR.GetFace2();
+		auto& face2 = e.GetOther(oldFace);
+
+		return m_FaceFaceInteractions.GetInteraction(face1, face2);
+	}
+
+	FaceFaceInteraction& InitialPrevInteration(const FaceFaceInteraction& startR)
+	{
+		auto& i = startR.GetInter1();
+
+		auto& face1 = i.GetFace(); // The pierced face is in startR
+
+		auto& other = (&face1 == &startR.GetFace1()) ? startR.GetFace2() : startR.GetFace1(); // Now get the other face in startR
+		auto& face2 = i.GetEdge().GetOther(other);
+
+		return m_FaceFaceInteractions.GetInteraction(face1, face2);
+	}
+
+	bool FindLoop(IntersectionLoop& loop, FaceFaceInteraction& startR)
+	{
+		auto prevR = &InitialPrevInteration(startR);
+		auto currR = &startR;
+
+		while (!currR->IsUsed())
+		{
+			if (!currR->IsComplete())
+				return false;
+
+			currR->MarkUsed();
+			loop.AddIntersection(GetNextIntPoint(*prevR, *currR));
+
+			auto temp = prevR;
+			prevR = currR;
+			currR = &GetNextInteration(*temp, *currR);
+		}
+
+		return &startR == currR;
+	}
 
 public:
 	IntersectionLinker()
@@ -135,7 +235,20 @@ public:
 
 	bool FindLoops(std::vector<IntersectionLoop*>& loops)
 	{
-		
+		m_IntersectionLoops->Reset();
+
+		auto start = m_FaceFaceInteractions.GetUnUsedInteraction();
+		while (start)
+		{
+			auto& loop = m_IntersectionLoops->Recycle();
+
+			if (!FindLoop(loop, *start))
+				return false;
+
+			loops.emplace_back(&loop);
+			start = m_FaceFaceInteractions.GetUnUsedInteraction();
+		}
+		return true;
 	}
 
 	void RegisterIntersection(const EdgeFaceIntersection& inter)
@@ -260,6 +373,7 @@ private:
 		assert(Vector3::LinePlaneIntersection(face.GetPlaneP0(), face.GetNormal(), piercingEdge.GetP0().GetPoint(), piercingEdge.GetP1().GetPoint(), intPoint));
 
 		m_Linker.RegisterIntersection(EdgeFaceIntersection(face, piercingEdge, intPoint));
+		m_IntersectionCount++;
 	}
 
 	void FindIntersections(const std::vector<Face*>& faces, const std::vector<ShapeEdge*>& piercingEdges)
@@ -290,12 +404,16 @@ private:
 
 	void AssignHashes(const Shape& s)
 	{
-
+		AssignHashes(s.GetEdgeObjects());
+		AssignHashes(s.GetPointObjects());
+		AssignHashes(s.GetFaces());
 	}
 
 	void UnAssignHashes(const Shape& s)
 	{
-
+		UnAssignHashes(s.GetEdgeObjects());
+		UnAssignHashes(s.GetPointObjects());
+		UnAssignHashes(s.GetFaces());
 	}
 
 	void AssignHashes(const Shape& shapeA, const Shape& shapeB)
@@ -334,6 +452,7 @@ public:
 
 		DetermineEdgeEdgeRelationships(shapeB.GetEdgeObjects(), shapeA.GetEdgeObjects());
 
+		m_IntersectionCount = 0;
 		FindIntersections(shapeA.GetFaces(), shapeB.GetEdgeObjects());
 		FindIntersections(shapeB.GetFaces(), shapeA.GetEdgeObjects());
 
@@ -348,4 +467,5 @@ private:
 	IntersectionLinker m_Linker;
 	MapToPointPlaneRelationship m_PointPlaneRelationshipMap;
 	TwoDArray<Constants::MaxNumEdges, Constants::MaxNumEdges, EdgeEdgeRelationship> m_EdgeEdgeRelationships;
+	int m_IntersectionCount;
 };
