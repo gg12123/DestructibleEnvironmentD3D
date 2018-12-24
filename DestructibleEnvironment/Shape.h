@@ -94,7 +94,7 @@ public:
 
 	void OnAllFacesAdded(Transform& refTran) // faces are in the ref transforms local space
 	{
-		RemoveSmallEdges();
+		RemoveSmallEdges(); // May also need to remove faces that have long edges but small area.
 		CollectPointsAndEdges();
 
 		auto c = CalculateCentre();

@@ -1,13 +1,20 @@
 ﻿  App.cpp
   Camera.cpp
+  CollisionDetector.cpp
+  CollisionResponder.cpp
   DestructibleEnvironmentMain.cpp
   DynamicBodyProxy.cpp
   DynamicMesh.cpp
+  Face.cpp
   GameControlledDynamicBody.cpp
   GameTheadToPhysicsThreadAction.cpp
+  IntersectionFinder.cpp
   Light.cpp
   Physics.cpp
   PhysicsEngine.cpp
+  Rigidbody.cpp
+  Shape.cpp
+  ShapeEdge.cpp
   ShapeProxy.cpp
   StaticShapeProxy.cpp
   World.cpp

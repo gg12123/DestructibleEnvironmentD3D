@@ -18,5 +18,5 @@ public:
 	}
 
 private:
-	std::array<FaceRelationshipWithOtherShape, Constants::MaxNumPoints> m_Map;
+	std::array<FaceRelationshipWithOtherShape, 2 * Constants::MaxNumFaces> m_Map;
 };

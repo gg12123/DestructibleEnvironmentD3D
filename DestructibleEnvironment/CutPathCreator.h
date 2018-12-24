@@ -61,10 +61,31 @@ private:
 		m_FacesCutPathCollections->At(firstFaceExited.GetHash()).ForceCreateWhenFinalWasAddedBeforeFirst(*m_FacesCutPathObjects, path);
 	}
 
+	auto TotalIntersectionCount(const std::vector<IntersectionLoop*>& intersectionLoops)
+	{
+		auto c = 0;
+		for (auto loop : intersectionLoops)
+			c += loop->GetCount();
+
+		return c;
+	}
+
 public:
 	void GeneratePaths(const std::vector<IntersectionLoop*>& intersectionLoops)
 	{
+		// Resize the pools of recyclables now so that
+		// they do not resize during the path generation, which
+		// leaves pointers dangling.
+
+		m_CutPaths->Reserve(intersectionLoops.size());
+
+		auto c = TotalIntersectionCount(intersectionLoops);
+		m_FacesCutPathCollections->Reserve(c);
+		m_FacesCutPathObjects->Reserve(c);
+
 		m_CutPaths->Reset();
+		m_FacesCutPathObjects->Reset();
+		m_FacesCutPathCollections->Reset();
 
 		for (auto loop : intersectionLoops)
 			GeneratePath(*loop);
@@ -96,7 +117,7 @@ public:
 	CutPathCreator()
 	{
 		m_FacesCutPathObjects =
-			std::unique_ptr<PoolOfRecyclables<FacesCutPath>>(new PoolOfRecyclables<FacesCutPath>(10));
+			std::unique_ptr<PoolOfRecyclables<FacesCutPath>>(new PoolOfRecyclables<FacesCutPath>(20));
 
 		m_CutPaths =
 			std::unique_ptr<PoolOfRecyclables<std::vector<CutPathElement>>>(new PoolOfRecyclables<std::vector<CutPathElement>>(3));
@@ -107,7 +128,7 @@ public:
 		};
 
 		m_FacesCutPathCollections =
-			std::unique_ptr<PoolOfRecyclables<FacesCutPaths>>(new PoolOfRecyclables<FacesCutPaths>(10, c));
+			std::unique_ptr<PoolOfRecyclables<FacesCutPaths>>(new PoolOfRecyclables<FacesCutPaths>(20, c));
 	}
 
 private:

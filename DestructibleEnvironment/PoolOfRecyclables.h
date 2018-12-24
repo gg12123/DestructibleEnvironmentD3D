@@ -18,6 +18,11 @@ public:
 	{
 	}
 
+	void Reserve(int capacity)
+	{
+		m_Contents.reserve(capacity);
+	}
+
 	void Reset()
 	{
 		m_Curr = 0;
