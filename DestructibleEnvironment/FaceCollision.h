@@ -136,19 +136,16 @@ private:
 	}
 
 public:
-	FaceCollision(const Face& faceA, const Face& faceB, const Shape& faceAShape, const Shape& faceBShape)
+	FaceCollision(const Face& faceA, const Face& faceB)
 	{
 		m_FaceA = &faceA;
 		m_FaceB = &faceB;
-
-		m_FaceAShape = &faceAShape;
-		m_FaceBShape = &faceBShape;
 	}
 
 	// Returns the best (i.e. smallest)
 	VectorDirectionWithMagnitude CalculateSeperationVectors(const Shape& shapeToMove)
 	{
-		auto movingA = &shapeToMove == m_FaceAShape;
+		auto movingA = &shapeToMove == &m_FaceA->GetOwnerShape();
 
 		auto faceToMove = WorldSpaceFace(movingA ? *m_FaceA : *m_FaceB);
 		auto otherFace = WorldSpaceFace(movingA ? *m_FaceB : *m_FaceA);
@@ -190,7 +187,4 @@ private:
 
 	const Face* m_FaceA;
 	const Face* m_FaceB;
-
-	const Shape* m_FaceAShape;
-	const Shape* m_FaceBShape;
 };

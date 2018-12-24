@@ -81,12 +81,16 @@ private:
 		return EdgeRelationshipWithFace::PointsBelow;
 	}
 
-	Vector3 AssertDExists(const Face& fBi, const Face& fA0) const
+	bool TryCalculateD(const Face& fBi, const Face& fA0, Vector3& d) const
 	{
-		auto d = Vector3::Cross(fBi.GetNormal(), fA0.GetNormal());
+		d = Vector3::Cross(fBi.GetNormal(), fA0.GetNormal());
 		auto mag = d.Magnitude();
-		assert(mag > 0.0f);
-		return d / mag;
+		if (mag > 0.0f)
+		{
+			d /= mag;
+			return true;
+		}
+		return false;
 	}
 
 	DWithChosenFace CalculateD(const ShapeEdge& eB, const Face& fA0, const Vector3& eAN) const
@@ -94,8 +98,18 @@ private:
 		auto& fB0 = eB.GetFace1();
 		auto& fB1 = eB.GetFace2();
 
-		auto d0 = AssertDExists(fB0, fA0).InDirectionOf(-fB0.GetEdgeNormal(eB));
-		auto d1 = AssertDExists(fB1, fA0).InDirectionOf(-fB1.GetEdgeNormal(eB));;
+		Vector3 temp;
+
+		auto d0 = TryCalculateD(fB0, fA0, temp) ?
+			temp.InDirectionOf(-fB0.GetEdgeNormal(eB)) :
+			-fB0.GetEdgeNormal(eB);
+
+		auto d1 = TryCalculateD(fB1, fA0, temp) ?
+			temp.InDirectionOf(-fB1.GetEdgeNormal(eB)) :
+			-fB1.GetEdgeNormal(eB);
+
+		//auto d0 = AssertDExists(fB0, fA0).InDirectionOf(-fB0.GetEdgeNormal(eB));
+		//auto d1 = AssertDExists(fB1, fA0).InDirectionOf(-fB1.GetEdgeNormal(eB));;
 
 		return MathU::Abs(Vector3::Dot(d0, eAN)) > MathU::Abs(Vector3::Dot(d1, eAN)) ?
 			DWithChosenFace(fB0, d0) :

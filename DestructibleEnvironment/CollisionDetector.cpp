@@ -12,9 +12,7 @@ void CollisionDetector::ProcessFaceFaceInteraction(std::vector<FaceCollision>& d
 
 	if (!m_FaceCollisionCreated.Get(faceA.GetHash(), faceB.GetHash()))
 	{
-		detectedColls.emplace_back(FaceCollision(faceA, faceB,
-			m_IntersectionFinder.GetOwnerShape(faceA),
-			m_IntersectionFinder.GetOwnerShape(faceB)));
+		detectedColls.emplace_back(FaceCollision(faceA, faceB));
 
 		m_FaceCollisionCreated.Get(faceA.GetHash(), faceB.GetHash()) = true;
 	}
@@ -38,7 +36,7 @@ bool CollisionDetector::FindCollision(Shape& shape1, Shape& shape2, std::vector<
 	detectedColls.clear();
 	inters.clear();
 
-	m_IntersectionFinder.FindIntersections(shape1, shape2, inters);
+	m_IntersectionFinder.FindEdgeFaceIntersections(shape1, shape2, inters);
 
 	if (inters.size() > 0U)
 	{

@@ -12,37 +12,19 @@ bool CollisionResponder::CalculateSeperation1To2(std::vector<FaceCollision>& fac
 {
 	static constexpr float allowableOverlap = 0.001f;
 
-	auto sepRequired = false;
-	auto sepVec = Vector3::Zero();
+	auto biggestMag = 0.0f;
 
 	for (auto& coll : faceColls)
 	{
 		auto x = coll.CalculateSeperationVectors(*m_Body2);
 
-		if (x.GetMag() > allowableOverlap)
+		if (x.GetMag() > biggestMag)
 		{
-			sepVec += x.GetMag() * x.GetDir();
-			sepRequired = true;
+			biggestMag = x.GetMag();
+			sep1To2 = biggestMag * x.GetDir();
 		}
 	}
-
-	auto sepVecMag = sepVec.Magnitude();
-
-	if (!sepRequired || sepVecMag < allowableOverlap)
-		return false;
-	
-	auto moveDir = sepVec / sepVecMag;
-	auto biggestDist = 0.0f;
-
-	for (auto& coll : faceColls)
-	{
-		auto dist = coll.CalculateRequiredSeperation(moveDir);
-		if (dist > biggestDist)
-			biggestDist = dist;
-	}
-
-	sep1To2 = biggestDist * moveDir;
-	return true;
+	return biggestMag > allowableOverlap;
 }
 
 bool CollisionResponder::CalculateCollisionPoint(const std::vector<EdgeFaceIntersection>& inters, const Vector3& normal1To2, Vector3& finalPoint)

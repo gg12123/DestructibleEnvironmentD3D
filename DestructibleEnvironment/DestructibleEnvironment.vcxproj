@@ -257,7 +257,6 @@
     <ClInclude Include="IMeshRenderer.h" />
     <ClInclude Include="InitialShapeCreator.h" />
     <ClInclude Include="IntersectionFinder.h" />
-    <ClInclude Include="LastCheckedAgainst.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Loggers.h" />
     <ClInclude Include="MathU.h" />

@@ -1,6 +1,5 @@
 ﻿  App.cpp
   Camera.cpp
-  CollisionDetector.cpp
   DestructibleEnvironmentMain.cpp
   DynamicBodyProxy.cpp
   DynamicMesh.cpp

@@ -19,7 +19,7 @@ private:
 		auto A = r * splitPoint;
 		auto C = A + sZ * splitNormal;
 
-		q = Quaternion::Identity(); // Quaternion::LookRotation(-splitNormal, Vector3::OrthogonalDirection(splitNormal));
+		q = Quaternion::LookRotation(-splitNormal, Vector3::OrthogonalDirection(splitNormal));
 
 		return Matrix4::FromTranslation(C) * Matrix4::FromRotation(q) * Matrix4::FromScale(sZ, sZ, sZ);
 	}

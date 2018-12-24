@@ -294,9 +294,6 @@
     <ClInclude Include="GridPartition.h">
       <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
-    <ClInclude Include="LastCheckedAgainst.h">
-      <Filter>Physics\CollisionStuff</Filter>
-    </ClInclude>
     <ClInclude Include="BodyCollectionBounds.h">
       <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>

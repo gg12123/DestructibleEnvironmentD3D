@@ -2,10 +2,10 @@
 #include <vector>
 #include <memory>
 #include "Vector3.h"
-#include "CleanIntersectionsWrapper.h"
 #include "FaceCollision.h"
 #include "Constants.h"
 #include "TriangleArray.h"
+#include "IntersectionFinder.h"
 
 class Shape;
 class Transform;
@@ -20,6 +20,6 @@ private:
 	void ProcessFaceFaceInteraction(std::vector<FaceCollision>& detectedColls, Face& faceA, Face& faceB);
 	void UnAssignHashes(const std::vector<EdgeFaceIntersection>& inters);
 
-	CleanIntersectionsWrapper m_IntersectionFinder;
+	IntersectionFinder m_IntersectionFinder;
 	TriangleArray<Constants::MaxNumFaces, bool> m_FaceCollisionCreated;
 };
