@@ -7,6 +7,7 @@
 #include "Transform.h"
 #include "Matrix.h"
 #include "TwoDArray.h"
+#include "ShapeElementPool.h"
 
 class CubeFacesCreator
 {
@@ -18,16 +19,15 @@ private:
 	{
 		auto s = Vector3(1.0f, 1.0f, 1.0f);
 
-		// TODO - get from pool
-		m_Points[0] = new ShapePoint(M * Vector3(s.x, s.y, s.z));
-		m_Points[1] = new ShapePoint(M * Vector3(-s.x, s.y, s.z));
-		m_Points[2] = new ShapePoint(M * Vector3(-s.x, s.y, -s.z));
-		m_Points[3] = new ShapePoint(M * Vector3(s.x, s.y, -s.z));
+		m_Points[0] = &PointPool::Take(M * Vector3(s.x, s.y, s.z));
+		m_Points[1] = &PointPool::Take(M * Vector3(-s.x, s.y, s.z));
+		m_Points[2] = &PointPool::Take(M * Vector3(-s.x, s.y, -s.z));
+		m_Points[3] = &PointPool::Take(M * Vector3(s.x, s.y, -s.z));
 
-		m_Points[4] = new ShapePoint(M * Vector3(s.x, -s.y, s.z));
-		m_Points[5] = new ShapePoint(M * Vector3(-s.x, -s.y, s.z));
-		m_Points[6] = new ShapePoint(M * Vector3(-s.x, -s.y, -s.z));
-		m_Points[7] = new ShapePoint(M * Vector3(s.x, -s.y, -s.z));
+		m_Points[4] = &PointPool::Take(M * Vector3(s.x, -s.y, s.z));
+		m_Points[5] = &PointPool::Take(M * Vector3(-s.x, -s.y, s.z));
+		m_Points[6] = &PointPool::Take(M * Vector3(-s.x, -s.y, -s.z));
+		m_Points[7] = &PointPool::Take(M * Vector3(s.x, -s.y, -s.z));
 	}
 
 	void CreateEdges()
@@ -62,8 +62,7 @@ private:
 
 	void CreateEdge(int p, int pNext)
 	{
-		// TODO - get from pool
-		auto& edge = *(new ShapeEdge(*m_Points[p], *m_Points[pNext]));
+		auto& edge = EdgePool::Take(*m_Points[p], *m_Points[pNext]);
 
 		m_Edges.Get(p, pNext) = &edge;
 		m_Edges.Get(pNext, p) = &edge;
@@ -77,8 +76,7 @@ private:
 	template<int numPoints>
 	Face& CreateFace(const std::array<int, numPoints>& pointIndexes, const Vector3& normal)
 	{
-		// TODO - get from pool
-		auto& f = *(new Face());
+		auto& f = FacePool::Take();
 
 		for (auto i = 0U; i < numPoints; i++)
 		{
@@ -92,20 +90,24 @@ private:
 		return f;
 	}
 
-	void CreateFaces(Shape& shape)
+	void CreateFaces(Shape& shape, const Quaternion& q)
 	{
-		shape.AddFace(CreateFace(m_Face0, Vector3::Up()));
-		shape.AddFace(CreateFace(m_Face1, Vector3::Up()));
-		shape.AddFace(CreateFace(m_Face2, Vector3::Right()));
-		shape.AddFace(CreateFace(m_Face3, Vector3::Right()));
-		shape.AddFace(CreateFace(m_Face4, -Vector3::Foward()));
-		shape.AddFace(CreateFace(m_Face5, -Vector3::Foward()));
-		shape.AddFace(CreateFace(m_Face6, -Vector3::Right()));
-		shape.AddFace(CreateFace(m_Face7, -Vector3::Right()));
-		shape.AddFace(CreateFace(m_Face8, Vector3::Foward()));
-		shape.AddFace(CreateFace(m_Face9, Vector3::Foward()));
-		shape.AddFace(CreateFace(m_Face10, -Vector3::Up()));
-		shape.AddFace(CreateFace(m_Face11, -Vector3::Up()));
+		auto upRot = q.RotateV(Vector3::Up());
+		auto rightRot = q.RotateV(Vector3::Right());
+		auto forwardRot = q.RotateV(Vector3::Foward());
+
+		shape.AddFace(CreateFace(m_Face0, upRot));
+		shape.AddFace(CreateFace(m_Face1, upRot));
+		shape.AddFace(CreateFace(m_Face2, rightRot));
+		shape.AddFace(CreateFace(m_Face3, rightRot));
+		shape.AddFace(CreateFace(m_Face4, -forwardRot));
+		shape.AddFace(CreateFace(m_Face5, -forwardRot));
+		shape.AddFace(CreateFace(m_Face6, -rightRot));
+		shape.AddFace(CreateFace(m_Face7, -rightRot));
+		shape.AddFace(CreateFace(m_Face8, forwardRot));
+		shape.AddFace(CreateFace(m_Face9, forwardRot));
+		shape.AddFace(CreateFace(m_Face10, -upRot));
+		shape.AddFace(CreateFace(m_Face11, -upRot));
 	}
 
 public:
@@ -130,11 +132,11 @@ public:
 		m_Face11 = { 6, 7, 4 };
 	}
 
-	void CreateFaces(Shape& shape, const Matrix4& M)
+	void CreateFaces(Shape& shape, const Matrix4& M, const Quaternion& MsRot)
 	{
 		CreatePoints(M);
 		CreateEdges();
-		CreateFaces(shape);
+		CreateFaces(shape, MsRot);
 	}
 
 private:

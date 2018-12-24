@@ -69,7 +69,7 @@ public:
 		if (inter == m_CurrStartIntersection)
 			return true;
 
-		if (&inter.GetFace().GetShape() == m_OriginalShape)
+		if (&inter.GetFace().GetOwnerShape() == m_OriginalShape)
 		{
 			if ((inter != m_CurrStartIntersection) && m_EquivalenceChecker.AreEquivalent(inter, m_CurrStartIntersection))
 				return false; // TODO - this can be corrected for.

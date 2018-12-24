@@ -3,6 +3,7 @@
 #include "ShapePoint.h"
 #include "Face.h"
 #include "ShapeEdge.h"
+#include "ShapeElementPool.h"
 
 class CutPathElement
 {
@@ -13,7 +14,7 @@ public:
 		m_FaceExited = &faceExited;
 		m_PiercedFace = &facePierced;
 		m_FaceEntered = &m_PiercingEdge->GetOther(*m_FaceExited);
-		m_Point = new ShapePoint(intPoint); // TODO - pool
+		m_Point = &PointPool::Take(intPoint);
 	}
 
 	int GetIndexInSplitEdge() const

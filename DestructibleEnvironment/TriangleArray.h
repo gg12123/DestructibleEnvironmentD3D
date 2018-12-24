@@ -27,6 +27,11 @@ public:
 		return m_Data[GetIndex(row, col)];
 	}
 
+	void Clear(const T& val)
+	{
+		std::memset(m_Data.data(), static_cast<int>(val), m_Data.size() * sizeof(T));
+	}
+
 private:
 	std::array<T, Capacity> m_Data;
 };

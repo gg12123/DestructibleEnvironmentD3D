@@ -11,7 +11,7 @@
 class CutShapeCreator
 {
 private:
-	Matrix4 CalculateCutShapesTransform(Transform& toSplitsTransform, const Vector3& splitPoint, const Vector3& splitNormal)
+	Matrix4 CalculateCutShapesTransform(Transform& toSplitsTransform, const Vector3& splitPoint, const Vector3& splitNormal, Quaternion& q)
 	{
 		auto sZ = 100.0f;
 		auto r = 0.0f; // Random::Range(0.0f, 0.5f);
@@ -19,7 +19,7 @@ private:
 		auto A = r * splitPoint;
 		auto C = A + sZ * splitNormal;
 
-		auto q = Quaternion::Identity(); // Quaternion::LookRotation(-splitNormal, Vector3::OrthogonalDirection(splitNormal));
+		q = Quaternion::Identity(); // Quaternion::LookRotation(-splitNormal, Vector3::OrthogonalDirection(splitNormal));
 
 		return Matrix4::FromTranslation(C) * Matrix4::FromRotation(q) * Matrix4::FromScale(sZ, sZ, sZ);
 	}
@@ -33,9 +33,10 @@ public:
 		auto splitPoint = toSplitsTransform.ToLocalPosition(splitPointWorld);
 		auto splitNormal = toSplitsTransform.ToLocalDirection(splitNormalWorld);
 
-		auto M = CalculateCutShapesTransform(toSplitsTransform, splitPoint, splitNormal);
+		Quaternion q;
+		auto M = CalculateCutShapesTransform(toSplitsTransform, splitPoint, splitNormal, q);
 
-		m_FacesCreator.CreateFaces(m_CutShape, M);
+		m_FacesCreator.CreateFaces(m_CutShape, M, q);
 
 		m_CutShape.OnAllFacesAdded();
 

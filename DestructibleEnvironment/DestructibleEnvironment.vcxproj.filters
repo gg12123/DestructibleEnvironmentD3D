@@ -273,9 +273,6 @@
     <ClInclude Include="CollisionResponder.h">
       <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
-    <ClInclude Include="PotentialCollision.h">
-      <Filter>Physics\CollisionStuff</Filter>
-    </ClInclude>
     <ClInclude Include="Bounds.h">
       <Filter>Utils</Filter>
     </ClInclude>
@@ -434,6 +431,15 @@
     </ClInclude>
     <ClInclude Include="TriangleArray.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ShapeElementPool.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="FaceCollision.h">
+      <Filter>Physics\CollisionStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="CleanIntersectionsWrapper.h">
+      <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

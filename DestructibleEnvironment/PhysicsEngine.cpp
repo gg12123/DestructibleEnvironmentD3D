@@ -17,7 +17,7 @@ void PhysicsEngine::Run()
 	{
 		while (m_SafeToSync)
 		{
-			// collision detection will be expensive so execution shoulnt get to here
+			// Collision detection will be expensive so execution shouln't be here for long.
 		}
 
 		m_Time.WaitForNextUpdateTime();
@@ -26,30 +26,32 @@ void PhysicsEngine::Run()
 
 		m_SafeToSync = true;
 
-		DoCollisionDetection();
+		DoCollisionDetectionResponse();
 	}
 }
 
-void PhysicsEngine::DoCollisionDetection()
+void PhysicsEngine::DoCollisionDetectionResponse(PhysicsObject& body1, PhysicsObject& body2)
+{
+	if (m_CollisionDetector.FindCollision(body1, body2, m_FaceCollisions, m_Intersections))
+		m_CollisionResponder.CalculateResponse(m_FaceCollisions, m_Intersections, body1, body2);
+}
+
+void PhysicsEngine::DoCollisionDetectionResponse()
 {
 	auto dynamicCount = m_DynamicBodies.size();
 	auto staticCount = m_StaticBodies.size();
+
+	// TODO - partition
 
 	for (auto i = 0U; i < dynamicCount; i++)
 	{
 		auto& bodyi = *m_DynamicBodies[i];
 
 		for (auto j = i + 1; j < dynamicCount; j++)
-		{
-			if (m_CollisionDetector.FindCollision(bodyi, *m_DynamicBodies[j], m_PotentialCollisions))
-				m_CollisionResponder.CalculateResponse(m_PotentialCollisions, bodyi, *m_DynamicBodies[j]);
-		}
+			DoCollisionDetectionResponse(bodyi, *m_DynamicBodies[j]);
 
 		for (auto j = 0U; j < staticCount; j++)
-		{
-			if (m_CollisionDetector.FindCollision(bodyi, *m_StaticBodies[j], m_PotentialCollisions))
-				m_CollisionResponder.CalculateResponse(m_PotentialCollisions, bodyi, *m_StaticBodies[j]);
-		}
+			DoCollisionDetectionResponse(bodyi, *m_StaticBodies[j]);
 	}
 }
 

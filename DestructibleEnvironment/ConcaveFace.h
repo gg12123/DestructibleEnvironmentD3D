@@ -8,6 +8,7 @@
 #include "Vector2.h"
 #include "Polygon2.h"
 #include "CollectionU.h"
+#include "ShapeElementPool.h"
 
 template<class T>
 class Triangulator
@@ -130,7 +131,7 @@ private:
 
 	Face& CreateFace(int i0, int i1, int i2)
 	{
-		auto& f = *(new Face()); // TODO - pool
+		auto& f = FacePool::Take();
 
 		f.AddPoint(*m_Points[i0], GetEdgeBetween(i0, i1));
 		f.AddPoint(*m_Points[i1], GetEdgeBetween(i1, i2));

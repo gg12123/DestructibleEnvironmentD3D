@@ -1,5 +1,11 @@
 #pragma once
 
+// When using these hashes always...
+
+// First reset the next hash counter
+// Then assign hashes as and when required by the algorithm
+// Finally, un-assign any assigned hashes ready for the next algorithm that wants to use them
+
 template<class T>
 class ObjectWithHash
 {

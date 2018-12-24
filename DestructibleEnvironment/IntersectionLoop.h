@@ -60,6 +60,11 @@ public:
 		return m_Intersections[index].GetIntPoint();
 	}
 
+	const auto& GetIntersections()
+	{
+		return m_Intersections;
+	}
+
 private:
 	std::vector<EdgeFaceIntersection> m_Intersections;
 };

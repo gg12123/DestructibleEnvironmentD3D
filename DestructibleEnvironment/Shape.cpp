@@ -18,7 +18,7 @@ void Shape::TryCollectPoint(ShapePoint& p)
 	{
 		m_PointObjects.emplace_back(&p);
 		p.SetIndexInShape(m_PointObjects.size() - 1);
-		p.SetBeenCollected(true);
+		p.SetBeenCollected();
 	}
 }
 
@@ -33,7 +33,7 @@ void Shape::TryCollectEdge(ShapeEdge& e)
 		m_EdgeIndexes.emplace_back(e.GetP0().GetIndexInShape());
 		m_EdgeIndexes.emplace_back(e.GetP1().GetIndexInShape());
 
-		e.SetBeenCollected(true);
+		e.SetBeenCollected();
 	}
 }
 
@@ -129,8 +129,8 @@ void Shape::ReCentre(const Vector3& centre)
 	}
 }
 
-void Shape::InitFaces()
+void Shape::InitFacesPointsEdges()
 {
 	for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
-		(*it)->OnSplittingFinished(*this);
+		(*it)->OnSplittingFinished(*this); // The face will init its points and edges
 }

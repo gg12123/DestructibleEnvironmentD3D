@@ -3,16 +3,17 @@
 #include "ShapePoint.h"
 #include "CutPathElement.h"
 #include "MapToShapePointOnReversedFace.h"
+#include "ShapeElementPool.h"
 
 class ReversedGeometryCreator
 {
 private:
 	ShapePoint& CreatePointCommon(const ShapePoint& from)
 	{
-		auto p = new ShapePoint(from.GetPoint()); // TODO - get form pool
-		m_MapToReversed.Add(from, *p);
-		p->AssignHash();
-		return *p;
+		auto& p = PointPool::Take(from.GetPoint());
+		m_MapToReversed.Add(from, p);
+		p.AssignHash();
+		return p;
 	}
 
 	ShapePoint & TryCreatePointOnReversed(ShapePoint& from)
@@ -67,8 +68,7 @@ public:
 				m_EdgeCreator->CreateEdge(p0, p1);
 		}
 
-		// TODO - pool
-		auto reversedFace = new Face();
+		auto& reversedFace = FacePool::Take();
 
 		for (int i = points.size() - 1; i >= 0; i--)
 		{
@@ -79,10 +79,10 @@ public:
 
 			auto& e = m_EdgeCreator->GetMapToNewEdges().GetNewEdge(pRev0, pRev1);
 
-			reversedFace->AddPoint(pRev0, e);
+			reversedFace.AddPoint(pRev0, e);
 		}
 
-		reversedFace->SetNormal(-face.GetNormal());
+		reversedFace.SetNormal(-face.GetNormal());
 	}
 
 	void Init(ShapeEdgesCreator& edgeCreator)

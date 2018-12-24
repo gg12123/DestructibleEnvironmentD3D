@@ -66,7 +66,8 @@ public:
 private:
 	void Run();
 
-	void DoCollisionDetection();
+	void DoCollisionDetectionResponse();
+	void DoCollisionDetectionResponse(PhysicsObject& body1, PhysicsObject& body2);
 	void UpdateBodies();
 	void ExecuteGameToPhysicsActions();
 	void ProcessSplits();
@@ -89,7 +90,8 @@ private:
 
 	CollisionDetector m_CollisionDetector;
 	CollisionResponder m_CollisionResponder;
-	std::vector<PotentialCollision> m_PotentialCollisions;
+	std::vector<EdgeFaceIntersection> m_Intersections;
+	std::vector<FaceCollision> m_FaceCollisions;
 
 	ShapeSplitter<Rigidbody> m_Splitter;
 	std::vector<Rigidbody*> m_NewBodiesFromSplit;

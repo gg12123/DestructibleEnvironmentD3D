@@ -15,14 +15,33 @@ class Shape;
 class ShapePoint : public ObjectWithHash<ShapePoint>
 {
 public:
-	ShapePoint(const Vector3& p)
+	ShapePoint()
 	{
-		m_Point = p;
 	}
 
-	void SetBeenCollected(bool val)
+	void OnTakenFromPool(const Vector3& p)
 	{
-		m_BeenCollectedByShape = val;
+		m_Point = p;
+		m_OwnerShape = nullptr;
+		m_BeenCollectedByShape = false;
+		ResetHash();
+	}
+
+	void SetBeenCollected()
+	{
+		m_BeenCollectedByShape = true;
+	}
+
+	void OnSplittingFinished(const Shape& owner)
+	{
+		m_OwnerShape = &owner;
+		m_BeenCollectedByShape = false;
+		ResetHash();
+	}
+
+	const auto& GetOwnerShape() const
+	{
+		return *m_OwnerShape;
 	}
 
 	bool HasBeenCollected() const
@@ -54,4 +73,5 @@ private:
 	Vector3 m_Point;
 	bool m_BeenCollectedByShape = false;
 	int m_IndexInShape;
+	const Shape* m_OwnerShape;
 };

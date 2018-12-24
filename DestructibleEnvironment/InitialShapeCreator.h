@@ -17,7 +17,7 @@ public:
 		auto M = Matrix4::FromScale(w, h, w);
 
 		shape.Clear();
-		m_FacesCreator.CreateFaces(shape, M);
+		m_FacesCreator.CreateFaces(shape, M, Quaternion::Identity());
 
 		shape.GetTransform().SetEqualTo(transform);
 		shape.OnAllFacesAdded();

@@ -202,6 +202,7 @@
     <ClInclude Include="Bounds.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CleanIntersectionFinder.h" />
+    <ClInclude Include="CleanIntersectionsWrapper.h" />
     <ClInclude Include="CollectionU.h" />
     <ClInclude Include="CollisionData.h" />
     <ClInclude Include="CollisionDetector.h" />
@@ -216,6 +217,7 @@
     <ClInclude Include="CutShapeCreator.h" />
     <ClInclude Include="EdgeEdgeRelationship.h" />
     <ClInclude Include="EdgeFaceIntersection.h" />
+    <ClInclude Include="FaceCollision.h" />
     <ClInclude Include="FaceIterator.h" />
     <ClInclude Include="FaceOrderingComparator.h" />
     <ClInclude Include="FaceRelationshipWithOtherShape.h" />
@@ -267,10 +269,10 @@
     <ClInclude Include="PhysicsTime.h" />
     <ClInclude Include="ReversedGeometryCreator.h" />
     <ClInclude Include="ShapeEdgesCreator.h" />
+    <ClInclude Include="ShapeElementPool.h" />
     <ClInclude Include="ShapePoint.h" />
     <ClInclude Include="Pool.h" />
     <ClInclude Include="PoolOfRecyclables.h" />
-    <ClInclude Include="PotentialCollision.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="Random.h" />
     <ClInclude Include="Renderer.h" />

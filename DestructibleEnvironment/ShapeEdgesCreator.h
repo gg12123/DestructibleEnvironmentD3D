@@ -6,6 +6,7 @@
 #include "MapToShapePointOnReversedFace.h"
 #include "CutPathElement.h"
 #include "PoolOfRecyclables.h"
+#include "ShapeElementPool.h"
 
 class ShapeEdgesCreator
 {
@@ -101,7 +102,7 @@ public:
 	// called by the reversing and triangulation code
 	void CreateEdge(ShapePoint& p0, ShapePoint& p1)
 	{
-		auto& edge = *(new ShapeEdge(p0, p1)); // TODO - pool
+		auto& edge = EdgePool::Take(p0, p1);
 		m_MapToEdges.AddNewEdge(p0, p1, edge);
 	}
 

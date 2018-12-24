@@ -10,6 +10,7 @@
 
 class Face;
 class SplitShapeEdge;
+class Shape;
 
 /**
  * 
@@ -17,10 +18,20 @@ class SplitShapeEdge;
 class ShapeEdge : public ObjectWithHash<ShapeEdge>
 {
 public:
-	ShapeEdge(ShapePoint& p0, ShapePoint& p1)
+	ShapeEdge()
+	{
+	}
+
+	void OnTakenFromPool(ShapePoint& p0, ShapePoint& p1)
 	{
 		m_P0 = &p0;
 		m_P1 = &p1;
+		m_OwnerShape = nullptr;
+		m_BeenCollectedByShape = false;
+		m_SplitEdge = nullptr;
+		m_Face1 = nullptr;
+		m_Face2 = nullptr;
+		ResetHash();
 	}
 
 	void RegisterFace(Face& f, int indexOfThisEdgeInTheFace)
@@ -123,14 +134,26 @@ public:
 		return *m_Face1;
 	}
 
-	void SetBeenCollected(bool val)
+	void OnSplittingFinished(const Shape& owner)
 	{
-		m_BeenCollectedByShape = val;
+		m_OwnerShape = &owner;
+		m_BeenCollectedByShape = false;
+		ResetHash();
+	}
+
+	const auto& GetOwnerShape() const
+	{
+		return *m_OwnerShape;
 	}
 
 	bool HasBeenCollected() const
 	{
 		return m_BeenCollectedByShape;
+	}
+
+	void SetBeenCollected()
+	{
+		m_BeenCollectedByShape = true;
 	}
 
 	Vector3 GetDirFromP0ToP1() const
@@ -184,4 +207,5 @@ private:
 	SplitShapeEdge* m_SplitEdge = nullptr;
 
 	bool m_BeenCollectedByShape = false;
+	const Shape* m_OwnerShape;
 };

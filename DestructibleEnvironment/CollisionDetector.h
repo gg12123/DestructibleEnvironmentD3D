@@ -2,8 +2,10 @@
 #include <vector>
 #include <memory>
 #include "Vector3.h"
-#include "PotentialCollision.h"
-#include "IntersectionFinder.h"
+#include "CleanIntersectionsWrapper.h"
+#include "FaceCollision.h"
+#include "Constants.h"
+#include "TriangleArray.h"
 
 class Shape;
 class Transform;
@@ -12,11 +14,12 @@ class CollisionDetector
 {
 public:
 	// TODO - the shapes should be const
-	bool FindCollision(Shape& shape1, Shape& shape2, std::vector<PotentialCollision>& detectedColls);
+	bool FindCollision(Shape& shape1, Shape& shape2, std::vector<FaceCollision>& detectedColls, std::vector<EdgeFaceIntersection>& inters);
 
 private:
-	PotentialCollision ToPotentialCollision(const EdgeFaceIntersection& inter, const Shape& shape1, const Shape& shape2);
+	void ProcessFaceFaceInteraction(std::vector<FaceCollision>& detectedColls, Face& faceA, Face& faceB);
+	void UnAssignHashes(const std::vector<EdgeFaceIntersection>& inters);
 
-	IntersectionFinder m_IntersectionFinder;
-	std::vector<EdgeFaceIntersection> m_FoundIntersections;
+	CleanIntersectionsWrapper m_IntersectionFinder;
+	TriangleArray<Constants::MaxNumFaces, bool> m_FaceCollisionCreated;
 };

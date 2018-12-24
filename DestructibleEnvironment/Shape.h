@@ -100,7 +100,7 @@ public:
 		auto c = CalculateCentre();
 
 		ReCentre(c);
-		InitFaces();
+		InitFacesPointsEdges();
 
 		GetTransform().SetPosition(refTran.ToWorldPosition(c));
 		GetTransform().SetRotation(refTran.GetRotation());
@@ -114,7 +114,7 @@ public:
 		CollectPointsAndEdges();
 
 		ReCentre(Vector3::Zero());
-		InitFaces();
+		InitFacesPointsEdges();
 
 		SetDirty();
 	}
@@ -131,7 +131,7 @@ private:
 	void RemoveSmallEdges();
 	void TryCollectPoint(ShapePoint& p);
 	void TryCollectEdge(ShapeEdge& p);
-	void InitFaces();
+	void InitFacesPointsEdges();
 
 	std::vector<Face*> m_Faces;
 	std::vector<Vector3> m_CachedPoints;

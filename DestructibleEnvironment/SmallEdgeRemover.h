@@ -3,11 +3,12 @@
 #include "Face.h"
 #include "ShapePoint.h"
 #include "IterationAboutShape.h"
+#include "ShapeElementPool.h"
 
 class SmallEdgeRemover
 {
 private:
-	void CollapseFace(const Face& f, const ShapeEdge& smallEdge)
+	void CollapseFace(Face& f, const ShapeEdge& smallEdge)
 	{
 		auto& edges = f.GetEdgeObjects();
 
@@ -22,6 +23,8 @@ private:
 		e0SideFace.ReplaceEdge(e0, e1);
 
 		// TODO - retrun e0 and f to the pool.
+		EdgePool::Return(e0);
+		FacePool::Return(f);
 	}
 
 public:
@@ -38,7 +41,7 @@ public:
 		IterationAboutShape::FindEdgesAndFacesAboutPoint(p1, toRemove, m_EdgesAboutPoint1, m_FacesAboutPoints);
 
 		// TODO - pool
-		auto& newPoint = *(new ShapePoint((p0.GetPoint() + p1.GetPoint()) / 2.0f));
+		auto& newPoint = PointPool::Take((p0.GetPoint() + p1.GetPoint()) / 2.0f);
 
 		// Make all the edges reference the new point
 

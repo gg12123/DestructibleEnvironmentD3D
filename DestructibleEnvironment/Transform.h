@@ -44,7 +44,7 @@ public:
 
 	Vector3 ToLocalDirection(const Vector3& worldDir) const
 	{
-		return m_Rotation.Conj().RotateV(worldDir);
+		return GetWorldToLocalRotation().RotateV(worldDir); // m_Rotation.Conj().RotateV(worldDir);
 	}
 
 	Vector3 ToWorldPosition(const Vector3& localPos)
@@ -55,7 +55,7 @@ public:
 
 	Vector3 ToWorldDirection(const Vector3& localDir)
 	{
-		return m_Rotation.RotateV(localDir);
+		return GetLocalToWorldRotation().RotateV(localDir);// m_Rotation.RotateV(localDir);
 	}
 
 	Matrix3 ApplySimilarityTransform(const Matrix3& localMatrix)
@@ -76,6 +76,16 @@ public:
 	{
 		ReCalculateIfDirty();
 		return m_WorldToLocal;
+	}
+
+	const Quaternion& GetLocalToWorldRotation() const
+	{
+		return m_Rotation;
+	}
+
+	Quaternion GetWorldToLocalRotation() const
+	{
+		return m_Rotation.Conj();
 	}
 
 	Vector3 GetForward()

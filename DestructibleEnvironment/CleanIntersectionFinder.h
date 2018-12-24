@@ -241,6 +241,7 @@ public:
 		while (start)
 		{
 			auto& loop = m_IntersectionLoops->Recycle();
+			loop.Clear();
 
 			if (!FindLoop(loop, *start))
 				return false;
@@ -428,10 +429,6 @@ private:
 
 	void UnAssignHashes(const Shape& shapeA, const Shape& shapeB)
 	{
-		Face::ResetNextHashCounter();
-		ShapeEdge::ResetNextHashCounter();
-		ShapePoint::ResetNextHashCounter();
-
 		UnAssignHashes(shapeA);
 		UnAssignHashes(shapeB);
 	}

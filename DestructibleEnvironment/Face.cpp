@@ -50,11 +50,8 @@ void Face::OnSplittingFinished(Shape& owner)
 		m_CachedPoints.emplace_back(p);
 		m_FacePoly.Add(ToFaceSpacePosition(p));
 
-		po.ResetHash();
-		po.SetBeenCollected(false);
-
-		eo.ResetHash();
-		eo.SetBeenCollected(false);
+		po.OnSplittingFinished(owner);
+		eo.OnSplittingFinished(owner);
 	}
 	ResetHash();
 }

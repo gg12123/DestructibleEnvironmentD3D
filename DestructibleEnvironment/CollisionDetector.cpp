@@ -5,33 +5,57 @@
 #include "Transform.h"
 #include "ShapeEdge.h"
 
-PotentialCollision CollisionDetector::ToPotentialCollision(const EdgeFaceIntersection& inter, const Shape& shape1, const Shape& shape2)
+void CollisionDetector::ProcessFaceFaceInteraction(std::vector<FaceCollision>& detectedColls, Face& faceA, Face& faceB)
 {
-	auto& edge = inter.GetEdge();
-	auto& shapeEdges = edge.GetFace1().GetShape();
+	faceA.TryAssignHash();
+	faceB.TryAssignHash();
 
-	auto& transformedPoints = &shapeEdges == &shape1 ?
-		m_IntersectionFinder.GetShape1sTransformedPoints() :
-		m_IntersectionFinder.GetShape2sTransformedPoints();
+	if (!m_FaceCollisionCreated.Get(faceA.GetHash(), faceB.GetHash()))
+	{
+		detectedColls.emplace_back(FaceCollision(faceA, faceB,
+			m_IntersectionFinder.GetOwnerShape(faceA),
+			m_IntersectionFinder.GetOwnerShape(faceB)));
 
-	auto& edgeP0 = transformedPoints[edge.GetP0().GetIndexInShape()];
-	auto& edgeP1 = transformedPoints[edge.GetP1().GetIndexInShape()];
-
-	return PotentialCollision(edgeP0, edgeP1, inter.GetIntPoint(), inter.GetFace());
+		m_FaceCollisionCreated.Get(faceA.GetHash(), faceB.GetHash()) = true;
+	}
 }
 
-bool CollisionDetector::FindCollision(Shape& shape1, Shape& shape2, std::vector<PotentialCollision>& detectedColls)
+void CollisionDetector::UnAssignHashes(const std::vector<EdgeFaceIntersection>& inters)
+{
+	for (auto& inter : inters)
+	{
+		auto& e = inter.GetEdge();
+		auto& f = inter.GetFace();
+
+		f.ResetHash();
+		e.GetFace1().ResetHash();
+		e.GetFace2().ResetHash();
+	}
+}
+
+bool CollisionDetector::FindCollision(Shape& shape1, Shape& shape2, std::vector<FaceCollision>& detectedColls, std::vector<EdgeFaceIntersection>& inters)
 {
 	detectedColls.clear();
+	inters.clear();
 
-	m_FoundIntersections.clear();
-	m_IntersectionFinder.FindEdgeFaceIntersections(shape1, shape2, m_FoundIntersections);
+	m_IntersectionFinder.FindIntersections(shape1, shape2, inters);
 
-	if (m_FoundIntersections.size() > 0U)
+	if (inters.size() > 0U)
 	{
-		for (auto it = m_FoundIntersections.begin(); it != m_FoundIntersections.end(); it++)
-			detectedColls.emplace_back(ToPotentialCollision(*it, shape1, shape2));
+		m_FaceCollisionCreated.Clear(false);
 
+		Face::ResetNextHashCounter();
+
+		for (auto& inter : inters)
+		{
+			auto& e = inter.GetEdge();
+			auto& f = inter.GetFace();
+
+			ProcessFaceFaceInteraction(detectedColls, f, e.GetFace1());
+			ProcessFaceFaceInteraction(detectedColls, f, e.GetFace2());
+		}
+
+		UnAssignHashes(inters);
 		return true;
 	}
 	return false;

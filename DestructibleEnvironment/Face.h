@@ -139,7 +139,7 @@ public:
 		return m_EdgeObjects;
 	}
 
-	Shape& GetShape() const
+	Shape& GetOwnerShape() const
 	{
 		return *m_OwnerShape;
 	}
@@ -175,6 +175,12 @@ public:
 
 	void ReplacePointObjects(const ShapePoint& oldP0, const ShapePoint& oldP1, ShapePoint& replacement);
 
+	void OnTakenFromPool()
+	{
+		m_OwnerShape = nullptr;
+		ResetHash();
+	}
+
 private:
 	void InitFaceCoOrdinateSystem(const Vector3& origin)
 	{
@@ -186,7 +192,7 @@ private:
 	std::vector<ShapePoint*> m_PointObjects;
 	std::vector<ShapeEdge*> m_EdgeObjects;
 
-	Shape* m_OwnerShape;
+	Shape* m_OwnerShape = nullptr;
 	Polygon2 m_FacePoly;
 
 	Vector3 m_Normal;

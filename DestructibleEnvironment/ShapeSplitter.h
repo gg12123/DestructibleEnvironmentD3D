@@ -11,6 +11,7 @@
 #include "CleanIntersectionFinder.h"
 #include "FaceIterator.h"
 #include "ReversedGeometryCreator.h"
+#include "ShapeElementPool.h"
 
 template<class Tshape>
 class ShapeSplitter
@@ -54,7 +55,7 @@ private:
 			auto sizeBefore = m_NewInsideFaces.size();
 			m_FaceSplitter.SpitInside(fcpColl, m_NewInsideFaces);
 
-			if (&fcpColl.GetFace().GetShape() == &cutShape)
+			if (&fcpColl.GetFace().GetOwnerShape() == &cutShape)
 			{
 				for (auto i = sizeBefore; i < m_NewInsideFaces.size(); i++)
 					m_NewInsideFacesFromCutShape.emplace_back(m_NewInsideFaces[i]);
@@ -76,7 +77,7 @@ private:
 		for (auto it = fcpColls.Begin(); it != fcpColls.End(); it++)
 		{
 			auto& fcpColl = *it;
-			if (&fcpColl.GetFace().GetShape() == &originalShape)
+			if (&fcpColl.GetFace().GetOwnerShape() == &originalShape)
 				m_FaceSplitter.SplitOutside(fcpColl, m_NewOutsideFaces);
 		}
 	}
@@ -135,15 +136,60 @@ private:
 		return m_IntersectionFinder.FindCleanIntersections(cutShape, originalShape, m_Intersections);
 	}
 
+	void CollectFacesAndEdgesForPool(const Shape& originalShape)
+	{
+		m_OriginalShapeFacesForPool.clear();
+		for (auto f : originalShape.GetFaces())
+		{
+			if (m_CutPathCreator.FaceIsSplit(*f))
+				m_OriginalShapeFacesForPool.emplace_back(f);
+		}
+
+		m_OriginalShapeEdgesForPool.clear();
+		for (auto e : originalShape.GetEdgeObjects())
+		{
+			if (e->IsSplit())
+				m_OriginalShapeEdgesForPool.emplace_back(e);
+		}
+	}
+
+	void ReturnUnusedOriginalShapeStuffToPool()
+	{
+		for (auto f : m_OriginalShapeFacesForPool)
+			FacePool::Return(*f);
+
+		for (auto e : m_OriginalShapeEdgesForPool)
+			EdgePool::Return(*e);
+	}
+
+	template<class T>
+	void ReturnIfStillOwnedByCutShape(const std::vector<T*>& objs, const Shape& cutShape)
+	{
+		for (auto o : objs)
+		{
+			if (&o->GetOwnerShape() == &cutShape)
+				ShapeElementPool<T>::Return(*o);
+		}
+	}
+
+	void ReturnUnusedCutShapeStuffToPool(const Shape& cutShape)
+	{
+		ReturnIfStillOwnedByCutShape(cutShape.GetEdgeObjects(), cutShape);
+		ReturnIfStillOwnedByCutShape(cutShape.GetPointObjects(), cutShape);
+		ReturnIfStillOwnedByCutShape(cutShape.GetFaces(), cutShape);
+	}
+
 public:
 	void Split(const Vector3& splitPointWorld, const Vector3& splitNormalWorld, Tshape& originalShape, std::vector<Tshape*>& newShapes)
 	{
-		ResetHashCounters();
-
 		auto& cutShape = m_CutShapeCreator.Create(originalShape.GetTransform(), splitPointWorld, splitNormalWorld);
 
 		// TODO - abort nicely if this returns false.
 		assert(FindIntersections(originalShape, cutShape));
+
+		// The intersection finder uses the hashes so reset the counters here ready
+		// for the rest of the splitting algorithm.
+		ResetHashCounters();
 
 		m_CutPathCreator.GeneratePaths(m_Intersections);
 
@@ -151,7 +197,9 @@ public:
 		CreateInsideEdgesFromSplitEdges();
 
 		// Now get the stuff from original shape that needs returning to the pool. But dont return
-		// it until the end of the split.
+		// it until the end of the split. Returning it early may break some state that is relied
+		// upon in the rest of the algorithm.
+		CollectFacesAndEdgesForPool(originalShape);
 
 		InitFaceSplitter();
 
@@ -166,12 +214,20 @@ public:
 
 		InitNewShapes(originalShape, newShapes);
 
-		// TODO - to clean up, loop through everything on the cut shape and if it has not
+		// To clean up, loop through everything on the cut shape and if it has not
 		// been assigned to one of the new shapes (check owner shape property), it must be
 		// returned to the pool. Also any faces and edges on the original shape that got split
 		// must be returned. All points on the original shape are re-used. To check if an
 		// edge is split, use the reference to split edge. To check if a face is split, use
 		// the cut path creator.
+		// Cut shape doesnt need returning to the pool becasue it is re-used in the cut shape
+		// creator.
+		ReturnUnusedCutShapeStuffToPool(cutShape);
+		ReturnUnusedOriginalShapeStuffToPool();
+
+		// No need to un-assign any hashes because that is done by the new
+		// shapes in 'on splitting finished' and when an object is taken from
+		// a pool.
 	}
 
 private:
@@ -189,4 +245,7 @@ private:
 
 	std::vector<Face*> m_NewInsideFaces;
 	std::vector<Face*> m_NewOutsideFaces;
+
+	std::vector<Face*> m_OriginalShapeFacesForPool;
+	std::vector<ShapeEdge*> m_OriginalShapeEdgesForPool;
 };
