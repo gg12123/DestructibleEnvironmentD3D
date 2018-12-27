@@ -42,9 +42,15 @@ public:
 
 	RayCastHit<ShapeProxy> RayCast(const Ray& r) const;
 
+	static bool AcceptingGameInput()
+	{
+		return m_AcceptGameInput;
+	}
+
 private:
-	void CreateShapeProxyForBodyAddedByPhysics(Shape& shape);
+	void CreateShapeProxyForBodyAddedByPhysics(Rigidbody& shape);
 	void CreateProxiesForBodiesAddedByEngine();
+	void AddNewProxy(ShapeProxy& proxy, Shape& physicsShape);
 
 	std::vector<std::unique_ptr<IGameTheadToPhysicsThreadAction>> m_GameToPhysicsActions;
 
@@ -58,4 +64,6 @@ private:
 	InitialShapeCreator m_ShapeCreator;
 
 	World* m_World;
+
+	static bool m_AcceptGameInput;
 };

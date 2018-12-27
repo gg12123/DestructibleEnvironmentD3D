@@ -9,7 +9,7 @@
 
 Shape::~Shape()
 {
-	// return faces to pool.
+	// TODO - return everything to pool.
 }
 
 bool Shape::IntersectsRay(const Ray& worldSpaceRay, Vector3& intPoint)
@@ -17,10 +17,25 @@ bool Shape::IntersectsRay(const Ray& worldSpaceRay, Vector3& intPoint)
 	auto localRay = Ray(m_Transform.ToLocalPosition(worldSpaceRay.GetOrigin()),
 		m_Transform.ToLocalDirection(worldSpaceRay.GetDirection()));
 
+	Vector3 p;
+	auto closestHitDist = MathU::Infinity;
+	auto hit = false;
+
 	for (auto f : m_Faces)
 	{
-
+		if (localRay.IntersectsPlane(f->GetPlaneP0(), f->GetNormal(), p) &&
+			f->PointIsOnFace(p))
+		{
+			auto dist = (p - localRay.GetOrigin()).MagnitudeSqr();
+			if (dist < closestHitDist)
+			{
+				closestHitDist = dist;
+				intPoint = p;
+				hit = true;
+			}
+		}
 	}
+	return hit;
 }
 
 void Shape::TryCollectPoint(ShapePoint& p)

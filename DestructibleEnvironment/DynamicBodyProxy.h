@@ -1,6 +1,9 @@
 #pragma once
 #include "ShapeProxy.h"
 #include "Vector3.h"
+#include "CollisionData.h"
+
+class Rigidbody;
 
 class DynamicBodyProxy : public ShapeProxy
 {
@@ -9,7 +12,7 @@ public:
 	{
 	}
 
-	DynamicBodyProxy(Shape& body);
+	DynamicBodyProxy(Rigidbody& body);
 
 	float GetMass() const
 	{
@@ -41,11 +44,22 @@ public:
 		m_AngularDrag = angDrag;
 	}
 
+	void AddForce(const Vector3& force);
+	void AddTorque(const Vector3& torque);
+	void AddImpulse(const Impulse& imp);
+
 protected:
 	Shape & RegisterWithPhysics() override;
+
+	void SetRigidBody(Rigidbody& body)
+	{
+		m_Body = &body;
+	}
 
 private:
 	float m_Mass;
 	float m_Drag;
 	float m_AngularDrag;
+
+	Rigidbody* m_Body;
 };

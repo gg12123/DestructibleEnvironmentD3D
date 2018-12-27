@@ -33,6 +33,13 @@ void PhysicsEngine::Run()
 RayCastHit<Shape> PhysicsEngine::RayCast(const Ray& r) const
 {
 	assert(m_SafeToSync);
+
+	auto cast = UpdatableRayCast<Shape>(r);
+
+	cast.Update(m_DynamicBodies);
+	cast.Update(m_StaticBodies);
+
+	return cast.ToRayCastHit();
 }
 
 void PhysicsEngine::DoCollisionDetectionResponse(PhysicsObject& body1, PhysicsObject& body2)

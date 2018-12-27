@@ -12,10 +12,4 @@ public:
 
 protected:
 	Shape & RegisterWithPhysics() override;
-
-	void AddForce(const Vector3& force);
-	void AddTorque(const Vector3& torque);
-
-private:
-	Rigidbody * m_Rigidbody;
 };

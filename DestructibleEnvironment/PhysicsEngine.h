@@ -78,7 +78,7 @@ private:
 	std::atomic<bool> m_SafeToSync = false;
 
 	// The game thread fills this during collision detection, i.e. the sync phase.
-	// the actions are executed at the start of updateBodies().
+	// the actions are executed at the start of UpdateBodies().
 	std::vector<std::unique_ptr<IGameTheadToPhysicsThreadAction>> m_GameToPhysicsActions;
 
 	// This is filled with the bodies added by the physics engine (due to splits) during UpdateBodies().

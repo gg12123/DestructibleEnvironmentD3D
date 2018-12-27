@@ -10,6 +10,14 @@
 #include "StaticBody.h"
 #include "GameControlledDynamicBody.h"
 
+bool Physics::m_AcceptGameInput = false;
+
+void Physics::AddNewProxy(ShapeProxy& proxy, Shape& physicsShape)
+{
+	m_ShapeProxies.push_back(&proxy);
+	m_MapToProxy[&physicsShape] = &proxy;
+}
+
 Shape & Physics::AddStaticRigidbody(StaticShapeProxy& proxy)
 {
 	auto body = std::unique_ptr<StaticBody>(new StaticBody());
@@ -19,8 +27,7 @@ Shape & Physics::AddStaticRigidbody(StaticShapeProxy& proxy)
 
 	m_GameToPhysicsActions.emplace_back(std::unique_ptr<IGameTheadToPhysicsThreadAction>(new AddStaticRigidbodyAction(std::move(body))));
 
-	// this proxy has come from the world so just push it onto the list
-	m_ShapeProxies.push_back(&proxy);
+	AddNewProxy(proxy, toRet);
 
 	return toRet;
 }
@@ -36,8 +43,7 @@ Rigidbody & Physics::AddDynamicRigidbody(DynamicBodyProxy& proxy)
 
 	m_GameToPhysicsActions.emplace_back(std::unique_ptr<IGameTheadToPhysicsThreadAction>(new AddDynamicRigidbodyAction(std::move(body))));
 
-	// this proxy has come from the world so just push it onto the list
-	m_ShapeProxies.push_back(&proxy);
+	AddNewProxy(proxy, b);
 
 	return b;
 }
@@ -56,6 +62,8 @@ Rigidbody & Physics::AddGameControlledRigidbody(GameControlledDynamicBody& proxy
 
 RayCastHit<ShapeProxy> Physics::RayCast(const Ray& r) const
 {
+	assert(m_AcceptGameInput);
+
 	auto hit = m_Engine.RayCast(r);
 	if (hit.Hit())
 	{
@@ -85,11 +93,15 @@ void Physics::Syncronise()
 
 		// Allow game to add forces etc to physics objects.
 		// This is the only time ray-casting is allowed.
+		m_AcceptGameInput = true;
+
 		for (auto it = m_GameControlledProxies.begin(); it != m_GameControlledProxies.end(); it++)
 			(*it)->FixedUpdate();
 
 		for (auto x : m_OnPhysicsUpdatedListeners)
 			x->OnPhysicsWorldUpdated();
+
+		m_AcceptGameInput = false;
 
 		m_Engine.ClearSafeToSync();
 	}
@@ -104,13 +116,13 @@ void Physics::CreateProxiesForBodiesAddedByEngine()
 	newBodies.clear();
 }
 
-void Physics::CreateShapeProxyForBodyAddedByPhysics(Shape& shape)
+void Physics::CreateShapeProxyForBodyAddedByPhysics(Rigidbody& body)
 {
-	auto prox = new DynamicBodyProxy(shape);
+	auto prox = new DynamicBodyProxy(body);
 
 	// this proxy has been created for a shape that was added by the physics thread
 	// so it needs registering with the world
 	m_World->RegisterEntity(std::unique_ptr<Entity>(prox));
 
-	m_ShapeProxies.push_back(prox);
+	AddNewProxy(*prox, body);
 }
