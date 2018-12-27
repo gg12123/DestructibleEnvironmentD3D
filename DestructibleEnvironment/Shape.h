@@ -1,10 +1,11 @@
 #pragma once
 
+#include <vector>
 #include "Vector3.h"
 #include "Transform.h"
 #include "Bounds.h"
 #include "PointInPolyCase.h"
-#include <vector>
+#include "RayCasting.h"
 
 class ShapePoint;
 class ShapeEdge;
@@ -118,6 +119,8 @@ public:
 
 		SetDirty();
 	}
+
+	bool IntersectsRay(const Ray& worldSpaceRay, Vector3& intPoint);
 
 private:
 	void SetDirty()

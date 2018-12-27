@@ -12,7 +12,7 @@
 
 Shape & Physics::AddStaticRigidbody(StaticShapeProxy& proxy)
 {
-	auto body = std::unique_ptr<StaticBody>(new StaticBody()); // pool
+	auto body = std::unique_ptr<StaticBody>(new StaticBody());
 	m_ShapeCreator.Create(*body, proxy.GetInitialWidth(), proxy.GetInitialHeight(), proxy.GetTransform());
 
 	auto& toRet = *body;
@@ -27,7 +27,7 @@ Shape & Physics::AddStaticRigidbody(StaticShapeProxy& proxy)
 
 Rigidbody & Physics::AddDynamicRigidbody(DynamicBodyProxy& proxy)
 {
-	auto body = std::unique_ptr<Rigidbody>(new Rigidbody()); // pool
+	auto body = std::unique_ptr<Rigidbody>(new Rigidbody());
 	m_ShapeCreator.Create(*body, proxy.GetInitialWidth(), proxy.GetInitialHeight(), proxy.GetTransform());
 
 	auto& b = *body;
@@ -54,27 +54,42 @@ Rigidbody & Physics::AddGameControlledRigidbody(GameControlledDynamicBody& proxy
 	return body;
 }
 
+RayCastHit<ShapeProxy> Physics::RayCast(const Ray& r) const
+{
+	auto hit = m_Engine.RayCast(r);
+	if (hit.Hit())
+	{
+		auto hitShape = hit.GetHitObject();
+		return RayCastHit<ShapeProxy>(m_MapToProxy[hitShape], hit.GetHitPoint());
+	}
+	return RayCastHit<ShapeProxy>(nullptr, Vector3::Zero());
+}
+
 void Physics::Syncronise()
 {
 	if (m_Engine.IsSafeToSync())
 	{
-		// physics engine is doing collision detection. This is when it is safe to sync state
+		// Physics engine is doing collision detection. This is when it is safe to sync state.
 
-		// trasfer actions into the physics engine. It will then execute these
-		// when it gets to updating the bodies - after this sync phase
+		// Trasfer actions into the physics engine. It will then execute these
+		// when it gets to updating the bodies - after this sync phase.
 		m_Engine.GetGameToPhysicsActions().swap(m_GameToPhysicsActions);
 		m_GameToPhysicsActions.clear();
 
-		// create proxies for any bodies that were added by the engine during its last updateBodies() step.
+		// Create proxies for any bodies that were added by the engine during its last updateBodies() step.
 		CreateProxiesForBodiesAddedByEngine();
 
-		// tell the proxies to sync.
+		// Tell the proxies to sync.
 		for (auto it = m_ShapeProxies.begin(); it != m_ShapeProxies.end(); it++)
 			(*it)->Syncronise();
 
-		// allow game to add forces etc to physics objects
+		// Allow game to add forces etc to physics objects.
+		// This is the only time ray-casting is allowed.
 		for (auto it = m_GameControlledProxies.begin(); it != m_GameControlledProxies.end(); it++)
 			(*it)->FixedUpdate();
+
+		for (auto x : m_OnPhysicsUpdatedListeners)
+			x->OnPhysicsWorldUpdated();
 
 		m_Engine.ClearSafeToSync();
 	}

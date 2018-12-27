@@ -61,6 +61,8 @@ void Rigidbody::CalculateMotionProperties()
 
 void Rigidbody::ApplyImpulses(std::vector<SplitInfo>& splits)
 {
+	TransferAdditionalImpulses();
+
 	Impulse* biggest = nullptr;
 	auto biggestImpact = 0.0f;
 
@@ -103,7 +105,7 @@ void Rigidbody::ApplyImpulse(const Impulse& impulse)
 {
 	m_VelocityWorld += impulse.WorldImpulse / GetMass();
 
-	auto& r = impulse.WorldCollisionPoint - GetTransform().GetPosition();
+	auto& r = impulse.WorldImpulsePoint - GetTransform().GetPosition();
 	auto& J = impulse.WorldImpulse;
 
 	m_AngularVelocityWorld += (GetInertiaInverseWorld() * Vector3::Cross(r, J));

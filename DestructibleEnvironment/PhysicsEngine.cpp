@@ -30,6 +30,11 @@ void PhysicsEngine::Run()
 	}
 }
 
+RayCastHit<Shape> PhysicsEngine::RayCast(const Ray& r) const
+{
+	assert(m_SafeToSync);
+}
+
 void PhysicsEngine::DoCollisionDetectionResponse(PhysicsObject& body1, PhysicsObject& body2)
 {
 	if (m_CollisionDetector.FindCollision(body1, body2, m_FaceCollisions, m_Intersections))
@@ -62,7 +67,15 @@ void PhysicsEngine::UpdateBodies()
 	m_Splits.clear();
 	
 	for (auto it = m_DynamicBodies.begin(); it != m_DynamicBodies.end(); it++)
-		(*it)->Update(m_Splits);
+	{
+		auto& b = **it;
+
+		b.Update(m_Splits);
+
+		// Must fully re-calculate the transform so that it doesnt re-calculate during collision
+		// detection whilst it may be getting accsesed from the game thread.
+		b.GetTransform().ReCalculateIfDirty();
+	}
 	
 	ProcessSplits();
 }
@@ -80,7 +93,7 @@ void PhysicsEngine::ProcessSplits()
 			auto& toSplit = *s.ToSplit;
 
 			m_NewBodiesFromSplit.clear();
-			m_Splitter.Split(s.CauseImpulse.WorldCollisionPoint, s.CauseImpulse.WorldImpulse.Normalized(), toSplit, m_NewBodiesFromSplit);
+			m_Splitter.Split(s.CauseImpulse.WorldImpulsePoint, s.CauseImpulse.WorldImpulse.Normalized(), toSplit, m_NewBodiesFromSplit);
 		
 			// TODO - this is a bit messy. The first entry in the list
 			// is the original shape so no need to add it to the world etc.
@@ -95,8 +108,10 @@ void PhysicsEngine::ProcessSplits()
 			for (auto it = m_NewBodiesFromSplit.begin(); it != m_NewBodiesFromSplit.end(); it++)
 			{
 				auto& newBody = **it;
+
 				newBody.CopyVelocity(toSplit);
 				newBody.CalculateMotionProperties();
+				newBody.GetTransform().ReCalculateIfDirty();
 			}
 		}
 	}

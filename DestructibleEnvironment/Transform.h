@@ -36,6 +36,16 @@ public:
 		m_Dirty = true;
 	}
 
+	void ReCalculateIfDirty()
+	{
+		if (m_Dirty)
+		{
+			m_LocalToWorld = Matrix4::FromTranslation(m_Position) * Matrix4::FromRotation(m_Rotation);
+			m_WorldToLocal = Matrix4::FromRotation(m_Rotation.Conj()) * Matrix4::FromTranslation(-m_Position);
+			m_Dirty = false;
+		}
+	}
+
 	Vector3 ToLocalPosition(const Vector3& worldPos)
 	{
 		ReCalculateIfDirty();
@@ -44,7 +54,7 @@ public:
 
 	Vector3 ToLocalDirection(const Vector3& worldDir) const
 	{
-		return GetWorldToLocalRotation().RotateV(worldDir); // m_Rotation.Conj().RotateV(worldDir);
+		return GetWorldToLocalRotation().RotateV(worldDir);
 	}
 
 	Vector3 ToWorldPosition(const Vector3& localPos)
@@ -55,7 +65,7 @@ public:
 
 	Vector3 ToWorldDirection(const Vector3& localDir)
 	{
-		return GetLocalToWorldRotation().RotateV(localDir);// m_Rotation.RotateV(localDir);
+		return GetLocalToWorldRotation().RotateV(localDir);
 	}
 
 	Matrix3 ApplySimilarityTransform(const Matrix3& localMatrix)
@@ -110,16 +120,6 @@ private:
 	static inline Vector3 FromColumn(const float* col)
 	{
 		return Vector3(col[0], col[1], col[2]);
-	}
-
-	void ReCalculateIfDirty()
-	{
-		if (m_Dirty)
-		{
-			m_LocalToWorld = Matrix4::FromTranslation(m_Position) * Matrix4::FromRotation(m_Rotation);
-			m_WorldToLocal = Matrix4::FromRotation(m_Rotation.Conj()) * Matrix4::FromTranslation(-m_Position);
-			m_Dirty = false;
-		}
 	}
 
 	Vector3 m_Position;

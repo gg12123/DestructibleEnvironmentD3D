@@ -438,6 +438,12 @@
     <ClInclude Include="CleanIntersectionsWrapper.h">
       <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
+    <ClInclude Include="RayCasting.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="IOnPhysicsWorldUpdated.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">

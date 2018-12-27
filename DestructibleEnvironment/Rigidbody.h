@@ -10,7 +10,14 @@ class Rigidbody : public PhysicsObject
 public:
 	void AddImpulse(const Impulse& impulse) override
 	{
+		// Impulses added by collision response
 		m_Impulses.emplace_back(impulse);
+	}
+
+	void AddAdditionalImpulse(const Impulse& impulse)
+	{
+		// Impulses added by the game thread
+		m_AdditionalImpulses.emplace_back(impulse);
 	}
 
 	void AddToRequiredToSeperate(const Vector3& toSep) override
@@ -81,6 +88,14 @@ public:
 	}
 
 private:
+	void TransferAdditionalImpulses()
+	{
+		for (auto& i : m_AdditionalImpulses)
+			m_Impulses.emplace_back(i);
+
+		m_AdditionalImpulses.clear();
+	}
+
 	void UpdateTransform();
 	void ApplyImpulses(std::vector<SplitInfo>& splits);
 	void CalculateForces();
@@ -90,6 +105,7 @@ private:
 	void CalculateInertia();
 
 	std::vector<Impulse> m_Impulses;
+	std::vector<Impulse> m_AdditionalImpulses;
 
 	Vector3 m_VelocityWorld;
 	Vector3 m_AngularVelocityWorld;

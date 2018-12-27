@@ -12,11 +12,11 @@
 #include "CollisionResponder.h"
 #include "FixedTimeStepTime.h"
 #include "ShapeSplitter.h"
+#include "RayCasting.h"
 
 class PhysicsEngine
 {
 public:
-
 	PhysicsEngine()
 	{
 		m_DynamicBodies.reserve(Constants::MaxNumShapes);
@@ -62,6 +62,8 @@ public:
 	}
 
 	void StartRunning();
+
+	RayCastHit<Shape> RayCast(const Ray& r) const;
 
 private:
 	void Run();

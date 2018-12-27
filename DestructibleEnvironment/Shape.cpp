@@ -12,6 +12,17 @@ Shape::~Shape()
 	// return faces to pool.
 }
 
+bool Shape::IntersectsRay(const Ray& worldSpaceRay, Vector3& intPoint)
+{
+	auto localRay = Ray(m_Transform.ToLocalPosition(worldSpaceRay.GetOrigin()),
+		m_Transform.ToLocalDirection(worldSpaceRay.GetDirection()));
+
+	for (auto f : m_Faces)
+	{
+
+	}
+}
+
 void Shape::TryCollectPoint(ShapePoint& p)
 {
 	if (!p.HasBeenCollected())
