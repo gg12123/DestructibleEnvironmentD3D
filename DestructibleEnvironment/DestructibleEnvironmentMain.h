@@ -10,8 +10,11 @@ namespace DestructibleEnvironment
 	class DestructibleEnvironmentMain : public DX::IDeviceNotify
 	{
 	public:
-		DestructibleEnvironmentMain(const std::shared_ptr<DX::DeviceResources>& deviceResources);
+		DestructibleEnvironmentMain(const std::shared_ptr<DX::DeviceResources>& deviceResources,
+			const WindowsInput^ input);
+
 		~DestructibleEnvironmentMain();
+
 		void CreateWindowSizeDependentResources();
 		void Update();
 		void Render();

@@ -226,6 +226,8 @@
     <ClInclude Include="FacesCutPaths.h" />
     <ClInclude Include="FacesOriginalPointsIterator.h" />
     <ClInclude Include="FacesPointsIterator.h" />
+    <ClInclude Include="InputChannel.h" />
+    <ClInclude Include="InputChannelWrapper.h" />
     <ClInclude Include="IntersectionEquivalenceChecker.h" />
     <ClInclude Include="IntersectionLoop.h" />
     <ClInclude Include="IOnPhysicsWorldUpdated.h" />
@@ -268,6 +270,8 @@
     <ClInclude Include="PhysicsObject.h" />
     <ClInclude Include="PhysicsTime.h" />
     <ClInclude Include="RayCasting.h" />
+    <ClInclude Include="RayShooter.h" />
+    <ClInclude Include="ReadOnlyInput.h" />
     <ClInclude Include="ReversedGeometryCreator.h" />
     <ClInclude Include="ShapeEdgesCreator.h" />
     <ClInclude Include="ShapeElementPool.h" />
@@ -296,6 +300,7 @@
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="Vertex.h" />
+    <ClInclude Include="WindowsInput.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
@@ -324,6 +329,7 @@
     </ClCompile>
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
+    <ClCompile Include="RayShooter.cpp" />
     <ClCompile Include="ShapePoint.cpp" />
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="Random.cpp" />

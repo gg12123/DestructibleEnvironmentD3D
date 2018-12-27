@@ -4,6 +4,7 @@
 #include "Renderer.h"
 #include "Physics.h"
 #include "Entity.h"
+#include "ReadOnlyInput.h"
 
 class World
 {
@@ -17,8 +18,9 @@ public:
 		m_Physics.StopRunningPhysicsThread();
 	}
 
-	void Init(const std::shared_ptr<DX::DeviceResources>& deviceResources)
+	void Init(const std::shared_ptr<DX::DeviceResources>& deviceResources, const ReadOnlyInput& input)
 	{
+		m_Input = input;
 		m_Renderer.SetResources(deviceResources);
 		m_Physics.SetWorld(*this);
 		m_Physics.StartRunningPhysicsThread();
@@ -32,6 +34,11 @@ public:
 	Physics& GetPhysics()
 	{
 		return m_Physics;
+	}
+
+	auto& GetInput() const
+	{
+		return m_Input;
 	}
 
 	void RegisterEntity(std::unique_ptr<Entity>&& ent);
@@ -48,4 +55,6 @@ private:
 
 	std::vector<std::unique_ptr<Entity>> m_Entities;
 	std::vector<Entity*> m_UpdateableEntities;
+
+	ReadOnlyInput m_Input;
 };

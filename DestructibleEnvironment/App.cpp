@@ -85,7 +85,8 @@ void App::Load(Platform::String^ entryPoint)
 {
 	if (m_main == nullptr)
 	{
-		m_main = std::unique_ptr<DestructibleEnvironmentMain>(new DestructibleEnvironmentMain(m_deviceResources));
+		m_Input = ref new WindowsInput();
+		m_main = std::unique_ptr<DestructibleEnvironmentMain>(new DestructibleEnvironmentMain(m_deviceResources, m_Input));
 	}
 }
 
@@ -104,6 +105,8 @@ void App::Run()
 		}
 	}
 
+	m_Input->Init(CoreWindow::GetForCurrentThread());
+
 	while (!m_windowClosed)
 	{
 		if (m_windowVisible)
@@ -113,6 +116,7 @@ void App::Run()
 			m_main->Update();
 			m_main->Render();
 			m_deviceResources->Present();
+			m_Input->Reset();
 		}
 		else
 		{

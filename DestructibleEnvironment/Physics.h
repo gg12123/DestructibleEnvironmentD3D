@@ -47,6 +47,11 @@ public:
 		return m_AcceptGameInput;
 	}
 
+	void AddOnPhysicsUpdatedListener(IOnPhysicsWorldUpdated& listener)
+	{
+		m_OnPhysicsUpdatedListeners.emplace_back(&listener);
+	}
+
 private:
 	void CreateShapeProxyForBodyAddedByPhysics(Rigidbody& shape);
 	void CreateProxiesForBodiesAddedByEngine();

@@ -89,6 +89,9 @@
     <Filter Include="Debuging">
       <UniqueIdentifier>{049a5bdb-3e58-4c22-bd1e-71ee64ee63bc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Input">
+      <UniqueIdentifier>{5d096711-e1d8-4015-aa15-5b95b2c607fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
@@ -165,6 +168,9 @@
     </ClCompile>
     <ClCompile Include="Vector2.cpp">
       <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="RayShooter.cpp">
+      <Filter>Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -443,6 +449,21 @@
     </ClInclude>
     <ClInclude Include="IOnPhysicsWorldUpdated.h">
       <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowsInput.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="InputChannel.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="InputChannelWrapper.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="ReadOnlyInput.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="RayShooter.h">
+      <Filter>Misc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

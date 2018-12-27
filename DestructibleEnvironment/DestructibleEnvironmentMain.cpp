@@ -8,6 +8,7 @@
 #include "DynamicBodyProxy.h"
 #include "StaticShapeProxy.h"
 #include "Random.h"
+#include "ReadOnlyInput.h"
 
 using namespace DestructibleEnvironment;
 using namespace Windows::Foundation;
@@ -15,13 +16,14 @@ using namespace Windows::System::Threading;
 using namespace Concurrency;
 
 // Loads and initializes application assets when the application is loaded.
-DestructibleEnvironmentMain::DestructibleEnvironmentMain(const std::shared_ptr<DX::DeviceResources>& deviceResources) :
+DestructibleEnvironmentMain::DestructibleEnvironmentMain(const std::shared_ptr<DX::DeviceResources>& deviceResources,
+	const WindowsInput^ input) :
 	m_deviceResources(deviceResources)
 {
 	// Register to be notified if the Device is lost or recreated
 	m_deviceResources->RegisterDeviceNotify(this);
 
-	m_World.Init(m_deviceResources);
+	m_World.Init(m_deviceResources, ReadOnlyInput(input));
 	RegisterEntitiesWithWorld();
 }
 

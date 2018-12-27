@@ -3,6 +3,7 @@
 #include "pch.h"
 #include "Common\DeviceResources.h"
 #include "DestructibleEnvironmentMain.h"
+#include "WindowsInput.h"
 
 namespace DestructibleEnvironment
 {
@@ -38,6 +39,7 @@ namespace DestructibleEnvironment
 	private:
 		std::shared_ptr<DX::DeviceResources> m_deviceResources;
 		std::unique_ptr<DestructibleEnvironmentMain> m_main;
+		WindowsInput^ m_Input;
 		bool m_windowClosed;
 		bool m_windowVisible;
 	};
