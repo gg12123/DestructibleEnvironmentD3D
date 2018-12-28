@@ -5,6 +5,7 @@
 #include "Common\DeviceResources.h"
 #include "ConstantBufferInputTypes.h"
 #include "D3DBuffers.h"
+#include "ViewportDimensions.h"
 
 class IMeshRenderer;
 class Light;
@@ -18,7 +19,8 @@ public:
 	{
 	}
 
-	void SetResources(const std::shared_ptr<DX::DeviceResources>& deviceResources);
+	void SetResources(const std::shared_ptr<DX::DeviceResources>& deviceResources,
+					const ViewportDimensions& viewDims);
 
 	void Register(IMeshRenderer& toReg)
 	{
@@ -35,14 +37,24 @@ public:
 		m_Camera = &cam;
 	}
 
+	auto& GetActiveCamera() const
+	{
+		return *m_Camera;
+	}
+
 	auto& GetBuffers()
 	{
 		return *m_Buffers;
 	}
 
-	bool IsReadyToRender()
+	bool IsReadyToRender() const
 	{
 		return m_LoadedVS && m_LoadedPS;
+	}
+
+	auto& GetViewportDimensions() const
+	{
+		return m_ViewportDims;
 	}
 
 	void Render();
@@ -69,6 +81,7 @@ private:
 	static int constexpr PerObjectConstBufferSlot = 0;
 	static int constexpr PerSceneConstBufferSlot = 1;
 
+	ViewportDimensions m_ViewportDims;
 	std::shared_ptr<DX::DeviceResources> m_DeviceResources;
 	ID3D11DeviceContext3* m_Context;
 

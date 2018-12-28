@@ -6,6 +6,7 @@
 ShapeProxy::ShapeProxy(Shape& shape)
 {
 	m_Shape = &shape;
+	m_Shape->SetProxy(*this);
 }
 
 void ShapeProxy::Awake()
@@ -13,6 +14,7 @@ void ShapeProxy::Awake()
 	if (!m_Shape)
 	{
 		m_Shape = &RegisterWithPhysics();
+		m_Shape->SetProxy(*this);
 	}
 }
 

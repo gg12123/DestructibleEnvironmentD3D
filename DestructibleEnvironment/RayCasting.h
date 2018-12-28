@@ -94,7 +94,7 @@ public:
 
 				if (dist < m_ClosestSqrDistToHitObj)
 				{
-					m_ClosestDistToHitObj = dist;
+					m_ClosestSqrDistToHitObj = dist;
 					m_HitObj = obj.get();
 					m_HitPoint = intPoint;
 				}

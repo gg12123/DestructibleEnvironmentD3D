@@ -300,6 +300,7 @@
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="Vertex.h" />
+    <ClInclude Include="ViewportDimensions.h" />
     <ClInclude Include="WindowsInput.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>

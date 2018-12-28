@@ -15,7 +15,6 @@ bool Physics::m_AcceptGameInput = false;
 void Physics::AddNewProxy(ShapeProxy& proxy, Shape& physicsShape)
 {
 	m_ShapeProxies.push_back(&proxy);
-	m_MapToProxy[&physicsShape] = &proxy;
 }
 
 Shape & Physics::AddStaticRigidbody(StaticShapeProxy& proxy)
@@ -68,7 +67,7 @@ RayCastHit<ShapeProxy> Physics::RayCast(const Ray& r) const
 	if (hit.Hit())
 	{
 		auto hitShape = hit.GetHitObject();
-		return RayCastHit<ShapeProxy>(m_MapToProxy[hitShape], hit.GetHitPoint());
+		return RayCastHit<ShapeProxy>(&hitShape->GetProxy(), hit.GetHitPoint());
 	}
 	return RayCastHit<ShapeProxy>(nullptr, Vector3::Zero());
 }

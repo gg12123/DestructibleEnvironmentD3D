@@ -5,22 +5,7 @@
 
 ref class WindowsInput
 {
-public:
-	void Init(_In_ Windows::UI::Core::CoreWindow^ window)
-	{
-		window->PointerPressed +=
-			ref new Windows::Foundation::TypedEventHandler<Windows::UI::Core::CoreWindow^, Windows::UI::Core::PointerEventArgs^>(this, &WindowsInput::OnPointerPressed);
-
-		window->PointerReleased +=
-			ref new Windows::Foundation::TypedEventHandler<Windows::UI::Core::CoreWindow^, Windows::UI::Core::PointerEventArgs^>(this, &WindowsInput::OnPointerReleased);
-	}
-
-	void Reset()
-	{
-		for (auto i : m_NeedReseting)
-			i->Reset();
-	}
-
+internal:
 	const InputChannel& GetMouseInputChannel(int mouseButton) const
 	{
 		return m_MouseInputs[mouseButton];
@@ -39,6 +24,30 @@ public:
 	bool GetMouseButtonDown(int btn) const
 	{
 		return m_MouseInputs[btn].IsJustDown();
+	}
+
+	Vector2 GetMousePosition() const
+	{
+		auto window = Windows::UI::Core::CoreWindow::GetForCurrentThread();
+		auto p = window->PointerPosition;
+		auto b = window->Bounds;
+		return Vector2(p.X, b.Height - p.Y);
+	}
+
+public:
+	void Init(_In_ Windows::UI::Core::CoreWindow^ window)
+	{
+		window->PointerPressed +=
+			ref new Windows::Foundation::TypedEventHandler<Windows::UI::Core::CoreWindow^, Windows::UI::Core::PointerEventArgs^>(this, &WindowsInput::OnPointerPressed);
+
+		window->PointerReleased +=
+			ref new Windows::Foundation::TypedEventHandler<Windows::UI::Core::CoreWindow^, Windows::UI::Core::PointerEventArgs^>(this, &WindowsInput::OnPointerReleased);
+	}
+
+	void Reset()
+	{
+		for (auto i : m_NeedReseting)
+			i->Reset();
 	}
 
 private:

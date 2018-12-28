@@ -9,10 +9,12 @@
 #include "StaticShapeProxy.h"
 #include "Random.h"
 #include "ReadOnlyInput.h"
+#include "ViewportDimensions.h"
 
 using namespace DestructibleEnvironment;
 using namespace Windows::Foundation;
 using namespace Windows::System::Threading;
+using namespace Windows::UI::Core;
 using namespace Concurrency;
 
 // Loads and initializes application assets when the application is loaded.
@@ -23,7 +25,7 @@ DestructibleEnvironmentMain::DestructibleEnvironmentMain(const std::shared_ptr<D
 	// Register to be notified if the Device is lost or recreated
 	m_deviceResources->RegisterDeviceNotify(this);
 
-	m_World.Init(m_deviceResources, ReadOnlyInput(input));
+	m_World.Init(m_deviceResources, ReadOnlyInput(input), ViewportDimensions());
 	RegisterEntitiesWithWorld();
 }
 

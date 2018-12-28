@@ -7,8 +7,10 @@
 #include "Light.h"
 #include "Common\DirectXHelper.h"
 
-void Renderer::SetResources(const std::shared_ptr<DX::DeviceResources>& deviceResources)
+void Renderer::SetResources(const std::shared_ptr<DX::DeviceResources>& deviceResources,
+	const ViewportDimensions& viewDims)
 {
+	m_ViewportDims = viewDims;
 	m_DeviceResources = deviceResources;
 	m_Context = m_DeviceResources->GetD3DDeviceContext();
 

@@ -10,6 +10,7 @@
 class ShapePoint;
 class ShapeEdge;
 class Face;
+class ShapeProxy;
 
 class Shape
 {
@@ -122,6 +123,16 @@ public:
 
 	bool IntersectsRay(const Ray& worldSpaceRay, Vector3& intPoint);
 
+	void SetProxy(ShapeProxy& proxy)
+	{
+		m_Proxy = &proxy;
+	}
+
+	ShapeProxy& GetProxy() const
+	{
+		return *m_Proxy;
+	}
+
 private:
 	void SetDirty()
 	{
@@ -147,4 +158,5 @@ private:
 	Bounds m_WorldBounds;
 
 	bool m_Dirty = true;
+	ShapeProxy* m_Proxy = nullptr;
 };

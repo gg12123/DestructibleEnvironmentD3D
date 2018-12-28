@@ -6,7 +6,6 @@ class World;
 class Entity
 {
 public:
-
 	virtual ~Entity()
 	{
 	}
@@ -26,9 +25,15 @@ public:
 	{
 	}
 
+	template<class T>
+	T* As()
+	{
+		return dynamic_cast<T*>(this);
+	}
+
 protected:
 
-	World & GetWorld()
+	World & GetWorld() const
 	{
 		return *m_World;
 	}

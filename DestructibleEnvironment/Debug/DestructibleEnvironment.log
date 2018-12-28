@@ -1,8 +1,16 @@
-﻿  App.cpp
+﻿  compilation object save succeeded; see C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\SamplePixelShader.cso
+  compilation object save succeeded; see C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\SampleVertexShader.cso
+  compilation object save succeeded; see C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\MyPixelShader.cso
+  compilation object save succeeded; see C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\MyVertexShader.cso
+  pch.cpp
+  App.cpp
   Camera.cpp
   CollisionDetector.cpp
   CollisionResponder.cpp
+  DeviceResources.cpp
   DestructibleEnvironmentMain.cpp
+  SampleFpsTextRenderer.cpp
+  Sample3DSceneRenderer.cpp
   DynamicBodyProxy.cpp
   DynamicMesh.cpp
   Face.cpp
@@ -12,50 +20,18 @@
   Light.cpp
   Physics.cpp
   PhysicsEngine.cpp
+  RayShooter.cpp
+  ShapePoint.cpp
+  Quaternion.cpp
+  Random.cpp
+  Renderer.cpp
   Rigidbody.cpp
   Shape.cpp
   ShapeEdge.cpp
   ShapeProxy.cpp
-c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(67): error C2678: binary '[': no operator found which takes a left-hand operand of type 'const std::unordered_map<Shape *,ShapeProxy *,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<std::pair<const _Kty,_Ty>>>' (or there is no acceptable conversion)
-          with
-          [
-              _Kty=Shape *,
-              _Ty=ShapeProxy *
-          ]
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.14.26428\include\unordered_map(488): note: could be 'ShapeProxy *&std::unordered_map<Shape *,ShapeProxy *,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<std::pair<const _Kty,_Ty>>>::operator [](Shape *const &)'
-          with
-          [
-              _Kty=Shape *,
-              _Ty=ShapeProxy *
-          ] (compiling source file Physics.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.14.26428\include\unordered_map(287): note: or       'ShapeProxy *&std::unordered_map<Shape *,ShapeProxy *,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<std::pair<const _Kty,_Ty>>>::operator [](Shape *&&)'
-          with
-          [
-              _Kty=Shape *,
-              _Ty=ShapeProxy *
-          ] (compiling source file Physics.cpp)
-  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(67): note: while trying to match the argument list '(const std::unordered_map<Shape *,ShapeProxy *,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<std::pair<const _Kty,_Ty>>>, Shape *)'
-          with
-          [
-              _Kty=Shape *,
-              _Ty=ShapeProxy *
-          ]
-c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(67): error C2440: '<function-style-cast>': cannot convert from 'const Vector3' to 'RayCastHit<ShapeProxy>'
-  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physics.cpp(67): note: No constructor could take the source type, or constructor overload resolution was ambiguous
-c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\raycasting.h(97): error C2065: 'm_ClosestDistToHitObj': undeclared identifier (compiling source file PhysicsEngine.cpp)
-  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physicsengine.cpp(39): note: see reference to function template instantiation 'void UpdatableRayCast<Shape>::Update<Rigidbody>(const std::vector<std::unique_ptr<Rigidbody,std::default_delete<_Ty>>,std::allocator<std::unique_ptr<_Ty,std::default_delete<_Ty>>>> &)' being compiled
-          with
-          [
-              _Ty=Rigidbody
-          ]
-  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\physicsengine.cpp(39): note: see reference to function template instantiation 'void UpdatableRayCast<Shape>::Update<Rigidbody>(const std::vector<std::unique_ptr<Rigidbody,std::default_delete<_Ty>>,std::allocator<std::unique_ptr<_Ty,std::default_delete<_Ty>>>> &)' being compiled
-          with
-          [
-              _Ty=Rigidbody
-          ]
-  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\cutpathcreator.h(24): note: see reference to class template instantiation 'PoolOfRecyclables<FacesCutPaths>' being compiled (compiling source file PhysicsEngine.cpp)
-  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\shapeedgescreator.h(16): note: see reference to class template instantiation 'PoolOfRecyclables<SplitShapeEdge>' being compiled (compiling source file PhysicsEngine.cpp)
+  SplitShapeEdge.cpp
   StaticShapeProxy.cpp
+  Vector2.cpp
   World.cpp
 c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.14.26428\include\xmemory0(920): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned short', possible loss of data (compiling source file ShapeProxy.cpp)
   c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.14.26428\include\vector(951): note: see reference to function template instantiation 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,unsigned int&>(_Alloc &,_Objty *const ,unsigned int &)' being compiled
@@ -77,10 +53,11 @@ c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.1
           [
               _Ty=unsigned short
           ] (compiling source file ShapeProxy.cpp)
-  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\shapeproxy.cpp(45): note: see reference to function template instantiation 'void std::vector<unsigned short,std::allocator<_Ty>>::emplace_back<unsigned int&>(unsigned int &)' being compiled
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\shapeproxy.cpp(47): note: see reference to function template instantiation 'void std::vector<unsigned short,std::allocator<_Ty>>::emplace_back<unsigned int&>(unsigned int &)' being compiled
           with
           [
               _Ty=unsigned short
           ]
   c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\cutpathcreator.h(24): note: see reference to class template instantiation 'PoolOfRecyclables<FacesCutPaths>' being compiled (compiling source file ShapeProxy.cpp)
   c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\shapeedgescreator.h(16): note: see reference to class template instantiation 'PoolOfRecyclables<SplitShapeEdge>' being compiled (compiling source file ShapeProxy.cpp)
+  DestructibleEnvironment.vcxproj -> C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\DestructibleEnvironment.exe

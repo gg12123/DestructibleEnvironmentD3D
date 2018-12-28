@@ -5,6 +5,7 @@
 #include "Physics.h"
 #include "Entity.h"
 #include "ReadOnlyInput.h"
+#include "ViewportDimensions.h"
 
 class World
 {
@@ -18,10 +19,10 @@ public:
 		m_Physics.StopRunningPhysicsThread();
 	}
 
-	void Init(const std::shared_ptr<DX::DeviceResources>& deviceResources, const ReadOnlyInput& input)
+	void Init(const std::shared_ptr<DX::DeviceResources>& deviceResources, const ReadOnlyInput& input, const ViewportDimensions& viewDims)
 	{
 		m_Input = input;
-		m_Renderer.SetResources(deviceResources);
+		m_Renderer.SetResources(deviceResources, viewDims);
 		m_Physics.SetWorld(*this);
 		m_Physics.StartRunningPhysicsThread();
 	}

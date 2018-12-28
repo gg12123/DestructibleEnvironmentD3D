@@ -2,15 +2,13 @@
 #include "Entity.h"
 #include "Matrix.h"
 #include "Transform.h"
+#include "RayCasting.h"
+#include "Vector2.h"
 
 class Camera : public Entity
 {
 public:
-	Matrix4 CalcuateVPMatrix()
-	{
-		return Matrix4::Perspective(m_Fov, m_Aspect, m_NearClip, m_FarClip) *
-			GetTransform().GetWorldToLocalMatrix();
-	}
+	Matrix4 CalcuateVPMatrix();
 
 	Vector3 GetViewDirection()
 	{
@@ -32,13 +30,13 @@ public:
 		m_Fov = val;
 	}
 
-protected:
+	Ray ScreenPointToRay(const Vector2& p);
 
+protected:
 	void Awake() override;
 
 private:
-	float m_Fov;
-	float m_Aspect = 1.0f; // this needs to come from the window config - probs through the renderer
+	float m_Fov; // In radians
 	float m_NearClip;
 	float m_FarClip;
 };

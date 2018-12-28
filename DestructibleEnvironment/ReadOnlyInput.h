@@ -34,6 +34,11 @@ public:
 		return m_Input->GetMouseInputChannel(btn);
 	}
 
+	Vector2 GetMousePosition() const
+	{
+		return m_Input->GetMousePosition();
+	}
+
 private:
 	const WindowsInput ^ m_Input;
 };

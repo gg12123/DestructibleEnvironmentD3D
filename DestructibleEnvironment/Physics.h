@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include <unordered_map>
 #include "Vector3.h"
 #include "PhysicsEngine.h"
 #include "GameThreadToPhysicsThreadAction.h"
@@ -61,7 +60,6 @@ private:
 
 	std::vector<ShapeProxy*> m_ShapeProxies; // All the proxies
 	std::vector<GameControlledDynamicBody*> m_GameControlledProxies;
-	std::unordered_map<Shape*, ShapeProxy*> m_MapToProxy;
 
 	std::vector<IOnPhysicsWorldUpdated*> m_OnPhysicsUpdatedListeners;
 

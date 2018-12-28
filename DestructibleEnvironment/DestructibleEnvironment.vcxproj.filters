@@ -465,6 +465,9 @@
     <ClInclude Include="RayShooter.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="ViewportDimensions.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">
