@@ -10,7 +10,7 @@
 #include "Constants.h"
 #include "CollectionU.h"
 #include "PoolOfRecyclables.h"
-#include "TwoDArray.h"
+#include "DynamicTwoDArray.h"
 #include "IntersectionLoop.h"
 #include "DynamicTriangleArray.h"
 
@@ -270,7 +270,7 @@ private:
 class CleanIntersectionFinder
 {
 private:
-	const EdgeEdgeRelationship& GetEdgeEdgeRelationship(const ShapeEdge& edgeFaces, const ShapeEdge& piercingEdge) const
+	const EdgeEdgeRelationship& GetEdgeEdgeRelationship(const ShapeEdge& edgeFaces, const ShapeEdge& piercingEdge)
 	{
 		return m_EdgeEdgeRelationships.Get(edgeFaces.GetHash(), piercingEdge.GetHash());
 	}
@@ -463,6 +463,6 @@ public:
 private:
 	IntersectionLinker m_Linker;
 	MapToPointPlaneRelationship m_PointPlaneRelationshipMap;
-	TwoDArray<Constants::MaxNumEdges, Constants::MaxNumEdges, EdgeEdgeRelationship> m_EdgeEdgeRelationships;
+	DynamicTwoDArray<EdgeEdgeRelationship> m_EdgeEdgeRelationships;
 	int m_IntersectionCount;
 };

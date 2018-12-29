@@ -2,7 +2,7 @@
 #include "Face.h"
 #include "ShapePoint.h"
 #include "FacesCutPath.h"
-#include "TwoDArray.h"
+#include "DynamicTwoDArray.h"
 #include "Constants.h"
 
 class MapToFacesCutPath
@@ -19,5 +19,5 @@ public:
 	}
 
 private:
-	TwoDArray<Constants::MaxNumPoints, Constants::MaxNumFaces, FacesCutPath*> m_Map;
+	DynamicTwoDArray<FacesCutPath*> m_Map;
 };

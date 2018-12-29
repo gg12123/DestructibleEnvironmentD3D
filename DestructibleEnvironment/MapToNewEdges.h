@@ -18,7 +18,7 @@ public:
 		return m_Edges.Get(p0.GetHash(), p1.GetHash());
 	}
 
-	ShapeEdge & GetNewEdge(const ShapePoint& p0, const ShapePoint& p1)
+	ShapeEdge & GetNewEdge(const ShapePoint& p0, const ShapePoint& p1) const
 	{
 		auto e = m_Edges.Get(p0.GetHash(), p1.GetHash());
 		assert(e);

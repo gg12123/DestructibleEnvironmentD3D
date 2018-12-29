@@ -297,6 +297,7 @@
     <ClInclude Include="Transform.h" />
     <ClInclude Include="DynamicTriangleArray.h" />
     <ClInclude Include="TwoDArray.h" />
+    <ClInclude Include="DynamicTwoDArray.h" />
     <ClInclude Include="UpdatableBound.h" />
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector3.h" />

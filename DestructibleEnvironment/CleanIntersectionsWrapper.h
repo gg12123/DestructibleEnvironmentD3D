@@ -3,6 +3,7 @@
 #include "CleanIntersectionFinder.h"
 #include "Shape.h"
 #include "ShapeElementPool.h"
+#include "DynamicTriangleArray.h"
 
 class CleanIntersectionsWrapper
 {
@@ -133,5 +134,5 @@ private:
 	Shape* m_Other;
 
 	std::array<ShapePoint*, Constants::MaxNumPoints> m_MapToTransformedPoint;
-	TriangleArray<Constants::MaxNumPoints, ShapeEdge*> m_MapToTransformedEdges;
+	DynamicTriangleArray<ShapeEdge*> m_MapToTransformedEdges;
 };

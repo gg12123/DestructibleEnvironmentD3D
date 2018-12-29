@@ -37,7 +37,7 @@ public:
 		return FacesCutPath::GetNewPointFromCpPoint<FaceRelationshipWithOtherShape::InIntersection>(se.GetNext(*points[i]), *m_MapToReversed);
 	}
 
-	void InitMaps(const MapToShapePointOnReversedFace& map, MapToNewEdges& edgeMap)
+	void InitMaps(const MapToShapePointOnReversedFace& map, const MapToNewEdges& edgeMap)
 	{
 		m_MapToEdges = &edgeMap;
 		m_MapToReversed = &map;
@@ -53,5 +53,5 @@ private:
 	const Face * m_OriginalFace = nullptr;
 	ConcaveFace* m_NewFace = nullptr;
 	const MapToShapePointOnReversedFace* m_MapToReversed = nullptr;
-	MapToNewEdges* m_MapToEdges = nullptr;
+	const MapToNewEdges* m_MapToEdges = nullptr;
 };

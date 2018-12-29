@@ -30,9 +30,8 @@ void ShapeProxy::Syncronise()
 		auto& indicies = MapIndexBuffer();
 
 		// fill the buffers
-		for (auto it = m_Shape->GetFaces().begin(); it != m_Shape->GetFaces().end(); it++)
+		for (auto f : m_Shape->GetFaces())
 		{
-			auto f = *it;
 			auto& points = f->GetCachedPoints();
 			auto normal = f->GetNormal();
 			auto baseIndex = verts.size();

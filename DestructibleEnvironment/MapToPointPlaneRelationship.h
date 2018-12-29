@@ -1,7 +1,7 @@
 #pragma once
 #include "Face.h"
 #include "ShapePoint.h"
-#include "TwoDArray.h"
+#include "DynamicTwoDArray.h"
 #include "Constants.h"
 
 enum class PointPlaneRelationship
@@ -24,5 +24,5 @@ public:
 	}
 
 private:
-	TwoDArray<2 * Constants::MaxNumFaces, 2 * Constants::MaxNumPoints, PointPlaneRelationship> m_Map;
+	DynamicTwoDArray<PointPlaneRelationship> m_Map;
 };

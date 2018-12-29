@@ -39,8 +39,6 @@ void DynamicMesh::UnMapVertexBuffer()
 
 void DynamicMesh::SetVertCount(int count)
 {
-	assert(count < Constants::MaxNumVerts);
-
 	auto& b = GetWorld().GetRenderer().GetBuffers();
 
 	if (m_VertexBuffer.get())
@@ -51,8 +49,6 @@ void DynamicMesh::SetVertCount(int count)
 
 void DynamicMesh::SetIndexCount(int count)
 {
-	assert(count < Constants::MaxNumIndicies);
-
 	auto& b = GetWorld().GetRenderer().GetBuffers();
 
 	if (m_IndexBuffer.get())

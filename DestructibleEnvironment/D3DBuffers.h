@@ -136,8 +136,12 @@ public:
 	}
 
 private:
-	static constexpr int VertexBufferSize = Constants::MaxNumVerts;
-	static constexpr int IndexBufferSize = Constants::MaxNumIndicies;
+	// TODO - need to re-work the way in which the sizes are handled
+	// becasue if lots of shapes are bigger than the average, a new buffer
+	// will be created on nearly every get request. Probably need to store
+	// the buffers in a structure that allows lookup by size.
+	static constexpr int VertexBufferSize = Constants::AverageNumVerts;
+	static constexpr int IndexBufferSize = Constants::AverageNumIndicies;
 
 	std::unique_ptr<Pool<BufferPtr>> m_VertexBufferPool;
 	std::unique_ptr<Pool<BufferPtr>> m_IndexBufferPool;

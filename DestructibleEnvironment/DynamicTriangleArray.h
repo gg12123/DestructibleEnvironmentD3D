@@ -25,6 +25,11 @@ public:
 		return m_Data[GetIndex(row, col)];
 	}
 
+	const T & Get(int row, int col) const
+	{
+		return m_Data[GetIndex(row, col)];
+	}
+
 	void Clear(int val)
 	{
 		m_Data.Clear(val);

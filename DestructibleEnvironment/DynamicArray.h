@@ -19,9 +19,22 @@ private:
 	}
 
 public:
+	DynamicArray<T>& operator=(DynamicArray<T>&& other) = default;
+	DynamicArray(DynamicArray<T>&& other) = default;
+
+	DynamicArray()
+	{
+		static_assert(std::is_nothrow_move_constructible<DynamicArray<T>>::value, "Dynamic array should be noexcept MoveConstructible");
+	}
+
 	T& operator[](size_t index)
 	{
 		ReSize(index + 1u);
+		return m_Data[index];
+	}
+
+	const T& operator[](size_t index) const
+	{
 		return m_Data[index];
 	}
 

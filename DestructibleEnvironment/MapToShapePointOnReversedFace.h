@@ -1,5 +1,5 @@
 #pragma once
-#include <array>
+#include "DynamicArray.h"
 #include "ShapePoint.h"
 #include "Constants.h"
 
@@ -16,5 +16,5 @@ public:
 		m_Map[from.GetHash()] = &to;
 	}
 private:
-	std::array<ShapePoint*, Constants::MaxNumPoints> m_Map;
+	DynamicArray<ShapePoint*> m_Map;
 };
