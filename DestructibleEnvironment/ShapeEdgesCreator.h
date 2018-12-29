@@ -106,12 +106,12 @@ public:
 		m_MapToEdges.AddNewEdge(p0, p1, edge);
 	}
 
-	const auto& GetMapToNewEdges() const
+	auto& GetMapToNewEdges()
 	{
 		return m_MapToEdges;
 	}
 
-	bool EdgeExistsBetween(const ShapePoint& p0, const ShapePoint& p1) const
+	bool EdgeExistsBetween(const ShapePoint& p0, const ShapePoint& p1)
 	{
 		return m_MapToEdges.EdgeExistsBetween(p0, p1);
 	}

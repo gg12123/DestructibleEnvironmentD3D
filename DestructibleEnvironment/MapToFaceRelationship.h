@@ -1,5 +1,5 @@
 #pragma once
-#include <array>
+#include "DynamicArray.h"
 #include "Constants.h"
 #include "FaceRelationshipWithOtherShape.h"
 #include "Face.h"
@@ -7,7 +7,7 @@
 class MapToFaceRelationship
 {
 public:
-	FaceRelationshipWithOtherShape GetRelationship(const Face& f) const
+	FaceRelationshipWithOtherShape GetRelationship(const Face& f)
 	{
 		return m_Map[f.GetHash()];
 	}
@@ -18,5 +18,5 @@ public:
 	}
 
 private:
-	std::array<FaceRelationshipWithOtherShape, 2 * Constants::MaxNumFaces> m_Map;
+	DynamicArray<FaceRelationshipWithOtherShape> m_Map;
 };

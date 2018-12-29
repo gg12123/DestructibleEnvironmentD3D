@@ -10,6 +10,7 @@
 #include "Random.h"
 #include "ReadOnlyInput.h"
 #include "ViewportDimensions.h"
+#include "RayShooter.h"
 
 using namespace DestructibleEnvironment;
 using namespace Windows::Foundation;
@@ -111,7 +112,7 @@ void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 	//m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodyPos3, RandRot(), 1.0f, 1.0f)));
 
 	m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodiesCentre,
-		Quaternion::LookRotation((Vector3::Right() + Vector3::Up()).Normalized()),
+		Quaternion::Identity(),
 		1.0f, 1.0f)));
 
 	//CreateRandomBodies(m_World);
@@ -139,11 +140,10 @@ void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 	light->GetTransform().SetRotation(Quaternion::Identity());
 	m_World.RegisterEntity(std::unique_ptr<Entity>(light));
 
-	auto aP0 = Vector2::Zero();
-	auto aP1 = Vector2(10.0f, 0.0f);
-
-	auto bP0 = Vector2(5.0f, 5.0f);
-	auto bP1 = Vector2(5.0f, -5.0f);
+	auto shooter = new RayShooter();
+	shooter->GetTransform().SetPosition(Vector3::Zero());
+	shooter->GetTransform().SetRotation(Quaternion::Identity());
+	m_World.RegisterEntity(std::unique_ptr<Entity>(shooter));
 }
 
 // ###############################################################

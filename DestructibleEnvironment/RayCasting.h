@@ -49,7 +49,7 @@ public:
 
 	bool Hit() const
 	{
-		return m_HitObject != nullptr;
+		return m_HitObject;
 	}
 
 	T* GetHitObject() const

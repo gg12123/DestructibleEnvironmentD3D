@@ -215,6 +215,7 @@
     <ClInclude Include="CutPathElement.h" />
     <ClInclude Include="CutPathIntersectionsHandler.h" />
     <ClInclude Include="CutShapeCreator.h" />
+    <ClInclude Include="DynamicArray.h" />
     <ClInclude Include="EdgeEdgeRelationship.h" />
     <ClInclude Include="EdgeFaceIntersection.h" />
     <ClInclude Include="FaceCollision.h" />
@@ -294,7 +295,7 @@
     <ClInclude Include="StaticShapeProxy.h" />
     <ClInclude Include="StringU.h" />
     <ClInclude Include="Transform.h" />
-    <ClInclude Include="TriangleArray.h" />
+    <ClInclude Include="DynamicTriangleArray.h" />
     <ClInclude Include="TwoDArray.h" />
     <ClInclude Include="UpdatableBound.h" />
     <ClInclude Include="Vector2.h" />

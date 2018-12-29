@@ -31,12 +31,14 @@ public:
 			return numToRound + multiple - remainder;
 	}
 
-	static inline float Max(float a, float b)
+	template<class T>
+	static inline T Max(T a, T b)
 	{
 		return (a > b) ? a : b;
 	}
 
-	static inline float Min(float a, float b)
+	template<class T>
+	static inline T Min(T a, T b)
 	{
 		return (a < b) ? a : b;
 	}

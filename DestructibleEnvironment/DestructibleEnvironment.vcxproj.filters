@@ -432,9 +432,6 @@
     <ClInclude Include="IntersectionLoop.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
-    <ClInclude Include="TriangleArray.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="ShapeElementPool.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
@@ -467,6 +464,12 @@
     </ClInclude>
     <ClInclude Include="ViewportDimensions.h">
       <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="DynamicArray.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="DynamicTriangleArray.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

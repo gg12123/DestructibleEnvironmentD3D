@@ -12,7 +12,7 @@
 #include "PoolOfRecyclables.h"
 #include "TwoDArray.h"
 #include "IntersectionLoop.h"
-#include "TriangleArray.h"
+#include "DynamicTriangleArray.h"
 
 class FaceFaceInteraction
 {
@@ -168,7 +168,7 @@ public:
 	}
 
 private:
-	TriangleArray<Constants::MaxNumFaces, FaceFaceInteraction> m_Interactions;
+	DynamicTriangleArray<FaceFaceInteraction> m_Interactions;
 	std::vector<InteractionSlot> m_SlotsWithInters;
 };
 

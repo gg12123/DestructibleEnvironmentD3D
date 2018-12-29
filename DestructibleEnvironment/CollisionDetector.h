@@ -4,7 +4,7 @@
 #include "Vector3.h"
 #include "FaceCollision.h"
 #include "Constants.h"
-#include "TriangleArray.h"
+#include "DynamicTriangleArray.h"
 #include "IntersectionFinder.h"
 
 class Shape;
@@ -21,5 +21,8 @@ private:
 	void UnAssignHashes(const std::vector<EdgeFaceIntersection>& inters);
 
 	IntersectionFinder m_IntersectionFinder;
-	TriangleArray<Constants::MaxNumFaces, bool> m_FaceCollisionCreated;
+
+	// Have to use int instead of bool becasue std::vector<bool> does some
+	// optimizations that breaks my dynamic array implementation.
+	DynamicTriangleArray<int> m_FaceCollisionCreated;
 };

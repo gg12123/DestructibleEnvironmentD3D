@@ -102,7 +102,7 @@ public:
 		Iterate<FaceRelationshipWithOtherShape::NotInIntersection>(sp);
 	}
 
-	void InitMaps(const MapToShapePointOnReversedFace& map, const MapToNewEdges& edgeMap, const MapToFacesCutPath& mapToFcp)
+	void InitMaps(const MapToShapePointOnReversedFace& map, MapToNewEdges& edgeMap, const MapToFacesCutPath& mapToFcp)
 	{
 		m_MapToCutPaths = &mapToFcp;
 		m_OPIterator.InitMaps(map, edgeMap);

@@ -35,6 +35,8 @@ bool Shape::IntersectsRay(const Ray& worldSpaceRay, Vector3& intPoint)
 			}
 		}
 	}
+
+	intPoint = m_Transform.ToLocalPosition(intPoint);
 	return hit;
 }
 

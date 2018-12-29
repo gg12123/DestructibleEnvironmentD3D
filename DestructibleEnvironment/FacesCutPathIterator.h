@@ -53,7 +53,7 @@ public:
 		return *m_EndPiercingEdge;
 	}
 
-	void InitMaps(const MapToShapePointOnReversedFace& map, const MapToNewEdges& edgeMap)
+	void InitMaps(const MapToShapePointOnReversedFace& map, MapToNewEdges& edgeMap)
 	{
 		m_MapToEdges = &edgeMap;
 		m_MapToReversed = &map;
@@ -95,5 +95,5 @@ private:
 	ShapeEdge * m_EndPiercingEdge;
 
 	const MapToShapePointOnReversedFace* m_MapToReversed = nullptr;
-	const MapToNewEdges* m_MapToEdges = nullptr;
+	MapToNewEdges* m_MapToEdges = nullptr;
 };
