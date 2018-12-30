@@ -172,6 +172,9 @@
     <ClCompile Include="RayShooter.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
+    <ClCompile Include="PlaneMesh.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -473,6 +476,9 @@
     </ClInclude>
     <ClInclude Include="DynamicTwoDArray.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="PlaneMesh.h">
+      <Filter>Misc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

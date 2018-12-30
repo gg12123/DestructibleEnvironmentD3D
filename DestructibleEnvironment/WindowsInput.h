@@ -31,7 +31,10 @@ internal:
 		auto window = Windows::UI::Core::CoreWindow::GetForCurrentThread();
 		auto p = window->PointerPosition;
 		auto b = window->Bounds;
-		return Vector2(p.X, b.Height - p.Y);
+
+		auto p2 = Vector2(p.X, p.Y) - Vector2(b.X, b.Y);
+
+		return Vector2(p2.x, b.Height - p2.y);
 	}
 
 public:

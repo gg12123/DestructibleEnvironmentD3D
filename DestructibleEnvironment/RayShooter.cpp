@@ -4,6 +4,7 @@
 #include "Physics.h"
 #include "Camera.h"
 #include "DynamicBodyProxy.h"
+#include "PlaneMesh.h"
 
 void RayShooter::OnPhysicsWorldUpdated()
 {
@@ -15,8 +16,13 @@ void RayShooter::OnPhysicsWorldUpdated()
 		auto mousePos = w.GetInput().GetMousePosition();
 		auto ray = w.GetRenderer().GetActiveCamera().ScreenPointToRay(mousePos);
 
-		auto hit = w.GetPhysics().RayCast(ray);
+		//auto plane = new PlaneMesh(Vector2(1.0f, 1.0f));
+		//plane->GetTransform().SetPosition(ray.GetOrigin() + 10.0f * ray.GetDirection());
+		//plane->GetTransform().SetRotation(Quaternion::LookRotation(-ray.GetDirection()));
+		//w.RegisterEntity(std::unique_ptr<Entity>(plane));
 
+		auto hit = w.GetPhysics().RayCast(ray);
+		
 		if (hit.Hit())
 		{
 			auto body = hit.GetHitObject()->As<DynamicBodyProxy>();
@@ -24,7 +30,7 @@ void RayShooter::OnPhysicsWorldUpdated()
 			{
 				body->AddImpulse(Impulse(ray.GetDirection(),
 					hit.GetHitPoint(),
-					1000.0f));
+					2000.0f));
 			}
 		}
 	}

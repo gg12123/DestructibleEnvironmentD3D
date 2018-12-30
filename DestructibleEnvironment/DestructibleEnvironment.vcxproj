@@ -239,6 +239,7 @@
     <ClInclude Include="MapToPointPlaneRelationship.h" />
     <ClInclude Include="MapToShapePointOnReversedFace.h" />
     <ClInclude Include="ObjectWithHash.h" />
+    <ClInclude Include="PlaneMesh.h" />
     <ClInclude Include="PointInPolyCase.h" />
     <ClInclude Include="Polygon2.h" />
     <ClInclude Include="D3DBuffers.h" />
@@ -332,6 +333,7 @@
     </ClCompile>
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
+    <ClCompile Include="PlaneMesh.cpp" />
     <ClCompile Include="RayShooter.cpp" />
     <ClCompile Include="ShapePoint.cpp" />
     <ClCompile Include="Quaternion.cpp" />

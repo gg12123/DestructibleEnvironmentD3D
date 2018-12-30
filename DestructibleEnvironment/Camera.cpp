@@ -23,8 +23,8 @@ Ray Camera::ScreenPointToRay(const Vector2& p)
 	auto& viewDims = GetWorld().GetRenderer().GetViewportDimensions();
 	auto theta = 0.5f * m_Fov;
 
-	auto w = d * tanf(theta);
-	auto h = w / viewDims.GetAspect();
+	auto h = d * tanf(theta);
+	auto w = h * viewDims.GetAspect();
 
 	auto halfSw = viewDims.GetWidth() / 2.0f;
 	auto halfSh = viewDims.GetHeight() / 2.0f;

@@ -11,6 +11,7 @@
 #include "ReadOnlyInput.h"
 #include "ViewportDimensions.h"
 #include "RayShooter.h"
+#include "PlaneMesh.h"
 
 using namespace DestructibleEnvironment;
 using namespace Windows::Foundation;
