@@ -179,6 +179,7 @@ public:
 	{
 		m_OwnerShape = nullptr;
 		ResetHash();
+		Clear();
 	}
 
 private:

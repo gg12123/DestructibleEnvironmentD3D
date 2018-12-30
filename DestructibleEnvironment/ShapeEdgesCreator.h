@@ -116,8 +116,9 @@ public:
 		return m_MapToEdges.EdgeExistsBetween(p0, p1);
 	}
 
-	void ClearMap()
+	void Init(int totalIntersectionCount)
 	{
+		m_SplitEdgesPool->Reserve(totalIntersectionCount);
 		m_MapToEdges.Clear();
 	}
 

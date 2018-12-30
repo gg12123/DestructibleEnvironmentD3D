@@ -179,6 +179,14 @@ private:
 		ReturnIfStillOwnedByCutShape(cutShape.GetFaces(), cutShape);
 	}
 
+	int TotalIntersectionCount()
+	{
+		auto c = 0;
+		for (auto loop : m_Intersections)
+			c += loop->GetCount();
+		return c;
+	}
+
 public:
 	void Split(const Vector3& splitPointWorld, const Vector3& splitNormalWorld, Tshape& originalShape, std::vector<Tshape*>& newShapes)
 	{
@@ -193,6 +201,7 @@ public:
 
 		m_CutPathCreator.GeneratePaths(m_Intersections);
 
+		m_EdgesCreator.Init(TotalIntersectionCount());
 		CreateEdgesFromCPs();
 		CreateInsideEdgesFromSplitEdges();
 
