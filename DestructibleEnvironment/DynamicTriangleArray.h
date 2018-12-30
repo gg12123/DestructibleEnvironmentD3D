@@ -30,9 +30,9 @@ public:
 		return m_Data[GetIndex(row, col)];
 	}
 
-	void Clear(int val)
+	void Zero()
 	{
-		m_Data.Clear(val);
+		m_Data.Zero();
 	}
 
 private:

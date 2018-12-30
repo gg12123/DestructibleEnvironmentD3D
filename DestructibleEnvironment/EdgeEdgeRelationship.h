@@ -128,9 +128,7 @@ private:
 	}
 
 public:
-	EdgeEdgeRelationship()
-	{
-	}
+	EdgeEdgeRelationship() = default;
 
 	EdgeEdgeRelationship(const ShapeEdge& edgeFaces,
 		const ShapeEdge& piercingEdge,
@@ -267,3 +265,5 @@ private:
 
 	bool m_IsConstrained;
 };
+
+static_assert(std::is_trivial<EdgeEdgeRelationship>::value, "Edge edge relationship must be trivial.");

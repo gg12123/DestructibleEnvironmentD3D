@@ -10,7 +10,7 @@ class MapToNewEdges
 public:
 	MapToNewEdges()
 	{
-		m_Edges.Clear(0);
+		m_Edges.Zero();
 	}
 
 	bool EdgeExistsBetween(const ShapePoint& p0, const ShapePoint& p1)

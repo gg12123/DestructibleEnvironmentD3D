@@ -40,7 +40,7 @@ bool CollisionDetector::FindCollision(Shape& shape1, Shape& shape2, std::vector<
 
 	if (inters.size() > 0U)
 	{
-		m_FaceCollisionCreated.Clear(false);
+		m_FaceCollisionCreated.Zero();
 
 		Face::ResetNextHashCounter();
 

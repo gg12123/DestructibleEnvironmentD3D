@@ -105,6 +105,8 @@ private:
 	const Face* m_Face2 = nullptr;
 };
 
+static_assert(std::is_trivially_copyable<FaceFaceInteraction>::value, "Face face interaction must be trivially copyable.");
+
 class MapToFaceFaceInteractions
 {
 private:

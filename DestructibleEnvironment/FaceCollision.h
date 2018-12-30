@@ -9,9 +9,7 @@
 class VectorDirectionWithMagnitude
 {
 public:
-	VectorDirectionWithMagnitude()
-	{
-	}
+	VectorDirectionWithMagnitude() = default;
 
 	VectorDirectionWithMagnitude(float mag, Vector3 dir) : m_Mag(mag), m_Dir(dir)
 	{
@@ -136,6 +134,8 @@ private:
 	}
 
 public:
+	FaceCollision() = default;
+
 	FaceCollision(const Face& faceA, const Face& faceB)
 	{
 		m_FaceA = &faceA;
@@ -188,3 +188,5 @@ private:
 	const Face* m_FaceA;
 	const Face* m_FaceB;
 };
+
+static_assert(std::is_trivially_copyable<FaceCollision>::value, "Face collision should be trivially copyable.");
