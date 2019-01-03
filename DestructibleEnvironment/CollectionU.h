@@ -4,6 +4,12 @@
 class CollectionU
 {
 public:
+	enum class IterationDir
+	{
+		NextDir,
+		PrevDir
+	};
+
 	template<class T>
 	static inline int GetNextIndex(const T& coll, int curr)
 	{
@@ -15,6 +21,18 @@ public:
 	{
 		auto c = coll.size();
 		return (curr - 1 + c) % c;
+	}
+
+	template<class T, IterationDir D>
+	static inline int MoveIndex(const T& coll, int curr)
+	{
+		return GetNextIndex(coll, curr);
+	}
+
+	template<class T, IterationDir D>
+	static inline int MoveIndex<T, IterationDir::PrevDir>(const T& coll, int curr)
+	{
+		return GetPrevIndex(coll, curr);
 	}
 
 	template<class Tcollec, class Tval>

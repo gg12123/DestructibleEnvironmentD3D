@@ -109,7 +109,7 @@ public:
 		m_CPIterator.InitMaps(map, edgeMap);
 	}
 
-	void InitFaces(const Face& orig, ConcaveFace& newFace)
+	void InitFaces(const Face& orig, Face& newFace)
 	{
 		m_OriginalFace = &orig;
 		m_OPIterator.InitFaces(orig, newFace);

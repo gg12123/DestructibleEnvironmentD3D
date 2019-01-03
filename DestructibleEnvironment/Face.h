@@ -112,8 +112,6 @@ public:
 	Vector3 GetEdgeDirection(const ShapeEdge& edge) const;
 	Vector3 GetEdgeDirection(int index) const;
 
-	FaceEdgeCaseResult CastToEdgeInside(const Vector3& origin, const Vector3& dir) const;
-
 	auto GetPlaneP0() const
 	{
 		return m_CachedPoints[0];
@@ -181,6 +179,9 @@ public:
 		ResetHash();
 		Clear();
 	}
+
+	void MergeWith(const Face& other, const ShapeEdge& commonEdge);
+	void RemovePoint(const ShapePoint& toRemove, ShapeEdge& newEdge);
 
 private:
 	void InitFaceCoOrdinateSystem(const Vector3& origin)

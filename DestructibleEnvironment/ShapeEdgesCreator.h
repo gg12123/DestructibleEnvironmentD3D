@@ -99,7 +99,6 @@ public:
 		CreateEdgesAlongSplitEdges(false);
 	}
 
-	// called by the reversing and triangulation code
 	void CreateEdge(ShapePoint& p0, ShapePoint& p1)
 	{
 		auto& edge = EdgePool::Take(p0, p1);

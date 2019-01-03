@@ -12,6 +12,7 @@
 #include "FaceIterator.h"
 #include "ReversedGeometryCreator.h"
 #include "ShapeElementPool.h"
+#include "RedundantPointRemover.h"
 
 template<class Tshape>
 class ShapeSplitter
@@ -187,6 +188,15 @@ private:
 		return c;
 	}
 
+	void RemoveRedundantPoints()
+	{
+		m_RedundantPointsRemover.Init(m_EdgesCreator, m_Reverser.GetMapToReversed());
+
+		auto& cps = m_CutPathCreator.GetCutPaths();
+		for (auto it = cps.Begin(); it != cps.End(); it++)
+			m_RedundantPointsRemover.RemovePoints(*it);
+	}
+
 public:
 	void Split(const Vector3& splitPointWorld, const Vector3& splitNormalWorld, Tshape& originalShape, std::vector<Tshape*>& newShapes)
 	{
@@ -221,6 +231,10 @@ public:
 		CreateNewOutsideFaces(originalShape);
 		CreateNewOutsideShapes(newShapes);
 
+		RemoveRedundantPoints();
+
+		// Now remove the cleared faces from the shapes and triangulate.
+
 		InitNewShapes(originalShape, newShapes);
 
 		// To clean up, loop through everything on the cut shape and if it has not
@@ -246,6 +260,7 @@ private:
 	CutPathCreator m_CutPathCreator;
 	FaceIterator<Tshape> m_FaceIterator;
 	ReversedGeometryCreator m_Reverser;
+	RedundantPointRemover m_RedundantPointsRemover;
 
 	CleanIntersectionFinder m_IntersectionFinder;
 	std::vector<IntersectionLoop*> m_Intersections;

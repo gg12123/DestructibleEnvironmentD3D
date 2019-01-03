@@ -274,6 +274,7 @@
     <ClInclude Include="RayCasting.h" />
     <ClInclude Include="RayShooter.h" />
     <ClInclude Include="ReadOnlyInput.h" />
+    <ClInclude Include="RedundantPointRemover.h" />
     <ClInclude Include="ReversedGeometryCreator.h" />
     <ClInclude Include="ShapeEdgesCreator.h" />
     <ClInclude Include="ShapeElementPool.h" />

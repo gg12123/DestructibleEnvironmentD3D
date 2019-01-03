@@ -43,7 +43,7 @@ public:
 		m_MapToReversed = &map;
 	}
 
-	void InitFaces(const Face& orig, ConcaveFace& newFace)
+	void InitFaces(const Face& orig, Face& newFace)
 	{
 		m_OriginalFace = &orig;
 		m_NewFace = &newFace;
@@ -51,7 +51,7 @@ public:
 
 private:
 	const Face * m_OriginalFace = nullptr;
-	ConcaveFace* m_NewFace = nullptr;
+	Face* m_NewFace = nullptr;
 	const MapToShapePointOnReversedFace* m_MapToReversed = nullptr;
 	const MapToNewEdges* m_MapToEdges = nullptr;
 };

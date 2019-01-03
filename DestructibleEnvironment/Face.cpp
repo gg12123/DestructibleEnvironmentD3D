@@ -86,29 +86,3 @@ void Face::ReplacePointObjects(const ShapePoint& oldP0, const ShapePoint& oldP1,
 			*it = &replacement;
 	}
 }
-
-FaceEdgeCaseResult Face::CastToEdgeInside(const Vector3& origin, const Vector3& dir) const
-{
-	auto origin2 = ToFaceSpacePosition(origin);
-	auto dir2 = ToFaceSpaceDirection(dir);
-
-	auto res = FaceEdgeCaseResult();
-
-	for (auto i = 0U; i < m_FacePoly.GetPointCount(); i++)
-	{
-		auto nextI = m_FacePoly.NextIndex(i);
-
-		auto& p0 = m_FacePoly.GetPointAt(i);
-		auto& p1 = m_FacePoly.GetPointAt(nextI);
-
-		Vector2 intPoint;
-		if (Vector2::RayIntersectsLine(origin2, dir2, p0, p1, intPoint) && (Vector3::Dot(dir, GetEdgeNormal(i)) > 0.0f))
-		{
-			auto dist = (origin2 - intPoint).Magnitude();
-
-			if (dist < res.Distance)
-				res = FaceEdgeCaseResult(*m_EdgeObjects[i], ToShapeSpacePosition(intPoint), dist);
-		}
-	}
-	return res;
-}

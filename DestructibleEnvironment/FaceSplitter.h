@@ -6,19 +6,16 @@
 #include "FacesPointsIterator.h"
 #include "ConcaveFace.h"
 #include "ShapeEdgesCreator.h"
+#include "ShapeElementPool.h"
 
 class FaceSplitter
 {
 private:
-	void InitFaces(const FacesCutPaths& paths)
+	void InitFaces(const FacesCutPaths& paths, std::vector<Face*>& newFaces)
 	{
-		m_ConcaveFace.Init(paths.GetFace(), *m_EdgesCreator);
-		m_Iterator.InitFaces(paths.GetFace(), m_ConcaveFace);
-	}
-
-	void CreateTriangleFaces(const FacesCutPaths& paths, std::vector<Face*>& newFaces)
-	{
-		m_ConcaveFace.Triangulate(newFaces);
+		auto& newFace = FacePool::Take();
+		m_Iterator.InitFaces(paths.GetFace(), newFace);
+		newFaces.emplace_back(&newFace);
 	}
 
 public:
@@ -33,9 +30,8 @@ public:
 
 			if (!fcp.BeenUsedToGenInsideFace())
 			{
-				InitFaces(paths);
+				InitFaces(paths, newFaces);
 				m_Iterator.IterateInside(fcp);
-				CreateTriangleFaces(paths, newFaces);
 			}
 		}
 	}
@@ -51,9 +47,8 @@ public:
 
 			if (!fcp.BeenUsedToGenOutsideFace())
 			{
-				InitFaces(paths);
+				InitFaces(paths, newFaces);
 				m_Iterator.IterateOutside(fcp);
-				CreateTriangleFaces(paths, newFaces);
 			}
 		}
 	}
@@ -65,6 +60,5 @@ public:
 	}
 private:
 	FacesPointsIterator m_Iterator;
-	ConcaveFace m_ConcaveFace;
 	ShapeEdgesCreator* m_EdgesCreator = nullptr;
 };

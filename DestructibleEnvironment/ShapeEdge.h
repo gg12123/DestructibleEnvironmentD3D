@@ -34,6 +34,11 @@ public:
 		ResetHash();
 	}
 
+	bool BridgesCoPlanarFaces() const
+	{
+		assert(false);
+	}
+
 	void RegisterFace(Face& f, int indexOfThisEdgeInTheFace)
 	{
 		if (!m_Face1)

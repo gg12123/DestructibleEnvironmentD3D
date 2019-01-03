@@ -480,6 +480,9 @@
     <ClInclude Include="PlaneMesh.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="RedundantPointRemover.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">
