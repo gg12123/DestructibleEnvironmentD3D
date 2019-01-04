@@ -411,9 +411,6 @@
     <ClInclude Include="FaceOrderingComparator.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
-    <ClInclude Include="ConcaveFace.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
     <ClInclude Include="CollectionU.h">
       <Filter>Utils</Filter>
     </ClInclude>
@@ -481,6 +478,9 @@
       <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="RedundantPointRemover.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
+    <ClInclude Include="FaceTriangulator.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
   </ItemGroup>

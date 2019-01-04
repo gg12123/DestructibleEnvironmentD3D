@@ -86,3 +86,48 @@ void Face::ReplacePointObjects(const ShapePoint& oldP0, const ShapePoint& oldP1,
 			*it = &replacement;
 	}
 }
+
+void Face::MergeWith(const Face& other, const ShapeEdge& commonEdge)
+{
+	auto c = m_PointObjects.size() + other.m_PointObjects.size();
+	std::vector<ShapePoint*> newPoints(c);
+	std::vector<ShapeEdge*> newEdges(c);
+
+	auto& faceA = *this;
+	auto& faceB = other;
+
+	auto iA = commonEdge.GetIndex(faceA);
+	auto iB = commonEdge.GetIndex(faceB);
+
+	for (auto i = faceA.NextPointIndex(iA); i != iA; i = faceA.NextPointIndex(i))
+	{
+		newPoints.emplace_back(faceA.m_PointObjects[i]);
+		newEdges.emplace_back(faceA.m_EdgeObjects[i]);
+	}
+
+	for (auto i = faceB.NextPointIndex(iB); i != iB; i = faceB.NextPointIndex(i))
+	{
+		newPoints.emplace_back(faceB.m_PointObjects[i]);
+		newEdges.emplace_back(faceB.m_EdgeObjects[i]);
+	}
+
+	m_PointObjects = std::move(newPoints);
+	m_EdgeObjects = std::move(newEdges);
+}
+
+void Face::RemovePoint(const ShapePoint& toRemove, ShapeEdge& newEdge)
+{
+	auto itEdge = m_EdgeObjects.begin();
+	auto index = 0;
+	for (auto it = m_PointObjects.begin(); it != m_PointObjects.end(); it++, itEdge++, index++)
+	{
+		if (*it == &toRemove)
+		{
+			m_PointObjects.erase(it);
+			m_EdgeObjects.erase(itEdge);
+			break;
+		}
+	}
+
+	m_EdgeObjects[CollectionU::GetPrevIndex(m_EdgeObjects, index)] = &newEdge;
+}

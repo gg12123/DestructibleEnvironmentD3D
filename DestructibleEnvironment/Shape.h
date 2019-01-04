@@ -11,6 +11,7 @@ class ShapePoint;
 class ShapeEdge;
 class Face;
 class ShapeProxy;
+class FaceTriangulator;
 
 class Shape
 {
@@ -132,6 +133,8 @@ public:
 	{
 		return *m_Proxy;
 	}
+
+	void TriangulateFaces(FaceTriangulator& triangulator);
 
 private:
 	void SetDirty()

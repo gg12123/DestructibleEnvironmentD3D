@@ -5,6 +5,11 @@
 #include "Shape.h"
 #include "Face.h"
 
+bool ShapeEdge::BridgesCoPlanarFaces() const
+{
+	return m_Face1->GetPlaneId() == m_Face2->GetPlaneId();
+}
+
 ShapePoint& ShapeEdge::GetStart(const Face& requester) const
 {
 	return *requester.GetPointObjects()[GetIndex(requester)];

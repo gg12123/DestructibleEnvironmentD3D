@@ -6,7 +6,6 @@
 #include "ShapeEdge.h"
 #include "MapToShapePointOnReversedFace.h"
 #include "MapToNewEdges.h"
-#include "ConcaveFace.h"
 
 class FacesOriginalPointsIterator
 {

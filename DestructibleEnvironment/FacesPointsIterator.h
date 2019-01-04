@@ -3,7 +3,6 @@
 #include "FacesCutPathIterator.h"
 #include "MapToFacesCutPath.h"
 #include "FaceRelationshipWithOtherShape.h"
-#include "ConcaveFace.h"
 
 class FacesPointsIterator
 {

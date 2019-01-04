@@ -82,7 +82,7 @@ public:
 			reversedFace.AddPoint(pRev0, e);
 		}
 
-		reversedFace.SetNormal(-face.GetNormal());
+		reversedFace.SetNormal(-face.GetNormal(), face.GetPlaneId());
 	}
 
 	void Init(ShapeEdgesCreator& edgeCreator)

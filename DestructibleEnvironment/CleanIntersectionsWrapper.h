@@ -41,7 +41,7 @@ private:
 			transFace.AddPoint(*m_MapToTransformedPoint[p0.GetHash()], e);
 		}
 
-		transFace.SetNormal(q.RotateV(f.GetNormal()));
+		//transFace.SetNormal(q.RotateV(f.GetNormal()));
 		return transFace;
 	}
 

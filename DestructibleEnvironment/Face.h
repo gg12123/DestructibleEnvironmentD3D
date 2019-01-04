@@ -96,9 +96,16 @@ public:
 
 	void AddPoint(ShapePoint& point, ShapeEdge& edgeToNext);
 
-	void SetNormal(const Vector3& normal)
+	void SetNormal(const Vector3& normal, int planeId)
 	{
+		assert(planeId >= 0);
 		m_Normal = normal;
+		m_PlaneId = planeId;
+	}
+
+	auto GetPlaneId() const
+	{
+		return m_PlaneId;
 	}
 
 	auto GetNormal() const
@@ -198,6 +205,7 @@ private:
 	Polygon2 m_FacePoly;
 
 	Vector3 m_Normal;
+	int m_PlaneId;
 
 	FaceCoOrdinateSystem m_FaceSpace;
 };

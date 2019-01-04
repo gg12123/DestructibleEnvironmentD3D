@@ -25,7 +25,7 @@ private:
 	}
 
 public:
-	Shape & Create(Transform& toSplitsTransform, const Vector3& splitPointWorld, const Vector3& splitNormalWorld)
+	Shape & Create(Transform& toSplitsTransform, const Vector3& splitPointWorld, const Vector3& splitNormalWorld, int firstPlaneId)
 	{
 		m_CutShape.Clear();
 		m_CutShape.GetTransform().SetEqualTo(toSplitsTransform);
@@ -36,7 +36,7 @@ public:
 		Quaternion q;
 		auto M = CalculateCutShapesTransform(toSplitsTransform, splitPoint, splitNormal, q);
 
-		m_FacesCreator.CreateFaces(m_CutShape, M, q);
+		m_FacesCreator.CreateFaces(m_CutShape, M, q, firstPlaneId);
 
 		m_CutShape.OnAllFacesAdded();
 

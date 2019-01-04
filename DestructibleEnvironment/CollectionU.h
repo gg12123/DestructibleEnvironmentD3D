@@ -10,6 +10,26 @@ public:
 		PrevDir
 	};
 
+private:
+	template<class T, IterationDir itDir>
+	struct MoveIndexImp
+	{
+		static inline int Call(const T& coll, int curr)
+		{
+			return GetNextIndex(coll, curr);
+		}
+	};
+
+	template<class T>
+	struct MoveIndexImp<T, IterationDir::PrevDir>
+	{
+		static inline int Call(const T& coll, int curr)
+		{
+			return GetPrevIndex(coll, curr);
+		}
+	};
+
+public:
 	template<class T>
 	static inline int GetNextIndex(const T& coll, int curr)
 	{
@@ -23,16 +43,10 @@ public:
 		return (curr - 1 + c) % c;
 	}
 
-	template<class T, IterationDir D>
+	template<class T, IterationDir itDir>
 	static inline int MoveIndex(const T& coll, int curr)
 	{
-		return GetNextIndex(coll, curr);
-	}
-
-	template<class T, IterationDir D>
-	static inline int MoveIndex<T, IterationDir::PrevDir>(const T& coll, int curr)
-	{
-		return GetPrevIndex(coll, curr);
+		return MoveIndexImp<T, itDir>::Call(coll, curr);
 	}
 
 	template<class Tcollec, class Tval>

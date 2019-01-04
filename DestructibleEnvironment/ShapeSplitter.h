@@ -13,6 +13,7 @@
 #include "ReversedGeometryCreator.h"
 #include "ShapeElementPool.h"
 #include "RedundantPointRemover.h"
+#include "FaceTriangulator.h"
 
 template<class Tshape>
 class ShapeSplitter
@@ -197,10 +198,29 @@ private:
 			m_RedundantPointsRemover.RemovePoints(*it);
 	}
 
+	void TriangulateShapesFaces(const std::vector<Tshape*>& newShapes)
+	{
+		m_Triangulator.Init(m_EdgesCreator);
+		for (auto s : newShapes)
+			s->TriangulateFaces(m_Triangulator);
+	}
+
+	int FirstPlaneIdForCutShape(const Shape& originalShape)
+	{
+		auto maxId = -1;
+		for (auto f : originalShape.GetFaces())
+		{
+			auto id = f->GetPlaneId();
+			if (id > maxId)
+				maxId = id;
+		}
+		return maxId + 1;
+	}
+
 public:
 	void Split(const Vector3& splitPointWorld, const Vector3& splitNormalWorld, Tshape& originalShape, std::vector<Tshape*>& newShapes)
 	{
-		auto& cutShape = m_CutShapeCreator.Create(originalShape.GetTransform(), splitPointWorld, splitNormalWorld);
+		auto& cutShape = m_CutShapeCreator.Create(originalShape.GetTransform(), splitPointWorld, splitNormalWorld, FirstPlaneIdForCutShape(originalShape));
 
 		// TODO - abort nicely if this returns false.
 		assert(FindIntersections(originalShape, cutShape));
@@ -233,8 +253,7 @@ public:
 
 		RemoveRedundantPoints();
 
-		// Now remove the cleared faces from the shapes and triangulate.
-
+		TriangulateShapesFaces(newShapes);
 		InitNewShapes(originalShape, newShapes);
 
 		// To clean up, loop through everything on the cut shape and if it has not
@@ -261,6 +280,7 @@ private:
 	FaceIterator<Tshape> m_FaceIterator;
 	ReversedGeometryCreator m_Reverser;
 	RedundantPointRemover m_RedundantPointsRemover;
+	FaceTriangulator m_Triangulator;
 
 	CleanIntersectionFinder m_IntersectionFinder;
 	std::vector<IntersectionLoop*> m_Intersections;

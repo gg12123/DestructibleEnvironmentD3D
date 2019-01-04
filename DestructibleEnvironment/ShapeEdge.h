@@ -34,10 +34,7 @@ public:
 		ResetHash();
 	}
 
-	bool BridgesCoPlanarFaces() const
-	{
-		assert(false);
-	}
+	bool BridgesCoPlanarFaces() const;
 
 	void RegisterFace(Face& f, int indexOfThisEdgeInTheFace)
 	{

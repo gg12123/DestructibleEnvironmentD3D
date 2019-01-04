@@ -6,6 +6,8 @@
 #include "Random.h"
 #include "IntersectionFinder.h"
 #include "SmallEdgeRemover.h"
+#include "FaceTriangulator.h"
+#include "ShapeElementPool.h"
 
 Shape::~Shape()
 {
@@ -161,4 +163,25 @@ void Shape::InitFacesPointsEdges()
 {
 	for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
 		(*it)->OnSplittingFinished(*this); // The face will init its points and edges
+}
+
+void Shape::TriangulateFaces(FaceTriangulator& triangulator)
+{
+	std::vector<Face*> triangles(m_Faces.size());
+
+	for (auto f : m_Faces)
+	{
+		auto pointCount = f->GetPointObjects().size();
+		if (pointCount == 3u)
+		{
+			triangles.emplace_back(f);
+		}
+		else if (pointCount > 3u)
+		{
+			triangulator.Triangulate(*f, triangles);
+			FacePool::Return(*f);
+		}
+		// If the face has less than 3 points, assume it has been cleared and returned to pool.
+	}
+	m_Faces = std::move(triangles);
 }

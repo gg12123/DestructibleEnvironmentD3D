@@ -4,7 +4,6 @@
 #include "Vector3.h"
 #include "FacesCutPaths.h"
 #include "FacesPointsIterator.h"
-#include "ConcaveFace.h"
 #include "ShapeEdgesCreator.h"
 #include "ShapeElementPool.h"
 
