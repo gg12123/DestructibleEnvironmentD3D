@@ -177,13 +177,15 @@ void Shape::TriangulateFaces(FaceTriangulator& triangulator)
 		{
 			triangles.emplace_back(f);
 		}
-		else if (pointCount > 3u)
+		else
 		{
-			f->InitFaceCoOrdinateSystem();
-			triangulator.Triangulate(*f, triangles);
+			if (pointCount > 3u)
+			{
+				f->InitFaceCoOrdinateSystem();
+				triangulator.Triangulate(*f, triangles);
+			}
 			FacePool::Return(*f);
 		}
-		// If the face has less than 3 points, assume it has been cleared and returned to pool.
 	}
 	m_Faces = std::move(triangles);
 }

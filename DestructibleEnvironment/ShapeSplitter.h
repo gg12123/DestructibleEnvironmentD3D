@@ -217,24 +217,6 @@ private:
 		return maxId + 1;
 	}
 
-	void ShapesHaveDupFaces(std::vector<Tshape*>& newShapes)
-	{
-		for (auto s : newShapes)
-		{
-			for (auto other : newShapes)
-			{
-				if (s == other)
-					continue;
-
-				for (auto f : s->GetFaces())
-				{
-					for (auto fOther : other->GetFaces())
-						assert(f != fOther);
-				}
-			}
-		}
-	}
-
 public:
 	void Split(const Vector3& splitPointWorld, const Vector3& splitNormalWorld, Tshape& originalShape, std::vector<Tshape*>& newShapes)
 	{
@@ -270,10 +252,8 @@ public:
 		CreateNewOutsideShapes(newShapes);
 
 		RemoveRedundantPoints();
-		ShapesHaveDupFaces(newShapes);
 
 		TriangulateShapesFaces(newShapes);
-		ShapesHaveDupFaces(newShapes);
 		InitNewShapes(originalShape, newShapes);
 
 		// To clean up, loop through everything on the cut shape and if it has not

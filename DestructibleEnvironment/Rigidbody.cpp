@@ -82,7 +82,7 @@ void Rigidbody::ApplyImpulses(std::vector<SplitInfo>& splits)
 
 	m_Impulses.clear();
 
-	static constexpr auto impactNeededForSplit = 1.0f;
+	static constexpr auto impactNeededForSplit = 1000.0f;
 
 	if (biggest && (biggest->Impact > impactNeededForSplit))
 	{

@@ -65,10 +65,9 @@ private:
 			m_Fb->RemovePoint(pR, newEdge);
 
 			// Clear this face to indicate to the owner shape that it is
-			// not required.
+			// not required. Dont return it to the pool yet becuase it is
+			// still referenced by its owner shape. Let the owner shape do it later.
 			m_Fa1->Clear();
-
-			FacePool::Return(*m_Fa1);
 		}
 		else if (edgeFaceAboutPointCount == 2u)
 		{
@@ -76,7 +75,7 @@ private:
 			m_FacesAboutPoint[1]->RemovePoint(pR, newEdge);
 		}
 
-		// Everything is returned to the pool here, even though some things
+		// Points and edges are returned to the pool here, even though some things
 		// may be accesed again by this algorithm. I think that is ok for now though.
 
 		PointPool::Return(pR);
