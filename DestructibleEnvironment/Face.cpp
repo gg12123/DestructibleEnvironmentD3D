@@ -32,6 +32,11 @@ void Face::ReplaceEdge(const ShapeEdge& existing, ShapeEdge& newEdge)
 	assert(false);
 }
 
+void Face::InitFaceCoOrdinateSystem()
+{
+	InitFaceCoOrdinateSystem(m_PointObjects[0]->GetPoint());
+}
+
 void Face::OnSplittingFinished(Shape& owner)
 {
 	m_OwnerShape = &owner;
@@ -89,9 +94,12 @@ void Face::ReplacePointObjects(const ShapePoint& oldP0, const ShapePoint& oldP1,
 
 void Face::MergeWith(const Face& other, const ShapeEdge& commonEdge)
 {
+	std::vector<ShapePoint*> newPoints;
+	std::vector<ShapeEdge*> newEdges;
+
 	auto c = m_PointObjects.size() + other.m_PointObjects.size();
-	std::vector<ShapePoint*> newPoints(c);
-	std::vector<ShapeEdge*> newEdges(c);
+	newPoints.reserve(c);
+	newEdges.reserve(c);
 
 	auto& faceA = *this;
 	auto& faceB = other;
@@ -111,12 +119,24 @@ void Face::MergeWith(const Face& other, const ShapeEdge& commonEdge)
 		newEdges.emplace_back(faceB.m_EdgeObjects[i]);
 	}
 
+	for (auto e : other.GetEdgeObjects())
+		e->DeRegisterFace(other);
+
+	for (auto e : m_EdgeObjects)
+		e->DeRegisterFace(*this);
+
 	m_PointObjects = std::move(newPoints);
 	m_EdgeObjects = std::move(newEdges);
+
+	for (auto i = 0u; i < m_EdgeObjects.size(); i++)
+		m_EdgeObjects[i]->RegisterFace(*this, i);
 }
 
 void Face::RemovePoint(const ShapePoint& toRemove, ShapeEdge& newEdge)
 {
+	for (auto e : m_EdgeObjects)
+		e->DeRegisterFace(*this);
+
 	auto itEdge = m_EdgeObjects.begin();
 	auto index = 0;
 	for (auto it = m_PointObjects.begin(); it != m_PointObjects.end(); it++, itEdge++, index++)
@@ -130,4 +150,7 @@ void Face::RemovePoint(const ShapePoint& toRemove, ShapeEdge& newEdge)
 	}
 
 	m_EdgeObjects[CollectionU::GetPrevIndex(m_EdgeObjects, index)] = &newEdge;
+
+	for (auto i = 0u; i < m_EdgeObjects.size(); i++)
+		m_EdgeObjects[i]->RegisterFace(*this, i);
 }

@@ -168,8 +168,12 @@ public:
 		m_OriginalFace = &originalFace;
 		m_TriangleFaces = &triangleFaces;
 
-		for (auto& p : m_OriginalFace->GetFacePoly().GetPoints())
-			m_Triangulator.AddPoint(p);
+		for (auto e : m_OriginalFace->GetEdgeObjects())
+			e->DeRegisterFace(*m_OriginalFace);
+
+		m_Triangulator.Clear();
+		for (auto p : m_OriginalFace->GetPointObjects())
+			m_Triangulator.AddPoint(m_OriginalFace->ToFaceSpacePosition(p->GetPoint()));
 
 		m_Triangulator.Triangulate(*this);
 	}

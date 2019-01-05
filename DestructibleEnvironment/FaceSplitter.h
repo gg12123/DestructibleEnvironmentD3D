@@ -13,7 +13,11 @@ private:
 	void InitFaces(const FacesCutPaths& paths, std::vector<Face*>& newFaces)
 	{
 		auto& newFace = FacePool::Take();
-		m_Iterator.InitFaces(paths.GetFace(), newFace);
+		auto& origFace = paths.GetFace();
+
+		newFace.SetNormal(origFace.GetNormal(), origFace.GetPlaneId());
+
+		m_Iterator.InitFaces(origFace, newFace);
 		newFaces.emplace_back(&newFace);
 	}
 

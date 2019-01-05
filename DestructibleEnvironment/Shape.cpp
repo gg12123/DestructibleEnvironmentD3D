@@ -167,7 +167,8 @@ void Shape::InitFacesPointsEdges()
 
 void Shape::TriangulateFaces(FaceTriangulator& triangulator)
 {
-	std::vector<Face*> triangles(m_Faces.size());
+	std::vector<Face*> triangles;
+	triangles.reserve(m_Faces.size());
 
 	for (auto f : m_Faces)
 	{
@@ -178,6 +179,7 @@ void Shape::TriangulateFaces(FaceTriangulator& triangulator)
 		}
 		else if (pointCount > 3u)
 		{
+			f->InitFaceCoOrdinateSystem();
 			triangulator.Triangulate(*f, triangles);
 			FacePool::Return(*f);
 		}

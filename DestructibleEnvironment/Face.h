@@ -190,6 +190,8 @@ public:
 	void MergeWith(const Face& other, const ShapeEdge& commonEdge);
 	void RemovePoint(const ShapePoint& toRemove, ShapeEdge& newEdge);
 
+	void InitFaceCoOrdinateSystem();
+
 private:
 	void InitFaceCoOrdinateSystem(const Vector3& origin)
 	{
