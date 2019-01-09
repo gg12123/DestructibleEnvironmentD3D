@@ -12,6 +12,7 @@
 #include "FacesCutPaths.h"
 #include "CutPathIntersectionsHandler.h"
 #include "IntersectionLoop.h"
+#include "PiercedOnlyFaceHandler.h"
 
 class CutPathCreator
 {
@@ -44,7 +45,7 @@ private:
 		ProcessNewCPE(cpe, path.size() - 1, path);
 	}
 
-	void GeneratePath(const IntersectionLoop& loop)
+	bool GeneratePath(const IntersectionLoop& loop)
 	{
 		auto& path = m_CutPaths->Recycle();
 		path.clear();
@@ -54,11 +55,21 @@ private:
 		auto& firstFacePierced = loop.GetPiercedFace(0);
 		auto& firstFaceExited = loop.GetFaceExited(0);
 
+		auto onlyOnePiercedFace = true;
+
 		for (auto i = 0; i < c; i++)
-			AddNewCPEToPath(CutPathElement(loop.GetFaceExited(i), loop.GetPiercedFace(i), loop.GetPiercingEdge(i), loop.GetIntPoint(i)), path);
+		{
+			auto& pf = loop.GetPiercedFace(i);
+			AddNewCPEToPath(CutPathElement(loop.GetFaceExited(i), pf, loop.GetPiercingEdge(i), loop.GetIntPoint(i)), path);
+
+			if (&pf != &loop.GetPiercedFace(MathU::Max(i - 1, 0)))
+				onlyOnePiercedFace = false;
+		}
 
 		m_FacesCutPathCollections->At(firstFacePierced.GetHash()).ForceCreateWhenFinalWasAddedBeforeFirst(*m_FacesCutPathObjects, path);
 		m_FacesCutPathCollections->At(firstFaceExited.GetHash()).ForceCreateWhenFinalWasAddedBeforeFirst(*m_FacesCutPathObjects, path);
+
+		return !onlyOnePiercedFace;
 	}
 
 	auto TotalIntersectionCount(const std::vector<IntersectionLoop*>& intersectionLoops)
@@ -71,7 +82,7 @@ private:
 	}
 
 public:
-	void GeneratePaths(const std::vector<IntersectionLoop*>& intersectionLoops)
+	bool GeneratePaths(const std::vector<IntersectionLoop*>& intersectionLoops, PiercedOnlyFaceHandler::PiercedFace& piercedOnlyFace)
 	{
 		// Resize the pools of recyclables now so that
 		// they do not resize during the path generation, which
@@ -88,7 +99,14 @@ public:
 		m_FacesCutPathCollections->Reset();
 
 		for (auto loop : intersectionLoops)
-			GeneratePath(*loop);
+		{
+			if (!GeneratePath(*loop))
+			{
+				piercedOnlyFace = PiercedOnlyFaceHandler::PiercedFace(loop->GetPiercedFace(0), loop->IntersectionsCentre());
+				return false;
+			}
+		}
+		return true;
 	}
 
 	const auto& GetFacesCutPathCollections() const

@@ -14,6 +14,7 @@
 #include "ShapeElementPool.h"
 #include "RedundantPointRemover.h"
 #include "FaceTriangulator.h"
+#include "PiercedOnlyFaceHandler.h"
 
 template<class Tshape>
 class ShapeSplitter
@@ -217,19 +218,33 @@ private:
 		return maxId + 1;
 	}
 
+	void GenerateCutPaths(const Shape& originalShape, const Shape& cutShape)
+	{
+		auto success = false;
+
+		while (!success)
+		{
+			// TODO - abort nicely if this returns false.
+			assert(FindIntersections(originalShape, cutShape));
+
+			// The intersection finder uses the hashes so reset the counters here ready
+			// for the rest of the splitting algorithm.
+			ResetHashCounters();
+
+			PiercedOnlyFaceHandler::PiercedFace piercedOnlyFace;
+			success = m_CutPathCreator.GeneratePaths(m_Intersections, piercedOnlyFace);
+
+			if (!success)
+				m_PiercedOnlyFaceHandler.Handle(piercedOnlyFace);
+		}
+	}
+
 public:
 	void Split(const Vector3& splitPointWorld, const Vector3& splitNormalWorld, Tshape& originalShape, std::vector<Tshape*>& newShapes)
 	{
 		auto& cutShape = m_CutShapeCreator.Create(originalShape.GetTransform(), splitPointWorld, splitNormalWorld, FirstPlaneIdForCutShape(originalShape));
 
-		// TODO - abort nicely if this returns false.
-		assert(FindIntersections(originalShape, cutShape));
-
-		// The intersection finder uses the hashes so reset the counters here ready
-		// for the rest of the splitting algorithm.
-		ResetHashCounters();
-
-		m_CutPathCreator.GeneratePaths(m_Intersections);
+		GenerateCutPaths(originalShape, cutShape);
 
 		m_EdgesCreator.Init(TotalIntersectionCount());
 		CreateEdgesFromCPs();
@@ -281,6 +296,7 @@ private:
 	ReversedGeometryCreator m_Reverser;
 	RedundantPointRemover m_RedundantPointsRemover;
 	FaceTriangulator m_Triangulator;
+	PiercedOnlyFaceHandler m_PiercedOnlyFaceHandler;
 
 	CleanIntersectionFinder m_IntersectionFinder;
 	std::vector<IntersectionLoop*> m_Intersections;

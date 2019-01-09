@@ -239,6 +239,7 @@
     <ClInclude Include="MapToPointPlaneRelationship.h" />
     <ClInclude Include="MapToShapePointOnReversedFace.h" />
     <ClInclude Include="ObjectWithHash.h" />
+    <ClInclude Include="PiercedOnlyFaceHandler.h" />
     <ClInclude Include="PlaneMesh.h" />
     <ClInclude Include="PointInPolyCase.h" />
     <ClInclude Include="Polygon2.h" />

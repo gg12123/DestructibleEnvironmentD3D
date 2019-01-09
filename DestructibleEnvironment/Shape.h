@@ -95,6 +95,16 @@ public:
 		m_Faces.emplace_back(&f);
 	}
 
+	void AddPoint(ShapePoint& p)
+	{
+		m_PointObjects.emplace_back(&p);
+	}
+
+	void AddEdge(ShapeEdge& e)
+	{
+		m_EdgeObjects.emplace_back(&e);
+	}
+
 	void OnAllFacesAdded(Transform& refTran) // faces are in the ref transforms local space
 	{
 		RemoveSmallEdges(); // May also need to remove faces that have long edges but small area.

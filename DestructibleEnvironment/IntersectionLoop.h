@@ -60,9 +60,18 @@ public:
 		return m_Intersections[index].GetIntPoint();
 	}
 
-	const auto& GetIntersections()
+	const auto& GetIntersections() const
 	{
 		return m_Intersections;
+	}
+
+	Vector3 IntersectionsCentre() const
+	{
+		auto c = Vector3::Zero();
+		for (auto& inter : m_Intersections)
+			c += inter.GetIntPoint();
+
+		return c / static_cast<float>(m_Intersections.size());
 	}
 
 private:
