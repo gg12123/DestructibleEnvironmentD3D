@@ -9,6 +9,7 @@
 #include "Vector2.h"
 #include "Polygon2.h"
 #include "ObjectWithHash.h"
+#include "Plane.h"
 
 class Shape;
 class ShapeEdge;
@@ -74,6 +75,11 @@ private:
 class Face : public ObjectWithHash<Face>
 {
 public:
+	Plane ToPlane() const
+	{
+		return Plane(m_Normal, m_CachedPoints[0]);
+	}
+
 	Vector2 ToFaceSpaceDirection(const Vector3& shapesSpaceDir) const
 	{
 		return m_FaceSpace.ToFaceSpaceDirection(shapesSpaceDir);

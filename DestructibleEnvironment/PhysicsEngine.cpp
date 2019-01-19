@@ -100,7 +100,7 @@ void PhysicsEngine::ProcessSplits()
 			auto& toSplit = *s.ToSplit;
 
 			m_NewBodiesFromSplit.clear();
-			m_Splitter.Split(s.CauseImpulse.WorldImpulsePoint, s.CauseImpulse.WorldImpulse.Normalized(), toSplit, m_NewBodiesFromSplit);
+			m_Splitter.Split(s.CauseImpulse.WorldImpulsePoint, toSplit, m_NewBodiesFromSplit);
 		
 			// TODO - this is a bit messy. The first entry in the list
 			// is the original shape so no need to add it to the world etc.

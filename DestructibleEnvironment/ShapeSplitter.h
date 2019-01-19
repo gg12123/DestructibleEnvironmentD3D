@@ -182,7 +182,7 @@ private:
 		ReturnIfStillOwnedByCutShape(cutShape.GetFaces(), cutShape);
 	}
 
-	int TotalIntersectionCount()
+	int TotalIntersectionCount() const
 	{
 		auto c = 0;
 		for (auto loop : m_Intersections)
@@ -240,9 +240,9 @@ private:
 	}
 
 public:
-	void Split(const Vector3& splitPointWorld, const Vector3& splitNormalWorld, Tshape& originalShape, std::vector<Tshape*>& newShapes)
+	void Split(const Vector3& splitPointWorld, Tshape& originalShape, std::vector<Tshape*>& newShapes)
 	{
-		auto& cutShape = m_CutShapeCreator.Create(originalShape.GetTransform(), splitPointWorld, splitNormalWorld, FirstPlaneIdForCutShape(originalShape));
+		auto& cutShape = m_CutShapeCreator.Create(originalShape, splitPointWorld, FirstPlaneIdForCutShape(originalShape));
 
 		GenerateCutPaths(originalShape, cutShape);
 

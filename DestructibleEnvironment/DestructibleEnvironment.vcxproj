@@ -240,6 +240,7 @@
     <ClInclude Include="MapToShapePointOnReversedFace.h" />
     <ClInclude Include="ObjectWithHash.h" />
     <ClInclude Include="PiercedOnlyFaceHandler.h" />
+    <ClInclude Include="Plane.h" />
     <ClInclude Include="PlaneMesh.h" />
     <ClInclude Include="PointInPolyCase.h" />
     <ClInclude Include="Polygon2.h" />
@@ -272,6 +273,7 @@
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="PhysicsObject.h" />
     <ClInclude Include="PhysicsTime.h" />
+    <ClInclude Include="Ray.h" />
     <ClInclude Include="RayCasting.h" />
     <ClInclude Include="RayShooter.h" />
     <ClInclude Include="ReadOnlyInput.h" />
