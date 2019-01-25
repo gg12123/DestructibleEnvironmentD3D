@@ -12,11 +12,6 @@
 class CutShapeCreator
 {
 private:
-	bool FaceIsNearby(const Face& f, const Vector3& p) const
-	{
-		static const auto nearbyTol = 0.1f;
-	}
-
 	void FindNearbyPlanes(const std::vector<Face*>& faces, const Vector3& p)
 	{
 		m_UsedPlanes.clear();
@@ -24,15 +19,7 @@ private:
 
 		for (auto f : faces)
 		{
-			// TODO - should also check that the normals dont point in opposite directions.
-			if (FaceIsNearby(*f, p) && !CollectionU::Contains(m_UsedPlanes, f->GetPlaneId()))
-			{
-				m_UsedPlanes.emplace_back(f->GetPlaneId());
-				m_NearbyPlanes.emplace_back(f->ToPlane());
-
-				if (m_NearbyPlanes.size() == 3u)
-					break;
-			}
+			// find the closest 3 planes (or less than 3 if none are closer than some tol)
 		}
 	}
 
@@ -74,7 +61,31 @@ private:
 
 	Matrix4 CalculateCutShapesTransform(Transform& toSplitsTransform, const Plane& splitPlane, Quaternion& q) const
 	{
+		auto v = (Vector3(1.0f, 1.0f, 1.0f));
+		auto vMag = v.Magnitude();
+
+		v /= vMag;
+		auto u = Vector3::OrthogonalDirection(v);
+		auto k = Vector3::Cross(v, u);
+
+		Matrix4 R0;
+		R0.SetColumn(0, u.x, k.x, v.x, 0.0f);
+		R0.SetColumn(1, u.y, k.y, v.y, 0.0f);
+		R0.SetColumn(2, u.z, k.z, v.z, 0.0f);
+		R0.SetColumn(3, 0.0f, 0.0f, 0.0f, 1.0f);
+
+		auto sV = 5.0f;
+		auto S = Matrix4::FromScale(10.0f, 10.0f, sV / vMag);
+
+		auto& n = splitPlane.GetNormal();
+		auto R1 = Matrix4::FromRotation(Quaternion::LookRotation(-n, Vector3::OrthogonalDirection(n))); // could have some randomnes for up
 		
+		auto& P = splitPlane.GetP0();
+		auto D = 0.25f * P.Magnitude(); // could have some randomnes
+
+		auto T = Matrix4::FromTranslation(P + (sV - D) * n);
+
+		return T * R1 * S * R0;
 	}
 
 	Matrix4 CalculateCutShapesTransform(Transform& toSplitsTransform, const Vector3& splitPoint, const Vector3& splitNormal, Quaternion& q) const
