@@ -32,7 +32,6 @@ private:
 			m_ShapeToUseNext = nullptr;
 			return *s;
 		}
-		// get one from pool
 		return *(new Tshape());
 	}
 

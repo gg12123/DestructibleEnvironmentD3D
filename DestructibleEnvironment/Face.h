@@ -109,6 +109,8 @@ public:
 		m_PlaneId = planeId;
 	}
 
+	void CalculateNormalFromPoints(int planeId);
+
 	auto GetPlaneId() const
 	{
 		return m_PlaneId;

@@ -105,9 +105,9 @@ public:
 		m_EdgeObjects.emplace_back(&e);
 	}
 
-	void OnAllFacesAdded(Transform& refTran) // faces are in the ref transforms local space
+	void OnAllFacesAdded(Transform& refTran, int nextPlaneId) // faces are in the ref transforms local space
 	{
-		RemoveSmallEdges(); // May also need to remove faces that have long edges but small area.
+		RemoveSmallEdges(nextPlaneId); // May also need to remove faces that have long edges but small area.
 		CollectPointsAndEdges();
 
 		auto c = CalculateCentre();
@@ -155,7 +155,7 @@ private:
 	Vector3 CalculateCentre();
 	void ReCentre(const Vector3& centre);
 	void CollectPointsAndEdges();
-	void RemoveSmallEdges();
+	void RemoveSmallEdges(int nextPlaneId);
 	void TryCollectPoint(ShapePoint& p);
 	void TryCollectEdge(ShapeEdge& p);
 	void InitFacesPointsEdges();

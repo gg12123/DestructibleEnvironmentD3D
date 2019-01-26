@@ -56,13 +56,17 @@ public:
 
 		f.Clear();
 		AddPointsAndEdgesToFace(f, pC, 0);
+		f.OnSplittingFinished(s);
 
 		for (auto i = 1u; i < m_OuterPoints.size(); i++)
 		{
 			auto& fNew = FacePool::Take();
 			AddPointsAndEdgesToFace(fNew, pC, i);
+
 			fNew.SetNormal(f.GetNormal(), f.GetPlaneId());
+
 			s.AddFace(fNew);
+			fNew.OnSplittingFinished(s);
 		}
 
 		s.AddPoint(pC);

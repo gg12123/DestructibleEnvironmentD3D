@@ -22,13 +22,12 @@ private:
 		e1.DeRegisterFace(f);
 		e0SideFace.ReplaceEdge(e0, e1);
 
-		// TODO - retrun e0 and f to the pool.
 		EdgePool::Return(e0);
 		FacePool::Return(f);
 	}
 
 public:
-	void RemoveEdge(ShapeEdge& toRemove)
+	int RemoveEdge(ShapeEdge& toRemove, int nextPlaneId)
 	{
 		m_EdgesAboutPoint0.clear();
 		m_EdgesAboutPoint1.clear();
@@ -40,7 +39,6 @@ public:
 		IterationAboutShape::FindEdgesAndFacesAboutPoint(p0, toRemove, m_EdgesAboutPoint0, m_FacesAboutPoints);
 		IterationAboutShape::FindEdgesAndFacesAboutPoint(p1, toRemove, m_EdgesAboutPoint1, m_FacesAboutPoints);
 
-		// TODO - pool
 		auto& newPoint = PointPool::Take((p0.GetPoint() + p1.GetPoint()) / 2.0f);
 
 		// Make all the edges reference the new point
@@ -59,17 +57,24 @@ public:
 		CollapseFace(toRemove.GetFace1(), toRemove);
 		CollapseFace(toRemove.GetFace2(), toRemove);
 
-		// Make the faces grab the new point
-
+		// Make the faces grab the new point and re-calculate normals
+		auto planeId = nextPlaneId;
 		for (auto it = m_FacesAboutPoints.begin(); it != m_FacesAboutPoints.end(); it++)
 		{
 			auto f = *it;
 
 			if (f != removedFace1 && f != removedFace2)
+			{
 				f->ReplacePointObjects(p0, p1, newPoint);
+				f->CalculateNormalFromPoints(planeId);
+				planeId++;
+			}
 		}
 
-		// TODO - retrun p0 and p1 to the pool
+		PointPool::Return(p0);
+		PointPool::Return(p1);
+
+		return planeId;
 	}
 
 private:

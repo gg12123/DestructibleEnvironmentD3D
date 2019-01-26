@@ -92,6 +92,19 @@ void Face::ReplacePointObjects(const ShapePoint& oldP0, const ShapePoint& oldP1,
 	}
 }
 
+void Face::CalculateNormalFromPoints(int planeId)
+{
+	assert(planeId >= 0);
+
+	m_PlaneId = planeId;
+
+	auto& p0 = m_PointObjects[0]->GetPoint();
+	auto& p1 = m_PointObjects[1]->GetPoint();
+	auto& p2 = m_PointObjects[2]->GetPoint();
+
+	m_Normal = Vector3::Cross(p1 - p0, p2 - p1).Normalized();
+}
+
 void Face::MergeWith(const Face& other, const ShapeEdge& commonEdge)
 {
 	std::vector<ShapePoint*> newPoints;

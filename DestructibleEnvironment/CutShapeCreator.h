@@ -12,6 +12,100 @@
 class CutShapeCreator
 {
 private:
+	class FacesCreator
+	{
+	private:
+		void CreateEdge(int p, int pNext)
+		{
+			auto& edge = EdgePool::Take(*m_Points[p], *m_Points[pNext]);
+
+			m_Edges.Get(p, pNext) = &edge;
+			m_Edges.Get(pNext, p) = &edge;
+		}
+
+		Face& CreateFace(const std::array<int, 3>& pointIndexes, int planeId) const
+		{
+			auto& f = FacePool::Take();
+
+			for (auto i = 0U; i < 3; i++)
+			{
+				auto j = pointIndexes[i];
+				auto k = pointIndexes[(i + 1) % 3];
+
+				f.AddPoint(*m_Points[j], *m_Edges.Get(j, k));
+			}
+			f.CalculateNormalFromPoints(planeId);
+
+			return f;
+		}
+
+		void CreatePoints(const Matrix4& M)
+		{
+			m_Points[0] = &PointPool::Take(M * Vector3(0.0f, 0.0f, 1.0f));
+
+			m_Points[1] = &PointPool::Take(M * Vector3(-1.0f, -1.0f, 0.0f));
+			m_Points[2] = &PointPool::Take(M * Vector3(1.0f, -1.0f, 0.0f));
+			m_Points[3] = &PointPool::Take(M * Vector3(1.0f, 1.0f, 0.0f));
+			m_Points[4] = &PointPool::Take(M * Vector3(-1.0f, 1.0f, 0.0f));
+		}
+
+		void CreateEdges()
+		{
+			CreateEdge(1, 2);
+			CreateEdge(2, 3);
+			CreateEdge(3, 4);
+			CreateEdge(4, 1);
+
+			CreateEdge(0, 1);
+			CreateEdge(0, 2);
+			CreateEdge(0, 3);
+			CreateEdge(0, 4);
+			CreateEdge(0, 1);
+		}
+
+		void CreateFaces(Shape& shape, int firstPlaneId)
+		{
+			auto planeId = firstPlaneId;
+
+			shape.AddFace(CreateFace(m_Face0, planeId));
+			planeId++;
+
+			shape.AddFace(CreateFace(m_Face1, planeId));
+			planeId++;
+
+			shape.AddFace(CreateFace(m_Face2, planeId));
+			planeId++;
+
+			shape.AddFace(CreateFace(m_Face3, planeId));
+			planeId++;
+		}
+
+	public:
+		FacesCreator()
+		{
+			m_Face0 = { 1, 2, 0 };
+			m_Face1 = { 2, 3, 0 };
+			m_Face2 = { 3, 4, 0 };
+			m_Face3 = { 4, 1, 0 };
+		}
+
+		void CreateFaces(Shape& shape, const Matrix4& M, int firstPlaneId)
+		{
+			CreatePoints(M);
+			CreateEdges();
+			CreateFaces(shape, firstPlaneId);
+		}
+
+	private:
+		std::array<ShapePoint*, 5> m_Points;
+		TwoDArray<5, 5, ShapeEdge*> m_Edges;
+
+		std::array<int, 3> m_Face0;
+		std::array<int, 3> m_Face1;
+		std::array<int, 3> m_Face2;
+		std::array<int, 3> m_Face3;
+	};
+
 	class ClosestPlanes
 	{
 	private:
@@ -159,45 +253,37 @@ private:
 
 	Matrix4 CalculateCutShapesTransform(Transform& toSplitsTransform, const Plane& splitPlane) const
 	{
-		auto v = (Vector3(1.0f, 1.0f, 1.0f)).Normalized();
-		auto u = Vector3::OrthogonalDirection(v);
-		auto k = Vector3::Cross(v, u);
-
-		Matrix4 R0;
-		R0.SetColumn(0, u.x, k.x, v.x, 0.0f);
-		R0.SetColumn(1, u.y, k.y, v.y, 0.0f);
-		R0.SetColumn(2, u.z, k.z, v.z, 0.0f);
-		R0.SetColumn(3, 0.0f, 0.0f, 0.0f, 1.0f);
-
-		auto scaleFactor = 10.0f;
-		auto S = Matrix4::FromScale(scaleFactor, scaleFactor, scaleFactor);
+		static constexpr auto sXY = 10.0f;
+		static constexpr auto sZ = 5.0f;
+		auto S = Matrix4::FromScale(sXY, sXY, sZ);
 
 		auto& n = splitPlane.GetNormal();
-		auto R1 = Matrix4::FromRotation(Quaternion::LookRotation(-n, Vector3::OrthogonalDirection(n))); // could have some randomnes for up
+		auto R = Matrix4::FromRotation(Quaternion::LookRotation(-n, Vector3::OrthogonalDirection(n))); // could have some randomnes for up
 		
 		auto& P = splitPlane.GetP0();
-		auto D = 0.25f * P.Magnitude(); // could have some randomnes
+		auto D = 0.5f * P.Magnitude(); // could have some randomnes
 
-		auto sV = (Vector3(scaleFactor, scaleFactor, scaleFactor)).Magnitude();
-		auto T = Matrix4::FromTranslation(P + (sV - D) * n);
+		auto T = Matrix4::FromTranslation(P + (sZ - D) * n);
 
-		return T * R1 * R0 * S;
+		return T * R * S;
 	}
 
-	Matrix4 CalculateCutShapesTransform(Transform& toSplitsTransform, const Vector3& splitPoint, const Vector3& splitNormal, Quaternion& q) const
-	{
-		auto sZ = 100.0f;
-		auto r = 0.0f; // Random::Range(0.0f, 0.5f);
-
-		auto A = r * splitPoint;
-		auto C = A + sZ * splitNormal;
-
-		q = Quaternion::LookRotation(-splitNormal, Vector3::OrthogonalDirection(splitNormal));
-
-		return Matrix4::FromTranslation(C) * Matrix4::FromRotation(q) * Matrix4::FromScale(sZ, sZ, sZ);
-	}
+	//Matrix4 CalculateCutShapesTransform(Transform& toSplitsTransform, const Vector3& splitPoint, const Vector3& splitNormal, Quaternion& q) const
+	//{
+	//	auto sZ = 100.0f;
+	//	auto r = 0.0f; // Random::Range(0.0f, 0.5f);
+	//
+	//	auto A = r * splitPoint;
+	//	auto C = A + sZ * splitNormal;
+	//
+	//	q = Quaternion::LookRotation(-splitNormal, Vector3::OrthogonalDirection(splitNormal));
+	//
+	//	return Matrix4::FromTranslation(C) * Matrix4::FromRotation(q) * Matrix4::FromScale(sZ, sZ, sZ);
+	//}
 
 public:
+	static constexpr auto NumPlanesInCutShape = 4;
+
 	// Split point should be on the surface of one of the faces.
 	Shape & Create(Shape& toSplit, const Vector3& splitPointWorld, int firstPlaneId)
 	{
@@ -212,7 +298,7 @@ public:
 
 		auto M = CalculateCutShapesTransform(toSplitsTransform, splitPlane);
 
-		// Add faces
+		m_FacesCreator.CreateFaces(m_CutShape, M, firstPlaneId);
 
 		m_CutShape.OnAllFacesAdded();
 
@@ -223,4 +309,5 @@ private:
 	Shape m_CutShape;
 
 	ClosestPlanes m_NearbyPlanes;
+	FacesCreator m_FacesCreator;
 };

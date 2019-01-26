@@ -122,7 +122,7 @@ private:
 		}
 	}
 
-	void InitNewShapes(Shape& original, std::vector<Tshape*>& newShapes)
+	void InitNewShapes(Shape& original, std::vector<Tshape*>& newShapes, int nextPlaneId)
 	{
 		// Must copy the transform.
 		// Copy is needed becasue the original shape is re-used in the
@@ -130,7 +130,7 @@ private:
 		auto t = original.GetTransform();
 
 		for (auto it = newShapes.begin(); it != newShapes.end(); it++)
-			(*it)->OnAllFacesAdded(t);
+			(*it)->OnAllFacesAdded(t, nextPlaneId);
 	}
 
 	bool FindIntersections(const Shape& originalShape, const Shape& cutShape)
@@ -242,7 +242,10 @@ private:
 public:
 	void Split(const Vector3& splitPointWorld, Tshape& originalShape, std::vector<Tshape*>& newShapes)
 	{
-		auto& cutShape = m_CutShapeCreator.Create(originalShape, splitPointWorld, FirstPlaneIdForCutShape(originalShape));
+		auto nextPlaneId = FirstPlaneIdForCutShape(originalShape);
+		auto& cutShape = m_CutShapeCreator.Create(originalShape, splitPointWorld, nextPlaneId);
+
+		nextPlaneId += CutShapeCreator::NumPlanesInCutShape;
 
 		GenerateCutPaths(originalShape, cutShape);
 
@@ -269,7 +272,7 @@ public:
 		RemoveRedundantPoints();
 
 		TriangulateShapesFaces(newShapes);
-		InitNewShapes(originalShape, newShapes);
+		InitNewShapes(originalShape, newShapes, nextPlaneId);
 
 		// To clean up, loop through everything on the cut shape and if it has not
 		// been assigned to one of the new shapes (check owner shape property), it must be
