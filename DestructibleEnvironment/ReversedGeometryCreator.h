@@ -18,11 +18,11 @@ private:
 
 	ShapePoint & TryCreatePointOnReversed(ShapePoint& from)
 	{
-		if (!from.HashIsAssigned())
-		{
-			from.AssignHash();
+		from.TryAssignHash();
+
+		if (!m_MapToReversed.IsMappedToPointOnReversedFace(from))
 			CreatePointCommon(from);
-		}
+
 		return m_MapToReversed.GetPointOnReversedFace(from);
 	}
 
@@ -88,6 +88,7 @@ public:
 	void Init(ShapeEdgesCreator& edgeCreator)
 	{
 		m_EdgeCreator = &edgeCreator;
+		m_MapToReversed.Clear();
 	}
 
 	const auto& GetMapToReversed() const
