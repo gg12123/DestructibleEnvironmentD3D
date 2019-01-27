@@ -13,7 +13,7 @@ private:
 	{
 		m_CentreEdges.clear();
 		for (auto p : m_OuterPoints)
-			m_CentreEdges.emplace_back(EdgePool::Take(pC, *p));
+			m_CentreEdges.emplace_back(&EdgePool::Take(pC, *p));
 	}
 
 	template<class T>
@@ -39,6 +39,10 @@ public:
 		Vector3 CentreOfInters;
 
 		PiercedFace(Face& f, const Vector3& c) : CentreOfInters(c), TheFace(&f)
+		{
+		}
+
+		PiercedFace() : TheFace(nullptr)
 		{
 		}
 	};

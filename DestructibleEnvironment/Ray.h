@@ -34,9 +34,15 @@ public:
 		return false;
 	}
 
-	Vector3 ClosestPointOnRay(const Vector3& p) const
+	Vector3 ClosestPointOnRayAsInfLine(const Vector3& c) const
 	{
+		auto a = m_Origin;
+		auto b = m_Origin + m_Direction;
 
+		auto ab = b - a;
+		auto t = Vector3::Dot(c - a, ab) / Vector3::Dot(ab, ab);
+
+		return a + t * ab;
 	}
 
 private:

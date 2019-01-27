@@ -196,9 +196,71 @@ private:
 		std::vector<Plane> m_WithinTolPlanes;
 	};
 
+	Vector3 ClosestPointOnFaceToP(const Vector3& p, const Face& f) const
+	{
+		auto& points = f.GetCachedPoints();
+		assert(points.size() == 3u);
+
+		auto& a = points[0];
+		auto& b = points[1];
+		auto& c = points[2];
+
+		auto ab = b - a;
+		auto ac = c - a;
+		auto ap = p - a;
+		auto d1 = Vector3::Dot(ab, ap);
+		auto d2 = Vector3::Dot(ac, ap);
+
+		if (d1 <= 0.0f && d2 <= 0.0f)
+			return a;
+
+		auto bp = p - b;
+		auto d3 = Vector3::Dot(ab, bp);
+		auto d4 = Vector3::Dot(ac, bp);
+
+		if (d3 >= 0.0f && d4 <= d3)
+			return b;
+
+		auto vc = d1 * d4 - d3 * d2;
+
+		if (vc <= 0.0f && d1 >= 0.0f && d3 <= 0.0f)
+		{
+			auto v = d1 / (d1 - d3);
+			return (a + v * ab);
+		}
+
+		auto cp = p - c;
+		auto d5 = Vector3::Dot(ab, cp);
+		auto d6 = Vector3::Dot(ac, cp);
+
+		if (d6 >= 0.0f && d5 <= d6)
+			return c;
+
+		auto vb = d5 * d2 - d1 * d6;
+
+		if (vb <= 0.0f && d2 >= 0.0f && d6 <= 0.0f)
+		{
+			auto w = d2 / (d2 - d6);
+			return (a + w * ac);
+		}
+
+		auto va = d3 * d6 - d5 * d4;
+
+		if (va <= 0.0f && (d4 - d3) >= 0.0f && (d5 - d6) >= 0.0f)
+		{
+			auto w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+			return (b + w * (c - b));
+		}
+
+		auto denom = 1.0f / (va + vb + vc);
+		auto v = vb * denom;
+		auto w = vc * denom;
+		return (a + ab * v + ac * w);
+	}
+
 	float DistanceFromPointToFace(const Vector3& p, const Face& f) const
 	{
-
+		return (ClosestPointOnFaceToP(p, f) - p).Magnitude();
 	}
 
 	void FindNearbyPlanes(const std::vector<Face*>& faces, const Vector3& p)
@@ -229,7 +291,7 @@ private:
 			if (!nearbyPlanes[0].Intersects(nearbyPlanes[1], inter))
 				return nearbyPlanes[0];
 
-			auto p0 = inter.ClosestPointOnRay(p);
+			auto p0 = inter.ClosestPointOnRayAsInfLine(p);
 			auto n = (nearbyPlanes[0].GetNormal() + nearbyPlanes[1].GetNormal()).Normalized();
 
 			return Plane(n, p0);
@@ -260,7 +322,7 @@ private:
 		auto& n = splitPlane.GetNormal();
 		auto R = Matrix4::FromRotation(Quaternion::LookRotation(-n, Vector3::OrthogonalDirection(n))); // could have some randomnes for up
 		
-		auto& P = splitPlane.GetP0();
+		auto P = splitPlane.GetP0();
 		auto D = 0.5f * P.Magnitude(); // could have some randomnes
 
 		auto T = Matrix4::FromTranslation(P + (sZ - D) * n);
