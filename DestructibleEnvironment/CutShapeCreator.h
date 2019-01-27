@@ -47,6 +47,8 @@ private:
 			m_Points[2] = &PointPool::Take(M * Vector3(1.0f, -1.0f, 0.0f));
 			m_Points[3] = &PointPool::Take(M * Vector3(1.0f, 1.0f, 0.0f));
 			m_Points[4] = &PointPool::Take(M * Vector3(-1.0f, 1.0f, 0.0f));
+
+			m_Points[5] = &PointPool::Take(M * Vector3(0.0f, 0.0f, -20.0f));
 		}
 
 		void CreateEdges()
@@ -60,7 +62,11 @@ private:
 			CreateEdge(0, 2);
 			CreateEdge(0, 3);
 			CreateEdge(0, 4);
-			CreateEdge(0, 1);
+
+			CreateEdge(5, 1);
+			CreateEdge(5, 2);
+			CreateEdge(5, 3);
+			CreateEdge(5, 4);
 		}
 
 		void CreateFaces(Shape& shape, int firstPlaneId)
@@ -78,6 +84,18 @@ private:
 
 			shape.AddFace(CreateFace(m_Face3, planeId));
 			planeId++;
+
+			shape.AddFace(CreateFace(m_Face4, planeId));
+			planeId++;
+
+			shape.AddFace(CreateFace(m_Face5, planeId));
+			planeId++;
+
+			shape.AddFace(CreateFace(m_Face6, planeId));
+			planeId++;
+
+			shape.AddFace(CreateFace(m_Face7, planeId));
+			planeId++;
 		}
 
 	public:
@@ -87,6 +105,11 @@ private:
 			m_Face1 = { 2, 3, 0 };
 			m_Face2 = { 3, 4, 0 };
 			m_Face3 = { 4, 1, 0 };
+
+			m_Face4 = { 2, 1, 5 };
+			m_Face5 = { 3, 2, 5 };
+			m_Face6 = { 4, 3, 5 };
+			m_Face7 = { 1, 4, 5 };
 		}
 
 		void CreateFaces(Shape& shape, const Matrix4& M, int firstPlaneId)
@@ -97,13 +120,18 @@ private:
 		}
 
 	private:
-		std::array<ShapePoint*, 5> m_Points;
-		TwoDArray<5, 5, ShapeEdge*> m_Edges;
+		std::array<ShapePoint*, 6> m_Points;
+		TwoDArray<6, 6, ShapeEdge*> m_Edges;
 
 		std::array<int, 3> m_Face0;
 		std::array<int, 3> m_Face1;
 		std::array<int, 3> m_Face2;
 		std::array<int, 3> m_Face3;
+
+		std::array<int, 3> m_Face4;
+		std::array<int, 3> m_Face5;
+		std::array<int, 3> m_Face6;
+		std::array<int, 3> m_Face7;
 	};
 
 	class ClosestPlanes
@@ -140,7 +168,7 @@ private:
 			int indexOfExisting;
 			if (AlreadyGotPlane(id, indexOfExisting))
 			{
-				if (m_Distances[indexOfExisting] < dist)
+				if (dist < m_Distances[indexOfExisting])
 				{
 					m_Distances[indexOfExisting] = dist;
 					m_Planes[indexOfExisting] = plane;
@@ -150,7 +178,7 @@ private:
 
 			for (int i = 0; i < MaxNumPlanes; i++)
 			{
-				if (m_Distances[i] < dist)
+				if (dist < m_Distances[i])
 				{
 					m_Distances[i] = dist;
 					m_Planes[i] = plane;
@@ -316,7 +344,7 @@ private:
 	Matrix4 CalculateCutShapesTransform(Transform& toSplitsTransform, const Plane& splitPlane) const
 	{
 		static constexpr auto sXY = 10.0f;
-		static constexpr auto sZ = 5.0f;
+		static constexpr auto sZ = 1.0f;
 		auto S = Matrix4::FromScale(sXY, sXY, sZ);
 
 		auto& n = splitPlane.GetNormal();
