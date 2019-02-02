@@ -66,13 +66,20 @@ private:
 		return *faceToLoseEdge;
 	}
 
+	void EnsureEdgeIsEdgeMap(ShapeEdge& e) const
+	{
+		e.GetP0().TryAssignHash();
+		e.GetP1().TryAssignHash();
+
+		m_EdgesCreator->GetMapToNewEdges().AddNewEdge(e.GetP0(), e.GetP1(), e);
+	}
+
 	void RemovePoint(ShapePoint& pR, ShapePoint& beforePr, ShapePoint& afterPr)
 	{
 		m_FacesAboutPoint.clear();
 		m_EdgesAboutPoint.clear();
 
 		auto& e0 = m_EdgesCreator->GetMapToNewEdges().GetNewEdge(pR, beforePr);
-
 		IterationAboutShape::FindEdgesAndFacesAboutPoint(pR, e0, m_EdgesAboutPoint, m_FacesAboutPoint);
 
 		assert(m_EdgesAboutPoint.size() == 3u);
@@ -80,24 +87,45 @@ private:
 		FindCoPlanarFaces();
 		FindOtherFace();
 
-		assert(m_Fa1->GetPointObjects().size() > 3u || m_Fa0->GetPointObjects().size() > 3u);
+		if (m_Fa1->GetPointObjects().size() > 3u || m_Fa0->GetPointObjects().size() > 3u)
+		{
+			auto& faceToLoseEdge = FindEdgesToRemoveAndExtend();
+			auto& faceToHaveExtendedEdge = &faceToLoseEdge == m_Fa0 ? *m_Fa1 : *m_Fa0;
+			auto& pointToGainEdge = m_EbToRemove->GetOther(pR);
 
-		auto& faceToLoseEdge = FindEdgesToRemoveAndExtend();
-		auto& faceToHaveExtendedEdge = &faceToLoseEdge == m_Fa0 ? *m_Fa1 : *m_Fa0;
-		auto& pointToGainEdge = &m_EbToRemove->GetP0() == &pR ? m_EbToRemove->GetP0() : m_EbToRemove->GetP1();
+			m_Ea01->ReplacePoint(pR, pointToGainEdge);
+			m_EbToExtend->ReplacePoint(pR, pointToGainEdge);
 
-		m_Ea01->ReplacePoint(pR, pointToGainEdge);
-		m_EbToExtend->ReplacePoint(pR, pointToGainEdge);
+			faceToLoseEdge.RemovePointAndEdge(pR, *m_EbToRemove);
+			faceToHaveExtendedEdge.ReplacePointObject(pR, pointToGainEdge);
+			m_Fb->RemovePointAndEdge(pR, *m_EbToRemove);
 
-		faceToLoseEdge.RemovePointAndEdge(pR, *m_EbToRemove);
-		faceToHaveExtendedEdge.ReplacePointObject(pR, pointToGainEdge);
-		m_Fb->RemovePointAndEdge(pR, *m_EbToRemove);
+			// Not sure if I also need to clear these edges from the map before re-adding
+			// them in their new state.
+			EnsureEdgeIsEdgeMap(*m_Ea01);
+			EnsureEdgeIsEdgeMap(*m_EbToExtend);
+			
+			EdgePool::Return(*m_EbToRemove);
+		}
+		else
+		{
+			m_EdgesCreator->CreateEdge(beforePr, afterPr);
+			auto& newEdge = m_EdgesCreator->GetMapToNewEdges().GetNewEdge(beforePr, afterPr);
 
-		// Points and edges are returned to the pool here, even though some things
-		// may be accesed again by this algorithm. I think that is ok for now though.
+			m_Fa0->MergeWith(*m_Fa1, *m_Ea01);
+			m_Fa0->RemovePoint(pR, newEdge);
+			m_Fb->RemovePoint(pR, newEdge);
+
+			// Clear this face to indicate to the owner shape that it is
+			// not required. Dont return it to the pool yet becuase it is
+			// still referenced by its owner shape. Let the owner shape do it later.
+			m_Fa1->Clear();
+
+			for (auto e : m_EdgesAboutPoint)
+				EdgePool::Return(*e);
+		}
 
 		PointPool::Return(pR);
-		EdgePool::Return(*m_EbToRemove);
 	}
 
 	template<CollectionU::IterationDir itDir>

@@ -136,6 +136,18 @@ public:
 		return *m_Face1;
 	}
 
+	ShapePoint& GetOther(const ShapePoint& p) const
+	{
+		if (&p == m_P0)
+			return *m_P1;
+
+		if (&p == m_P1)
+			return *m_P0;
+
+		assert(false);
+		return *m_P0;
+	}
+
 	void OnSplittingFinished(const Shape& owner)
 	{
 		m_OwnerShape = &owner;
