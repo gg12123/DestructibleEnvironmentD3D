@@ -92,6 +92,15 @@ void Face::ReplacePointObjects(const ShapePoint& oldP0, const ShapePoint& oldP1,
 	}
 }
 
+void Face::ReplacePointObject(const ShapePoint& oldP, ShapePoint& replacement)
+{
+	for (auto it = m_PointObjects.begin(); it != m_PointObjects.end(); it++)
+	{
+		if (&oldP == *it)
+			*it = &replacement;
+	}
+}
+
 void Face::CalculateNormalFromPoints(int planeId)
 {
 	assert(planeId >= 0);
@@ -140,6 +149,33 @@ void Face::MergeWith(const Face& other, const ShapeEdge& commonEdge)
 
 	m_PointObjects = std::move(newPoints);
 	m_EdgeObjects = std::move(newEdges);
+
+	for (auto i = 0u; i < m_EdgeObjects.size(); i++)
+		m_EdgeObjects[i]->RegisterFace(*this, i);
+}
+
+void Face::RemovePointAndEdge(const ShapePoint& pointToRemove, const ShapeEdge& edgeToRemove)
+{
+	assert(edgeToRemove.IsAttachedTo(pointToRemove));
+
+	for (auto e : m_EdgeObjects)
+		e->DeRegisterFace(*this);
+
+	auto itEdge = m_EdgeObjects.begin();
+	auto index = 0;
+	for (auto itPoint = m_PointObjects.begin(); itPoint != m_PointObjects.end(); itPoint++, itEdge++, index++)
+	{
+		auto e = *itEdge;
+		if (e == &edgeToRemove)
+		{
+			m_EdgeObjects.erase(itEdge);
+
+			auto indexToRemove = *itPoint == &pointToRemove ? index : ((index + 1) % m_PointObjects.size());
+			m_PointObjects.erase(m_PointObjects.begin() + indexToRemove);
+
+			break;
+		}
+	}
 
 	for (auto i = 0u; i < m_EdgeObjects.size(); i++)
 		m_EdgeObjects[i]->RegisterFace(*this, i);

@@ -184,10 +184,6 @@ public:
 		m_FacePoly.Clear();
 	}
 
-	void ReplaceEdge(const ShapeEdge& existing, ShapeEdge& newEdge);
-
-	void ReplacePointObjects(const ShapePoint& oldP0, const ShapePoint& oldP1, ShapePoint& replacement);
-
 	void OnTakenFromPool()
 	{
 		m_OwnerShape = nullptr;
@@ -197,6 +193,10 @@ public:
 
 	void MergeWith(const Face& other, const ShapeEdge& commonEdge);
 	void RemovePoint(const ShapePoint& toRemove, ShapeEdge& newEdge);
+	void RemovePointAndEdge(const ShapePoint& pointToRemove, const ShapeEdge& edgeToRemove);
+	void ReplaceEdge(const ShapeEdge& existing, ShapeEdge& newEdge);
+	void ReplacePointObjects(const ShapePoint& oldP0, const ShapePoint& oldP1, ShapePoint& replacement);
+	void ReplacePointObject(const ShapePoint& oldP, ShapePoint& replacement);
 
 	void InitFaceCoOrdinateSystem();
 

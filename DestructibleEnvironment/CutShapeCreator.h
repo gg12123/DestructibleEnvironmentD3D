@@ -351,7 +351,7 @@ private:
 		auto R = Matrix4::FromRotation(Quaternion::LookRotation(-n, Vector3::OrthogonalDirection(n))); // could have some randomnes for up
 		
 		auto P = splitPlane.GetP0();
-		auto D = 0.5f * P.Magnitude(); // could have some randomnes
+		auto D = 0.05f;// 0.5f * P.Magnitude(); // could have some randomnes
 
 		auto T = Matrix4::FromTranslation(P + (sZ - D) * n);
 

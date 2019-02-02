@@ -191,9 +191,14 @@ public:
 		assert(false);
 	}
 
-	bool IsAttachedTo(const Face& f)
+	bool IsAttachedTo(const Face& f) const
 	{
 		return (&f == m_Face1) || (&f == m_Face2);
+	}
+
+	bool IsAttachedTo(const ShapePoint& p) const
+	{
+		return (&p == m_P0) || (&p == m_P1);
 	}
 
 private:
