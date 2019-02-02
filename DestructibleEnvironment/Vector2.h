@@ -24,6 +24,12 @@ public:
 		y += rhs.y;
 	}
 
+	void operator /= (float rhs)
+	{
+		x /= rhs;
+		y /= rhs;
+	}
+
 	Vector2 operator-() const
 	{
 		return Vector2(-x, -y);

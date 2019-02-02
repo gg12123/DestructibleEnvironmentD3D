@@ -15,19 +15,37 @@ template<class T>
 class Triangulator
 {
 private:
-	int GetNext(int curr)
+	int GetNext(int curr) const
 	{
 		return CollectionU::GetNextIndex(m_CurrPoly, curr);
 	}
 
-	int GetPrevious(int curr)
+	int GetPrevious(int curr) const
 	{
 		return CollectionU::GetPrevIndex(m_CurrPoly, curr);
 	}
 
-	const Vector2& GetPoint(int indexInCurr)
+	const Vector2& GetPoint(int indexInCurr) const
 	{
 		return m_AllPoints[m_CurrPoly[indexInCurr]];
+	}
+
+	bool IsInsideCorner(const Vector2& prev, const Vector2& corner, const Vector2& next) const
+	{
+		auto v0 = corner - prev;
+		auto v1 = next - corner;
+
+		auto v0Mag = v0.Magnitude();
+		auto v1Mag = v1.Magnitude();
+
+		// TODO - this is a bit flaky
+		if (v0Mag <= MathU::Epsilon || v1Mag <= MathU::Epsilon)
+			return true;
+
+		v0 /= v0Mag;
+		v1 /= v1Mag;
+
+		return Vector2::Cross2D(v0, v1) >= 0.0f;
 	}
 
 	bool TriangleCanBeClipped(int corner)
@@ -40,11 +58,14 @@ private:
 		m_Poly.Add(GetPoint(corner));
 		m_Poly.Add(GetPoint(next));
 
+		if (!IsInsideCorner(m_Poly.GetPointAt(0), m_Poly.GetPointAt(1), m_Poly.GetPointAt(2)))
+			return false;
+
 		for (auto i = GetNext(next); i != prev; i = GetNext(i))
 		{
 			auto& p = GetPoint(i);
 
-			// Use the winding method because it works when points are coincident (I think),
+			// Use the winding method because it works when points are coincident (I think).
 			if (m_Poly.PointIsInsideWindingMethod(p))
 				return false;
 		}

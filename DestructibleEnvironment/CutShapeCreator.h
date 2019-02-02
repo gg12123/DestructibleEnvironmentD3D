@@ -224,6 +224,16 @@ private:
 		std::vector<Plane> m_WithinTolPlanes;
 	};
 
+	struct PlaneWithPoint
+	{
+		const Plane ThePlane;
+		const Vector3 ThePoint;
+
+		PlaneWithPoint(const Plane& pl, const Vector3& p) : ThePlane(pl), ThePoint(p)
+		{
+		}
+	};
+
 	Vector3 ClosestPointOnFaceToP(const Vector3& p, const Face& f) const
 	{
 		auto& points = f.GetCachedPoints();
@@ -303,7 +313,7 @@ private:
 		m_NearbyPlanes.FinishUpdating(0.1f);
 	}
 
-	Plane CalculateSplitPlane(const Vector3& p) const
+	PlaneWithPoint CalculateSplitPlane(const Vector3& p) const
 	{
 		auto& nearbyPlanes = m_NearbyPlanes.GetNearbyPlanes();
 
@@ -311,46 +321,46 @@ private:
 		{
 		case 1:
 		{
-			return nearbyPlanes[0];
+			return PlaneWithPoint(nearbyPlanes[0], p);
 		}
 		case 2:
 		{
 			Ray inter;
 			if (!nearbyPlanes[0].Intersects(nearbyPlanes[1], inter))
-				return nearbyPlanes[0];
+				return PlaneWithPoint(nearbyPlanes[0], p);
 
 			auto p0 = inter.ClosestPointOnRayAsInfLine(p);
 			auto n = (nearbyPlanes[0].GetNormal() + nearbyPlanes[1].GetNormal()).Normalized();
 
-			return Plane(n, p0);
+			return PlaneWithPoint(Plane(n, p0), p0);
 		}
 		case 3:
 		{
 			Vector3 inter;
 			if (!nearbyPlanes[0].Intersects(nearbyPlanes[1], nearbyPlanes[2], inter))
-				return nearbyPlanes[0];
+				PlaneWithPoint(nearbyPlanes[0], p);
 
-			return Plane((nearbyPlanes[0].GetNormal() + nearbyPlanes[1].GetNormal() + nearbyPlanes[2].GetNormal()).Normalized(),
-				inter);
+			return PlaneWithPoint(Plane((nearbyPlanes[0].GetNormal() + nearbyPlanes[1].GetNormal() + nearbyPlanes[2].GetNormal()).Normalized(),
+				inter), inter);
 		}
 		default:
 		{
 			assert(false);
-			return Plane();
+			return PlaneWithPoint(Plane(), Vector3());
 		}
 		}
 	}
 
-	Matrix4 CalculateCutShapesTransform(Transform& toSplitsTransform, const Plane& splitPlane) const
+	Matrix4 CalculateCutShapesTransform(Transform& toSplitsTransform, const PlaneWithPoint& splitPlane) const
 	{
 		static constexpr auto sXY = 10.0f;
-		static constexpr auto sZ = 1.0f;
+		static constexpr auto sZ = 3.0f;
 		auto S = Matrix4::FromScale(sXY, sXY, sZ);
 
-		auto& n = splitPlane.GetNormal();
+		auto& n = splitPlane.ThePlane.GetNormal();
 		auto R = Matrix4::FromRotation(Quaternion::LookRotation(-n, Vector3::OrthogonalDirection(n))); // could have some randomnes for up
 		
-		auto P = splitPlane.GetP0();
+		auto P = splitPlane.ThePoint;
 		auto D = 0.05f;// 0.5f * P.Magnitude(); // could have some randomnes
 
 		auto T = Matrix4::FromTranslation(P + (sZ - D) * n);

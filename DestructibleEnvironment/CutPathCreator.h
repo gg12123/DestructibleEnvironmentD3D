@@ -66,10 +66,15 @@ private:
 				onlyOnePiercedFace = false;
 		}
 
-		m_FacesCutPathCollections->At(firstFacePierced.GetHash()).ForceCreateWhenFinalWasAddedBeforeFirst(*m_FacesCutPathObjects, path);
-		m_FacesCutPathCollections->At(firstFaceExited.GetHash()).ForceCreateWhenFinalWasAddedBeforeFirst(*m_FacesCutPathObjects, path);
+		if (!onlyOnePiercedFace)
+		{
+			m_FacesCutPathCollections->At(firstFacePierced.GetHash()).ForceCreateWhenFinalWasAddedBeforeFirst(*m_FacesCutPathObjects, path);
+			m_FacesCutPathCollections->At(firstFaceExited.GetHash()).ForceCreateWhenFinalWasAddedBeforeFirst(*m_FacesCutPathObjects, path);
 
-		return !onlyOnePiercedFace;
+			return true;
+		}
+
+		return false;
 	}
 
 	auto TotalIntersectionCount(const std::vector<IntersectionLoop*>& intersectionLoops)

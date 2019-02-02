@@ -10,6 +10,7 @@ public:
 	static constexpr float Infinity = (std::numeric_limits<float>::max)();
 	static constexpr float NegativeInfinity = std::numeric_limits<float>::lowest();
 	static constexpr int32 IntMax = (std::numeric_limits<int32>::max)();
+	static constexpr float Epsilon = std::numeric_limits<float>::epsilon();
 
 	static inline float ToRadians(float degrees)
 	{
