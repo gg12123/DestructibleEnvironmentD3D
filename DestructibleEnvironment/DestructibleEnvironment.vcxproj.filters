@@ -492,6 +492,9 @@
     <ClInclude Include="Ray.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="NewShapeGeometryCreator.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">

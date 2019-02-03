@@ -13,16 +13,16 @@ enum class PointPlaneRelationship
 class MapToPointPlaneRelationship
 {
 public:
-	PointPlaneRelationship GetRelationship(const Face& f, const ShapePoint& p) const
+	PointPlaneRelationship GetRelationship(const ShapePoint& p) const
 	{
-		return m_Map.Get(f.GetHash(), p.GetHash());
+		return m_Map[p.GetHash()];
 	}
 
-	void SetRelationship(const Face& f, const ShapePoint& p, PointPlaneRelationship r)
+	void SetRelationship(const ShapePoint& p, PointPlaneRelationship r)
 	{
-		m_Map.Get(f.GetHash(), p.GetHash()) = r;
+		m_Map[p.GetHash()] = r;
 	}
 
 private:
-	DynamicTwoDArray<PointPlaneRelationship> m_Map;
+	DynamicArray<PointPlaneRelationship> m_Map;
 };

@@ -238,6 +238,7 @@
     <ClInclude Include="MapToNewEdges.h" />
     <ClInclude Include="MapToPointPlaneRelationship.h" />
     <ClInclude Include="MapToShapePointOnReversedFace.h" />
+    <ClInclude Include="NewShapeGeometryCreator.h" />
     <ClInclude Include="ObjectWithHash.h" />
     <ClInclude Include="PiercedOnlyFaceHandler.h" />
     <ClInclude Include="Plane.h" />

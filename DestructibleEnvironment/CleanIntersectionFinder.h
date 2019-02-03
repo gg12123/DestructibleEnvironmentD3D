@@ -272,118 +272,41 @@ private:
 class CleanIntersectionFinder
 {
 private:
-	const EdgeEdgeRelationship& GetEdgeEdgeRelationship(const ShapeEdge& edgeFaces, const ShapeEdge& piercingEdge)
+	void DeterminePointPlaneRelationships(const std::vector<ShapePoint*>& points, const Plane& plane)
 	{
-		return m_EdgeEdgeRelationships.Get(edgeFaces.GetHash(), piercingEdge.GetHash());
-	}
+		auto planeP0 = plane.GetP0();
+		auto planeN = plane.GetNormal();
 
-	void SetEdgeEdgeRelationship(const ShapeEdge& edgeFaces, const ShapeEdge& piercingEdge, const EdgeEdgeRelationship& r)
-	{
-		m_EdgeEdgeRelationships.Get(edgeFaces.GetHash(), piercingEdge.GetHash()) = r;
-	}
-
-	EdgeEdgeRelationship MakeConsistentRelationship(const EdgeEdgeRelationship& rConstrained, const ShapeEdge& piercingEdge, const ShapeEdge& edgeFaces)
-	{
-		auto& bridged = *rConstrained.GetBridgedFace(m_PointPlaneRelationshipMap);
-		return EdgeEdgeRelationship(edgeFaces, piercingEdge, bridged, rConstrained.ImpliesIntersectionFor(bridged), m_PointPlaneRelationshipMap);
-	}
-
-	void InitConsistentEdgeEdgeRelationship(const ShapeEdge& peInConstrined, const ShapeEdge& efInConstrined, const EdgeEdgeRelationship& rConstrained)
-	{
-		SetEdgeEdgeRelationship(efInConstrined, peInConstrined, rConstrained);
-		SetEdgeEdgeRelationship(peInConstrined, efInConstrined, MakeConsistentRelationship(rConstrained, efInConstrined, peInConstrined));
-	}
-
-	void InitEdgeEdgeRelationship(const ShapeEdge& e0, const ShapeEdge& e1)
-	{
-		auto r0 = EdgeEdgeRelationship(e0, e1, m_PointPlaneRelationshipMap);
-		auto r1 = EdgeEdgeRelationship(e1, e0, m_PointPlaneRelationshipMap);
-
-		if (r0.IsConstrained() && r1.IsConstrained())
+		for (auto p : points)
 		{
-			SetEdgeEdgeRelationship(e1, e0, r0);
-			SetEdgeEdgeRelationship(e0, e1, r1);
-		}
-		else if (r0.IsConstrained())
-		{
-			InitConsistentEdgeEdgeRelationship(e0, e1, r0);
-		}
-		else if (r1.IsConstrained())
-		{
-			InitConsistentEdgeEdgeRelationship(e1, e0, r1);
-		}
-		else
-		{
-			auto b0 = r0.GetBridgedFace(m_PointPlaneRelationshipMap);
-			auto b1 = r1.GetBridgedFace(m_PointPlaneRelationshipMap);
-			if (b0)
-			{
-				InitConsistentEdgeEdgeRelationship(e0, e1, r0);
-			}
-			else if (b1)
-			{
-				InitConsistentEdgeEdgeRelationship(e1, e0, r1);
-			}
-			else
-			{
-				SetEdgeEdgeRelationship(e1, e0, r0);
-				SetEdgeEdgeRelationship(e0, e1, r1);
-			}
+			auto comp = Vector3::Dot((p->GetPoint() - planeP0), planeN);
+			auto r = comp >= 0.0f ? PointPlaneRelationship::PointsAbove : PointPlaneRelationship::PointsBelow;
+
+			m_PointPlaneRelationshipMap.SetRelationship(*p, r);
 		}
 	}
 
-	void DeterminePointPlaneRelationships(const std::vector<ShapePoint*>& points, const std::vector<Face*>& faces)
+	void FindIntersection(ShapeEdge& piercingEdge)
 	{
-		for (auto f : faces)
+		auto& p0 = piercingEdge.GetP0();
+		auto& p1 = piercingEdge.GetP1();
+
+		if (m_PointPlaneRelationshipMap.GetRelationship(p1) != m_PointPlaneRelationshipMap.GetRelationship(p0))
 		{
-			auto n = f->GetNormal();
-			auto p0 = f->GetPlaneP0();
+			Vector3 intPoint;
+			assert(Vector3::LinePlaneIntersection(m_SplitterFace.GetPlaneP0(), m_SplitterFace.GetNormal(), p0.GetPoint(), p1.GetPoint(), intPoint));
 
-			for (auto p : points)
-			{
-				auto comp = Vector3::Dot((p->GetPoint() - p0), n);
-				auto r = comp >= 0.0f ? PointPlaneRelationship::PointsAbove : PointPlaneRelationship::PointsBelow;
-
-				m_PointPlaneRelationshipMap.SetRelationship(*f, *p, r);
-			}
+			m_Linker.RegisterIntersection(EdgeFaceIntersection(m_SplitterFace, piercingEdge, intPoint));
+			m_IntersectionCount++;
 		}
 	}
 
-	void DetermineEdgeEdgeRelationships(const std::vector<ShapeEdge*>& edgesA, const std::vector<ShapeEdge*>& edgesB)
+	void FindIntersections(const std::vector<ShapeEdge*>& piercingEdges)
 	{
-		for (auto edgeAp : edgesA)
-		{
-			auto& a = *edgeAp;
+		m_IntersectionCount = 0;
 
-			for (auto edgeBp : edgesB)
-			{
-				InitEdgeEdgeRelationship(a, *edgeBp);
-			}
-		}
-	}
-
-	void FindIntersection(Face& face, ShapeEdge& piercingEdge)
-	{
-		auto& facesEdges = face.GetEdgeObjects();
-
-		for (auto faceEdge : facesEdges)
-		{
-			if (!GetEdgeEdgeRelationship(*faceEdge, piercingEdge).ImpliesIntersectionFor(face))
-				return;
-		}
-
-		Vector3 intPoint;
-		assert(Vector3::LinePlaneIntersection(face.GetPlaneP0(), face.GetNormal(), piercingEdge.GetP0().GetPoint(), piercingEdge.GetP1().GetPoint(), intPoint));
-
-		m_Linker.RegisterIntersection(EdgeFaceIntersection(face, piercingEdge, intPoint));
-		m_IntersectionCount++;
-	}
-
-	void FindIntersections(const std::vector<Face*>& faces, const std::vector<ShapeEdge*>& piercingEdges)
-	{
-		for (auto f : faces)
-			for (auto e : piercingEdges)
-				FindIntersection(*f, *e);
+		for (auto e : piercingEdges)
+			FindIntersection(*e);
 	}
 
 	bool LinkIntersections(std::vector<IntersectionLoop*>& loops)
@@ -407,32 +330,24 @@ private:
 
 	void AssignHashes(const Shape& s)
 	{
-		AssignHashes(s.GetEdgeObjects());
+		Face::ResetNextHashCounter();
+		ShapePoint::ResetNextHashCounter();
+
+		m_SplitterFace.AssignHash();
 		AssignHashes(s.GetPointObjects());
 		AssignHashes(s.GetFaces());
 	}
 
 	void UnAssignHashes(const Shape& s)
 	{
-		UnAssignHashes(s.GetEdgeObjects());
+		m_SplitterFace.ResetHash();
 		UnAssignHashes(s.GetPointObjects());
 		UnAssignHashes(s.GetFaces());
 	}
 
-	void AssignHashes(const Shape& shapeA, const Shape& shapeB)
+	void InitSplitterFace(const Plane& splitPlane)
 	{
-		Face::ResetNextHashCounter();
-		ShapeEdge::ResetNextHashCounter();
-		ShapePoint::ResetNextHashCounter();
-
-		AssignHashes(shapeA);
-		AssignHashes(shapeB);
-	}
-
-	void UnAssignHashes(const Shape& shapeA, const Shape& shapeB)
-	{
-		UnAssignHashes(shapeA);
-		UnAssignHashes(shapeB);
+		assert(false);
 	}
 
 public:
@@ -440,31 +355,24 @@ public:
 	{
 	}
 
-	// Both shapes must have the same local space.
-	// Loops are recycled so must be used before the next call.
-	bool FindCleanIntersections(const Shape& shapeA, const Shape& shapeB, std::vector<IntersectionLoop*>& loops)
+	bool FindCleanIntersections(const Shape& shape, const Plane& splitPlane, std::vector<IntersectionLoop*>& loops)
 	{
-		AssignHashes(shapeA, shapeB);
+		AssignHashes(shape);
 
-		DeterminePointPlaneRelationships(shapeA.GetPointObjects(), shapeB.GetFaces());
-		DeterminePointPlaneRelationships(shapeB.GetPointObjects(), shapeA.GetFaces());
-
-		DetermineEdgeEdgeRelationships(shapeB.GetEdgeObjects(), shapeA.GetEdgeObjects());
-
-		m_IntersectionCount = 0;
-		FindIntersections(shapeA.GetFaces(), shapeB.GetEdgeObjects());
-		FindIntersections(shapeB.GetFaces(), shapeA.GetEdgeObjects());
+		DeterminePointPlaneRelationships(shape.GetPointObjects(), splitPlane);
+		FindIntersections(shape.GetEdgeObjects());
 
 		auto valid = m_IntersectionCount > 0 ? LinkIntersections(loops) : false;
 		m_Linker.Clear();
-		UnAssignHashes(shapeA, shapeB);
+
+		UnAssignHashes(shape);
 
 		return valid;
 	}
 
 private:
+	Face m_SplitterFace;
 	IntersectionLinker m_Linker;
 	MapToPointPlaneRelationship m_PointPlaneRelationshipMap;
-	DynamicTwoDArray<EdgeEdgeRelationship> m_EdgeEdgeRelationships;
 	int m_IntersectionCount;
 };
