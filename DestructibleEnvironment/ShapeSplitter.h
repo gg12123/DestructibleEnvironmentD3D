@@ -218,14 +218,17 @@ private:
 		return maxId + 1;
 	}
 
-	void GenerateCutPaths(const Shape& originalShape, const Shape& cutShape)
+	bool GenerateCutPaths(const Shape& originalShape, const Shape& cutShape)
 	{
 		auto success = false;
 
 		while (!success)
 		{
 			// TODO - abort nicely if this returns false.
-			assert(FindIntersections(originalShape, cutShape));
+			if (!FindIntersections(originalShape, cutShape))
+			{
+				return false;
+			}
 
 			// The intersection finder uses the hashes so reset the counters here ready
 			// for the rest of the splitting algorithm.
@@ -237,57 +240,62 @@ private:
 			if (!success)
 				m_PiercedOnlyFaceHandler.Handle(piercedOnlyFace);
 		}
+		return true;
 	}
 
 public:
-	void Split(const Vector3& splitPointWorld, Tshape& originalShape, std::vector<Tshape*>& newShapes)
+	bool Split(const Vector3& splitPointWorld, Tshape& originalShape, std::vector<Tshape*>& newShapes)
 	{
 		auto nextPlaneId = FirstPlaneIdForCutShape(originalShape);
 		auto& cutShape = m_CutShapeCreator.Create(originalShape, splitPointWorld, nextPlaneId);
 
 		nextPlaneId += CutShapeCreator::NumPlanesInCutShape;
 
-		GenerateCutPaths(originalShape, cutShape);
+		if (GenerateCutPaths(originalShape, cutShape))
+		{
+			m_EdgesCreator.Init(TotalIntersectionCount());
+			CreateEdgesFromCPs();
+			CreateInsideEdgesFromSplitEdges();
 
-		m_EdgesCreator.Init(TotalIntersectionCount());
-		CreateEdgesFromCPs();
-		CreateInsideEdgesFromSplitEdges();
+			// Now get the stuff from original shape that needs returning to the pool. But dont return
+			// it until the end of the split. Returning it early may break some state that is relied
+			// upon in the rest of the algorithm.
+			CollectFacesAndEdgesForPool(originalShape);
 
-		// Now get the stuff from original shape that needs returning to the pool. But dont return
-		// it until the end of the split. Returning it early may break some state that is relied
-		// upon in the rest of the algorithm.
-		CollectFacesAndEdgesForPool(originalShape);
+			InitFaceSplitter();
 
-		InitFaceSplitter();
+			CreateNewInsideFaces(cutShape);
+			CreateNewInsideShapes(originalShape, newShapes);
 
-		CreateNewInsideFaces(cutShape);
-		CreateNewInsideShapes(originalShape, newShapes);
+			CreateReversedGeometry(cutShape);
+			CreateOutsideEdgesFromSplitEdges();
 
-		CreateReversedGeometry(cutShape);
-		CreateOutsideEdgesFromSplitEdges();
+			CreateNewOutsideFaces(originalShape);
+			CreateNewOutsideShapes(newShapes);
 
-		CreateNewOutsideFaces(originalShape);
-		CreateNewOutsideShapes(newShapes);
+			RemoveRedundantPoints();
 
-		RemoveRedundantPoints();
+			TriangulateShapesFaces(newShapes);
+			InitNewShapes(originalShape, newShapes, nextPlaneId);
 
-		TriangulateShapesFaces(newShapes);
-		InitNewShapes(originalShape, newShapes, nextPlaneId);
+			// To clean up, loop through everything on the cut shape and if it has not
+			// been assigned to one of the new shapes (check owner shape property), it must be
+			// returned to the pool. Also any faces and edges on the original shape that got split
+			// must be returned. All points on the original shape are re-used. To check if an
+			// edge is split, use the reference to split edge. To check if a face is split, use
+			// the cut path creator.
+			// Cut shape doesnt need returning to the pool becasue it is re-used in the cut shape
+			// creator.
+			ReturnUnusedCutShapeStuffToPool(cutShape);
+			ReturnUnusedOriginalShapeStuffToPool();
 
-		// To clean up, loop through everything on the cut shape and if it has not
-		// been assigned to one of the new shapes (check owner shape property), it must be
-		// returned to the pool. Also any faces and edges on the original shape that got split
-		// must be returned. All points on the original shape are re-used. To check if an
-		// edge is split, use the reference to split edge. To check if a face is split, use
-		// the cut path creator.
-		// Cut shape doesnt need returning to the pool becasue it is re-used in the cut shape
-		// creator.
-		ReturnUnusedCutShapeStuffToPool(cutShape);
-		ReturnUnusedOriginalShapeStuffToPool();
+			// No need to un-assign any hashes because that is done by the new
+			// shapes in 'on splitting finished' and when an object is taken from
+			// a pool.
 
-		// No need to un-assign any hashes because that is done by the new
-		// shapes in 'on splitting finished' and when an object is taken from
-		// a pool.
+			return true;
+		}
+		return false;
 	}
 
 private:

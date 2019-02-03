@@ -40,10 +40,8 @@ private:
 		assert(false);
 	}
 
-	Face& FindEdgesToRemoveAndExtend()
+	void FindEdgesToRemoveAndExtend(const Face& faceToLoseEdge)
 	{
-		auto faceToLoseEdge = m_Fa0->GetPointObjects().size() > m_Fa1->GetPointObjects().size() ? m_Fa0 : m_Fa1;
-
 		m_EbToExtend = nullptr;
 		m_EbToRemove = nullptr;
 
@@ -51,7 +49,7 @@ private:
 		{
 			if (e != m_Ea01)
 			{
-				if (e->IsAttachedTo(*faceToLoseEdge))
+				if (e->IsAttachedTo(faceToLoseEdge))
 				{
 					m_EbToRemove = e;
 				}
@@ -61,9 +59,7 @@ private:
 				}
 			}
 		}
-
 		assert(m_EbToExtend && m_EbToRemove);
-		return *faceToLoseEdge;
 	}
 
 	void EnsureEdgeIsEdgeMap(ShapeEdge& e) const
@@ -74,6 +70,69 @@ private:
 		m_EdgesCreator->GetMapToNewEdges().AddNewEdge(e.GetP0(), e.GetP1(), e);
 	}
 
+	bool PointIsRedundant(const ShapePoint& p, ShapeEdge& attachedToP) const
+	{
+		static std::vector<ShapeEdge*> edges;
+		static std::vector<Face*> faces;
+
+		edges.clear();
+		faces.clear();
+
+		IterationAboutShape::FindEdgesAndFacesAboutPoint(p, attachedToP, edges, faces);
+
+		if (edges.size() == 3u)
+		{
+			for (auto e : edges)
+			{
+				if (e->BridgesCoPlanarFaces())
+					return true;
+			}
+		}
+		return false;
+	}
+
+	bool FaceCanLoseEdge(const Face& f, const ShapePoint& pR)
+	{
+		if (f.GetPointObjects().size() > 3u)
+		{
+			FindEdgesToRemoveAndExtend(f);
+			return !PointIsRedundant(m_EbToRemove->GetOther(pR), *m_EbToRemove);
+		}
+		return false;
+	}
+
+	bool CanDoShiftEdgeMethod(const ShapePoint& pR, Face** faceToLoseEdge)
+	{
+		if (FaceCanLoseEdge(*m_Fa0, pR))
+		{
+			*faceToLoseEdge = m_Fa0;
+			return true;
+		}
+
+		if (FaceCanLoseEdge(*m_Fa1, pR))
+		{
+			*faceToLoseEdge = m_Fa1;
+			return true;
+		}
+		return false;
+	}
+
+	int NumSharedEdges(const Face& f0, const Face& f1) const
+	{
+		auto num = 0;
+		for (auto e : f0.GetEdgeObjects())
+		{
+			if (e->IsAttachedTo(f1))
+				num++;
+		}
+		return num;
+	}
+
+	bool CanDoMergeFaceMethod() const
+	{
+		return NumSharedEdges(*m_Fa0, *m_Fa1) == 1;
+	}
+
 	void RemovePoint(ShapePoint& pR, ShapePoint& beforePr, ShapePoint& afterPr)
 	{
 		m_FacesAboutPoint.clear();
@@ -82,49 +141,67 @@ private:
 		auto& e0 = m_EdgesCreator->GetMapToNewEdges().GetNewEdge(pR, beforePr);
 		IterationAboutShape::FindEdgesAndFacesAboutPoint(pR, e0, m_EdgesAboutPoint, m_FacesAboutPoint);
 
-		assert(m_EdgesAboutPoint.size() == 3u);
+		assert(m_EdgesAboutPoint.size() == 3u || m_EdgesAboutPoint.size() == 2u);
 
-		FindCoPlanarFaces();
-		FindOtherFace();
-
-		if (m_Fa1->GetPointObjects().size() > 3u || m_Fa0->GetPointObjects().size() > 3u)
-		{
-			auto& faceToLoseEdge = FindEdgesToRemoveAndExtend();
-			auto& faceToHaveExtendedEdge = &faceToLoseEdge == m_Fa0 ? *m_Fa1 : *m_Fa0;
-			auto& pointToGainEdge = m_EbToRemove->GetOther(pR);
-
-			m_Ea01->ReplacePoint(pR, pointToGainEdge);
-			m_EbToExtend->ReplacePoint(pR, pointToGainEdge);
-
-			faceToLoseEdge.RemovePointAndEdge(pR, *m_EbToRemove);
-			faceToHaveExtendedEdge.ReplacePointObject(pR, pointToGainEdge);
-			m_Fb->RemovePointAndEdge(pR, *m_EbToRemove);
-
-			// Not sure if I also need to clear these edges from the map before re-adding
-			// them in their new state.
-			EnsureEdgeIsEdgeMap(*m_Ea01);
-			EnsureEdgeIsEdgeMap(*m_EbToExtend);
-			
-			EdgePool::Return(*m_EbToRemove);
-		}
-		else
+		if (m_EdgesAboutPoint.size() == 2u)
 		{
 			m_EdgesCreator->CreateEdge(beforePr, afterPr);
 			auto& newEdge = m_EdgesCreator->GetMapToNewEdges().GetNewEdge(beforePr, afterPr);
 
-			m_Fa0->MergeWith(*m_Fa1, *m_Ea01);
-			m_Fa0->RemovePoint(pR, newEdge);
-			m_Fb->RemovePoint(pR, newEdge);
-
-			// Clear this face to indicate to the owner shape that it is
-			// not required. Dont return it to the pool yet becuase it is
-			// still referenced by its owner shape. Let the owner shape do it later.
-			m_Fa1->Clear();
+			m_FacesAboutPoint[0]->RemovePoint(pR, newEdge);
+			m_FacesAboutPoint[1]->RemovePoint(pR, newEdge);
 
 			for (auto e : m_EdgesAboutPoint)
 				EdgePool::Return(*e);
 		}
+		else
+		{
+			FindCoPlanarFaces();
+			FindOtherFace();
 
+			Face* faceToLoseEdge = nullptr;
+
+			if (CanDoShiftEdgeMethod(pR, &faceToLoseEdge))
+			{
+				auto& faceToHaveExtendedEdge = faceToLoseEdge == m_Fa0 ? *m_Fa1 : *m_Fa0;
+				auto& pointToGainEdge = m_EbToRemove->GetOther(pR);
+
+				m_Ea01->ReplacePoint(pR, pointToGainEdge);
+				m_EbToExtend->ReplacePoint(pR, pointToGainEdge);
+
+				faceToLoseEdge->RemovePointAndEdge(pR, *m_EbToRemove);
+				faceToHaveExtendedEdge.ReplacePointObject(pR, pointToGainEdge);
+				m_Fb->RemovePointAndEdge(pR, *m_EbToRemove);
+
+				// Not sure if I also need to clear these edges from the map before re-adding
+				// them in their new state.
+				EnsureEdgeIsEdgeMap(*m_Ea01);
+				EnsureEdgeIsEdgeMap(*m_EbToExtend);
+
+				EdgePool::Return(*m_EbToRemove);
+			}
+			else if (CanDoMergeFaceMethod())
+			{
+				m_EdgesCreator->CreateEdge(beforePr, afterPr);
+				auto& newEdge = m_EdgesCreator->GetMapToNewEdges().GetNewEdge(beforePr, afterPr);
+
+				m_Fa0->MergeWith(*m_Fa1, *m_Ea01);
+				m_Fa0->RemovePoint(pR, newEdge);
+				m_Fb->RemovePoint(pR, newEdge);
+
+				// Clear this face to indicate to the owner shape that it is
+				// not required. Dont return it to the pool yet becuase it is
+				// still referenced by its owner shape. Let the owner shape do it later.
+				m_Fa1->Clear();
+
+				for (auto e : m_EdgesAboutPoint)
+					EdgePool::Return(*e);
+			}
+			else
+			{
+				assert(false);
+			}
+		}
 		PointPool::Return(pR);
 	}
 

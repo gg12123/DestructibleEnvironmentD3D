@@ -455,7 +455,7 @@ public:
 		FindIntersections(shapeA.GetFaces(), shapeB.GetEdgeObjects());
 		FindIntersections(shapeB.GetFaces(), shapeA.GetEdgeObjects());
 
-		auto valid = LinkIntersections(loops);
+		auto valid = m_IntersectionCount > 0 ? LinkIntersections(loops) : false;
 		m_Linker.Clear();
 		UnAssignHashes(shapeA, shapeB);
 

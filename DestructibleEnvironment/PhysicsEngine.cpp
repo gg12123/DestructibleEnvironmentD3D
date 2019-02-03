@@ -91,7 +91,7 @@ void PhysicsEngine::ProcessSplits()
 {
 	static auto constexpr doSplits = true;
 
-	if (doSplits && (m_DynamicBodies.size() < 10u))
+	if (doSplits)
 	{
 		for (auto it = m_Splits.begin(); it != m_Splits.end(); it++)
 		{
@@ -100,29 +100,29 @@ void PhysicsEngine::ProcessSplits()
 			auto& toSplit = *s.ToSplit;
 
 			m_NewBodiesFromSplit.clear();
-			m_Splitter.Split(s.CauseImpulse.WorldImpulsePoint, toSplit, m_NewBodiesFromSplit);
-		
-			// TODO - this is a bit messy. The first entry in the list
-			// is the original shape so no need to add it to the world etc.
-			for (auto i = 1U; i < m_NewBodiesFromSplit.size(); i++)
+			if (m_Splitter.Split(s.CauseImpulse.WorldImpulsePoint, toSplit, m_NewBodiesFromSplit))
 			{
-				auto newBody = m_NewBodiesFromSplit[i];
-				m_BodiesAdded.emplace_back(newBody);
-				m_DynamicBodies.emplace_back(std::unique_ptr<Rigidbody>(newBody));
-			}
+				// TODO - this is a bit messy. The first entry in the list
+				// is the original shape so no need to add it to the world etc.
+				for (auto i = 1U; i < m_NewBodiesFromSplit.size(); i++)
+				{
+					auto newBody = m_NewBodiesFromSplit[i];
+					m_BodiesAdded.emplace_back(newBody);
+					m_DynamicBodies.emplace_back(std::unique_ptr<Rigidbody>(newBody));
+				}
 
-			// The original will copy velocity from itself but that doesnt really matter
-			for (auto it = m_NewBodiesFromSplit.begin(); it != m_NewBodiesFromSplit.end(); it++)
-			{
-				auto& newBody = **it;
+				// The original will copy velocity from itself but that doesnt really matter
+				for (auto it = m_NewBodiesFromSplit.begin(); it != m_NewBodiesFromSplit.end(); it++)
+				{
+					auto& newBody = **it;
 
-				newBody.CopyVelocity(toSplit);
-				newBody.CalculateMotionProperties();
-				newBody.GetTransform().ReCalculateIfDirty();
+					newBody.CopyVelocity(toSplit);
+					newBody.CalculateMotionProperties();
+					newBody.GetTransform().ReCalculateIfDirty();
+				}
 			}
 		}
 	}
-
 	m_Splits.clear();
 }
 
