@@ -227,6 +227,7 @@
     <ClInclude Include="FacesCutPaths.h" />
     <ClInclude Include="FacesOriginalPointsIterator.h" />
     <ClInclude Include="FacesPointsIterator.h" />
+    <ClInclude Include="InPlaneFacesCreator.h" />
     <ClInclude Include="InputChannel.h" />
     <ClInclude Include="InputChannelWrapper.h" />
     <ClInclude Include="IntersectionEquivalenceChecker.h" />

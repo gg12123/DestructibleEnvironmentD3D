@@ -1,11 +1,8 @@
 #pragma once
-#include <array>
-#include <vector>
 #include <stack>
 #include <assert.h>
 #include "Shape.h"
 #include "Face.h"
-#include "MapToFaceRelationship.h"
 
 template<class Tshape>
 class FaceIterator
@@ -19,9 +16,8 @@ private:
 
 	void Visit(Face& f)
 	{
-		assert(!FaceIsVisited(f));
+		assert(!FaceIsVisited(f))
 		f.AssignHash();
-		m_Map.SetRelationship(f, m_CurrRelationship);
 	}
 
 	Tshape & GetNextShapeToUse()
@@ -60,13 +56,7 @@ private:
 				auto& other = (*it)->GetOther(next);
 
 				if (!FaceIsVisited(other))
-				{
 					m_FaceStack.push(&other);
-				}
-				else
-				{
-					assert(m_Map.GetRelationship(other) == m_CurrRelationship);
-				}
 			}
 		}
 		return newShape;
@@ -90,9 +80,8 @@ public:
 		m_ShapeToUseNext = &s;
 	}
 
-	void CreateShapes(const std::vector<Face*>& faces, std::vector<Tshape*>& newShapes, FaceRelationshipWithOtherShape relationship)
+	void CreateShapes(const std::vector<Face*>& faces, std::vector<Tshape*>& newShapes)
 	{
-		m_CurrRelationship = relationship;
 		auto root = FindNextRootFace(faces);
 
 		while (root)
@@ -102,15 +91,7 @@ public:
 		}
 	}
 
-	const MapToFaceRelationship& GetMapToFaceRelationship() const
-	{
-		return m_Map;
-	}
-
 private:
 	Tshape * m_ShapeToUseNext = nullptr;
-
 	std::stack<Face*> m_FaceStack;
-	MapToFaceRelationship m_Map;
-	FaceRelationshipWithOtherShape m_CurrRelationship;
 };

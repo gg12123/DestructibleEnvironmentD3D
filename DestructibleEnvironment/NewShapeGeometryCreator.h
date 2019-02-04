@@ -35,6 +35,18 @@ public:
 		m_Points[splitEdge.GetHash()] = PointPair(above, below);
 	}
 
+	template<PointPlaneRelationship r>
+	ShapePoint & GetPoint(const ShapeEdge& splitEdge) const
+	{
+		return GetPointAbove(splitEdge);
+	}
+
+	template<>
+	ShapePoint & GetPoint<PointPlaneRelationship::PointsBelow>(const ShapeEdge& splitEdge) const
+	{
+		return GetPointBelow(splitEdge);
+	}
+
 private:
 	DynamicArray<PointPair> m_Points;
 };
