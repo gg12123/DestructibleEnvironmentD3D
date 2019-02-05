@@ -12,6 +12,7 @@
 #include "FaceTriangulator.h"
 #include "NewShapeGeometryCreator.h"
 #include "InPlaneFacesCreator.h"
+#include "Random.h"
 
 template<class Tshape>
 class ShapeSplitter
@@ -102,7 +103,15 @@ private:
 
 	Plane CalculateSplitPlane(const Vector3& splitPointLocal) const
 	{
+		auto a = Random::Range(0.01f, 1.0f);
+		auto b = Random::Range(0.01f, 1.0f);
+		auto c = Random::Range(0.01f, 1.0f);
 
+		a *= Random::Range(0.0f, 1.0f) > 0.5f ? -1.0f : 1.0f;
+		b *= Random::Range(0.0f, 1.0f) > 0.5f ? -1.0f : 1.0f;
+		c *= Random::Range(0.0f, 1.0f) > 0.5f ? -1.0f : 1.0f;
+
+		return Plane(Vector3(a, b, c).Normalized(), splitPointLocal);
 	}
 
 public:

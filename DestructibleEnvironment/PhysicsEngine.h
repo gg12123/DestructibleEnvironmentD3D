@@ -11,7 +11,7 @@
 #include "CollisionDetector.h"
 #include "CollisionResponder.h"
 #include "FixedTimeStepTime.h"
-#include "ShapeSplitter.h"
+#include "ShapeSubDivider.h"
 #include "RayCasting.h"
 
 class PhysicsEngine
@@ -95,7 +95,7 @@ private:
 	std::vector<EdgeFaceIntersection> m_Intersections;
 	std::vector<FaceCollision> m_FaceCollisions;
 
-	ShapeSplitter<Rigidbody> m_Splitter;
+	ShapeSubDivider<Rigidbody> m_ShapeDivider;
 	std::vector<Rigidbody*> m_NewBodiesFromSplit;
 
 	FixedTimeStepTime m_Time;

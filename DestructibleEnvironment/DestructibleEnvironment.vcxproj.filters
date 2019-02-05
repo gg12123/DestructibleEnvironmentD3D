@@ -498,6 +498,9 @@
     <ClInclude Include="InPlaneFacesCreator.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
+    <ClInclude Include="ShapeSubDivider.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">

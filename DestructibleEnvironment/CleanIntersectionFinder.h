@@ -14,10 +14,10 @@
 #include "IntersectionLoop.h"
 #include "DynamicTriangleArray.h"
 
-class FaceFaceInteraction
+class IntersectionPair
 {
 public:
-	FaceFaceInteraction()
+	IntersectionPair()
 	{
 		Reset();
 	}
@@ -26,7 +26,7 @@ public:
 	{
 		m_NumIntersRegistered = 0;
 		m_IsUsed = false;
-		m_Face1 = m_Face2 = nullptr;
+		m_Face = nullptr;
 	}
 
 	void Register(const EdgeFaceIntersection& inter)
@@ -45,10 +45,9 @@ public:
 		m_NumIntersRegistered++;
 	}
 
-	void SetFaces(const Face& f1, const Face& f2)
+	void SetFace(const Face& f)
 	{
-		m_Face1 = &f1;
-		m_Face2 = &f2;
+		m_Face = &f;
 	}
 
 	const auto& GetInter1() const
@@ -86,14 +85,21 @@ public:
 		return m_NumIntersRegistered == 2;
 	}
 
-	auto& GetFace1() const
+	auto& GetFace() const
 	{
-		return *m_Face1;
+		return *m_Face;
 	}
 
-	auto& GetFace2() const
+	const auto& GetOther(const EdgeFaceIntersection& inter)
 	{
-		return *m_Face2;
+		if (inter == m_Inter1)
+			return m_Inter2;
+
+		if (inter == m_Inter2)
+			return m_Inter1;
+
+		assert(false);
+		return m_Inter1;
 	}
 
 private:
@@ -101,131 +107,89 @@ private:
 	EdgeFaceIntersection m_Inter2;
 	int m_NumIntersRegistered;
 	bool m_IsUsed;
-	const Face* m_Face1 = nullptr;
-	const Face* m_Face2 = nullptr;
+	const Face* m_Face = nullptr;
 };
 
-static_assert(std::is_trivially_copyable<FaceFaceInteraction>::value, "Face face interaction must be trivially copyable.");
+static_assert(std::is_trivially_copyable<IntersectionPair>::value, "Intersection pair must be trivially copyable.");
 
-class MapToFaceFaceInteractions
+class MapToIntersectionPairs
 {
 private:
-	struct InteractionSlot
+	void RegisterIntersection(const EdgeFaceIntersection& inter, Face& f)
 	{
-		const int Row;
-		const int Col;
+		f.TryAssignHash();
 
-		InteractionSlot(int row, int col) : Row(row), Col(col)
+		auto i = f.GetHash();
+		auto& pair = m_InteractionPairs[i];
+
+		pair.Register(inter);
+
+		if (pair.NumIntersRegistered() == 1)
 		{
-		}
-	};
-
-	void RegisterIntersection(const EdgeFaceIntersection& inter, const Face& faceA, const Face& faceB)
-	{
-		auto row = faceA.GetHash();
-		auto col = faceB.GetHash();
-
-		auto& interac = m_Interactions.Get(row, col);
-		interac.Register(inter);
-
-		if (interac.NumIntersRegistered() == 1)
-		{
-			m_SlotsWithInters.emplace_back(InteractionSlot(row, col));
-			interac.SetFaces(faceA, faceB);
+			m_SlotsWithInters.emplace_back(i);
+			pair.SetFace(f);
 		}
 	}
 
 public:
 	void RegisterIntersection(const EdgeFaceIntersection& inter)
 	{
-		auto& pf = inter.GetFace();
 		auto& pe = inter.GetEdge();
 
-		RegisterIntersection(inter, pf, pe.GetFace1());
-		RegisterIntersection(inter, pf, pe.GetFace2());
+		RegisterIntersection(inter, pe.GetFace1());
+		RegisterIntersection(inter, pe.GetFace2());
 	}
 
 	void Clear()
 	{
 		for (auto& slot : m_SlotsWithInters)
-			m_Interactions.Get(slot.Row, slot.Col).Reset();
+			m_InteractionPairs[slot].Reset();
 
 		m_SlotsWithInters.clear();
 	}
 
-	FaceFaceInteraction* GetUnUsedInteraction()
+	IntersectionPair* GetUnUsedPair()
 	{
 		for (auto& slot : m_SlotsWithInters)
 		{
-			auto& interac = m_Interactions.Get(slot.Row, slot.Col);
-			if (!interac.IsUsed())
-				return &interac;
+			auto& pair = m_InteractionPairs[slot];
+			if (!pair.IsUsed())
+				return &pair;
 		}
 		return nullptr;
 	}
 
-	auto& GetInteraction(const Face& faceA, const Face& faceB)
+	auto& GetIntersectionPair(const Face& face)
 	{
-		return m_Interactions.Get(faceA.GetHash(), faceB.GetHash());
+		return m_InteractionPairs[face.GetHash()];
 	}
 
 private:
-	DynamicTriangleArray<FaceFaceInteraction> m_Interactions;
-	std::vector<InteractionSlot> m_SlotsWithInters;
+	DynamicArray<IntersectionPair> m_InteractionPairs;
+	std::vector<int> m_SlotsWithInters;
 };
 
 class IntersectionLinker
 {
 private:
-	EdgeFaceIntersection GetNextIntPoint(const FaceFaceInteraction& prevR, const FaceFaceInteraction& currR) const
+	bool FindLoop(IntersectionLoop& loop, IntersectionPair& startPair)
 	{
-		return prevR.Contains(currR.GetInter1()) ? currR.GetInter2() : currR.GetInter1();
-	}
+		auto currPair = &startPair;
+		auto prevInter = startPair.GetInter1(); // Could be either.
 
-	FaceFaceInteraction& GetNextInteration(const FaceFaceInteraction& prevR, const FaceFaceInteraction& currR)
-	{
-		auto endIntPoint = GetNextIntPoint(prevR, currR);
-
-		auto& face1 = endIntPoint.GetFace();
-
-		auto& e = endIntPoint.GetEdge();
-		auto& oldFace = e.IsAttachedTo(currR.GetFace1()) ? currR.GetFace1() : currR.GetFace2();
-		auto& face2 = e.GetOther(oldFace);
-
-		return m_FaceFaceInteractions.GetInteraction(face1, face2);
-	}
-
-	FaceFaceInteraction& InitialPrevInteration(const FaceFaceInteraction& startR)
-	{
-		auto& i = startR.GetInter1();
-
-		auto& face1 = i.GetFace(); // The pierced face is in startR
-
-		auto& other = (&face1 == &startR.GetFace1()) ? startR.GetFace2() : startR.GetFace1(); // Now get the other face in startR
-		auto& face2 = i.GetEdge().GetOther(other);
-
-		return m_FaceFaceInteractions.GetInteraction(face1, face2);
-	}
-
-	bool FindLoop(IntersectionLoop& loop, FaceFaceInteraction& startR)
-	{
-		auto prevR = &InitialPrevInteration(startR);
-		auto currR = &startR;
-
-		while (!currR->IsUsed())
+		while (!currPair->IsUsed())
 		{
-			if (!currR->IsComplete())
-				return false;
+			auto& inter = currPair->GetOther(prevInter);
+			auto& nextFace = inter.GetEdge().GetOther(currPair->GetFace());
 
-			currR->MarkUsed();
-			loop.AddIntersection(GetNextIntPoint(*prevR, *currR));
+			currPair->MarkUsed();
+			loop.AddIntersection(inter);
 
-			auto temp = prevR;
-			prevR = currR;
-			currR = &GetNextInteration(*temp, *currR);
+			currPair = &m_InterPairs.GetIntersectionPair(nextFace);
+			prevInter = inter;
 		}
 
-		return &startR == currR;
+		return currPair == &startPair;
 	}
 
 public:
@@ -239,7 +203,7 @@ public:
 	{
 		m_IntersectionLoops->Reset();
 
-		auto start = m_FaceFaceInteractions.GetUnUsedInteraction();
+		auto start = m_InterPairs.GetUnUsedPair();
 		while (start)
 		{
 			auto& loop = m_IntersectionLoops->Recycle();
@@ -249,23 +213,23 @@ public:
 				return false;
 
 			loops.emplace_back(&loop);
-			start = m_FaceFaceInteractions.GetUnUsedInteraction();
+			start = m_InterPairs.GetUnUsedPair();
 		}
 		return true;
 	}
 
 	void RegisterIntersection(const EdgeFaceIntersection& inter)
 	{
-		m_FaceFaceInteractions.RegisterIntersection(inter);
+		m_InterPairs.RegisterIntersection(inter);
 	}
 
 	void Clear()
 	{
-		m_FaceFaceInteractions.Clear();
+		m_InterPairs.Clear();
 	}
 
 private:
-	MapToFaceFaceInteractions m_FaceFaceInteractions;
+	MapToIntersectionPairs m_InterPairs;
 	std::unique_ptr<PoolOfRecyclables<IntersectionLoop>> m_IntersectionLoops;
 };
 
@@ -294,9 +258,10 @@ private:
 		if (m_PointPlaneRelationshipMap.GetRelationship(p1) != m_PointPlaneRelationshipMap.GetRelationship(p0))
 		{
 			Vector3 intPoint;
-			assert(Vector3::LinePlaneIntersection(m_SplitterFace.GetPlaneP0(), m_SplitterFace.GetNormal(), p0.GetPoint(), p1.GetPoint(), intPoint));
+			assert(Vector3::LinePlaneIntersection(m_SplitPlane.GetP0(), m_SplitPlane.GetNormal(), p0.GetPoint(), p1.GetPoint(), intPoint));
 
-			m_Linker.RegisterIntersection(EdgeFaceIntersection(m_SplitterFace, piercingEdge, intPoint));
+			static Face nullFace;
+			m_Linker.RegisterIntersection(EdgeFaceIntersection(nullFace, piercingEdge, intPoint));
 			m_IntersectionCount++;
 		}
 	}
@@ -333,21 +298,14 @@ private:
 		Face::ResetNextHashCounter();
 		ShapePoint::ResetNextHashCounter();
 
-		m_SplitterFace.AssignHash();
 		AssignHashes(s.GetPointObjects());
 		AssignHashes(s.GetFaces());
 	}
 
 	void UnAssignHashes(const Shape& s)
 	{
-		m_SplitterFace.ResetHash();
 		UnAssignHashes(s.GetPointObjects());
 		UnAssignHashes(s.GetFaces());
-	}
-
-	void InitSplitterFace(const Plane& splitPlane)
-	{
-		assert(false);
 	}
 
 public:
@@ -357,6 +315,8 @@ public:
 
 	bool FindCleanIntersections(const Shape& shape, const Plane& splitPlane, std::vector<IntersectionLoop*>& loops)
 	{
+		m_SplitPlane = splitPlane;
+
 		AssignHashes(shape);
 
 		DeterminePointPlaneRelationships(shape.GetPointObjects(), splitPlane);
@@ -371,8 +331,8 @@ public:
 	}
 
 private:
-	Face m_SplitterFace;
 	IntersectionLinker m_Linker;
 	MapToPointPlaneRelationship m_PointPlaneRelationshipMap;
 	int m_IntersectionCount;
+	Plane m_SplitPlane;
 };
