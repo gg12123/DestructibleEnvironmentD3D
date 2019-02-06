@@ -31,7 +31,7 @@ private:
 	}
 
 	template<PointPlaneRelationship r>
-	Face& CreateFace(int dir, const IntersectionLoop& loop, const Vector3& normal, int planeId)
+	Face& CreateFace(int dir, const IntersectionLoop& loop, const Vector3& normal)
 	{
 		auto c = loop.GetCount();
 		auto& inters = loop.GetIntersections();
@@ -50,17 +50,17 @@ private:
 			newFace.AddPoint(p, m_NewEdges->GetNewEdge(p, pNext));
 		}
 
-		newFace.SetNormal(normal, planeId);
+		newFace.SetNormal(normal);
 		return newFace;
 	}
 
 public:
-	void Create(const IntersectionLoop& loop, const Plane& splitPlane, std::vector<Face*>& newFacesAbove, std::vector<Face*>& newFacesBelow, int planeId)
+	void Create(const IntersectionLoop& loop, const Plane& splitPlane, std::vector<Face*>& newFacesAbove, std::vector<Face*>& newFacesBelow)
 	{
 		auto aboveDir = DirForFaceAbove(splitPlane, loop);
 		
-		newFacesAbove.emplace_back(&CreateFace<PointPlaneRelationship::PointsAbove>(aboveDir, loop, -splitPlane.GetNormal(), planeId));
-		newFacesBelow.emplace_back(&CreateFace<PointPlaneRelationship::PointsBelow>(-aboveDir, loop, splitPlane.GetNormal(), planeId));
+		newFacesAbove.emplace_back(&CreateFace<PointPlaneRelationship::PointsAbove>(aboveDir, loop, -splitPlane.GetNormal()));
+		newFacesBelow.emplace_back(&CreateFace<PointPlaneRelationship::PointsBelow>(-aboveDir, loop, splitPlane.GetNormal()));
 	}
 
 private:

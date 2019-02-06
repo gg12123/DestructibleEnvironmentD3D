@@ -2,9 +2,6 @@
 #include <vector>
 #include <memory>
 #include "Vector3.h"
-#include "FacesCutPaths.h"
-#include "FacesPointsIterator.h"
-#include "ShapeEdgesCreator.h"
 #include "ShapeElementPool.h"
 #include "NewShapeGeometryCreator.h"
 
@@ -39,11 +36,11 @@ private:
 
 			if (pRel == PointPlaneRelationship::PointsAbove)
 			{
-				m_PointsAbove.emplace_back((p, i));
+				m_PointsAbove.emplace_back(PointWithIndex(p, i));
 			}
 			else
 			{
-				m_PointsBelow.emplace_back((p, i));
+				m_PointsBelow.emplace_back(PointWithIndex(p, i));
 			}
 
 			if (pNextRel != pRel)
@@ -75,7 +72,7 @@ private:
 			newFace.AddPoint(*p.Point, e);
 		}
 
-		newFace.SetNormal(orignal.GetNormal(), orignal.GetPlaneId());
+		newFace.SetNormal(orignal.GetNormal());
 		return newFace;
 	}
 

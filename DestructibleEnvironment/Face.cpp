@@ -39,6 +39,8 @@ void Face::InitFaceCoOrdinateSystem()
 
 void Face::OnSplittingFinished(Shape& owner)
 {
+	CalculateNormalFromPoints();
+
 	m_OwnerShape = &owner;
 
 	m_CachedPoints.clear();
@@ -92,12 +94,8 @@ void Face::ReplacePointObjects(const ShapePoint& oldP0, const ShapePoint& oldP1,
 	}
 }
 
-void Face::CalculateNormalFromPoints(int planeId)
+void Face::CalculateNormalFromPoints()
 {
-	assert(planeId >= 0);
-
-	m_PlaneId = planeId;
-
 	auto& p0 = m_PointObjects[0]->GetPoint();
 	auto& p1 = m_PointObjects[1]->GetPoint();
 	auto& p2 = m_PointObjects[2]->GetPoint();

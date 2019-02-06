@@ -6,7 +6,7 @@ template<class Tshape>
 class ShapeSubDivider
 {
 public:
-	void DivideShape(int numDivisions, std::vector<Tshape*>& newShapes, const Tshape& original)
+	void DivideShape(int numDivisions, std::vector<Tshape*>& newShapes, Tshape& original)
 	{
 		m_ShapesToDivide.clear();
 		newShapes.clear();

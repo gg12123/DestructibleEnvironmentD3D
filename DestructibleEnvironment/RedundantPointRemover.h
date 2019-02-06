@@ -3,11 +3,8 @@
 #include "Face.h"
 #include "ShapeEdge.h"
 #include "IterationAboutShape.h"
-#include "CutPathElement.h"
-#include "ShapeEdgesCreator.h"
 #include "ShapeElementPool.h"
 #include "CollectionU.h"
-#include "MapToShapePointOnReversedFace.h"
 #include "NewShapeGeometryCreator.h"
 
 class RedundantPointRemover

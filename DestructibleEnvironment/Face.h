@@ -102,18 +102,9 @@ public:
 
 	void AddPoint(ShapePoint& point, ShapeEdge& edgeToNext);
 
-	void SetNormal(const Vector3& normal, int planeId)
+	void SetNormal(const Vector3& n)
 	{
-		assert(planeId >= 0);
-		m_Normal = normal;
-		m_PlaneId = planeId;
-	}
-
-	void CalculateNormalFromPoints(int planeId);
-
-	auto GetPlaneId() const
-	{
-		return m_PlaneId;
+		m_Normal = n;
 	}
 
 	auto GetNormal() const
@@ -199,6 +190,8 @@ public:
 	void InitFaceCoOrdinateSystem();
 
 private:
+	void CalculateNormalFromPoints();
+
 	void InitFaceCoOrdinateSystem(const Vector3& origin)
 	{
 		m_FaceSpace.Init(m_Normal, origin);
@@ -213,7 +206,6 @@ private:
 	Polygon2 m_FacePoly;
 
 	Vector3 m_Normal;
-	int m_PlaneId;
 
 	FaceCoOrdinateSystem m_FaceSpace;
 };

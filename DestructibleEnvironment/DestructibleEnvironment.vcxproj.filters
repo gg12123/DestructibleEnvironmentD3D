@@ -163,9 +163,6 @@
     <ClCompile Include="ShapePoint.cpp">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClCompile>
-    <ClCompile Include="SplitShapeEdge.cpp">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClCompile>
     <ClCompile Include="Vector2.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
@@ -330,9 +327,6 @@
     <ClInclude Include="Polygon2.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="FaceRelationshipWithOtherShape.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
     <ClInclude Include="ShapeSplitter.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
@@ -342,43 +336,13 @@
     <ClInclude Include="FaceIterator.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
-    <ClInclude Include="CutShapeCreator.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
     <ClInclude Include="CubeFacesCreator.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="ShapePoint.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
-    <ClInclude Include="CutPathElement.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="FacesCutPath.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="FacesCutPathIterator.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="SplitShapeEdge.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="FacesOriginalPointsIterator.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="FacesPointsIterator.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="MapToFacesCutPath.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="MapToShapePointOnReversedFace.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
     <ClInclude Include="MapToNewEdges.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="CutPathCreator.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="EdgeFaceIntersection.h">
@@ -387,29 +351,11 @@
     <ClInclude Include="ObjectWithHash.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="FacesCutPaths.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="ShapeEdgesCreator.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
     <ClInclude Include="MapToFaceRelationship.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="ReversedGeometryCreator.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="IntersectionEquivalenceChecker.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="CutPathIntersectionsHandler.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="UpdatableBound.h">
       <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="FaceOrderingComparator.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="CollectionU.h">
       <Filter>Utils</Filter>
@@ -418,9 +364,6 @@
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="SmallEdgeRemover.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="EdgeEdgeRelationship.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="MapToPointPlaneRelationship.h">
@@ -481,9 +424,6 @@
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="FaceTriangulator.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="PiercedOnlyFaceHandler.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="Plane.h">

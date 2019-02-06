@@ -74,7 +74,7 @@ private:
 	}
 
 	template<int numPoints>
-	Face& CreateFace(const std::array<int, numPoints>& pointIndexes, const Vector3& normal, int planeId)
+	Face& CreateFace(const std::array<int, numPoints>& pointIndexes, const Vector3& normal)
 	{
 		auto& f = FacePool::Take();
 
@@ -85,42 +85,34 @@ private:
 
 			f.AddPoint(*m_Points[j], EdgeToNext(j, k));
 		}
-		f.SetNormal(normal, planeId);
+		f.SetNormal(normal);
 
 		return f;
 	}
 
-	void CreateFaces(Shape& shape, const Quaternion& q, int firstPlaneId)
+	void CreateFaces(Shape& shape, const Quaternion& q)
 	{
 		auto upRot = q.RotateV(Vector3::Up());
 		auto rightRot = q.RotateV(Vector3::Right());
 		auto forwardRot = q.RotateV(Vector3::Foward());
 
-		auto planeId = firstPlaneId;
+		shape.AddFace(CreateFace(m_Face0, upRot));
+		shape.AddFace(CreateFace(m_Face1, upRot));
 
-		shape.AddFace(CreateFace(m_Face0, upRot, planeId));
-		shape.AddFace(CreateFace(m_Face1, upRot, planeId));
-		planeId++;
+		shape.AddFace(CreateFace(m_Face2, rightRot));
+		shape.AddFace(CreateFace(m_Face3, rightRot));
 
-		shape.AddFace(CreateFace(m_Face2, rightRot, planeId));
-		shape.AddFace(CreateFace(m_Face3, rightRot, planeId));
-		planeId++;
+		shape.AddFace(CreateFace(m_Face4, -forwardRot));
+		shape.AddFace(CreateFace(m_Face5, -forwardRot));
 
-		shape.AddFace(CreateFace(m_Face4, -forwardRot, planeId));
-		shape.AddFace(CreateFace(m_Face5, -forwardRot, planeId));
-		planeId++;
+		shape.AddFace(CreateFace(m_Face6, -rightRot));
+		shape.AddFace(CreateFace(m_Face7, -rightRot));
 
-		shape.AddFace(CreateFace(m_Face6, -rightRot, planeId));
-		shape.AddFace(CreateFace(m_Face7, -rightRot, planeId));
-		planeId++;
+		shape.AddFace(CreateFace(m_Face8, forwardRot));
+		shape.AddFace(CreateFace(m_Face9, forwardRot));
 
-		shape.AddFace(CreateFace(m_Face8, forwardRot, planeId));
-		shape.AddFace(CreateFace(m_Face9, forwardRot, planeId));
-		planeId++;
-
-		shape.AddFace(CreateFace(m_Face10, -upRot, planeId));
-		shape.AddFace(CreateFace(m_Face11, -upRot, planeId));
-		planeId++;
+		shape.AddFace(CreateFace(m_Face10, -upRot));
+		shape.AddFace(CreateFace(m_Face11, -upRot));
 	}
 
 public:
@@ -145,11 +137,11 @@ public:
 		m_Face11 = { 6, 7, 4 };
 	}
 
-	void CreateFaces(Shape& shape, const Matrix4& M, const Quaternion& MsRot, int firstPlaneId)
+	void CreateFaces(Shape& shape, const Matrix4& M, const Quaternion& MsRot)
 	{
 		CreatePoints(M);
 		CreateEdges();
-		CreateFaces(shape, MsRot, firstPlaneId);
+		CreateFaces(shape, MsRot);
 	}
 
 private:

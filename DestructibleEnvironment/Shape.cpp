@@ -67,13 +67,11 @@ void Shape::TryCollectEdge(ShapeEdge& e)
 	}
 }
 
-void Shape::RemoveSmallEdges(int nextPlaneId)
+void Shape::RemoveSmallEdges()
 {
 	static SmallEdgeRemover edgeRemover;
 	static constexpr float minEdgeLength = 0.001f;
 	static constexpr float minEdgeLengthSqr = minEdgeLength * minEdgeLength;
-
-	auto planeId = nextPlaneId;
 
 	for (auto itFace = m_Faces.begin(); itFace != m_Faces.end();	)
 	{
@@ -89,7 +87,7 @@ void Shape::RemoveSmallEdges(int nextPlaneId)
 				auto f1 = *itFace;
 				auto f2 = &e.GetOther(*f1);
 
-				planeId = edgeRemover.RemoveEdge(e, planeId);
+				edgeRemover.RemoveEdge(e);
 
 				itFace = m_Faces.erase(itFace);
 

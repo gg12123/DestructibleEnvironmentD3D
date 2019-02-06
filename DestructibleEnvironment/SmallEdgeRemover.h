@@ -27,7 +27,7 @@ private:
 	}
 
 public:
-	int RemoveEdge(ShapeEdge& toRemove, int nextPlaneId)
+	void RemoveEdge(ShapeEdge& toRemove)
 	{
 		m_EdgesAboutPoint0.clear();
 		m_EdgesAboutPoint1.clear();
@@ -58,7 +58,6 @@ public:
 		CollapseFace(toRemove.GetFace2(), toRemove);
 
 		// Make the faces grab the new point and re-calculate normals
-		auto planeId = nextPlaneId;
 		for (auto it = m_FacesAboutPoints.begin(); it != m_FacesAboutPoints.end(); it++)
 		{
 			auto f = *it;
@@ -66,15 +65,11 @@ public:
 			if (f != removedFace1 && f != removedFace2)
 			{
 				f->ReplacePointObjects(p0, p1, newPoint);
-				f->CalculateNormalFromPoints(planeId);
-				planeId++;
 			}
 		}
 
 		PointPool::Return(p0);
 		PointPool::Return(p1);
-
-		return planeId;
 	}
 
 private:

@@ -8,16 +8,16 @@ template<class Tshape>
 class FaceIterator
 {
 private:
-	bool FaceIsVisited(const Face& f) const
+	bool FaceIsVisited(Face& f)
 	{
-		// TODO - using the hash like this is not very safe.
-		return f.HashIsAssigned();
+		f.TryAssignHash();
+		return m_Visited[f.GetHash()];
 	}
 
 	void Visit(Face& f)
 	{
-		assert(!FaceIsVisited(f))
-		f.AssignHash();
+		assert(!FaceIsVisited(f));
+		m_Visited[f.GetHash()] = true;
 	}
 
 	Tshape & GetNextShapeToUse()
@@ -82,6 +82,8 @@ public:
 
 	void CreateShapes(const std::vector<Face*>& faces, std::vector<Tshape*>& newShapes)
 	{
+		m_Visited.Zero();
+
 		auto root = FindNextRootFace(faces);
 
 		while (root)
@@ -94,4 +96,5 @@ public:
 private:
 	Tshape * m_ShapeToUseNext = nullptr;
 	std::stack<Face*> m_FaceStack;
+	DynamicArray<int> m_Visited;
 };

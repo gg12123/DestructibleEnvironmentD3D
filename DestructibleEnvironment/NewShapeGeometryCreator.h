@@ -16,6 +16,10 @@ private:
 		PointPair(ShapePoint& a, ShapePoint& b) : Above(&a), Below(&b)
 		{
 		}
+
+		PointPair() : Above(nullptr), Below(nullptr)
+		{
+		}
 	};
 
 public:
@@ -104,7 +108,7 @@ private:
 	}
 
 public:
-	void Init(MapToPointPlaneRelationship& pointPlaneMap)
+	void Init(const MapToPointPlaneRelationship& pointPlaneMap)
 	{
 		m_MapToPointPlane = &pointPlaneMap;
 	}
@@ -120,6 +124,11 @@ public:
 		return m_MapToEdges;
 	}
 
+	auto& GetNewEdgeMap()
+	{
+		return m_MapToEdges;
+	}
+
 	const auto& GetNewPointMap() const
 	{
 		return m_MapToPoints;
@@ -128,5 +137,5 @@ public:
 private:
 	MapToNewEdges m_MapToEdges;
 	MapToNewPoints m_MapToPoints;
-	MapToPointPlaneRelationship* m_MapToPointPlane;
+	const MapToPointPlaneRelationship* m_MapToPointPlane;
 };

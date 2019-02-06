@@ -5,7 +5,6 @@
 #include "Shape.h"
 #include "ShapePoint.h"
 #include "ShapeEdge.h"
-#include "EdgeEdgeRelationship.h"
 #include "EdgeFaceIntersection.h"
 #include "Constants.h"
 #include "CollectionU.h"
@@ -246,6 +245,7 @@ private:
 			auto comp = Vector3::Dot((p->GetPoint() - planeP0), planeN);
 			auto r = comp >= 0.0f ? PointPlaneRelationship::PointsAbove : PointPlaneRelationship::PointsBelow;
 
+			p->TryAssignHash();
 			m_PointPlaneRelationshipMap.SetRelationship(*p, r);
 		}
 	}
@@ -279,35 +279,6 @@ private:
 		return m_Linker.FindLoops(loops);
 	}
 
-	template<class T>
-	void AssignHashes(const std::vector<T*>& objs)
-	{
-		for (auto o : objs)
-			o->AssignHash();
-	}
-
-	template<class T>
-	void UnAssignHashes(const std::vector<T*>& objs)
-	{
-		for (auto o : objs)
-			o->ResetHash();
-	}
-
-	void AssignHashes(const Shape& s)
-	{
-		Face::ResetNextHashCounter();
-		ShapePoint::ResetNextHashCounter();
-
-		AssignHashes(s.GetPointObjects());
-		AssignHashes(s.GetFaces());
-	}
-
-	void UnAssignHashes(const Shape& s)
-	{
-		UnAssignHashes(s.GetPointObjects());
-		UnAssignHashes(s.GetFaces());
-	}
-
 public:
 	CleanIntersectionFinder()
 	{
@@ -317,17 +288,18 @@ public:
 	{
 		m_SplitPlane = splitPlane;
 
-		AssignHashes(shape);
-
 		DeterminePointPlaneRelationships(shape.GetPointObjects(), splitPlane);
 		FindIntersections(shape.GetEdgeObjects());
 
 		auto valid = m_IntersectionCount > 0 ? LinkIntersections(loops) : false;
 		m_Linker.Clear();
 
-		UnAssignHashes(shape);
-
 		return valid;
+	}
+
+	const auto& GetPointPlaneMap() const
+	{
+		return m_PointPlaneRelationshipMap;
 	}
 
 private:

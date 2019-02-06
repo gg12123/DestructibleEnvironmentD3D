@@ -9,7 +9,6 @@
 #include "Polygon2.h"
 #include "CollectionU.h"
 #include "ShapeElementPool.h"
-#include "ShapeEdgesCreator.h"
 
 template<class T>
 class Triangulator
@@ -144,6 +143,16 @@ private:
 		return m_OriginalFace->GetEdgeObjects();
 	}
 
+	ShapeEdge* FindMidFaceEdge(const ShapePoint& p0, const ShapePoint& p1) const
+	{
+		for (auto e : m_MidFaceEdges)
+		{
+			if (e->IsAttachedTo(p0) && e->IsAttachedTo(p1))
+				return e;
+		}
+		return nullptr;
+	}
+
 	ShapeEdge& GetEdgeBetween(int i0, int i1)
 	{
 		auto& points = OriginalPoints();
@@ -158,10 +167,14 @@ private:
 		auto& p0 = *points[i0];
 		auto& p1 = *points[i1];
 
-		if (!m_NewEdges->EdgeExistsBetween(p0, p1))
-			m_NewEdges->CreateEdge(p0, p1);
+		auto midEdge = FindMidFaceEdge(p0, p1);
+		if (!midEdge)
+		{
+			midEdge = &EdgePool::Take(p0, p1);
+			m_MidFaceEdges.emplace_back(midEdge);
+		}
 
-		return m_NewEdges->GetMapToNewEdges().GetNewEdge(p0, p1);
+		return *midEdge;
 	}
 
 	Face& CreateFace(int i0, int i1, int i2)
@@ -173,19 +186,16 @@ private:
 		f.AddPoint(*points[i1], GetEdgeBetween(i1, i2));
 		f.AddPoint(*points[i2], GetEdgeBetween(i2, i0));
 
-		f.SetNormal(m_OriginalFace->GetNormal(), m_OriginalFace->GetPlaneId());
+		f.SetNormal(m_OriginalFace->GetNormal());
 
 		return f;
 	}
 
 public:
-	void Init(ShapeEdgesCreator& edges)
-	{
-		m_NewEdges = &edges;
-	}
-
 	void Triangulate(const Face& originalFace, std::vector<Face*>& triangleFaces)
 	{
+		m_MidFaceEdges.clear();
+
 		m_OriginalFace = &originalFace;
 		m_TriangleFaces = &triangleFaces;
 
@@ -205,10 +215,9 @@ public:
 	}
 
 private:
-	ShapeEdgesCreator * m_NewEdges = nullptr;
-
 	std::vector<Face*>* m_TriangleFaces;
 	Triangulator<FaceTriangulator> m_Triangulator;
+	std::vector<ShapeEdge*> m_MidFaceEdges;
 
 	const Face* m_OriginalFace = nullptr;
 };
