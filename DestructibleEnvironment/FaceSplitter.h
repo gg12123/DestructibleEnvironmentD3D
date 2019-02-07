@@ -64,7 +64,7 @@ private:
 
 			auto& e = p.Index == -1 || pNext.Index == -1 ?
 				m_NewEdges->GetNewEdge(*p.Point, *pNext.Point) :
-				*edges[i];
+				*edges[p.Index];
 
 			if (e.IsAttachedTo(orignal))
 				e.DeRegisterFace(orignal);

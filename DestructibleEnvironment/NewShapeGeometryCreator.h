@@ -67,7 +67,7 @@ private:
 		auto& edgeBelow = EdgePool::Take(m_MapToPoints.GetPointBelow(e1), m_MapToPoints.GetPointBelow(e2));
 
 		m_MapToEdges.AddNewEdge(edgeAbove);
-		m_MapToEdges.AddNewEdge(edgeAbove);
+		m_MapToEdges.AddNewEdge(edgeBelow);
 	}
 
 	void CreateEdgesAlongSplitEdge(const EdgeFaceIntersection& inter)
@@ -83,7 +83,7 @@ private:
 		auto& edgeBelow = EdgePool::Take(existingBelow, m_MapToPoints.GetPointBelow(se));
 
 		m_MapToEdges.AddNewEdge(edgeAbove);
-		m_MapToEdges.AddNewEdge(edgeAbove);
+		m_MapToEdges.AddNewEdge(edgeBelow);
 	}
 
 	void CreateNewPoints(const IntersectionLoop& loop)

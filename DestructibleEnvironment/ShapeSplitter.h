@@ -78,6 +78,8 @@ private:
 
 	void CreateInPlaneFaces(const Plane& sp)
 	{
+		m_InPlaneFaceCreator.Init(m_NewGeometryCreator.GetNewPointMap(), m_NewGeometryCreator.GetNewEdgeMap());
+
 		for (auto l : m_Intersections)
 			m_InPlaneFaceCreator.Create(*l, sp, m_NewAboveFaces, m_NewBelowFaces);
 	}
@@ -99,6 +101,18 @@ private:
 		c *= Random::Range(0.0f, 1.0f) > 0.5f ? -1.0f : 1.0f;
 
 		return Plane(Vector3(a, b, c).Normalized(), splitPointLocal);
+	}
+
+	void ReturnStuffToPool()
+	{
+		for (auto l : m_Intersections)
+		{
+			for (auto i = 0; i < l->GetCount(); i++)
+			{
+				FacePool::Return(l->GetFaceEntered(i));
+				EdgePool::Return(l->GetPiercingEdge(i));
+			}
+		}
 	}
 
 public:
@@ -124,6 +138,7 @@ public:
 		TriangulateShapesFaces(newShapes);
 		InitNewShapes(originalShape, newShapes); // This will reset hashes on all shape elements
 
+		ReturnStuffToPool();
 		return true;
 	}
 

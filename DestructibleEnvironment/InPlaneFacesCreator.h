@@ -27,7 +27,7 @@ private:
 			crossSum += Vector3::Dot(n, Vector3::Cross(d0, d1));
 		}
 
-		return crossSum > 0.0f ? 1 : -1;
+		return crossSum > 0.0f ? -1 : 1;
 	}
 
 	template<PointPlaneRelationship r>
@@ -55,6 +55,12 @@ private:
 	}
 
 public:
+	void Init(const MapToNewPoints& newPoint, const MapToNewEdges& newEdges)
+	{
+		m_NewPoints = &newPoint;
+		m_NewEdges = &newEdges;
+	}
+
 	void Create(const IntersectionLoop& loop, const Plane& splitPlane, std::vector<Face*>& newFacesAbove, std::vector<Face*>& newFacesBelow)
 	{
 		auto aboveDir = DirForFaceAbove(splitPlane, loop);
