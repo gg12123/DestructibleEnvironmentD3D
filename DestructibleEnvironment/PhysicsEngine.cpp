@@ -15,18 +15,29 @@ void PhysicsEngine::Run()
 
 	while (m_Running)
 	{
-		while (m_SafeToSync)
-		{
-			// Collision detection will be expensive so execution shouln't be here for long.
-		}
+		//while (m_SafeToSync)
+		//{
+		//	// Collision detection will be expensive so execution shouln't be here for long.
+		//}
+		//
+		//m_Time.WaitForNextUpdateTime();
+		//
+		//UpdateBodies();
+		//
+		//m_SafeToSync = true;
+		//
+		//DoCollisionDetectionResponse();
 
-		m_Time.WaitForNextUpdateTime();
+		ApplyExternalForces();
+
+		m_SafeToSync = true;
+		DoCollisionDetectionResponse();
+		while (m_SafeToSync)
+			;
 
 		UpdateBodies();
 
-		m_SafeToSync = true;
-
-		DoCollisionDetectionResponse();
+		m_Time.WaitForNextUpdateTime();
 	}
 }
 
@@ -40,6 +51,12 @@ RayCastHit<Shape> PhysicsEngine::RayCast(const Ray& r) const
 	cast.Update(m_StaticBodies);
 
 	return cast.ToRayCastHit();
+}
+
+void PhysicsEngine::ApplyExternalForces() const
+{
+	for (auto& b : m_DynamicBodies)
+		b->ApplyExternalForces();
 }
 
 void PhysicsEngine::DoCollisionDetectionResponse(PhysicsObject& body1, PhysicsObject& body2)
@@ -77,7 +94,7 @@ void PhysicsEngine::UpdateBodies()
 	{
 		auto& b = **it;
 
-		b.Update(m_Splits);
+		b.UpdatePosition(m_Splits);
 
 		// Must fully re-calculate the transform so that it doesnt re-calculate during collision
 		// detection whilst it may be getting accsesed from the game thread.

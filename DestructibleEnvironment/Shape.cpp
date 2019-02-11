@@ -67,45 +67,6 @@ void Shape::TryCollectEdge(ShapeEdge& e)
 	}
 }
 
-void Shape::RemoveSmallEdges()
-{
-	static SmallEdgeRemover edgeRemover;
-	static constexpr float minEdgeLength = 0.001f;
-	static constexpr float minEdgeLengthSqr = minEdgeLength * minEdgeLength;
-
-	for (auto itFace = m_Faces.begin(); itFace != m_Faces.end();	)
-	{
-		auto& edges = (*itFace)->GetEdgeObjects();
-		auto removed = false;
-
-		for (auto itEdge = edges.begin(); itEdge != edges.end(); itEdge++)
-		{
-			auto& e = **itEdge;
-
-			if ((e.GetP0().GetPoint() - e.GetP1().GetPoint()).MagnitudeSqr() <= minEdgeLengthSqr)
-			{
-				auto f1 = *itFace;
-				auto f2 = &e.GetOther(*f1);
-
-				edgeRemover.RemoveEdge(e);
-
-				itFace = m_Faces.erase(itFace);
-
-				if (*itFace == f2)
-					itFace = m_Faces.erase(itFace);
-				else
-					m_Faces.erase(std::find(itFace, m_Faces.end(), f2));
-
-				removed = true;
-				break;
-			}
-		}
-
-		if (!removed)
-			itFace++;
-	}
-}
-
 void Shape::CollectPointsAndEdges()
 {
 	m_EdgeObjects.clear();
@@ -163,29 +124,4 @@ void Shape::InitFacesPointsEdges()
 {
 	for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
 		(*it)->OnSplittingFinished(*this); // The face will init its points and edges
-}
-
-void Shape::TriangulateFaces(FaceTriangulator& triangulator)
-{
-	std::vector<Face*> triangles;
-	triangles.reserve(m_Faces.size());
-
-	for (auto f : m_Faces)
-	{
-		auto pointCount = f->GetPointObjects().size();
-		if (pointCount == 3u)
-		{
-			triangles.emplace_back(f);
-		}
-		else
-		{
-			if (pointCount > 3u)
-			{
-				f->InitFaceCoOrdinateSystem();
-				triangulator.Triangulate(*f, triangles);
-			}
-			FacePool::Return(*f);
-		}
-	}
-	m_Faces = std::move(triangles);
 }

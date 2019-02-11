@@ -73,6 +73,7 @@ private:
 	void UpdateBodies();
 	void ExecuteGameToPhysicsActions();
 	void ProcessSplits();
+	void ApplyExternalForces() const;
 
 	std::atomic<bool> m_Running = true;
 	std::atomic<bool> m_SafeToSync = false;

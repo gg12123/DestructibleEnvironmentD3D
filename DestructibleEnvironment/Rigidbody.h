@@ -20,9 +20,8 @@ public:
 		m_AdditionalImpulses.emplace_back(impulse);
 	}
 
-	void AddToRequiredToSeperate(const Vector3& toSep) override
+	void AddContact(const ContactManifold& contact) override
 	{
-		m_ToSeperate += toSep;
 	}
 
 	const Vector3& GetVelocityWorld() const
@@ -50,7 +49,7 @@ public:
 		return m_VelocityWorld + Vector3::Cross(m_AngularVelocityWorld, worldPoint - GetTransform().GetPosition());
 	}
 
-	void Update(std::vector<SplitInfo>& splits);
+	void UpdatePosition(std::vector<SplitInfo>& splits);
 
 	void CopyVelocity(const Rigidbody& toCopy)
 	{
@@ -87,25 +86,25 @@ public:
 		m_AngularDrag = angDrag;
 	}
 
+	void ApplyExternalForces();
+
 private:
 	void TransferAdditionalImpulses()
 	{
-		for (auto& i : m_AdditionalImpulses)
-			m_Impulses.emplace_back(i);
-
+		m_Impulses.insert(m_Impulses.end(), m_AdditionalImpulses.begin(), m_AdditionalImpulses.end());
 		m_AdditionalImpulses.clear();
 	}
 
 	void UpdateTransform();
+	void RewindIfPenetrating();
+	void SatisfyContactConstraints();
 	void ApplyImpulses(std::vector<SplitInfo>& splits);
-	void CalculateForces();
-	void Integrate();
-	void ApplyNormalForces();
 	void ApplyImpulse(const Impulse& impulse);
 	void CalculateInertia();
 
 	std::vector<Impulse> m_Impulses;
 	std::vector<Impulse> m_AdditionalImpulses;
+	std::vector<ContactManifold> m_Contacts;
 
 	Vector3 m_VelocityWorld;
 	Vector3 m_AngularVelocityWorld;

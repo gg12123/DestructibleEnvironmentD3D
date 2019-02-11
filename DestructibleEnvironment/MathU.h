@@ -61,4 +61,9 @@ public:
 	{
 		return fabs(val);
 	}
+
+	static inline float Clamp(float val)
+	{
+		assert(false);
+	}
 };

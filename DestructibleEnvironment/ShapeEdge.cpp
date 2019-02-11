@@ -7,7 +7,8 @@
 
 bool ShapeEdge::BridgesCoPlanarFaces() const
 {
-	return Vector3::Dot(m_Face1->GetNormal(), m_Face2->GetNormal()) > 0.99f;
+	assert(false);
+	return false;
 }
 
 ShapePoint& ShapeEdge::GetStart(const Face& requester) const

@@ -107,7 +107,6 @@ public:
 
 	void OnAllFacesAdded(Transform& refTran) // faces are in the ref transforms local space
 	{
-		RemoveSmallEdges(); // May also need to remove faces that have long edges but small area.
 		CollectPointsAndEdges();
 
 		auto c = CalculateCentre();
@@ -144,8 +143,6 @@ public:
 		return *m_Proxy;
 	}
 
-	void TriangulateFaces(FaceTriangulator& triangulator);
-
 private:
 	void SetDirty()
 	{
@@ -155,7 +152,6 @@ private:
 	Vector3 CalculateCentre();
 	void ReCentre(const Vector3& centre);
 	void CollectPointsAndEdges();
-	void RemoveSmallEdges();
 	void TryCollectPoint(ShapePoint& p);
 	void TryCollectEdge(ShapeEdge& p);
 	void InitFacesPointsEdges();

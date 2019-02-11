@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Rigidbody.h"
 #include "PhysicsTime.h"
+#include "MathU.h"
 
 void Rigidbody::CalculateInertia()
 {
@@ -111,7 +112,7 @@ void Rigidbody::ApplyImpulse(const Impulse& impulse)
 	m_AngularVelocityWorld += (GetInertiaInverseWorld() * Vector3::Cross(r, J));
 }
 
-void Rigidbody::CalculateForces()
+void Rigidbody::ApplyExternalForces()
 {
 	static constexpr float g = 9.8f;
 
@@ -119,26 +120,42 @@ void Rigidbody::CalculateForces()
 	m_AddedForceWorld -= m_Drag * m_VelocityWorld;
 
 	m_AddedMomentsWorld -= m_AngularDrag * m_AngularVelocityWorld;
-}
 
-void  Rigidbody::Integrate()
-{
 	m_VelocityWorld += (m_AddedForceWorld / GetMass()) * PhysicsTime::FixedDeltaTime;
 	m_AngularVelocityWorld += (GetInertiaInverseWorld() * m_AddedMomentsWorld) * PhysicsTime::FixedDeltaTime;
-}
-
-void Rigidbody::ApplyNormalForces()
-{
-	CalculateForces();
-	Integrate();
 
 	m_AddedForceWorld = Vector3::Zero();
 	m_AddedMomentsWorld = Vector3::Zero();
 }
 
-void Rigidbody::Update(std::vector<SplitInfo>& splits)
+void Rigidbody::UpdatePosition(std::vector<SplitInfo>& splits)
 {
-	ApplyNormalForces();
 	ApplyImpulses(splits);
+	SatisfyContactConstraints();
 	UpdateTransform();
+	RewindIfPenetrating();
+}
+
+void Rigidbody::SatisfyContactConstraints()
+{
+	for (auto& c : m_Contacts)
+	{
+		auto n = c.GetWorldNormal();
+		auto p = c.GetWorldPoint();
+
+		if (Vector3::Dot(WorldVelocityAt(p), n) < 0.0f)
+		{
+			m_VelocityWorld -= MathU::Min(0.0f, Vector3::Dot(m_VelocityWorld, n)) * n;
+
+			if (Vector3::Dot(WorldVelocityAt(p), n) < 0.0f)
+				m_AngularVelocityWorld = Vector3::Zero();
+		}
+	}
+
+	m_Contacts.clear();
+}
+
+void Rigidbody::RewindIfPenetrating()
+{
+	// TODO
 }

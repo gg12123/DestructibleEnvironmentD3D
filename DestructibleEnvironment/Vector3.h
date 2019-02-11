@@ -91,12 +91,11 @@ public:
 	static inline Vector3 ProjectOnPlane(const Vector3& planeNormal, const Vector3& vector);
 	static inline bool LinePlaneIntersection(const Vector3& planeP0, const Vector3& planeNormal, const Vector3& lineP0, const Vector3& lineP1, Vector3& intPoint);
 	static inline bool FindLineDefinedByTwoPlanes(const Vector3& planeP0, const Vector3& planeN0, const Vector3& planeP1, const Vector3& planeN1, Vector3& lineP0, Vector3& lineDir);
-	//static inline Vector3 PointClosestToOtherLine(const Vector3& lineP0, const Vector3& lineDir, const Vector3& otherLineP0, const Vector3& otherLineDir);
-	static inline Vector3 Zero();
 	static inline Vector3 Normalize(const Vector3& v);
-	static inline Vector3 Right();
-	static inline Vector3 Up();
-	static inline Vector3 Foward();
+	static inline constexpr Vector3 Zero();	
+	static inline constexpr Vector3 Right();
+	static inline constexpr Vector3 Up();
+	static inline constexpr Vector3 Foward();
 	static  Vector3 OrthogonalDirection(const Vector3& v);
 };
 
@@ -163,11 +162,6 @@ inline bool Vector3::LinePlaneIntersection(const Vector3& planeP0, const Vector3
 	return true;
 }
 
-inline Vector3 Vector3::Zero()
-{
-	return Vector3(0.0f, 0.0f, 0.0f);
-}
-
 inline Vector3 Vector3::Normalize(const Vector3& v)
 {
 	auto res = v;
@@ -175,17 +169,22 @@ inline Vector3 Vector3::Normalize(const Vector3& v)
 	return (mag > 0.0f ? res / mag : Vector3::Zero());
 }
 
-inline Vector3 Vector3::Right()
+inline constexpr Vector3 Vector3::Zero()
+{
+	return Vector3(0.0f, 0.0f, 0.0f);
+}
+
+inline constexpr Vector3 Vector3::Right()
 {
 	return Vector3(1.0f, 0.0f, 0.0f);
 }
 
-inline Vector3 Vector3::Up()
+inline constexpr Vector3 Vector3::Up()
 {
 	return Vector3(0.0f, 1.0f, 0.0f);
 }
 
-inline Vector3 Vector3::Foward()
+inline constexpr Vector3 Vector3::Foward()
 {
 	return Vector3(0.0f, 0.0f, 1.0f);
 }

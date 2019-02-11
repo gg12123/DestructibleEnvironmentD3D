@@ -32,6 +32,11 @@ private:
 		m_FaceIterator.CreateShapes(m_NewBelowFaces, newShapes);
 	}
 
+	void CleanGeometry(const std::vector<Tshape*>& newShapes) const
+	{
+		// TODO
+	}
+
 	void InitNewShapes(Shape& original, const std::vector<Tshape*>& newShapes)
 	{
 		// Must copy the transform.
@@ -57,14 +62,6 @@ private:
 			m_NewGeometryCreator.CreateGeometry(*l);
 	}
 
-	void RemoveRedundantPoints()
-	{
-		m_RedundantPointsRemover.Init(m_NewGeometryCreator.GetNewEdgeMap(), m_NewGeometryCreator.GetNewPointMap());
-
-		for (auto l : m_Intersections)
-			m_RedundantPointsRemover.RemovePoints(*l);
-	}
-
 	void SplitFaces()
 	{
 		m_FaceSplitter.Init(m_NewGeometryCreator.GetNewPointMap(), m_NewGeometryCreator.GetNewEdgeMap(), m_IntersectionFinder.GetPointPlaneMap());
@@ -82,12 +79,6 @@ private:
 
 		for (auto l : m_Intersections)
 			m_InPlaneFaceCreator.Create(*l, sp, m_NewAboveFaces, m_NewBelowFaces);
-	}
-
-	void TriangulateShapesFaces(const std::vector<Tshape*>& newShapes)
-	{
-		for (auto s : newShapes)
-			s->TriangulateFaces(m_Triangulator);
 	}
 
 	Plane CalculateSplitPlane(const Vector3& splitPointLocal) const
@@ -133,10 +124,10 @@ public:
 		SplitFaces();
 		CreateInPlaneFaces(sp);
 		CreateNewShapes(originalShape, newShapes);
+		CleanGeometry(newShapes);
 
-		RemoveRedundantPoints();
-		TriangulateShapesFaces(newShapes);
-		InitNewShapes(originalShape, newShapes); // This will reset hashes on all shape elements
+		// This will reset hashes on all shape elements
+		InitNewShapes(originalShape, newShapes);
 
 		ReturnStuffToPool();
 		return true;
@@ -145,8 +136,6 @@ public:
 private:
 	FaceSplitter m_FaceSplitter;
 	FaceIterator<Tshape> m_FaceIterator;
-	RedundantPointRemover m_RedundantPointsRemover;
-	FaceTriangulator m_Triangulator;
 	CleanIntersectionFinder m_IntersectionFinder;
 	InPlaneFaceCreator m_InPlaneFaceCreator;
 	NewShapeGeometryCreator m_NewGeometryCreator;

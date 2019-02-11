@@ -27,6 +27,11 @@ bool CollisionResponder::CalculateSeperation1To2(std::vector<FaceCollision>& fac
 	return biggestMag > allowableOverlap;
 }
 
+Vector3 AverageInterPoint(const std::vector<EdgeFaceIntersection>& inters)
+{
+
+}
+
 bool CollisionResponder::CalculateCollisionPoint(const std::vector<EdgeFaceIntersection>& inters, const Vector3& normal1To2, Vector3& finalPoint)
 {
 	auto weightSum = 0.0f;
@@ -103,18 +108,14 @@ void CollisionResponder::CalculateResponse(std::vector<FaceCollision>& faceColls
 
 		auto impact = -signedImpact;
 
-		auto v1N = MathU::Max(Vector3::Dot(v1, collNormalWorld1To2), 0.0f);
-		auto v2N = MathU::Max(Vector3::Dot(v2, -collNormalWorld1To2), 0.0f);
-
 		body1.AddImpulse(Impulse(-J * collNormalWorld1To2, collPointWorld, impact));
 		body2.AddImpulse(Impulse(J * collNormalWorld1To2, collPointWorld, impact));
-
-		body1.AddToRequiredToSeperate(-(v1N / (v1N + v2N)) * toSep * collNormalWorld1To2);
-		body2.AddToRequiredToSeperate((v2N / (v1N + v2N)) * toSep * collNormalWorld1To2);
 	}
 	else
 	{
-		body1.AddToRequiredToSeperate(-0.5f * toSep * collNormalWorld1To2);
-		body2.AddToRequiredToSeperate(0.5f * toSep * collNormalWorld1To2);
+		collPointWorld = AverageInterPoint(inters);
 	}
+
+	body1.AddContact(ContactManifold(collPointWorld, -collNormalWorld1To2));
+	body2.AddContact(ContactManifold(collPointWorld, collNormalWorld1To2));
 }

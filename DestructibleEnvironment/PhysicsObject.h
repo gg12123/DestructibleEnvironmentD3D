@@ -15,7 +15,7 @@ public:
 	{
 	}
 
-	virtual void AddToRequiredToSeperate(const Vector3& toSep)
+	virtual void AddContact(const ContactManifold& contact)
 	{
 	}
 
