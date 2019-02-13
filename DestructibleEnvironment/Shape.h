@@ -11,7 +11,7 @@ class ShapePoint;
 class ShapeEdge;
 class Face;
 class ShapeProxy;
-class FaceTriangulator;
+class CompoundShape;
 
 class Shape
 {
@@ -21,6 +21,21 @@ public:
 	}
 
 	virtual ~Shape();
+
+	auto& GetOwner() const
+	{
+		return *m_Owner;
+	}
+
+	bool HasOwner() const
+	{
+		return m_Owner;
+	}
+
+	void SetOwner(CompoundShape& o)
+	{
+		m_Owner = &o;
+	}
 
 	const auto& GetFaces() const
 	{
@@ -168,4 +183,5 @@ private:
 
 	bool m_Dirty = true;
 	ShapeProxy* m_Proxy = nullptr;
+	CompoundShape* m_Owner;
 };

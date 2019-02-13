@@ -107,12 +107,10 @@ private:
 	}
 
 public:
-	bool Split(const Vector3& splitPointWorld, Tshape& originalShape, std::vector<Tshape*>& newShapes)
+	bool Split(const Plane& sp, Tshape& originalShape, std::vector<Tshape*>& newShapesAbove, std::vector<Tshape*>& newShapesBelow)
 	{
 		ResetHashCounters();
 		// Assume hashes on all shape elements are reset.
-
-		auto sp = CalculateSplitPlane(originalShape.GetTransform().ToLocalPosition(splitPointWorld));
 
 		if (!FindIntersections(originalShape, sp))
 		{

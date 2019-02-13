@@ -255,10 +255,29 @@ private:
 		auto& p0 = piercingEdge.GetP0();
 		auto& p1 = piercingEdge.GetP1();
 
-		if (m_PointPlaneRelationshipMap.GetRelationship(p1) != m_PointPlaneRelationshipMap.GetRelationship(p0))
+		auto p0Rel = m_PointPlaneRelationshipMap.GetRelationship(p0);
+		auto p1Rel = m_PointPlaneRelationshipMap.GetRelationship(p1);
+
+		if (p1Rel != p0Rel)
 		{
+			// Always find the intersection point with above and below points in the same order so
+			// that when the same edge on two different shapes is split, the int points are exacty
+			// the same.
+			Vector3 pAbove;
+			Vector3 pBelow;
+			if (p1Rel == PointPlaneRelationship::PointsAbove)
+			{
+				pAbove = p1.GetPoint();
+				pBelow = p0.GetPoint();
+			}
+			else
+			{
+				pAbove = p0.GetPoint();
+				pBelow = p1.GetPoint();
+			}
+
 			Vector3 intPoint;
-			assert(Vector3::LinePlaneIntersection(m_SplitPlane.GetP0(), m_SplitPlane.GetNormal(), p0.GetPoint(), p1.GetPoint(), intPoint));
+			assert(Vector3::LinePlaneIntersection(m_SplitPlane.GetP0(), m_SplitPlane.GetNormal(), pAbove, pBelow, intPoint));
 
 			static Face nullFace;
 			m_Linker.RegisterIntersection(EdgeFaceIntersection(nullFace, piercingEdge, intPoint));
