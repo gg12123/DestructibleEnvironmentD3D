@@ -62,21 +62,6 @@ public:
 		return m_PointObjects;
 	}
 
-	auto& GetLocalBounds()
-	{
-		return m_LocalBounds;
-	}
-
-	auto& GetWorldBounds()
-	{
-		return m_WorldBounds;
-	}
-
-	Transform& GetTransform()
-	{
-		return m_Transform;
-	}
-
 	bool IsDirty()
 	{
 		return m_Dirty;
@@ -87,14 +72,6 @@ public:
 		m_Dirty = false;
 	}
 
-	void UpdateWorldBounds(RadiusBoundsType)
-	{
-	}
-
-	void UpdateWorldBounds(AABBBoundsType)
-	{
-	}
-
 	void Clear()
 	{
 		m_Faces.clear();
@@ -102,7 +79,6 @@ public:
 		m_EdgeObjects.clear();
 		m_EdgeIndexes.clear();
 		m_PointObjects.clear();
-		m_LocalBounds.Reset();
 	}
 
 	void AddFace(Face& f)
@@ -120,42 +96,19 @@ public:
 		m_EdgeObjects.emplace_back(&e);
 	}
 
-	void OnAllFacesAdded(Transform& refTran) // faces are in the ref transforms local space
-	{
-		CollectPointsAndEdges();
-
-		auto c = CalculateCentre();
-
-		ReCentre(c);
-		InitFacesPointsEdges();
-
-		GetTransform().SetPosition(refTran.ToWorldPosition(c));
-		GetTransform().SetRotation(refTran.GetRotation());
-
-		SetDirty();
-	}
-
-	// For when the centre is at the local origin.
-	void OnAllFacesAdded()
-	{
-		CollectPointsAndEdges();
-
-		ReCentre(Vector3::Zero());
-		InitFacesPointsEdges();
-
-		SetDirty();
-	}
-
 	bool IntersectsRay(const Ray& worldSpaceRay, Vector3& intPoint);
 
-	void SetProxy(ShapeProxy& proxy)
-	{
-		m_Proxy = &proxy;
-	}
+	// To create a new shape
+	// - add all the faces
+	// - call collect
+	// - call centre and cache
 
-	ShapeProxy& GetProxy() const
+	void CollectShapeElementsAndResetHashes();
+
+	void CentreAndCache(const Vector3& centre)
 	{
-		return *m_Proxy;
+		ReCentre(centre);
+		InitFacesPointsEdges();
 	}
 
 private:
@@ -164,9 +117,7 @@ private:
 		m_Dirty = true;
 	}
 
-	Vector3 CalculateCentre();
 	void ReCentre(const Vector3& centre);
-	void CollectPointsAndEdges();
 	void TryCollectPoint(ShapePoint& p);
 	void TryCollectEdge(ShapeEdge& p);
 	void InitFacesPointsEdges();
@@ -177,11 +128,6 @@ private:
 	std::vector<ShapeEdge*> m_EdgeObjects;
 	std::vector<int> m_EdgeIndexes;
 
-	Transform m_Transform;
-	Bounds m_LocalBounds;
-	Bounds m_WorldBounds;
-
 	bool m_Dirty = true;
-	ShapeProxy* m_Proxy = nullptr;
 	CompoundShape* m_Owner;
 };

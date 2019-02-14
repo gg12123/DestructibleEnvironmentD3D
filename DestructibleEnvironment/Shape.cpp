@@ -14,11 +14,8 @@ Shape::~Shape()
 	// TODO - return everything to pool.
 }
 
-bool Shape::IntersectsRay(const Ray& worldSpaceRay, Vector3& intPoint)
+bool Shape::IntersectsRay(const Ray& localRay, Vector3& intPoint)
 {
-	auto localRay = Ray(m_Transform.ToLocalPosition(worldSpaceRay.GetOrigin()),
-		m_Transform.ToLocalDirection(worldSpaceRay.GetDirection()));
-
 	Vector3 p;
 	auto closestHitDist = MathU::Infinity;
 	auto hit = false;
@@ -38,7 +35,6 @@ bool Shape::IntersectsRay(const Ray& worldSpaceRay, Vector3& intPoint)
 		}
 	}
 
-	intPoint = m_Transform.ToWorldPosition(intPoint);
 	return hit;
 }
 
@@ -67,7 +63,7 @@ void Shape::TryCollectEdge(ShapeEdge& e)
 	}
 }
 
-void Shape::CollectPointsAndEdges()
+void Shape::CollectShapeElementsAndResetHashes()
 {
 	m_EdgeObjects.clear();
 	m_EdgeIndexes.clear();
@@ -89,34 +85,22 @@ void Shape::CollectPointsAndEdges()
 
 			TryCollectEdge(*edges[i]);
 
-			assert(edges[i]->IsAttachedTo(face));
+			edges[i]->ResetHash();
+			points[i]->ResetHash();
 		}
+		face.ResetHash();
 	}
-}
-
-Vector3 Shape::CalculateCentre()
-{
-	auto c = Vector3::Zero();
-
-	for (auto it = m_PointObjects.begin(); it != m_PointObjects.end(); it++)
-		c += (*it)->GetPoint();
-
-	return c / static_cast<float>(m_PointObjects.size());
 }
 
 void Shape::ReCentre(const Vector3& centre)
 {
 	m_CachedPoints.clear();
-	m_LocalBounds.Reset();
 
 	for (auto it = m_PointObjects.begin(); it != m_PointObjects.end(); it++)
 	{
 		auto& p = **it;
 		p.ReCentre(centre);
-
-		auto point = p.GetPoint();
-		m_CachedPoints.emplace_back(point);
-		m_LocalBounds.Update(point);
+		m_CachedPoints.emplace_back(p.GetPoint());
 	}
 }
 

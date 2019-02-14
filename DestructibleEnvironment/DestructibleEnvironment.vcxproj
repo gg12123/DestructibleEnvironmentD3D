@@ -208,7 +208,7 @@
     <ClInclude Include="CollisionDetector.h" />
     <ClInclude Include="CollisionResponder.h" />
     <ClInclude Include="Common\DeviceResources.h" />
-    <ClInclude Include="CompundShape.h" />
+    <ClInclude Include="CompoundShape.h" />
     <ClInclude Include="FaceTriangulator.h" />
     <ClInclude Include="ConstantBufferInputTypes.h" />
     <ClInclude Include="CubeFacesCreator.h" />
@@ -303,6 +303,7 @@
     <ClCompile Include="CollisionDetector.cpp" />
     <ClCompile Include="CollisionResponder.cpp" />
     <ClCompile Include="Common\DeviceResources.cpp" />
+    <ClCompile Include="CompoundShape.cpp" />
     <ClCompile Include="DestructibleEnvironmentMain.cpp" />
     <ClCompile Include="Content\SampleFpsTextRenderer.cpp" />
     <ClCompile Include="Content\Sample3DSceneRenderer.cpp" />

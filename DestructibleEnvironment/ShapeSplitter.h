@@ -25,11 +25,11 @@ private:
 		ObjectWithHash<ShapeEdge>::ResetNextHashCounter();
 	}
 
-	void CreateNewShapes(Tshape& original, std::vector<Tshape*>& newShapes)
+	void CreateNewShapes(Tshape& original, std::vector<Tshape*>& newAboveShapes, std::vector<Tshape*>& newBelowShapes)
 	{
 		m_FaceIterator.SetShapeToUseNext(original);
-		m_FaceIterator.CreateShapes(m_NewAboveFaces, newShapes);
-		m_FaceIterator.CreateShapes(m_NewBelowFaces, newShapes);
+		m_FaceIterator.CreateShapes(m_NewAboveFaces, newAboveShapes);
+		m_FaceIterator.CreateShapes(m_NewBelowFaces, newBelowShapes);
 	}
 
 	void CleanGeometry(const std::vector<Tshape*>& newShapes) const
@@ -37,15 +37,10 @@ private:
 		// TODO
 	}
 
-	void InitNewShapes(Shape& original, const std::vector<Tshape*>& newShapes)
+	void InitNewShapes(const std::vector<Tshape*>& newShapes)
 	{
-		// Must copy the transform.
-		// Copy is needed becasue the original shape is re-used in the
-		// new shapes.
-		auto t = original.GetTransform();
-
-		for (auto it = newShapes.begin(); it != newShapes.end(); it++)
-			(*it)->OnAllFacesAdded(t);
+		for (auto s : newShapes)
+			s->CollectShapeElementsAndResetHashes();
 	}
 
 	bool FindIntersections(const Shape& originalShape, const Plane& sp)
@@ -81,19 +76,6 @@ private:
 			m_InPlaneFaceCreator.Create(*l, sp, m_NewAboveFaces, m_NewBelowFaces);
 	}
 
-	Plane CalculateSplitPlane(const Vector3& splitPointLocal) const
-	{
-		auto a = Random::Range(0.01f, 1.0f);
-		auto b = Random::Range(0.01f, 1.0f);
-		auto c = Random::Range(0.01f, 1.0f);
-
-		a *= Random::Range(0.0f, 1.0f) > 0.5f ? -1.0f : 1.0f;
-		b *= Random::Range(0.0f, 1.0f) > 0.5f ? -1.0f : 1.0f;
-		c *= Random::Range(0.0f, 1.0f) > 0.5f ? -1.0f : 1.0f;
-
-		return Plane(Vector3(a, b, c).Normalized(), splitPointLocal);
-	}
-
 	void ReturnStuffToPool()
 	{
 		for (auto l : m_Intersections)
@@ -121,11 +103,13 @@ public:
 		CreateNewGeometry();
 		SplitFaces();
 		CreateInPlaneFaces(sp);
-		CreateNewShapes(originalShape, newShapes);
-		CleanGeometry(newShapes);
+		CreateNewShapes(originalShape, newShapesAbove, newShapesBelow);
 
-		// This will reset hashes on all shape elements
-		InitNewShapes(originalShape, newShapes);
+		CleanGeometry(newShapesAbove);
+		CleanGeometry(newShapesBelow);
+
+		InitNewShapes(newShapesAbove);
+		InitNewShapes(newShapesBelow);
 
 		ReturnStuffToPool();
 		return true;

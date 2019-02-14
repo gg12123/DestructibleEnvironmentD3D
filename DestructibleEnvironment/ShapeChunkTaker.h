@@ -3,12 +3,14 @@
 #include "Shape.h"
 #include "Plane.h"
 #include "ShapeSplitter.h"
-#include "CompundShape.h"
+#include "CompoundShape.h"
 #include "Pool.h"
 
 class ShapeChunkTaker
 {
 private:
+	static constexpr int MaxNumSplitPlanes = 5;
+
 	enum class PlaneRelationship
 	{
 		Above,
@@ -22,9 +24,9 @@ private:
 		{
 		}
 
-		void CopyRelationships(const std::array<PlaneRelationship, 5>& relationships)
+		void CopyRelationships(const std::array<PlaneRelationship, MaxNumSplitPlanes>& relationships)
 		{
-
+			std::memcpy(m_Relationships.data(), relationships.data(), MaxNumSplitPlanes * sizeof(PlaneRelationship));
 		}
 
 		void SetRelationship(int plane, PlaneRelationship r)
@@ -73,10 +75,10 @@ private:
 
 	private:
 		Shape * m_Shape;
-		std::array<PlaneRelationship, 5> m_Relationships;
+		std::array<PlaneRelationship, MaxNumSplitPlanes> m_Relationships;
 	};
 
-	void CalculateSplitPlanes(const Vector3& chunkPoint)
+	void CalculateSplitPlanes(const Plane& chunkPlane)
 	{
 
 	}
@@ -212,13 +214,23 @@ private:
 	}
 
 public:
-	void TakeChunk(CompoundShape& origShape, const Vector3& chunkPoint, std::vector<CompoundShape*>& newShapes)
+	ShapeChunkTaker() : m_ShapePool([]() { return new CompoundShape(); } , 5)
 	{
-		CalculateSplitPlanes(chunkPoint);
+	}
+
+	void TakeChunk(CompoundShape& origShape, const Plane& chunkPlane, std::vector<CompoundShape*>& newShapes)
+	{
+		// Must make a copy
+		auto refTran = origShape.GetTransform();
+
+		CalculateSplitPlanes(chunkPlane);
 		CalculateSubShapes(origShape);
 
 		m_CsToUseNext = &origShape;
 		FormCompoundShapes(newShapes);
+
+		for (auto s : newShapes)
+			s->CentreAndCache(refTran);
 	}
 
 private:

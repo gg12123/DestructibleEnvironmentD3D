@@ -172,6 +172,9 @@
     <ClCompile Include="PlaneMesh.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
+    <ClCompile Include="CompoundShape.cpp">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -444,7 +447,7 @@
     <ClInclude Include="ShapeChunkTaker.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
-    <ClInclude Include="CompundShape.h">
+    <ClInclude Include="CompoundShape.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
   </ItemGroup>
