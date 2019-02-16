@@ -216,6 +216,7 @@
     <ClInclude Include="EdgeFaceIntersection.h" />
     <ClInclude Include="FaceCollision.h" />
     <ClInclude Include="FaceIterator.h" />
+    <ClInclude Include="GjkCollisionDetection.h" />
     <ClInclude Include="InPlaneFacesCreator.h" />
     <ClInclude Include="InputChannel.h" />
     <ClInclude Include="InputChannelWrapper.h" />

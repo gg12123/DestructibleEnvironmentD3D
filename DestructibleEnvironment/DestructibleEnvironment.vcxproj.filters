@@ -450,6 +450,9 @@
     <ClInclude Include="CompoundShape.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
+    <ClInclude Include="GjkCollisionDetection.h">
+      <Filter>Physics\CollisionStuff</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">

@@ -47,6 +47,12 @@ public:
 		NextHash++;
 	}
 
+	static void ResetHashes(const std::vector<T*>& objects)
+	{
+		for (auto o : objects)
+			o->ResetHash();
+	}
+
 private:
 	static int NextHash;
 	static constexpr int UnAssignedHash = -1;

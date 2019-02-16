@@ -43,7 +43,7 @@ private:
 			s->CollectShapeElementsAndResetHashes();
 	}
 
-	bool FindIntersections(const Shape& originalShape, const Plane& sp)
+	CleanIntersectionFinder::Result FindIntersections(const Shape& originalShape, const Plane& sp)
 	{
 		m_Intersections.clear();
 		return m_IntersectionFinder.FindCleanIntersections(originalShape, sp, m_Intersections);
@@ -88,30 +88,49 @@ private:
 		}
 	}
 
+	void ResetPointAndFaceHashes(const Shape& s) const
+	{
+		ObjectWithHash<ShapePoint>::ResetHashes(s.GetPointObjects());
+		ObjectWithHash<Face>::ResetHashes(s.GetFaces());
+	}
+
 public:
 	bool Split(const Plane& sp, Tshape& originalShape, std::vector<Tshape*>& newShapesAbove, std::vector<Tshape*>& newShapesBelow)
 	{
 		ResetHashCounters();
 		// Assume hashes on all shape elements are reset.
 
-		if (!FindIntersections(originalShape, sp))
+		auto interRes = FindIntersections(originalShape, sp);
+
+		if (interRes == CleanIntersectionFinder::Result::Error)
 		{
 			// log error
 			return false;
 		}
+		else if (interRes == CleanIntersectionFinder::Result::IntersectionsFound)
+		{
+			CreateNewGeometry();
+			SplitFaces();
+			CreateInPlaneFaces(sp);
+			CreateNewShapes(originalShape, newShapesAbove, newShapesBelow);
 
-		CreateNewGeometry();
-		SplitFaces();
-		CreateInPlaneFaces(sp);
-		CreateNewShapes(originalShape, newShapesAbove, newShapesBelow);
+			CleanGeometry(newShapesAbove);
+			CleanGeometry(newShapesBelow);
 
-		CleanGeometry(newShapesAbove);
-		CleanGeometry(newShapesBelow);
+			// These calls will reset the hashes
+			InitNewShapes(newShapesAbove);
+			InitNewShapes(newShapesBelow);
 
-		InitNewShapes(newShapesAbove);
-		InitNewShapes(newShapesBelow);
-
-		ReturnStuffToPool();
+			ReturnStuffToPool();
+		}
+		else
+		{
+			ResetPointAndFaceHashes(originalShape);
+			if (interRes == CleanIntersectionFinder::Result::ShapesAllAbove)
+				newShapesAbove.emplace_back(&originalShape);
+			else
+				newShapesBelow.emplace_back(&originalShape);
+		}
 		return true;
 	}
 

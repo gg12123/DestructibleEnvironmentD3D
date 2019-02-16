@@ -299,21 +299,39 @@ private:
 	}
 
 public:
+	enum class Result
+	{
+		IntersectionsFound,
+		ShapesAllAbove,
+		ShapesAllBelow,
+		Error
+	};
+
 	CleanIntersectionFinder()
 	{
 	}
 
-	bool FindCleanIntersections(const Shape& shape, const Plane& splitPlane, std::vector<IntersectionLoop*>& loops)
+	Result FindCleanIntersections(const Shape& shape, const Plane& splitPlane, std::vector<IntersectionLoop*>& loops)
 	{
 		m_SplitPlane = splitPlane;
 
 		DeterminePointPlaneRelationships(shape.GetPointObjects(), splitPlane);
 		FindIntersections(shape.GetEdgeObjects());
 
-		auto valid = m_IntersectionCount > 0 ? LinkIntersections(loops) : false;
-		m_Linker.Clear();
+		Result res;
+		if (m_IntersectionCount > 0)
+		{
+			res = LinkIntersections(loops) ? Result::IntersectionsFound : Result::Error;
+			m_Linker.Clear();
+		}
+		else
+		{
+			res = m_PointPlaneRelationshipMap.GetRelationship(*shape.GetPointObjects()[0]) == PointPlaneRelationship::PointsAbove ?
+				Result::ShapesAllAbove :
+				Result::ShapesAllBelow;
+		}
 
-		return valid;
+		return res;
 	}
 
 	const auto& GetPointPlaneMap() const
