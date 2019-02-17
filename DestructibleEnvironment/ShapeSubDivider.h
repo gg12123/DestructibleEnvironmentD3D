@@ -28,7 +28,6 @@ private:
 		c *= Random::Range(0.0f, 1.0f) > 0.5f ? -1.0f : 1.0f;
 
 		return Plane(Vector3(a, b, c).Normalized(), CalculateCentre(s));
-
 	}
 
 public:
@@ -68,7 +67,7 @@ public:
 	}
 
 private:
-	ShapeSplitter<Shape> m_Splitter;
+	ShapeSplitter m_Splitter;
 
 	std::vector<Shape*> m_ShapesToDivide;
 	std::vector<Shape*> m_ShapesToDivideNext;

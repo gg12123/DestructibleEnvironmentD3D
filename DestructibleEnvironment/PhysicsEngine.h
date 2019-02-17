@@ -8,8 +8,7 @@
 #include "Rigidbody.h"
 #include "StaticBody.h"
 #include "SplitInfo.h"
-#include "CollisionDetector.h"
-#include "CollisionResponder.h"
+#include "Collision.h"
 #include "FixedTimeStepTime.h"
 #include "ShapeSubDivider.h"
 #include "RayCasting.h"
@@ -63,13 +62,12 @@ public:
 
 	void StartRunning();
 
-	RayCastHit<Shape> RayCast(const Ray& r) const;
+	RayCastHit<CompoundShape> RayCast(const Ray& r) const;
 
 private:
 	void Run();
 
 	void DoCollisionDetectionResponse();
-	void DoCollisionDetectionResponse(PhysicsObject& body1, PhysicsObject& body2);
 	void UpdateBodies();
 	void ExecuteGameToPhysicsActions();
 	void ProcessSplits();
@@ -89,13 +87,9 @@ private:
 	std::vector<std::unique_ptr<Rigidbody>> m_DynamicBodies;
 	std::vector<std::unique_ptr<StaticBody>> m_StaticBodies;
 
+	Collision m_Collision;
+
 	std::vector<SplitInfo> m_Splits;
-
-	CollisionDetector m_CollisionDetector;
-	CollisionResponder m_CollisionResponder;
-	std::vector<EdgeFaceIntersection> m_Intersections;
-	std::vector<FaceCollision> m_FaceCollisions;
-
 	ShapeSubDivider<Rigidbody> m_ShapeDivider;
 	std::vector<Rigidbody*> m_NewBodiesFromSplit;
 

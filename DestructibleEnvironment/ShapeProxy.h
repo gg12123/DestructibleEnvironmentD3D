@@ -1,7 +1,7 @@
 #pragma once
 #include "DynamicMesh.h"
 
-class Shape;
+class CompoundShape;
 
 // TODO - not all shapes need a dynamic mesh to this needs sorting at some point.
 // could just specify the required buffer type to the base.
@@ -15,7 +15,7 @@ public:
 	}
 
 	// special constructor used when a shape is added by the physics engine.
-	ShapeProxy(Shape& shape);
+	ShapeProxy(CompoundShape& shape);
 
 	void Syncronise();
 
@@ -42,9 +42,9 @@ public:
 protected:
 	void Awake() override;
 
-	virtual Shape& RegisterWithPhysics() = 0;
+	virtual CompoundShape& RegisterWithPhysics() = 0;
 private:
-	Shape * m_Shape = nullptr;
+	CompoundShape * m_Shape = nullptr;
 
 	float m_InitialWidth;
 	float m_InitialHeight;

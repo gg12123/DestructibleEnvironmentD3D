@@ -204,6 +204,7 @@
     <ClInclude Include="CleanIntersectionFinder.h" />
     <ClInclude Include="CleanIntersectionsWrapper.h" />
     <ClInclude Include="CollectionU.h" />
+    <ClInclude Include="Collision.h" />
     <ClInclude Include="CollisionData.h" />
     <ClInclude Include="CollisionDetector.h" />
     <ClInclude Include="CollisionResponder.h" />
@@ -214,7 +215,6 @@
     <ClInclude Include="CubeFacesCreator.h" />
     <ClInclude Include="DynamicArray.h" />
     <ClInclude Include="EdgeFaceIntersection.h" />
-    <ClInclude Include="FaceCollision.h" />
     <ClInclude Include="FaceIterator.h" />
     <ClInclude Include="GjkCollisionDetection.h" />
     <ClInclude Include="InPlaneFacesCreator.h" />
@@ -251,7 +251,6 @@
     <ClInclude Include="GridPartition.h" />
     <ClInclude Include="IMeshRenderer.h" />
     <ClInclude Include="InitialShapeCreator.h" />
-    <ClInclude Include="IntersectionFinder.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Loggers.h" />
     <ClInclude Include="MathU.h" />
@@ -301,7 +300,6 @@
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="CollisionDetector.cpp" />
     <ClCompile Include="CollisionResponder.cpp" />
     <ClCompile Include="Common\DeviceResources.cpp" />
     <ClCompile Include="CompoundShape.cpp" />
@@ -313,7 +311,6 @@
     <ClCompile Include="Face.cpp" />
     <ClCompile Include="GameControlledDynamicBody.cpp" />
     <ClCompile Include="GameTheadToPhysicsThreadAction.cpp" />
-    <ClCompile Include="IntersectionFinder.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

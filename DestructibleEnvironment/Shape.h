@@ -10,7 +10,6 @@
 class ShapePoint;
 class ShapeEdge;
 class Face;
-class ShapeProxy;
 class CompoundShape;
 
 class Shape
@@ -62,16 +61,6 @@ public:
 		return m_PointObjects;
 	}
 
-	bool IsDirty()
-	{
-		return m_Dirty;
-	}
-
-	void ClearDirty()
-	{
-		m_Dirty = false;
-	}
-
 	void Clear()
 	{
 		m_Faces.clear();
@@ -96,7 +85,7 @@ public:
 		m_EdgeObjects.emplace_back(&e);
 	}
 
-	bool IntersectsRay(const Ray& worldSpaceRay, Vector3& intPoint);
+	bool IntersectsRay(const Ray& localRay, Vector3& intPoint);
 
 	// To create a new shape
 	// - add all the faces
@@ -105,18 +94,25 @@ public:
 
 	void CollectShapeElementsAndResetHashes();
 
-	void CentreAndCache(const Vector3& centre)
+	void CentreAndCache(const Vector3& ownersCentre)
 	{
-		ReCentre(centre);
+		ReCentre(ownersCentre);
 		InitFacesPointsEdges();
 	}
 
-private:
-	void SetDirty()
+	Vector3 GetCentre() const
 	{
-		m_Dirty = true;
+		return m_Centre;
 	}
 
+	void CalculateCentre();
+
+	void OnTakenFromPool()
+	{
+		Clear();
+	}
+
+private:
 	void ReCentre(const Vector3& centre);
 	void TryCollectPoint(ShapePoint& p);
 	void TryCollectEdge(ShapeEdge& p);
@@ -127,7 +123,7 @@ private:
 	std::vector<ShapePoint*> m_PointObjects;
 	std::vector<ShapeEdge*> m_EdgeObjects;
 	std::vector<int> m_EdgeIndexes;
+	Vector3 m_Centre;
 
-	bool m_Dirty = true;
 	CompoundShape* m_Owner;
 };

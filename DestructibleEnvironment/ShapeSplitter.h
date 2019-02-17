@@ -14,7 +14,6 @@
 #include "InPlaneFacesCreator.h"
 #include "Random.h"
 
-template<class Tshape>
 class ShapeSplitter
 {
 private:
@@ -25,19 +24,19 @@ private:
 		ObjectWithHash<ShapeEdge>::ResetNextHashCounter();
 	}
 
-	void CreateNewShapes(Tshape& original, std::vector<Tshape*>& newAboveShapes, std::vector<Tshape*>& newBelowShapes)
+	void CreateNewShapes(Shape& original, std::vector<Shape*>& newAboveShapes, std::vector<Shape*>& newBelowShapes)
 	{
 		m_FaceIterator.SetShapeToUseNext(original);
 		m_FaceIterator.CreateShapes(m_NewAboveFaces, newAboveShapes);
 		m_FaceIterator.CreateShapes(m_NewBelowFaces, newBelowShapes);
 	}
 
-	void CleanGeometry(const std::vector<Tshape*>& newShapes) const
+	void CleanGeometry(const std::vector<Shape*>& newShapes) const
 	{
 		// TODO
 	}
 
-	void InitNewShapes(const std::vector<Tshape*>& newShapes)
+	void InitNewShapes(const std::vector<Shape*>& newShapes)
 	{
 		for (auto s : newShapes)
 			s->CollectShapeElementsAndResetHashes();
@@ -95,7 +94,7 @@ private:
 	}
 
 public:
-	bool Split(const Plane& sp, Tshape& originalShape, std::vector<Tshape*>& newShapesAbove, std::vector<Tshape*>& newShapesBelow)
+	bool Split(const Plane& sp, Shape& originalShape, std::vector<Shape*>& newShapesAbove, std::vector<Shape*>& newShapesBelow)
 	{
 		ResetHashCounters();
 		// Assume hashes on all shape elements are reset.
@@ -136,7 +135,7 @@ public:
 
 private:
 	FaceSplitter m_FaceSplitter;
-	FaceIterator<Tshape> m_FaceIterator;
+	FaceIterator m_FaceIterator;
 	CleanIntersectionFinder m_IntersectionFinder;
 	InPlaneFaceCreator m_InPlaneFaceCreator;
 	NewShapeGeometryCreator m_NewGeometryCreator;

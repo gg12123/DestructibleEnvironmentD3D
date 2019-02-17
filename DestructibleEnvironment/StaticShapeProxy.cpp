@@ -2,7 +2,7 @@
 #include "StaticShapeProxy.h"
 #include "World.h"
 
-Shape & StaticShapeProxy::RegisterWithPhysics()
+CompoundShape & StaticShapeProxy::RegisterWithPhysics()
 {
 	return GetWorld().GetPhysics().AddStaticRigidbody(*this);
 }

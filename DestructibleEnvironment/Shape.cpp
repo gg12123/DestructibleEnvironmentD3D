@@ -4,7 +4,6 @@
 #include "ShapeEdge.h"
 #include "Face.h"
 #include "Random.h"
-#include "IntersectionFinder.h"
 #include "SmallEdgeRemover.h"
 #include "FaceTriangulator.h"
 #include "ShapeElementPool.h"
@@ -92,16 +91,27 @@ void Shape::CollectShapeElementsAndResetHashes()
 	}
 }
 
-void Shape::ReCentre(const Vector3& centre)
+void Shape::ReCentre(const Vector3& ownersCentre)
 {
 	m_CachedPoints.clear();
 
 	for (auto it = m_PointObjects.begin(); it != m_PointObjects.end(); it++)
 	{
 		auto& p = **it;
-		p.ReCentre(centre);
+		p.ReCentre(ownersCentre);
 		m_CachedPoints.emplace_back(p.GetPoint());
 	}
+	m_Centre -= ownersCentre;
+}
+
+void Shape::CalculateCentre()
+{
+	m_Centre = Vector3::Zero();
+
+	for (auto p : m_PointObjects)
+		m_Centre += p->GetPoint();
+
+	m_Centre /= static_cast<float>(m_PointObjects.size());
 }
 
 void Shape::InitFacesPointsEdges()

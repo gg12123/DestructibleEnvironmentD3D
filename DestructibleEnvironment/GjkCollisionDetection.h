@@ -115,10 +115,13 @@ private:
 		switch (m_Q.GetCount())
 		{
 		case 1:
+		{
 			p = points[0];
 			newQ = SetQ(p);
 			return true;
+		}
 		case 2:
+		{
 			for (auto i = 0; i < 2; i++)
 			{
 				if (OriginLiesInPointsVeroniRegion(points[i], points[(i + 1) % 2]))
@@ -129,7 +132,9 @@ private:
 				}
 			}
 			return false;
+		}
 		case 3:
+		{
 			for (auto i = 0; i < 3; i++)
 			{
 				if (OriginLiesInPointsVeroniRegion(points[i], points[(i + 1) % 3], points[(i + 2) % 3]))
@@ -140,7 +145,9 @@ private:
 				}
 			}
 			return false;
+		}
 		case 4:
+		{
 			for (auto i = 0; i < 4; i++)
 			{
 				if (OriginLiesInPointsVeroniRegion(points[i], points[(i + 1) % 4], points[(i + 2) % 4], points[(i + 3) % 4]))
@@ -151,9 +158,12 @@ private:
 				}
 			}
 			return false;
+		}
 		default:
 			break;
 		}
+		assert(false);
+		return false;
 	}
 
 	Vector3 ProjectOntoEdge(const Vector3& q1, const Vector3& q2) const
@@ -168,10 +178,13 @@ private:
 		switch (m_Q.GetCount())
 		{
 		case 2:
+		{
 			p = ProjectOntoEdge(points[0], points[1]);
 			newQ = SetQ(points[0], points[1]);
 			return true;
+		}
 		case 3:
+		{
 			for (auto i = 0; i < 3; i++)
 			{
 				auto& pA = points[i];
@@ -184,7 +197,9 @@ private:
 				}
 			}
 			return false;
+		}
 		case 4:
+		{
 			static int toOtherIndexA[] = { 2, 1, 1, 0, 0, 0 };
 			static int toOtherIndexB[] = { 3, 3, 2, 3, 2, 1 };
 
@@ -197,13 +212,18 @@ private:
 					{
 						p = ProjectOntoEdge(points[i], points[j]);
 						newQ = SetQ(points[i], points[j]);
+						return true;
 					}
 					k++;
 				}
 			}
+			return false;
+		}
 		default:
 			break;
 		}
+		assert(false);
+		return false;
 	}
 
 	Vector3 ProjectOntoFace(const Vector3& q1, const Vector3& q2, const Vector3& q3) const
@@ -218,10 +238,13 @@ private:
 		switch (m_Q.GetCount())
 		{
 		case 3:
+		{
 			p = ProjectOntoFace(points[0], points[1], points[2]);
 			newQ = SetQ(points[0], points[1], points[2]);
 			return true;
+		}
 		case 4:
+		{
 			for (auto i = 0; i < 4; i++)
 			{
 				auto& pA = points[i];
@@ -235,9 +258,12 @@ private:
 				}
 			}
 			return false;
+		}
 		default:
 			break;
 		}
+		assert(false);
+		return false;
 	}
 
 	bool UpdateQ(Vector3& pointOfMinNorm)

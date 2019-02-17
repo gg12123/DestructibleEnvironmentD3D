@@ -32,7 +32,7 @@ c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.1
           [
               _Ty=unsigned short
           ] (compiling source file ShapeProxy.cpp)
-  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\shapeproxy.cpp(46): note: see reference to function template instantiation 'void std::vector<unsigned short,std::allocator<_Ty>>::emplace_back<unsigned int&>(unsigned int &)' being compiled
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\shapeproxy.cpp(47): note: see reference to function template instantiation 'void std::vector<unsigned short,std::allocator<_Ty>>::emplace_back<unsigned int&>(unsigned int &)' being compiled
           with
           [
               _Ty=unsigned short

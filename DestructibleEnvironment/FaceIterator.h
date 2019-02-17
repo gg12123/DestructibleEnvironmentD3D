@@ -4,7 +4,6 @@
 #include "Shape.h"
 #include "Face.h"
 
-template<class Tshape>
 class FaceIterator
 {
 private:
@@ -20,7 +19,7 @@ private:
 		m_Visited[f.GetHash()] = true;
 	}
 
-	Tshape & GetNextShapeToUse()
+	Shape & GetNextShapeToUse()
 	{
 		auto s = m_ShapeToUseNext;
 		if (s)
@@ -28,10 +27,10 @@ private:
 			m_ShapeToUseNext = nullptr;
 			return *s;
 		}
-		return *(new Tshape());
+		return ShapePool::Take();
 	}
 
-	Tshape& CreateShape(Face& rootFace)
+	Shape& CreateShape(Face& rootFace)
 	{
 		auto& newShape = GetNextShapeToUse();
 		newShape.Clear();
@@ -75,12 +74,12 @@ private:
 	}
 
 public:
-	void SetShapeToUseNext(Tshape& s)
+	void SetShapeToUseNext(Shape& s)
 	{
 		m_ShapeToUseNext = &s;
 	}
 
-	void CreateShapes(const std::vector<Face*>& faces, std::vector<Tshape*>& newShapes)
+	void CreateShapes(const std::vector<Face*>& faces, std::vector<Shape*>& newShapes)
 	{
 		m_Visited.Zero();
 
@@ -94,7 +93,7 @@ public:
 	}
 
 private:
-	Tshape * m_ShapeToUseNext = nullptr;
+	Shape * m_ShapeToUseNext = nullptr;
 	std::stack<Face*> m_FaceStack;
 	DynamicArray<int> m_Visited;
 };

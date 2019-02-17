@@ -41,11 +41,11 @@ void PhysicsEngine::Run()
 	}
 }
 
-RayCastHit<Shape> PhysicsEngine::RayCast(const Ray& r) const
+RayCastHit<CompoundShape> PhysicsEngine::RayCast(const Ray& r) const
 {
 	assert(m_SafeToSync);
 
-	auto cast = UpdatableRayCast<Shape>(r);
+	auto cast = UpdatableRayCast<CompoundShape>(r);
 
 	cast.Update(m_DynamicBodies);
 	cast.Update(m_StaticBodies);
@@ -59,29 +59,9 @@ void PhysicsEngine::ApplyExternalForces() const
 		b->ApplyExternalForces();
 }
 
-void PhysicsEngine::DoCollisionDetectionResponse(PhysicsObject& body1, PhysicsObject& body2)
-{
-	if (m_CollisionDetector.FindCollision(body1, body2, m_FaceCollisions, m_Intersections))
-		m_CollisionResponder.CalculateResponse(m_FaceCollisions, m_Intersections, body1, body2);
-}
-
 void PhysicsEngine::DoCollisionDetectionResponse()
 {
-	auto dynamicCount = m_DynamicBodies.size();
-	auto staticCount = m_StaticBodies.size();
-
-	// TODO - partition
-
-	for (auto i = 0U; i < dynamicCount; i++)
-	{
-		auto& bodyi = *m_DynamicBodies[i];
-
-		for (auto j = i + 1; j < dynamicCount; j++)
-			DoCollisionDetectionResponse(bodyi, *m_DynamicBodies[j]);
-
-		for (auto j = 0U; j < staticCount; j++)
-			DoCollisionDetectionResponse(bodyi, *m_StaticBodies[j]);
-	}
+	m_Collision.DetectAndRespond(m_StaticBodies, m_DynamicBodies);
 }
 
 void PhysicsEngine::UpdateBodies()

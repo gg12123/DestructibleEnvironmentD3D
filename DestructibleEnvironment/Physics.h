@@ -20,7 +20,7 @@ class Physics
 public:
 	Rigidbody & AddGameControlledRigidbody(GameControlledDynamicBody& proxy);
 	Rigidbody & AddDynamicRigidbody(DynamicBodyProxy& proxy);
-	Shape & AddStaticRigidbody(StaticShapeProxy& proxy);
+	CompoundShape & AddStaticRigidbody(StaticShapeProxy& proxy);
 
 	void Syncronise();
 
@@ -54,7 +54,7 @@ public:
 private:
 	void CreateShapeProxyForBodyAddedByPhysics(Rigidbody& shape);
 	void CreateProxiesForBodiesAddedByEngine();
-	void AddNewProxy(ShapeProxy& proxy, Shape& physicsShape);
+	void AddNewProxy(ShapeProxy& proxy, CompoundShape& physicsShape);
 
 	std::vector<std::unique_ptr<IGameTheadToPhysicsThreadAction>> m_GameToPhysicsActions;
 

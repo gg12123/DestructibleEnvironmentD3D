@@ -4,5 +4,5 @@
 class StaticShapeProxy : public ShapeProxy
 {
 protected:
-	Shape & RegisterWithPhysics() override;
+	CompoundShape & RegisterWithPhysics() override;
 };

@@ -1,8 +1,8 @@
 #pragma once
-#include "Shape.h"
+#include "CompoundShape.h"
 #include "CollisionData.h"
 
-class PhysicsObject : public Shape
+class PhysicsObject : public CompoundShape
 {
 public:
 	PhysicsObject()

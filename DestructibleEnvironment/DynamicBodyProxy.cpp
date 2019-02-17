@@ -8,7 +8,7 @@ DynamicBodyProxy::DynamicBodyProxy(Rigidbody& body) : ShapeProxy(body)
 	SetRigidBody(body);
 }
 
-Shape & DynamicBodyProxy::RegisterWithPhysics()
+CompoundShape & DynamicBodyProxy::RegisterWithPhysics()
 {
 	auto& b = GetWorld().GetPhysics().AddDynamicRigidbody(*this);
 	SetRigidBody(b);

@@ -136,9 +136,6 @@
     <ClCompile Include="GameControlledDynamicBody.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
-    <ClCompile Include="CollisionDetector.cpp">
-      <Filter>Physics\CollisionStuff</Filter>
-    </ClCompile>
     <ClCompile Include="CollisionResponder.cpp">
       <Filter>Physics\CollisionStuff</Filter>
     </ClCompile>
@@ -156,9 +153,6 @@
     </ClCompile>
     <ClCompile Include="ShapeEdge.cpp">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClCompile>
-    <ClCompile Include="IntersectionFinder.cpp">
-      <Filter>Physics\CollisionStuff</Filter>
     </ClCompile>
     <ClCompile Include="ShapePoint.cpp">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
@@ -321,9 +315,6 @@
     <ClInclude Include="FaceSplitter.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
-    <ClInclude Include="IntersectionFinder.h">
-      <Filter>Physics\CollisionStuff</Filter>
-    </ClInclude>
     <ClInclude Include="Vector2.h">
       <Filter>Utils</Filter>
     </ClInclude>
@@ -380,9 +371,6 @@
     </ClInclude>
     <ClInclude Include="ShapeElementPool.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="FaceCollision.h">
-      <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
     <ClInclude Include="CleanIntersectionsWrapper.h">
       <Filter>Physics\CollisionStuff</Filter>
@@ -451,6 +439,9 @@
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="GjkCollisionDetection.h">
+      <Filter>Physics\CollisionStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision.h">
       <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
   </ItemGroup>

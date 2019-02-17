@@ -3,7 +3,7 @@
 #include "Rigidbody.h"
 #include "World.h"
 
-Shape & GameControlledDynamicBody::RegisterWithPhysics()
+CompoundShape & GameControlledDynamicBody::RegisterWithPhysics()
 {
 	auto& b = GetWorld().GetPhysics().AddGameControlledRigidbody(*this);
 	SetRigidBody(b);

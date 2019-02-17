@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
 #include "Transform.h"
+#include "ShapeElementPool.h"
+#include "Ray.h"
 
 class Shape;
 class ShapeProxy;
@@ -8,16 +10,21 @@ class ShapeProxy;
 class CompoundShape
 {
 public:
+	~CompoundShape()
+	{
+		// TODO - also need to return all the shapes points edge and faces to the pool
+		for (auto s : m_SubShapes)
+			ShapePool::Return(*s);
+	}
+
+	bool IntersectsRay(const Ray& worldRay, Vector3& intPoint);
+
 	const auto& GetSubShapes() const
 	{
 		return m_SubShapes;
 	}
 
-	void AddSubShape(Shape& s)
-	{
-		m_SubShapes.emplace_back(&s);
-		s.SetOwner(*this);
-	}
+	void AddSubShape(Shape& s);
 
 	void ClearSubShapes()
 	{
@@ -62,7 +69,7 @@ public:
 	}
 
 private:
-	Vector3 CalcuateCentre();
+	Vector3 CalcuateCentre() const;
 	void CentreAndCache(const Vector3& centre);
 
 	void SetDirty()

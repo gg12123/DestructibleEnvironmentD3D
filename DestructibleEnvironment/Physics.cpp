@@ -12,12 +12,12 @@
 
 bool Physics::m_AcceptGameInput = false;
 
-void Physics::AddNewProxy(ShapeProxy& proxy, Shape& physicsShape)
+void Physics::AddNewProxy(ShapeProxy& proxy, CompoundShape& physicsShape)
 {
 	m_ShapeProxies.push_back(&proxy);
 }
 
-Shape & Physics::AddStaticRigidbody(StaticShapeProxy& proxy)
+CompoundShape & Physics::AddStaticRigidbody(StaticShapeProxy& proxy)
 {
 	auto body = std::unique_ptr<StaticBody>(new StaticBody());
 	m_ShapeCreator.Create(*body, proxy.GetInitialWidth(), proxy.GetInitialHeight(), proxy.GetTransform());

@@ -242,7 +242,7 @@ private:
 
 	std::vector<Plane> m_SplitPlanes;
 
-	ShapeSplitter<Shape> m_Splitter;
+	ShapeSplitter m_Splitter;
 
 	Pool<CompoundShape*> m_ShapePool;
 	CompoundShape* m_CsToUseNext;

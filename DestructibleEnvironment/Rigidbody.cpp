@@ -2,11 +2,10 @@
 #include "Rigidbody.h"
 #include "PhysicsTime.h"
 #include "MathU.h"
+#include "Shape.h"
 
 void Rigidbody::CalculateInertia()
 {
-	auto& points = GetCachedPoints();
-
 	auto m = GetMass();
 
 	auto Ixx = 0.0f;
@@ -17,17 +16,22 @@ void Rigidbody::CalculateInertia()
 	auto Ixz = 0.0f;
 	auto Iyz = 0.0f;
 
-	for (auto it = points.begin(); it != points.end(); it++)
+	for (auto s : GetSubShapes())
 	{
-		auto P = (*it);
+		auto& points = s->GetCachedPoints();
 
-		Ixx += (P.y * P.y + P.z * P.z) * m;
-		Iyy += (P.x * P.x + P.z * P.z) * m;
-		Izz += (P.x * P.x + P.y * P.y) * m;
+		for (auto it = points.begin(); it != points.end(); it++)
+		{
+			auto P = (*it);
 
-		Ixy += (P.x * P.y) * m;
-		Ixz += (P.x * P.z) * m;
-		Iyz += (P.y * P.z) * m;
+			Ixx += (P.y * P.y + P.z * P.z) * m;
+			Iyy += (P.x * P.x + P.z * P.z) * m;
+			Izz += (P.x * P.x + P.y * P.y) * m;
+
+			Ixy += (P.x * P.y) * m;
+			Ixz += (P.x * P.z) * m;
+			Iyz += (P.y * P.z) * m;
+		}
 	}
 
 	Matrix3 inertia;
@@ -52,7 +56,7 @@ void Rigidbody::CalculateInertia()
 
 void Rigidbody::CalculateMotionProperties()
 {
-	SetMass(GetLocalBounds().GetVolume());
+	SetMass(1.0f); // TODO
 	CalculateInertia();
 
 	// TODO - not sure how to calculate these...

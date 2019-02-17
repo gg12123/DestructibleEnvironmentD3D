@@ -49,7 +49,7 @@ public:
 	void AddImpulse(const Impulse& imp);
 
 protected:
-	Shape & RegisterWithPhysics() override;
+	CompoundShape & RegisterWithPhysics() override;
 
 	void SetRigidBody(Rigidbody& body)
 	{

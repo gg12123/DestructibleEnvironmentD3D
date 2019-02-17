@@ -3,7 +3,7 @@
 #include "Shape.h"
 #include "World.h"
 
-ShapeProxy::ShapeProxy(Shape& shape)
+ShapeProxy::ShapeProxy(CompoundShape& shape)
 {
 	m_Shape = &shape;
 	m_Shape->SetProxy(*this);
@@ -29,26 +29,28 @@ void ShapeProxy::Syncronise()
 		auto& verts = MapVertexBuffer();
 		auto& indicies = MapIndexBuffer();
 
-		// fill the buffers
-		for (auto f : m_Shape->GetFaces())
+		for (auto subShape : m_Shape->GetSubShapes())
 		{
-			auto& points = f->GetCachedPoints();
-			auto normal = f->GetNormal();
-			auto baseIndex = verts.size();
-			auto numPoints = points.size();
-			
-			verts.emplace_back(Vertex(points.at(0), normal));
-
-			for (auto i = 1U; i < numPoints - 1U; i++)
+			for (auto f : subShape->GetFaces())
 			{
-				verts.emplace_back(Vertex(points.at(i), normal));
+				auto& points = f->GetCachedPoints();
+				auto normal = f->GetNormal();
+				auto baseIndex = verts.size();
+				auto numPoints = points.size();
 
-				indicies.emplace_back(baseIndex);
-				indicies.emplace_back(baseIndex + i);
-				indicies.emplace_back(baseIndex + i + 1U);
+				verts.emplace_back(Vertex(points.at(0), normal));
+
+				for (auto i = 1U; i < numPoints - 1U; i++)
+				{
+					verts.emplace_back(Vertex(points.at(i), normal));
+
+					indicies.emplace_back(baseIndex);
+					indicies.emplace_back(baseIndex + i);
+					indicies.emplace_back(baseIndex + i + 1U);
+				}
+
+				verts.emplace_back(Vertex(points.at(numPoints - 1), normal));
 			}
-
-			verts.emplace_back(Vertex(points.at(numPoints - 1), normal));
 		}
 
 		UnMapVertexBuffer();

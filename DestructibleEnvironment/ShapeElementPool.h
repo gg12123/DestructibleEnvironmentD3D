@@ -4,6 +4,7 @@
 class ShapeEdge;
 class Face;
 class ShapePoint;
+class Shape;
 
 template<class T>
 class ShapeElementPool
@@ -32,3 +33,4 @@ Pool<T*>* const ShapeElementPool<T>::m_Pool = new Pool<T*>([]() { return new T()
 using EdgePool = ShapeElementPool<ShapeEdge>;
 using FacePool = ShapeElementPool<Face>;
 using PointPool = ShapeElementPool<ShapePoint>;
+using ShapePool = ShapeElementPool<Shape>;

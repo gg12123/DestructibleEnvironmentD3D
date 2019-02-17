@@ -1,8 +1,6 @@
 #pragma once
 #include "DynamicBodyProxy.h"
 
-class Rigidbody;
-
 class GameControlledDynamicBody : public DynamicBodyProxy
 {
 public:
@@ -11,5 +9,5 @@ public:
 	}
 
 protected:
-	Shape & RegisterWithPhysics() override;
+	CompoundShape & RegisterWithPhysics() override;
 };

@@ -12,10 +12,9 @@ public:
 	{
 	}
 
-	const Vector3 WorldImpulse;
-	const Vector3 WorldImpulsePoint;
-
-	const float Impact;
+	Vector3 WorldImpulse;
+	Vector3 WorldImpulsePoint;
+	float Impact;
 };
 
 class ContactManifold
@@ -24,6 +23,10 @@ public:
 	// The normal must point towards the associated body.
 	// So is in the same direction as the impulse if there is one.
 	ContactManifold(const Vector3& worldPoint, const Vector3& worldNormal) : m_Plane(worldNormal, worldPoint)
+	{
+	}
+
+	ContactManifold()
 	{
 	}
 
