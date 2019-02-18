@@ -40,7 +40,7 @@ private:
 
 class GjkCollisionDetection
 {
-private:
+public:
 	class SetQ
 	{
 	public:
@@ -70,6 +70,7 @@ private:
 		int m_Count;
 	};
 
+private:
 	void InitQ(const GjkInputShape& shapeA, const GjkInputShape& shapeB)
 	{
 		auto toB = shapeB.GetCentroid() - shapeA.GetCentroid();
@@ -282,6 +283,16 @@ private:
 	}
 
 public:
+	static Vector3 GetMinowskiDiffSupportVertex(const GjkInputShape& shapeA, const GjkInputShape& shapeB, const Vector3& dir)
+	{
+		return shapeA.GetSupportVertex(dir) - shapeB.GetSupportVertex(-dir);
+	}
+
+	const auto& GetQ() const
+	{
+		return m_Q;
+	}
+
 	float Run(const GjkInputShape& shapeA, const GjkInputShape& shapeB)
 	{
 		InitQ(shapeA, shapeB);
@@ -292,7 +303,7 @@ public:
 			if (UpdateQ(p))
 				return -1.0f; // Intersecting
 
-			auto v = shapeA.GetSupportVertex(-p) - shapeB.GetSupportVertex(p);
+			auto v = GetMinowskiDiffSupportVertex(shapeA, shapeB, -p);
 
 			// If p is more (or same) extreme in the direction -p, there is no intersection
 			if (Vector3::Dot(p, -p) >= Vector3::Dot(v, -p))

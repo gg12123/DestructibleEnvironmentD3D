@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "GjkCollisionDetection.h"
+#include "EpaContact.h"
 #include "CollisionData.h"
 #include "CompoundShape.h"
 #include "Shape.h"
@@ -10,8 +11,7 @@ class CollisionDetector
 private:
 	ContactManifold CalculateCantact(const GjkInputShape& shape1, const GjkInputShape& shape2)
 	{
-		assert(false);
-		return ContactManifold();
+		return m_ContactFinder.FindContact(shape1, shape2, m_Detector.GetQ());
 	}
 
 	GjkInputShape TransformToShape1sSpace(const Shape& shape2)
@@ -64,5 +64,6 @@ public:
 private:
 	std::vector<Vector3> m_TransformedPoints;
 	GjkCollisionDetection m_Detector;
+	EpaContact m_ContactFinder;
 	Matrix4 m_ToShape1sSpace;
 };
