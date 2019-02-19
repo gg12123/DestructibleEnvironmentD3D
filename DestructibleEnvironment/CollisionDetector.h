@@ -9,16 +9,22 @@
 class CollisionDetector
 {
 private:
-	ContactManifold CalculateCantact(const GjkInputShape& shape1, const GjkInputShape& shape2)
+	ContactManifold CalculateCantact1To2(const GjkInputShape& shape1, const GjkInputShape& shape2)
 	{
-		return m_ContactFinder.FindContact(shape1, shape2, m_Detector.GetQ());
+		auto localContact = m_ContactFinder.FindContact(shape1, shape2, m_Detector.GetQ());
+
+		return ContactManifold(m_ActiveTransform->ToWorldPosition(localContact.GetPoint()),
+			m_ActiveTransform->ToWorldDirection(localContact.GetNormal().InDirectionOf(shape2.GetCentroid() - shape1.GetCentroid())));
 	}
 
 	GjkInputShape TransformToShape1sSpace(const Shape& shape2)
 	{
+		// TODO - Gjk can run without having all the points transformed upfront.
+		// It coud be done lazily.
+
 		m_TransformedPoints.clear();
 
-		for (auto p : shape2.GetCachedPoints())
+		for (auto& p : shape2.GetCachedPoints())
 			m_TransformedPoints.emplace_back(m_ToShape1sSpace * p);
 
 		return GjkInputShape(m_TransformedPoints, m_ToShape1sSpace * shape2.GetCentre());
@@ -31,7 +37,7 @@ private:
 
 		if (m_Detector.Run(gjkShape1, gjkShape2) <= 0.0f)
 		{
-			contact = CalculateCantact(gjkShape1, gjkShape2);
+			contact = CalculateCantact1To2(gjkShape1, gjkShape2);
 			return true;
 		}
 		return false;
@@ -43,6 +49,7 @@ private:
 		auto& t2 = shape2.GetTransform();
 
 		m_ToShape1sSpace = t1.GetWorldToLocalMatrix() * t2.GetLocalToWorldMatrix();
+		m_ActiveTransform = &t1;
 	}
 
 public:
@@ -66,4 +73,5 @@ private:
 	GjkCollisionDetection m_Detector;
 	EpaContact m_ContactFinder;
 	Matrix4 m_ToShape1sSpace;
+	Transform* m_ActiveTransform;
 };

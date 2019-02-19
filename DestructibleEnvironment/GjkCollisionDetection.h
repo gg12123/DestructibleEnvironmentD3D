@@ -10,7 +10,7 @@ public:
 	{
 	}
 
-	Vector3 GetSupportVertex(const Vector3& dir) const
+	int GetSupportVertex(const Vector3& dir) const
 	{
 		auto& points = *m_Points;
 		auto supportsIndex = 0u;
@@ -25,12 +25,17 @@ public:
 				supportsIndex = i;
 			}
 		}
-		return points[supportsIndex];
+		return supportsIndex;
 	}
 
 	Vector3 GetCentroid() const
 	{
 		return m_Centroid;
+	}
+
+	const auto& GetPointAt(int index) const
+	{
+		return (*m_Points)[index];
 	}
 
 private:
@@ -41,6 +46,21 @@ private:
 class GjkCollisionDetection
 {
 public:
+	struct MinowskiDiffPoint
+	{
+		Vector3 Value;
+		int OriginalA;
+		int OriginalB;
+		
+		MinowskiDiffPoint(const Vector3& val, int origA, int origB) : Value(val), OriginalA(origA), OriginalB(origB)
+		{
+		}
+
+		MinowskiDiffPoint()
+		{
+		}
+	};
+
 	class SetQ
 	{
 	public:
@@ -59,14 +79,14 @@ public:
 			return m_Count;
 		}
 
-		void AddPoint(const Vector3& p)
+		void AddPoint(const MinowskiDiffPoint& p)
 		{
 			m_Points[m_Count] = p;
 			m_Count++;
 		}
 
 	private:
-		std::array<Vector3, 4> m_Points;
+		std::array<MinowskiDiffPoint, 4> m_Points;
 		int m_Count;
 	};
 
@@ -74,7 +94,11 @@ private:
 	void InitQ(const GjkInputShape& shapeA, const GjkInputShape& shapeB)
 	{
 		auto toB = shapeB.GetCentroid() - shapeA.GetCentroid();
-		m_Q = SetQ(shapeA.GetSupportVertex(toB) - shapeB.GetSupportVertex(-toB));
+
+		auto origA = shapeA.GetSupportVertex(toB);
+		auto origB = shapeB.GetSupportVertex(-toB);
+
+		m_Q = SetQ(MinowskiDiffPoint(shapeA.GetPointAt(origA) - shapeB.GetPointAt(origB), origA, origB));
 	}
 
 	bool OriginLiesInEdgesVeroniRegion(const Vector3& q1, const Vector3& q2, const Vector3& qOther) const
@@ -117,18 +141,18 @@ private:
 		{
 		case 1:
 		{
-			p = points[0];
-			newQ = SetQ(p);
+			p = points[0].Value;
+			newQ = SetQ(points[0]);
 			return true;
 		}
 		case 2:
 		{
 			for (auto i = 0; i < 2; i++)
 			{
-				if (OriginLiesInPointsVeroniRegion(points[i], points[(i + 1) % 2]))
+				if (OriginLiesInPointsVeroniRegion(points[i].Value, points[(i + 1) % 2].Value))
 				{
-					p = points[i];
-					newQ = SetQ(p);
+					p = points[i].Value;
+					newQ = SetQ(points[i]);
 					return true;
 				}
 			}
@@ -138,10 +162,10 @@ private:
 		{
 			for (auto i = 0; i < 3; i++)
 			{
-				if (OriginLiesInPointsVeroniRegion(points[i], points[(i + 1) % 3], points[(i + 2) % 3]))
+				if (OriginLiesInPointsVeroniRegion(points[i].Value, points[(i + 1) % 3].Value, points[(i + 2) % 3].Value))
 				{
-					p = points[i];
-					newQ = SetQ(p);
+					p = points[i].Value;
+					newQ = SetQ(points[i]);
 					return true;
 				}
 			}
@@ -151,10 +175,10 @@ private:
 		{
 			for (auto i = 0; i < 4; i++)
 			{
-				if (OriginLiesInPointsVeroniRegion(points[i], points[(i + 1) % 4], points[(i + 2) % 4], points[(i + 3) % 4]))
+				if (OriginLiesInPointsVeroniRegion(points[i].Value, points[(i + 1) % 4].Value, points[(i + 2) % 4].Value, points[(i + 3) % 4].Value))
 				{
-					p = points[i];
-					newQ = SetQ(p);
+					p = points[i].Value;
+					newQ = SetQ(points[i]);
 					return true;
 				}
 			}
@@ -180,7 +204,7 @@ private:
 		{
 		case 2:
 		{
-			p = ProjectOntoEdge(points[0], points[1]);
+			p = ProjectOntoEdge(points[0].Value, points[1].Value);
 			newQ = SetQ(points[0], points[1]);
 			return true;
 		}
@@ -190,9 +214,9 @@ private:
 			{
 				auto& pA = points[i];
 				auto& pB = points[(i + 1) % 3];
-				if (OriginLiesInEdgesVeroniRegion(pA, pB, points[(i + 2) % 3]))
+				if (OriginLiesInEdgesVeroniRegion(pA.Value, pB.Value, points[(i + 2) % 3].Value))
 				{
-					p = ProjectOntoEdge(pA, pB);
+					p = ProjectOntoEdge(pA.Value, pB.Value);
 					newQ = SetQ(pA, pB);
 					return true;
 				}
@@ -209,9 +233,9 @@ private:
 			{
 				for (auto j = i + 1; j < 4; j++)
 				{
-					if (OriginLiesInEdgesVeroniRegion(points[i], points[j], points[toOtherIndexA[k]], points[toOtherIndexB[k]]))
+					if (OriginLiesInEdgesVeroniRegion(points[i].Value, points[j].Value, points[toOtherIndexA[k]].Value, points[toOtherIndexB[k]].Value))
 					{
-						p = ProjectOntoEdge(points[i], points[j]);
+						p = ProjectOntoEdge(points[i].Value, points[j].Value);
 						newQ = SetQ(points[i], points[j]);
 						return true;
 					}
@@ -240,7 +264,7 @@ private:
 		{
 		case 3:
 		{
-			p = ProjectOntoFace(points[0], points[1], points[2]);
+			p = ProjectOntoFace(points[0].Value, points[1].Value, points[2].Value);
 			newQ = SetQ(points[0], points[1], points[2]);
 			return true;
 		}
@@ -251,9 +275,9 @@ private:
 				auto& pA = points[i];
 				auto& pB = points[(i + 1) % 4];
 				auto& pC = points[(i + 2) % 4];
-				if (OriginLiesInFacesVeroniRegion(pA, pB, pC, points[(i + 3) % 4]))
+				if (OriginLiesInFacesVeroniRegion(pA.Value, pB.Value, pC.Value, points[(i + 3) % 4].Value))
 				{
-					p = ProjectOntoFace(pA, pB, pC);
+					p = ProjectOntoFace(pA.Value, pB.Value, pC.Value);
 					newQ = SetQ(pA, pB, pC);
 					return true;
 				}
@@ -283,9 +307,11 @@ private:
 	}
 
 public:
-	static Vector3 GetMinowskiDiffSupportVertex(const GjkInputShape& shapeA, const GjkInputShape& shapeB, const Vector3& dir)
+	static MinowskiDiffPoint GetMinowskiDiffSupportVertex(const GjkInputShape& shapeA, const GjkInputShape& shapeB, const Vector3& dir)
 	{
-		return shapeA.GetSupportVertex(dir) - shapeB.GetSupportVertex(-dir);
+		auto origA = shapeA.GetSupportVertex(dir);
+		auto origB = shapeB.GetSupportVertex(-dir);
+		return MinowskiDiffPoint(shapeA.GetPointAt(origA) - shapeB.GetPointAt(origB), origA, origB);
 	}
 
 	const auto& GetQ() const
@@ -306,7 +332,7 @@ public:
 			auto v = GetMinowskiDiffSupportVertex(shapeA, shapeB, -p);
 
 			// If p is more (or same) extreme in the direction -p, there is no intersection
-			if (Vector3::Dot(p, -p) >= Vector3::Dot(v, -p))
+			if (Vector3::Dot(p, -p) >= Vector3::Dot(v.Value, -p))
 				return p.Magnitude();
 
 			m_Q.AddPoint(v);

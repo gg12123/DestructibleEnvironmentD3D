@@ -97,6 +97,7 @@ public:
 	static inline Vector3 Up();
 	static inline Vector3 Foward();
 	static  Vector3 OrthogonalDirection(const Vector3& v);
+	static inline void CalculateBaryCords(const Vector3& A, const Vector3& B, const Vector3& C, const Vector3& p, float& a, float& b, float& c);
 };
 
 inline Vector3 operator+(const Vector3& lhs, const Vector3& rhs)
@@ -204,11 +205,29 @@ inline bool Vector3::FindLineDefinedByTwoPlanes(const Vector3& planeP0, const Ve
 		if (LinePlaneIntersection(planeP1, planeN1, planeP0, planeP0 + u, lineP0))
 			return true;
 	}
-
 	return false;
 }
 
 inline Vector3 Vector3::OrthogonalDirection(const Vector3& v)
 {
 	return Vector3::ProjectOnPlane(v, Vector3(-v.y, -v.z, v.x)).Normalized();
+}
+
+// The barycentric coordinates of p in triangle ABC
+inline void Vector3::CalculateBaryCords(const Vector3& A, const Vector3& B, const Vector3& C, const Vector3& p, float& a, float& b, float& c)
+{
+	auto v0 = B - A;
+	auto v1 = C - A;
+	auto v2 = p - A;
+
+	auto d00 = Dot(v0, v0);
+	auto d01 = Dot(v0, v1);
+	auto d11 = Dot(v1, v1);
+	auto d20 = Dot(v2, v0);
+	auto d21 = Dot(v2, v1);
+
+	auto denom = d00 * d11 - d01 * d01;
+	b = (d11 * d20 - d01 * d21) / denom;
+	c = (d00 * d21 - d01 * d20) / denom;
+	a = 1 - b - c;
 }

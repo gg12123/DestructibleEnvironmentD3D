@@ -46,12 +46,12 @@ bool CollisionResponder::CalculateCollisionPoint(const std::vector<EdgeFaceInter
 	return false;
 }
 
-void CollisionResponder::CalculateResponse(const ContactManifold& contact1To2, PhysicsObject& body1, PhysicsObject& body2)
+void CollisionResponder::CalculateResponse(const ContactManifold& worldContact1To2, PhysicsObject& body1, PhysicsObject& body2)
 {
 	static constexpr float e = 0.5f; // TODO - get this from somewere else
 
-	auto collNormalWorld1To2 = contact1To2.GetWorldNormal();
-	auto collPointWorld = contact1To2.GetWorldPoint();
+	auto collNormalWorld1To2 = worldContact1To2.GetNormal();
+	auto collPointWorld = worldContact1To2.GetPoint();
 
 	auto v1 = body1.WorldVelocityAt(collPointWorld);
 	auto v2 = body2.WorldVelocityAt(collPointWorld);

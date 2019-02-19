@@ -144,8 +144,8 @@ void Rigidbody::SatisfyContactConstraints()
 {
 	for (auto& c : m_Contacts)
 	{
-		auto n = c.GetWorldNormal();
-		auto p = c.GetWorldPoint();
+		auto n = c.GetNormal();
+		auto p = c.GetPoint();
 
 		if (Vector3::Dot(WorldVelocityAt(p), n) < 0.0f)
 		{
