@@ -112,8 +112,6 @@ private:
 	Vector3 m_AddedForceWorld;
 	Vector3 m_AddedMomentsWorld;
 
-	Vector3 m_ToSeperate;
-
 	float m_Drag;
 	float m_AngularDrag;
 };

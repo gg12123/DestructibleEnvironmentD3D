@@ -99,8 +99,7 @@ void Rigidbody::UpdateTransform()
 {
 	auto& t = GetTransform();
 
-	t.SetPosition(t.GetPosition() + m_VelocityWorld * PhysicsTime::FixedDeltaTime + m_ToSeperate);
-	m_ToSeperate = Vector3::Zero();
+	t.SetPosition(t.GetPosition() + m_VelocityWorld * PhysicsTime::FixedDeltaTime);
 
 	auto& q = t.GetRotation();
 	t.SetRotation(q + m_AngularVelocityWorld * q * 0.5f * PhysicsTime::FixedDeltaTime);

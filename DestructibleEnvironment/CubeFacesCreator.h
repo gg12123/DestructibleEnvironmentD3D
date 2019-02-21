@@ -13,7 +13,7 @@ class CubeFacesCreator
 {
 private:
 	static constexpr int CutShapeNumPoints = 8;
-	static constexpr int FaceNumPoints = 3;
+	static constexpr int FaceNumPoints = 4;
 
 	void CreatePoints(const Matrix4& M)
 	{
@@ -47,12 +47,12 @@ private:
 		CreateEdge(1, 5);
 		CreateEdge(2, 6);
 
-		CreateEdge(1, 3);
-		CreateEdge(7, 0);
-		CreateEdge(6, 3);
-		CreateEdge(5, 2);
-		CreateEdge(4, 1);
-		CreateEdge(6, 4);
+		//CreateEdge(1, 3);
+		//CreateEdge(7, 0);
+		//CreateEdge(6, 3);
+		//CreateEdge(5, 2);
+		//CreateEdge(4, 1);
+		//CreateEdge(6, 4);
 	}
 
 	Vector3 DirToNext(int p, int pNext)
@@ -97,44 +97,44 @@ private:
 		auto forwardRot = q.RotateV(Vector3::Foward());
 
 		shape.AddFace(CreateFace(m_Face0, upRot));
-		shape.AddFace(CreateFace(m_Face1, upRot));
+		//shape.AddFace(CreateFace(m_Face1, upRot));
 
-		shape.AddFace(CreateFace(m_Face2, rightRot));
-		shape.AddFace(CreateFace(m_Face3, rightRot));
+		shape.AddFace(CreateFace(m_Face1, rightRot));
+		//shape.AddFace(CreateFace(m_Face3, rightRot));
 
-		shape.AddFace(CreateFace(m_Face4, -forwardRot));
-		shape.AddFace(CreateFace(m_Face5, -forwardRot));
+		shape.AddFace(CreateFace(m_Face2, -forwardRot));
+		//shape.AddFace(CreateFace(m_Face5, -forwardRot));
 
-		shape.AddFace(CreateFace(m_Face6, -rightRot));
-		shape.AddFace(CreateFace(m_Face7, -rightRot));
+		shape.AddFace(CreateFace(m_Face3, -rightRot));
+		//shape.AddFace(CreateFace(m_Face7, -rightRot));
 
-		shape.AddFace(CreateFace(m_Face8, forwardRot));
-		shape.AddFace(CreateFace(m_Face9, forwardRot));
+		shape.AddFace(CreateFace(m_Face4, forwardRot));
+		//shape.AddFace(CreateFace(m_Face9, forwardRot));
 
-		shape.AddFace(CreateFace(m_Face10, -upRot));
-		shape.AddFace(CreateFace(m_Face11, -upRot));
+		shape.AddFace(CreateFace(m_Face5, -upRot));
+		//shape.AddFace(CreateFace(m_Face11, -upRot));
 	}
 
 public:
 	CubeFacesCreator()
 	{
-		m_Face0 = { 1, 0, 3 };
-		m_Face1 = { 3, 2, 1 };
+		m_Face0 = { 1, 0, 3, 2 };
+		//m_Face1 = { 3, 2, 1 };
 
-		m_Face2 = { 0, 4, 7 };
-		m_Face3 = { 7, 3, 0 };
+		m_Face1 = { 0, 4, 7, 3 };
+		//m_Face3 = { 7, 3, 0 };
 
-		m_Face4 = { 3, 7, 6 };
-		m_Face5 = { 6, 2, 3 };
+		m_Face2 = { 3, 7, 6, 2 };
+		//m_Face5 = { 6, 2, 3 };
 
-		m_Face6 = { 2, 6, 5 };
-		m_Face7 = { 5, 1, 2 };
+		m_Face3 = { 2, 6, 5, 1 };
+		//m_Face7 = { 5, 1, 2 };
 
-		m_Face8 = { 1, 5, 4 };
-		m_Face9 = { 4, 0, 1 };
+		m_Face4 = { 1, 5, 4, 0 };
+		//m_Face9 = { 4, 0, 1 };
 
-		m_Face10 = { 4, 5, 6 };
-		m_Face11 = { 6, 7, 4 };
+		m_Face5 = { 4, 5, 6, 7 };
+		//m_Face11 = { 6, 7, 4 };
 	}
 
 	void CreateFaces(Shape& shape, const Matrix4& M, const Quaternion& MsRot)
@@ -154,10 +154,4 @@ private:
 	std::array<int, FaceNumPoints> m_Face3;
 	std::array<int, FaceNumPoints> m_Face4;
 	std::array<int, FaceNumPoints> m_Face5;
-	std::array<int, FaceNumPoints> m_Face6;
-	std::array<int, FaceNumPoints> m_Face7;
-	std::array<int, FaceNumPoints> m_Face8;
-	std::array<int, FaceNumPoints> m_Face9;
-	std::array<int, FaceNumPoints> m_Face10;
-	std::array<int, FaceNumPoints> m_Face11;
 };

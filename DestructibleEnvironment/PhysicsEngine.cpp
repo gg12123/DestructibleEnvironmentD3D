@@ -86,7 +86,7 @@ void PhysicsEngine::UpdateBodies()
 
 void PhysicsEngine::ProcessSplits()
 {
-	static auto constexpr doSplits = true;
+	static auto constexpr doSplits = false;
 
 	if (doSplits)
 	{

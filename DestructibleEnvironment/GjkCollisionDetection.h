@@ -109,7 +109,7 @@ private:
 
 	bool OriginLiesInEdgesVeroniRegion(const Vector3& q1, const Vector3& q2, const Vector3& qOtherA, const Vector3& qOtherB) const
 	{
-		return OriginLiesInEdgesVeroniRegion(q2, q2, qOtherA) && OriginLiesInEdgesVeroniRegion(q2, q2, qOtherB);
+		return OriginLiesInEdgesVeroniRegion(q1, q2, qOtherA) && OriginLiesInEdgesVeroniRegion(q1, q2, qOtherB);
 	}
 
 	bool OriginLiesInFacesVeroniRegion(const Vector3& q1, const Vector3& q2, const Vector3& q3, const Vector3& qOther) const
@@ -254,7 +254,7 @@ private:
 	Vector3 ProjectOntoFace(const Vector3& q1, const Vector3& q2, const Vector3& q3) const
 	{
 		auto n = Vector3::Cross(q2 - q1, q3 - q1).Normalized();
-		return Vector3::ProjectOnPlane(n, -q1);
+		return Vector3::Dot(q1, n) * n;
 	}
 
 	bool TestFaceVeroniRegionsForP(Vector3& p, SetQ& newQ) const
@@ -331,8 +331,11 @@ public:
 
 			auto v = GetMinowskiDiffSupportVertex(shapeA, shapeB, -p);
 
+			auto pComp = Vector3::Dot(p, -p);
+			auto vComp = Vector3::Dot(v.Value, -p);
+
 			// If p is more (or same) extreme in the direction -p, there is no intersection
-			if (Vector3::Dot(p, -p) >= Vector3::Dot(v.Value, -p))
+			if (pComp >= vComp)
 				return p.Magnitude();
 
 			m_Q.AddPoint(v);

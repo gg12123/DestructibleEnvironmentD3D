@@ -96,6 +96,8 @@ public:
 	ContactManifold FindContact(const GjkInputShape& shapeA, const GjkInputShape& shapeB,
 		const GjkCollisionDetection::SetQ& q)
 	{
+		InitFaces(q);
+
 		MinowPoint sv;
 		while (true)
 		{
