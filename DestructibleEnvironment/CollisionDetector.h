@@ -35,7 +35,7 @@ private:
 		auto gjkShape1 = GjkInputShape(shape1.GetCachedPoints(), shape1.GetCentre());
 		auto gjkShape2 = TransformToShape1sSpace(shape2);
 
-		if (m_Detector.Run(gjkShape1, gjkShape2) <= 0.0f)
+		if (m_Detector.Run(gjkShape1, gjkShape2) < 0.0f)
 		{
 			contact = CalculateCantact1To2(gjkShape1, gjkShape2);
 			return true;

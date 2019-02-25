@@ -329,13 +329,10 @@ public:
 			if (UpdateQ(p))
 				return -1.0f; // Intersecting
 
-			auto v = GetMinowskiDiffSupportVertex(shapeA, shapeB, -p);
+			auto searchDir = -p;
+			auto v = GetMinowskiDiffSupportVertex(shapeA, shapeB, searchDir);
 
-			auto pComp = Vector3::Dot(p, -p);
-			auto vComp = Vector3::Dot(v.Value, -p);
-
-			// If p is more (or same) extreme in the direction -p, there is no intersection
-			if (pComp >= vComp)
+			if (Vector3::Dot(v.Value, searchDir) <= 0.0f)
 				return p.Magnitude();
 
 			m_Q.AddPoint(v);

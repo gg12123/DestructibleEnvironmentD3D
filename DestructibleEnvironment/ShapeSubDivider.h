@@ -37,6 +37,7 @@ public:
 
 		m_ShapesToDivide.clear();
 		m_ShapesToDivideNext.clear();
+		m_ShapesToDivedeNext2.clear();
 
 		for (auto s : original.GetSubShapes())
 			m_ShapesToDivide.emplace_back(s);
@@ -45,11 +46,13 @@ public:
 		{
 			for (auto s : m_ShapesToDivide)
 			{
-				assert(m_Splitter.Split(CalculateSplitPlane(*s), *s, m_ShapesToDivideNext, m_ShapesToDivideNext));
+				assert(m_Splitter.Split(CalculateSplitPlane(*s), *s, m_ShapesToDivideNext, m_ShapesToDivedeNext2));
+				m_ShapesToDivideNext.insert(m_ShapesToDivideNext.end(), m_ShapesToDivedeNext2.begin(), m_ShapesToDivedeNext2.end());
 			}
 
 			m_ShapesToDivide.swap(m_ShapesToDivideNext);
 			m_ShapesToDivideNext.clear();
+			m_ShapesToDivedeNext2.clear();
 		}
 
 		original.ClearSubShapes();
@@ -71,4 +74,5 @@ private:
 
 	std::vector<Shape*> m_ShapesToDivide;
 	std::vector<Shape*> m_ShapesToDivideNext;
+	std::vector<Shape*> m_ShapesToDivedeNext2;
 };

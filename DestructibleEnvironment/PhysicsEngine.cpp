@@ -15,19 +15,6 @@ void PhysicsEngine::Run()
 
 	while (m_Running)
 	{
-		//while (m_SafeToSync)
-		//{
-		//	// Collision detection will be expensive so execution shouln't be here for long.
-		//}
-		//
-		//m_Time.WaitForNextUpdateTime();
-		//
-		//UpdateBodies();
-		//
-		//m_SafeToSync = true;
-		//
-		//DoCollisionDetectionResponse();
-
 		ApplyExternalForces();
 
 		m_SafeToSync = true;
@@ -86,7 +73,7 @@ void PhysicsEngine::UpdateBodies()
 
 void PhysicsEngine::ProcessSplits()
 {
-	static auto constexpr doSplits = false;
+	static auto constexpr doSplits = true;
 
 	if (doSplits)
 	{

@@ -16,7 +16,8 @@ private:
 		MinowskiDifferenceFace(const MinowPoint& p0, const MinowPoint& p1, const MinowPoint& p2, const Vector3& normalRef) :
 			m_Points{p0, p1, p2}
 		{
-			m_N = Vector3::Cross(p1.Value - p0.Value, p2.Value - p0.Value).InDirectionOf(normalRef).Normalized();
+			auto cross = Vector3::Cross(p1.Value - p0.Value, p2.Value - p0.Value);
+			m_N = cross.InDirectionOf(normalRef).Normalized();
 		}
 
 		bool CanExpand(const GjkInputShape& shapeA, const GjkInputShape& shapeB, MinowPoint& sv) const
@@ -24,7 +25,11 @@ private:
 			static constexpr auto tol = 0.001f;
 
 			sv = GjkCollisionDetection::GetMinowskiDiffSupportVertex(shapeA, shapeB, m_N);
-			return MathU::Abs(Vector3::Dot(m_Points[0].Value, m_N) - Vector3::Dot(sv.Value, m_N)) > tol;
+
+			auto x = Vector3::Dot(m_Points[0].Value, m_N);
+			auto y = Vector3::Dot(sv.Value, m_N);
+
+			return MathU::Abs(x - y) > tol;
 		}
 
 		MinowskiDifferenceFace Expand(const MinowPoint& sv, int fromEdge) const
