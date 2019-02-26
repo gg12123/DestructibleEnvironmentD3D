@@ -319,7 +319,7 @@ public:
 		return m_Q;
 	}
 
-	float Run(const GjkInputShape& shapeA, const GjkInputShape& shapeB)
+	bool Run(const GjkInputShape& shapeA, const GjkInputShape& shapeB)
 	{
 		InitQ(shapeA, shapeB);
 
@@ -327,13 +327,13 @@ public:
 		while (true)
 		{
 			if (UpdateQ(p))
-				return -1.0f; // Intersecting
+				return true; // Intersecting
 
 			auto searchDir = -p;
 			auto v = GetMinowskiDiffSupportVertex(shapeA, shapeB, searchDir);
 
 			if (Vector3::Dot(v.Value, searchDir) <= 0.0f)
-				return p.Magnitude();
+				return false;
 
 			m_Q.AddPoint(v);
 		}
