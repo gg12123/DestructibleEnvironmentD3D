@@ -22,7 +22,7 @@ class ContactManifold
 public:
 	// The normal must point towards the associated body.
 	// So is in the same direction as the impulse if there is one.
-	ContactManifold(const Vector3& point, const Vector3& normal) : m_Plane(normal, point), m_Point(point)
+	ContactManifold(const Vector3& point, const Vector3& normal) : m_Normal(normal), m_Point(point)
 	{
 	}
 
@@ -32,15 +32,15 @@ public:
 
 	auto GetPoint() const
 	{
-		return m_Plane.GetP0();
+		return m_Point;
 	}
 
 	auto GetNormal() const
 	{
-		return m_Plane.GetNormal();
+		return m_Normal;
 	}
 
 private:
-	Plane m_Plane;
+	Vector3 m_Normal;
 	Vector3 m_Point;
 };

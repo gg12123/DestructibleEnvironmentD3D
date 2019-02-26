@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-static constexpr auto useRandomSeed = true;
+static constexpr auto useRandomSeed = false;
 
 template<bool random>
 uint32 GetSeed()
@@ -16,7 +16,7 @@ uint32 GetSeed()
 template<>
 uint32 GetSeed<false>()
 {
-	return 10U;
+	return 1000u;
 }
 
 static void Seed()

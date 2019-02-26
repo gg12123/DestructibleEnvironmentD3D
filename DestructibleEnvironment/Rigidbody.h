@@ -22,6 +22,7 @@ public:
 
 	void AddContact(const ContactManifold& contact) override
 	{
+		m_Contacts.emplace_back(contact);
 	}
 
 	const Vector3& GetVelocityWorld() const

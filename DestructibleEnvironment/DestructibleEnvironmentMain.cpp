@@ -113,8 +113,8 @@ void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 	//m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodyPos3, RandRot(), 1.0f, 1.0f)));
 
 	m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodiesCentre,
-		Quaternion::Identity(),
-		1.0f, 1.0f)));
+		RandRot(),
+		1.0f, 2.0f)));
 
 	//CreateRandomBodies(m_World);
 
