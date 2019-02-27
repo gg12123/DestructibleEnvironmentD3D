@@ -322,12 +322,21 @@ public:
 	bool Run(const GjkInputShape& shapeA, const GjkInputShape& shapeB)
 	{
 		InitQ(shapeA, shapeB);
+		m_PrevDist = MathU::Infinity;
 
 		Vector3 p;
 		while (true)
 		{
 			if (UpdateQ(p))
 				return true; // Intersecting
+
+			// TODO - why is this termination criteria needed?
+			// Is there something wrong in the implementation?
+			auto dist = p.MagnitudeSqr();
+			if (m_PrevDist <= dist)
+				return false;
+
+			m_PrevDist = dist;
 
 			auto searchDir = -p;
 			auto v = GetMinowskiDiffSupportVertex(shapeA, shapeB, searchDir);
@@ -341,4 +350,5 @@ public:
 
 private:
 	SetQ m_Q;
+	float m_PrevDist;
 };
