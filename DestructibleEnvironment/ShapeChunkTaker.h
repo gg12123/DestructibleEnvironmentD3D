@@ -9,241 +9,103 @@
 class ShapeChunkTaker
 {
 private:
-	static constexpr int MaxNumSplitPlanes = 5;
+	static constexpr int TetraNumVerts = 4;
 
-	enum class PlaneRelationship
-	{
-		Above,
-		Below
-	};
-
-	class ShapeWithPlaneRelationships
+	class TetraVerts
 	{
 	public:
-		ShapeWithPlaneRelationships(Shape& s) : m_Shape(&s)
+		std::array<Vector3, TetraNumVerts> Verts;
+
+		TetraVerts()
 		{
+			// set the original verts
 		}
 
-		void CopyRelationships(const std::array<PlaneRelationship, MaxNumSplitPlanes>& relationships)
+		void ApplyRandomTransform()
 		{
-			std::memcpy(m_Relationships.data(), relationships.data(), MaxNumSplitPlanes * sizeof(PlaneRelationship));
-		}
+			auto r = Quaternion(Random::Range(0.1f, 1.0f), Random::Range(0.1f, 1.0f), Random::Range(0.1f, 1.0f), Random::Range(0.1f, 1.0f));
+			r.Normalize();
 
-		void SetRelationship(int plane, PlaneRelationship r)
-		{
-			m_Relationships[plane] = r;
-		}
-
-		auto& GetShape() const
-		{
-			return *m_Shape;
-		}
-
-		const auto& GetRelationships() const
-		{
-			return m_Relationships;
-		}
-
-		bool CanLinkAboutPlane(int plane, int numPlanes, const ShapeWithPlaneRelationships& other) const
-		{
-			auto& myR = m_Relationships;
-			auto& otherR = other.m_Relationships;
-
-			if (myR[plane] == otherR[plane])
-				return false;
-
-			for (int i = 0; i < numPlanes; i++)
-			{
-				if (i == plane)
-					continue;
-
-				if (myR[i] != otherR[i])
-					return false;
-			}
-			return true;
-		}
-
-		bool IsBelowOnly(int numPlanes) const
-		{
-			for (int i = 0; i < numPlanes; i++)
-			{
-				if (m_Relationships[i] == PlaneRelationship::Above)
-					return false;
-			}
-			return true;
+			for (auto i = 0u; i < m_OrigVerts.size(); i++)
+				Verts[i] = r.RotateV(m_OrigVerts[i]);
 		}
 
 	private:
-		Shape * m_Shape;
-		std::array<PlaneRelationship, MaxNumSplitPlanes> m_Relationships;
+		std::array<Vector3, TetraNumVerts> m_OrigVerts;
 	};
 
-	void CalculateSplitPlanes(const Plane& chunkPlane)
+	Shape& Duplicate(const Shape& s)
 	{
 
 	}
 
-	void HandleNewSubShapes(const ShapeWithPlaneRelationships& splitFrom,
-		PlaneRelationship r,
-		int planeId,
-		const std::vector<Shape*>& newShapes)
+	void CalculatePlanes(const Vector3& t0, const Vector3& t1, const Vector3& t2, std::array<Plane, 3>& planes)
 	{
-		for (auto s : newShapes)
+		auto c = (t0 + t1 + t2) / 2.0f;
+
+		auto n0 = Vector3::Cross(t0, t1).InDirectionOf(t0 - c).Normalized();
+		auto n1 = Vector3::Cross(t1, t2).InDirectionOf(t1 - c).Normalized();
+		auto n2 = Vector3::Cross(t2, t0).InDirectionOf(t2 - c).Normalized();
+
+		planes[0] = Plane(n0, t0);
+		planes[1] = Plane(n1, t1);
+		planes[2] = Plane(n2, t2);
+	}
+
+	Shape& TakeChunk(Shape& toChunk, const std::array<Plane, 3>& planes)
+	{
+		Shape* above = nullptr;
+		Shape* below = &toChunk;
+
+		for (auto& p : planes)
 		{
-			auto sWithR = ShapeWithPlaneRelationships(*s);
-			sWithR.CopyRelationships(splitFrom.GetRelationships());
-			sWithR.SetRelationship(planeId, r);
-			m_BufferNext.emplace_back(sWithR);
+			assert(m_Splitter.Split(p, *below, &above, &below));
+			ShapePool::Return(*above); // MUST IMPLEMENT 'ON RETURNED TO POOL' SO THE SHAPE RETURNS IS POINTS ETC.
 		}
 	}
 
-	void CalculateSubShapes(CompoundShape& origShape)
+	CompoundShape& MakeShape(CompoundShape& shape, Shape& geometry, Transform& refTran)
 	{
-		for (auto s : origShape.GetSubShapes())
-			m_BufferActive.emplace_back(ShapeWithPlaneRelationships(*s));
-
-		for (auto i = 0u; i < m_SplitPlanes.size(); i++)
-		{
-			auto& plane = m_SplitPlanes[i];
-			for (auto& subShape : m_BufferActive)
-			{
-				m_NewShapesAbove.clear();
-				m_NewShapesBelow.clear();
-				m_Splitter.Split(plane, subShape.GetShape(), m_NewShapesAbove, m_NewShapesBelow);
-
-				HandleNewSubShapes(subShape, PlaneRelationship::Above, i, m_NewShapesAbove);
-				HandleNewSubShapes(subShape, PlaneRelationship::Below, i, m_NewShapesBelow);
-			}
-
-			m_BufferActive.swap(m_BufferNext);
-		}
-	}
-
-	bool ShouldBeLinked(const ShapeWithPlaneRelationships& s1, const ShapeWithPlaneRelationships& s2) const
-	{
-		for (auto i = 0u; i < m_SplitPlanes.size(); i++)
-		{
-			if (s1.CanLinkAboutPlane(i, m_SplitPlanes.size(), s2))
-				return true;
-		}
-		return false;
-	}
-
-	void HandleBelowOnlyShapes()
-	{
-		for (auto it = m_BufferActive.begin(); it != m_BufferActive.end(); it++)
-		{
-			if (it->IsBelowOnly(m_SplitPlanes.size()))
-			{
-				auto& cs = TakeCompoundShape();
-				cs.AddSubShape(it->GetShape());
-				m_BufferActive.erase(it);
-				it--;
-			}
-		}
-	}
-
-	CompoundShape& TakeCompoundShape()
-	{
-		if (m_CsToUseNext)
-		{
-			m_CsToUseNext->ClearSubShapes();
-			auto x = m_CsToUseNext;
-			m_CsToUseNext = nullptr;
-			return *x;
-		}
-
-		auto cs = m_ShapePool.GetObject();
-		cs->ClearSubShapes();
-		return *cs;
-	}
-
-	void LinkShapes(Shape& s1, Shape& s2)
-	{
-		if (!s1.HasOwner() && !s2.HasOwner())
-		{
-			auto& cs = TakeCompoundShape();
-			cs.AddSubShape(s1);
-			cs.AddSubShape(s2);
-		}
-		else if (s1.HasOwner() && s2.HasOwner())
-		{
-			auto& csToKeep = s1.GetOwner();
-			auto& csToLose = s2.GetOwner();
-
-			for (auto s : csToLose.GetSubShapes())
-				csToKeep.AddSubShape(*s);
-
-			m_ShapePool.Return(&csToLose);
-		}
-		else if (s1.HasOwner())
-		{
-			s1.GetOwner().AddSubShape(s2);
-		}
-		else
-		{
-			s2.GetOwner().AddSubShape(s1);
-		}
-	}
-
-	void FormCompoundShapes(std::vector<CompoundShape*>& newShapes)
-	{
-		// This must be done before the linking so that the original input compound shape
-		// is garunteed to be re-used.
-		// If it doesnt get re-used until the linking, it may get put back in the pool.
-		HandleBelowOnlyShapes();
-
-		for (auto i = 0u; i < m_BufferActive.size(); i++)
-		{
-			auto& shape = m_BufferActive[i];
-			for (auto j = 0u; j < m_BufferActive.size(); j++)
-			{
-				auto& otherShape = m_BufferActive[j];
-
-				if (ShouldBeLinked(shape, otherShape))
-					LinkShapes(shape.GetShape(), otherShape.GetShape());
-			}
-		}
-
-		for (auto& s : m_BufferActive)
-		{
-			auto& owner = s.GetShape().GetOwner();
-			if (!CollectionU::Contains(newShapes, &owner))
-				newShapes.emplace_back(&owner);
-		}
+		shape.ClearSubShapes();
+		shape.AddSubShape(geometry);
+		shape.CentreAndCache(refTran);
+		return shape;
 	}
 
 public:
-	ShapeChunkTaker() : m_ShapePool([]() { return new CompoundShape(); } , 5)
+	void Chunk(CompoundShape& toChunk, std::vector<CompoundShape*>& chunks)
 	{
-	}
+		assert(toChunk.GetSubShapes().size() == 1u);
 
-	void TakeChunk(CompoundShape& origShape, const Plane& chunkPlane, std::vector<CompoundShape*>& newShapes)
-	{
-		// Must make a copy
-		auto refTran = origShape.GetTransform();
+		auto& shape = *toChunk.GetSubShapes()[0];
+		auto refTran = toChunk.GetTransform();
 
-		CalculateSplitPlanes(chunkPlane);
-		CalculateSubShapes(origShape);
+		m_Tetra.ApplyRandomTransform();
+		m_NewShapes.clear();
 
-		m_CsToUseNext = &origShape;
-		FormCompoundShapes(newShapes);
+		auto& verts = m_Tetra.Verts;
+		std::array<Plane, 3> planes;
 
-		for (auto s : newShapes)
-			s->CentreAndCache(refTran);
+		CalculatePlanes(verts[0], verts[1], verts[2], planes);
+		m_NewShapes.emplace_back(&TakeChunk(Duplicate(shape), planes));
+
+		CalculatePlanes(verts[1], verts[2], verts[3], planes);
+		m_NewShapes.emplace_back(&TakeChunk(Duplicate(shape), planes));
+
+		CalculatePlanes(verts[0], verts[1], verts[3], planes);
+		m_NewShapes.emplace_back(&TakeChunk(Duplicate(shape), planes));
+
+		CalculatePlanes(verts[0], verts[2], verts[3], planes);
+		m_NewShapes.emplace_back(&TakeChunk(shape, planes)); // No need to duplicate on the final chunk
+
+		chunks.emplace_back(MakeShape(toChunk, *m_NewShapes[0], refTran));
+
+		for (auto i = 1u; i < m_NewShapes.size(); i++)
+			chunks.emplace_back(MakeShape((*new CompoundShape()), *m_NewShapes[i], refTran));
 	}
 
 private:
-	std::vector<ShapeWithPlaneRelationships> m_BufferActive;
-	std::vector<ShapeWithPlaneRelationships> m_BufferNext;
-
-	std::vector<Shape*> m_NewShapesAbove;
-	std::vector<Shape*> m_NewShapesBelow;
-
-	std::vector<Plane> m_SplitPlanes;
-
 	ShapeSplitter m_Splitter;
-
-	Pool<CompoundShape*> m_ShapePool;
-	CompoundShape* m_CsToUseNext;
+	TetraVerts m_Tetra;
+	std::vector<Shape*> m_NewShapes;
 };

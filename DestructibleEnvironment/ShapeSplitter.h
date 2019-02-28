@@ -94,6 +94,23 @@ private:
 	}
 
 public:
+	// When the input is convex.
+	bool Split(const Plane& sp, Shape& originalShape, Shape** newShapeAbove, Shape** newShapeBelow)
+	{
+		static std::vector<Shape*> above;
+		static std::vector<Shape*> below;
+
+		above.clear();
+		below.clear();
+
+		auto res = Split(sp, originalShape, above, below);
+
+		*newShapeAbove = above[0];
+		*newShapeBelow = below[0];
+
+		return res;
+	}
+
 	bool Split(const Plane& sp, Shape& originalShape, std::vector<Shape*>& newShapesAbove, std::vector<Shape*>& newShapesBelow)
 	{
 		ResetHashCounters();
