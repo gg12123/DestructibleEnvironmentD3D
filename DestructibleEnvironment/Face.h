@@ -182,6 +182,8 @@ public:
 		Clear();
 	}
 
+	void OnReturnedToPool(){}
+
 	void MergeWith(const Face& other, const ShapeEdge& commonEdge);
 	void RemovePoint(const ShapePoint& toRemove, ShapeEdge& newEdge);
 	void ReplaceEdge(const ShapeEdge& existing, ShapeEdge& newEdge);

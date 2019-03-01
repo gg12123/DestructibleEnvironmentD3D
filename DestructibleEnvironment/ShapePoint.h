@@ -27,6 +27,8 @@ public:
 		ResetHash();
 	}
 
+	void OnReturnedToPool() {}
+
 	void SetBeenCollected()
 	{
 		m_BeenCollectedByShape = true;

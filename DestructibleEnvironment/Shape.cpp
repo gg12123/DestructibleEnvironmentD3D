@@ -7,6 +7,7 @@
 #include "SmallEdgeRemover.h"
 #include "FaceTriangulator.h"
 #include "ShapeElementPool.h"
+#include "ShapeDuplicater.h"
 
 Shape::~Shape()
 {
@@ -118,4 +119,24 @@ void Shape::InitFacesPointsEdges()
 {
 	for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
 		(*it)->OnSplittingFinished(*this); // The face will init its points and edges
+}
+
+Shape& Shape::Duplicate() const
+{
+	static ShapeDuplicater duplicator;
+	auto& dup = duplicator.Duplicate(*this);
+	dup.m_Centre = m_Centre;
+	return dup;
+}
+
+void Shape::OnReturnedToPool()
+{
+	for (auto& e : m_EdgeObjects)
+		EdgePool::Return(*e);
+
+	for (auto& f : m_Faces)
+		FacePool::Return(*f);
+
+	for (auto& p : m_PointObjects)
+		PointPool::Return(*p);
 }

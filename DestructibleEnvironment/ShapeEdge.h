@@ -34,6 +34,8 @@ public:
 		ResetHash();
 	}
 
+	void OnReturnedToPool() {}
+
 	bool BridgesCoPlanarFaces() const;
 
 	void RegisterFace(Face& f, int indexOfThisEdgeInTheFace)

@@ -112,6 +112,10 @@ public:
 		Clear();
 	}
 
+	void OnReturnedToPool();
+
+	Shape& Duplicate() const;
+
 private:
 	void ReCentre(const Vector3& centre);
 	void TryCollectPoint(ShapePoint& p);

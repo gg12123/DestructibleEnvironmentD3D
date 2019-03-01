@@ -267,6 +267,7 @@
     <ClInclude Include="ReadOnlyInput.h" />
     <ClInclude Include="RedundantPointRemover.h" />
     <ClInclude Include="ShapeChunkTaker.h" />
+    <ClInclude Include="ShapeDuplicater.h" />
     <ClInclude Include="ShapeElementPool.h" />
     <ClInclude Include="ShapePoint.h" />
     <ClInclude Include="Pool.h" />

@@ -146,11 +146,26 @@ void Rigidbody::SatisfyContactConstraints()
 		auto n = c.GetNormal();
 		auto p = c.GetPoint();
 
+		// First modify the linear velocity to statisfy the contact constraint
+		auto pointVelDotN = Vector3::Dot(WorldVelocityAt(p), n);
+		if (pointVelDotN < 0.0f)
+			m_VelocityWorld -= pointVelDotN * n;
+	}
+
+	for (auto& c : m_Contacts)
+	{
+		auto n = c.GetNormal();
+		auto p = c.GetPoint();
+
 		if (Vector3::Dot(WorldVelocityAt(p), n) < 0.0f)
 		{
+			// The constraint is still not statisfied so zero the linear velocity
 			m_VelocityWorld -= MathU::Min(0.0f, Vector3::Dot(m_VelocityWorld, n)) * n;
 
-			if (Vector3::Dot(WorldVelocityAt(p), n) < 0.0f)
+			static constexpr float zeroAngVelTol = 0.0001f;
+
+			// If still not satisfied, zero the angular velocity.
+			if (Vector3::Dot(WorldVelocityAt(p), n) < -zeroAngVelTol)
 				m_AngularVelocityWorld = Vector3::Zero();
 		}
 	}

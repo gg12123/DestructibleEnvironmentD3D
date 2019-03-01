@@ -20,6 +20,7 @@ public:
 
 	static void Return(T& obj)
 	{
+		obj.OnReturnedToPool();
 		m_Pool->Return(&obj);
 	}
 

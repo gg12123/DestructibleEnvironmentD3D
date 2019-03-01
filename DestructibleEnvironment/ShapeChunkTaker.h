@@ -18,7 +18,10 @@ private:
 
 		TetraVerts()
 		{
-			// set the original verts
+			m_OrigVerts[0] = Vector3(std::sqrtf(8.0f / 9.0f), 0.0f, -1.0f / 3.0f);
+			m_OrigVerts[1] = Vector3(-std::sqrtf(2.0f / 9.0f), std::sqrtf(2.0f / 3.0f), -1.0f / 3.0f);
+			m_OrigVerts[2] = Vector3(-std::sqrtf(2.0f / 9.0f), -std::sqrtf(2.0f / 3.0f), -1.0f / 3.0f);
+			m_OrigVerts[3] = Vector3(0.0f, 0.0f, 1.0f);
 		}
 
 		void ApplyRandomTransform()
@@ -36,7 +39,7 @@ private:
 
 	Shape& Duplicate(const Shape& s)
 	{
-
+		return s.Duplicate();
 	}
 
 	void CalculatePlanes(const Vector3& t0, const Vector3& t1, const Vector3& t2, std::array<Plane, 3>& planes)
@@ -60,7 +63,7 @@ private:
 		for (auto& p : planes)
 		{
 			assert(m_Splitter.Split(p, *below, &above, &below));
-			ShapePool::Return(*above); // MUST IMPLEMENT 'ON RETURNED TO POOL' SO THE SHAPE RETURNS IS POINTS ETC.
+			ShapePool::Return(*above);
 		}
 	}
 
