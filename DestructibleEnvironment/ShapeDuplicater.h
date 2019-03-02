@@ -53,6 +53,7 @@ public:
 		}
 
 		dup.CollectShapeElementsAndResetHashes();
+		dup.ResetBeenCollectedFlag();
 
 		ShapePoint::ResetHashes(toDup.GetPointObjects());
 		ShapeEdge::ResetHashes(toDup.GetEdgeObjects());

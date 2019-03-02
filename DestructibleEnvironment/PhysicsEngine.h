@@ -10,7 +10,7 @@
 #include "SplitInfo.h"
 #include "Collision.h"
 #include "FixedTimeStepTime.h"
-#include "ShapeSubDivider.h"
+#include "ShapeChunkTaker.h"
 #include "RayCasting.h"
 
 class PhysicsEngine
@@ -90,7 +90,7 @@ private:
 	Collision m_Collision;
 
 	std::vector<SplitInfo> m_Splits;
-	ShapeSubDivider<Rigidbody> m_ShapeDivider;
+	ShapeChunkTaker<Rigidbody> m_ShapeChunker;
 	std::vector<Rigidbody*> m_NewBodiesFromSplit;
 
 	FixedTimeStepTime m_Time;

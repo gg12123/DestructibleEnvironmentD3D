@@ -172,6 +172,11 @@ public:
 		m_BeenCollectedByShape = true;
 	}
 
+	void ClearBeenCollected()
+	{
+		m_BeenCollectedByShape = false;
+	}
+
 	Vector3 GetDirFromP0ToP1() const
 	{
 		return (m_P1->GetPoint() - m_P0->GetPoint()).Normalized();

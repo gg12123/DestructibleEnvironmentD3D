@@ -65,6 +65,12 @@ void Shape::TryCollectEdge(ShapeEdge& e)
 
 void Shape::CollectShapeElementsAndResetHashes()
 {
+	// TODO - this could be done without the 'been collected flag'
+	// if we assume that each point is attached to three faces.
+	// At the moment this assumption holds but after the clean
+	// geometry method is implemented it may not. So re-vist this
+	// after implementing that.
+
 	m_EdgeObjects.clear();
 	m_EdgeIndexes.clear();
 	m_PointObjects.clear();
@@ -90,6 +96,15 @@ void Shape::CollectShapeElementsAndResetHashes()
 		}
 		face.ResetHash();
 	}
+}
+
+void Shape::ResetBeenCollectedFlag()
+{
+	for (auto p : m_PointObjects)
+		p->ClearBeenCollected();
+
+	for (auto e : m_EdgeObjects)
+		e->ClearBeenCollected();
 }
 
 void Shape::ReCentre(const Vector3& ownersCentre)

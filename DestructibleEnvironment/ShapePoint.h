@@ -34,6 +34,11 @@ public:
 		m_BeenCollectedByShape = true;
 	}
 
+	void ClearBeenCollected()
+	{
+		m_BeenCollectedByShape = false;
+	}
+
 	void OnSplittingFinished(const Shape& owner)
 	{
 		m_OwnerShape = &owner;

@@ -90,9 +90,10 @@ public:
 	// To create a new shape
 	// - add all the faces
 	// - call collect
-	// - call centre and cache
+	// - call 'centre and cache' (or call 'reset been collected' for intermediate shapes)
 
 	void CollectShapeElementsAndResetHashes();
+	void ResetBeenCollectedFlag();
 
 	void CentreAndCache(const Vector3& ownersCentre)
 	{

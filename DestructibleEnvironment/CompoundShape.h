@@ -12,7 +12,6 @@ class CompoundShape
 public:
 	~CompoundShape()
 	{
-		// TODO - also need to return all the shapes points edge and faces to the pool
 		for (auto s : m_SubShapes)
 			ShapePool::Return(*s);
 	}

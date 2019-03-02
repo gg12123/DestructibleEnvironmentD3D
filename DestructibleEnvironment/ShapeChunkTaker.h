@@ -6,6 +6,7 @@
 #include "CompoundShape.h"
 #include "Pool.h"
 
+template<class Tshape>
 class ShapeChunkTaker
 {
 private:
@@ -60,14 +61,17 @@ private:
 		Shape* above = nullptr;
 		Shape* below = &toChunk;
 
-		for (auto& p : planes)
+		for (auto& sp : planes)
 		{
-			assert(m_Splitter.Split(p, *below, &above, &below));
+			assert(m_Splitter.Split(sp, *below, &above, &below));
+
 			ShapePool::Return(*above);
+			below->ResetBeenCollectedFlag();
 		}
+		return *below;
 	}
 
-	CompoundShape& MakeShape(CompoundShape& shape, Shape& geometry, Transform& refTran)
+	Tshape& MakeShape(Tshape& shape, Shape& geometry, Transform& refTran)
 	{
 		shape.ClearSubShapes();
 		shape.AddSubShape(geometry);
@@ -76,7 +80,7 @@ private:
 	}
 
 public:
-	void Chunk(CompoundShape& toChunk, std::vector<CompoundShape*>& chunks)
+	void Chunk(Tshape& toChunk, std::vector<Tshape*>& chunks)
 	{
 		assert(toChunk.GetSubShapes().size() == 1u);
 
@@ -101,10 +105,10 @@ public:
 		CalculatePlanes(verts[0], verts[2], verts[3], planes);
 		m_NewShapes.emplace_back(&TakeChunk(shape, planes)); // No need to duplicate on the final chunk
 
-		chunks.emplace_back(MakeShape(toChunk, *m_NewShapes[0], refTran));
+		chunks.emplace_back(&MakeShape(toChunk, *m_NewShapes[0], refTran));
 
 		for (auto i = 1u; i < m_NewShapes.size(); i++)
-			chunks.emplace_back(MakeShape((*new CompoundShape()), *m_NewShapes[i], refTran));
+			chunks.emplace_back(&MakeShape((*new Tshape()), *m_NewShapes[i], refTran));
 	}
 
 private:

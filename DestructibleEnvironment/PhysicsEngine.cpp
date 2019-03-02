@@ -83,7 +83,10 @@ void PhysicsEngine::ProcessSplits()
 			auto& toSplit = *s.ToSplit;
 
 			m_NewBodiesFromSplit.clear();
-			m_ShapeDivider.DivideShape(1, m_NewBodiesFromSplit, toSplit);
+
+			m_ShapeChunker.Chunk(toSplit, m_NewBodiesFromSplit);
+
+			//m_ShapeDivider.DivideShape(1, m_NewBodiesFromSplit, toSplit);
 
 			for (auto newBody : m_NewBodiesFromSplit)
 			{
