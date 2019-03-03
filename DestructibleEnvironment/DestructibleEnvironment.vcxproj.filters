@@ -450,6 +450,15 @@
     <ClInclude Include="ShapeDuplicater.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
+    <ClInclude Include="ObjectInHGrid.h">
+      <Filter>Physics\CollisionStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="HGridLevel.h">
+      <Filter>Physics\CollisionStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="HGrid.h">
+      <Filter>Physics\CollisionStuff</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">

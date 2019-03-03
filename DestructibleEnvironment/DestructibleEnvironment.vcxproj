@@ -218,6 +218,8 @@
     <ClInclude Include="EdgeFaceIntersection.h" />
     <ClInclude Include="FaceIterator.h" />
     <ClInclude Include="GjkCollisionDetection.h" />
+    <ClInclude Include="HGrid.h" />
+    <ClInclude Include="HGridLevel.h" />
     <ClInclude Include="InPlaneFacesCreator.h" />
     <ClInclude Include="InputChannel.h" />
     <ClInclude Include="InputChannelWrapper.h" />
@@ -228,6 +230,7 @@
     <ClInclude Include="MapToNewEdges.h" />
     <ClInclude Include="MapToPointPlaneRelationship.h" />
     <ClInclude Include="NewShapeGeometryCreator.h" />
+    <ClInclude Include="ObjectInHGrid.h" />
     <ClInclude Include="ObjectWithHash.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="PlaneMesh.h" />
