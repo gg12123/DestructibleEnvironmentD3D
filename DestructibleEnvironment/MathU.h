@@ -62,7 +62,8 @@ public:
 		return fabs(val);
 	}
 
-	static inline float Clamp(float val)
+	template<class T>
+	static inline T Clamp(T val, T min, T max)
 	{
 		assert(false);
 	}

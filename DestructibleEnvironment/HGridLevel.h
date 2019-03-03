@@ -66,15 +66,30 @@ public:
 		int ZEnd;
 	};
 
-	HGridLevel(int numBuckets, float squareSize)
+	HGridLevel(int numBuckets, float squareSize) : m_SquareSize(squareSize)
 	{
 		m_Buckets.resize(numBuckets);
-		m_SquareSize = squareSize;
 	}
 
 	SquareRange GetRange(const ObjectInHGrid& obj) const
 	{
+		SquareRange r;
 
+		auto c = obj.GetCentre();
+		auto e = obj.GetExtends();
+
+		auto max = c + e;
+		auto min = c - e;
+
+		r.XStart = std::floorf(min.x / m_SquareSize);
+		r.YStart = std::floorf(min.y / m_SquareSize);
+		r.ZStart = std::floorf(min.z / m_SquareSize);
+
+		r.XEnd = std::floorf(max.x / m_SquareSize) + 1;
+		r.YEnd = std::floorf(max.y / m_SquareSize) + 1;
+		r.ZEnd = std::floorf(max.z / m_SquareSize) + 1;
+
+		return r;
 	}
 
 	int GetBucketIndex(int squareXIndex, int squareYIndex, int squareZIndex) const

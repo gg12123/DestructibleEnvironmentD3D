@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <stack>
+#include <algorithm>
 #include "HGridLevel.h"
 
 class HGrid
@@ -70,15 +71,48 @@ private:
 		std::stack<ObjectInHGrid*> m_Objects;
 	};
 
+	float CalculateObjectSize(const ObjectInHGrid& obj) const
+	{
+		auto ex = obj.GetExtends();
+		auto maxEx = MathU::Max(MathU::Max(ex.x, ex.y), ex.z);
+		return 2.0f * maxEx;
+	}
+
 	int GetLevel(const ObjectInHGrid& obj) const
 	{
+		auto x = static_cast<int>(std::floorf((CalculateObjectSize(obj) - m_MinObjSize) / m_MinObjSize));
+		return m_LevelLookup[MathU::Clamp(x, 0, static_cast<int>(m_Levels.size()) - 1)];
+	}
 
+	int NumBucketsFromSquareSize(float size) const
+	{
+		return 1000; // TODO - use less buckets when the square size is bigger
 	}
 
 public:
 	HGrid(float maxObjSize, float minObjSize)
 	{
+		auto size = maxObjSize;
+		m_Levels.emplace_back(LevelWithObjects(NumBucketsFromSquareSize(size), size));
 
+		while (size > minObjSize)
+		{
+			size /= 2.0f;
+			m_Levels.emplace_back(LevelWithObjects(NumBucketsFromSquareSize(size), size));
+		}
+
+		m_MinObjSize = size;
+
+		auto insertCount = 1;
+		auto insertVal = m_Levels.size() - 1;
+		for (auto i = 0u; i < m_Levels.size(); i++)
+		{
+			for (auto i = 0; i < insertCount; i++)
+				m_LevelLookup.emplace_back(insertVal);
+
+			insertCount *= 2;
+			insertVal--;
+		}
 	}
 
 	void AddObject(ObjectInHGrid& obj)
@@ -114,4 +148,6 @@ public:
 
 private:
 	std::vector<LevelWithObjects> m_Levels; // index 0 is for largest objects
+	std::vector<int> m_LevelLookup;
+	float m_MinObjSize;
 };
