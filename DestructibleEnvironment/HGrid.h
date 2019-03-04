@@ -4,21 +4,29 @@
 #include <algorithm>
 #include "HGridLevel.h"
 
+template<class Tobject, class TcollisionHandler>
 class HGrid
 {
 private:
 	class LevelWithObjects
 	{
 	private:
-		void Query(const ObjectInHGrid& obj, int bucketIndex)
+		void Query(const Tobject& obj, int bucketIndex, TcollisionHandler& collHandler)
 		{
 			auto& bucket = m_Level.GetBucket(bucketIndex);
 
-			for (auto& other : bucket.GetObjects())
+			for (auto other : bucket.GetObjects())
 			{
 				// check the other object has not already been checked against
 				// the input obj using the 'last checked against' flag.
 				// then check for collision
+				if (other->GetLastCheckedAgainst() != &obj)
+				{
+					other->SetLastCheckedAgainst(&obj);
+
+					if (other->GetAABB().OverlapsWith(obj.GetAABB()))
+						collHandler.RunNarrowPhaseCheckForCollision(obj, *other);
+				}
 			}
 		}
 
@@ -27,12 +35,12 @@ private:
 		{
 		}
 
-		void AddObject(ObjectInHGrid& obj)
+		void AddObject(Tobject& obj)
 		{
 			m_Objects.push(&obj);
 		}
 
-		void Query(const ObjectInHGrid& obj) // also pass in an object to call back to for handling the collision test
+		void Query(const Tobject& obj, TcollisionHandler& collHandler) // also pass in an object to call back to for handling the collision test
 		{
 			auto range = m_Level.GetRange(obj);
 
@@ -41,12 +49,12 @@ private:
 				for (auto y = range.YStart; y != range.YEnd; y++)
 				{
 					for (auto z = range.ZStart; z != range.ZEnd; z++)
-						Query(obj, m_Level.GetBucketIndex(x, y, z));
+						Query(obj, m_Level.GetBucketIndex(x, y, z), collHandler);
 				}
 			}
 		}
 
-		ObjectInHGrid* GetNextToInsert() const
+		Tobject* GetNextToInsert() const
 		{
 			return m_Objects.size() > 0u ? m_Objects.top() : nullptr;
 		}
@@ -56,8 +64,7 @@ private:
 			auto& toInsert = *GetNextToInsert();
 			m_Objects.pop();
 
-			// Clear 'last checked against' on the object to insert
-
+			toInsert.SetLastCheckedAgainst(nullptr);
 			m_Level.Insert(toInsert);
 		}
 
@@ -66,19 +73,24 @@ private:
 			m_Level.Clear();
 		}
 
+		bool HasObjectsToInsert() const
+		{
+			return m_Objects.size() > 0u;
+		}
+
 	private:
-		HGridLevel m_Level;
-		std::stack<ObjectInHGrid*> m_Objects;
+		HGridLevel<Tobject> m_Level;
+		std::stack<Tobject*> m_Objects;
 	};
 
-	float CalculateObjectSize(const ObjectInHGrid& obj) const
+	float CalculateObjectSize(const Tobject& obj) const
 	{
-		auto ex = obj.GetExtends();
+		auto ex = obj.GetWorldAABB().GetExtends();
 		auto maxEx = MathU::Max(MathU::Max(ex.x, ex.y), ex.z);
 		return 2.0f * maxEx;
 	}
 
-	int GetLevel(const ObjectInHGrid& obj) const
+	int GetLevel(const Tobject& obj) const
 	{
 		auto x = static_cast<int>(std::floorf((CalculateObjectSize(obj) - m_MinObjSize) / m_MinObjSize));
 		return m_LevelLookup[MathU::Clamp(x, 0, static_cast<int>(m_Levels.size()) - 1)];
@@ -87,6 +99,36 @@ private:
 	int NumBucketsFromSquareSize(float size) const
 	{
 		return 1000; // TODO - use less buckets when the square size is bigger
+	}
+
+	void CollectActiveLevels()
+	{
+		m_ActiveLevels.clear();
+		for (auto& l : m_Levels)
+		{
+			if (l.HasObjectsToInsert())
+				m_ActiveLevels.emplace_back(&l);
+		}
+	}
+
+	void HandleActiveLevel(int levelIndex, TcollisionHandler& collHandler)
+	{
+		auto& level = *m_ActiveLevels[levelIndex];
+		level.ClearLevel();
+
+		auto nextObj = level.GetNextToInsert();
+		while (nextObj)
+		{
+			// Test for collisions against its own level, and all levels
+			// that contain larger objects
+			for (auto i = levelIndex; i >= 0; i--)
+				m_ActiveLevels[i]->Query(*nextObj);
+
+			// Now insert the object into its level.
+			level.InsertNext();
+
+			nextObj = level.GetNextToInsert();
+		}
 	}
 
 public:
@@ -115,39 +157,22 @@ public:
 		}
 	}
 
-	void AddObject(ObjectInHGrid& obj)
+	void AddObject(Tobject& obj)
 	{
 		m_Levels[GetLevel(obj)].AddObject(obj);
 	}
 
-	void HandleLevel(int levelIndex)
+	void Run(TcollisionHandler& collHandler)
 	{
-		auto& level = m_Levels[levelIndex];
-		level.ClearLevel();
+		CollectActiveLevels();
 
-		auto nextObj = level.GetNextToInsert();
-		while (nextObj)
-		{
-			// Test for collisions against its own level, and all levels
-			// that contain larger objects
-			for (auto i = levelIndex; i >= 0; i--)
-				m_Levels[i].Query(*nextObj);
-
-			// Now insert the object into its level.
-			level.InsertNext();
-
-			nextObj = level.GetNextToInsert();
-		}
-	}
-
-	void Run()
-	{
-		for (auto i = 0u; i < m_Levels.size(); i++)
-			HandleLevel(i);
+		for (auto i = 0u; i < m_ActiveLevels.size(); i++)
+			HandleActiveLevel(i);
 	}
 
 private:
 	std::vector<LevelWithObjects> m_Levels; // index 0 is for largest objects
+	std::vector<LevelWithObjects*> m_ActiveLevels;
 	std::vector<int> m_LevelLookup;
 	float m_MinObjSize;
 };

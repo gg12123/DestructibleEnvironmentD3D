@@ -54,6 +54,11 @@ public:
 		m_Mass = mass;
 	}
 
+	PhysicsObject* ToPhysicsObject() override
+	{
+		return this;
+	}
+
 protected:
 	void SetInertia(const Matrix3& inertia)
 	{

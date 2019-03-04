@@ -53,19 +53,10 @@ private:
 	}
 
 public:
-	void FindContacts(CompoundShape& shape1, CompoundShape& shape2, std::vector<ContactManifold>& contacts1To2)
+	bool FindContact(Shape& shape1, Shape& shape2, ContactManifold& contact1To2)
 	{
-		InitTransformMatrix(shape1, shape2);
-
-		ContactManifold contact;
-		for (auto subShape1 : shape1.GetSubShapes())
-		{
-			for (auto subShape2 : shape2.GetSubShapes())
-			{
-				if (FindContact(*subShape1, *subShape2, contact))
-					contacts1To2.emplace_back(contact);
-			}
-		}
+		InitTransformMatrix(shape1.GetOwner(), shape2.GetOwner());
+		return FindContact(shape1, shape2, contact1To2);
 	}
 
 private:

@@ -131,7 +131,7 @@ void Rigidbody::ApplyExternalForces()
 	m_AddedMomentsWorld = Vector3::Zero();
 }
 
-void Rigidbody::UpdatePosition(std::vector<SplitInfo>& splits)
+bool Rigidbody::UpdatePosition(std::vector<SplitInfo>& splits)
 {
 	ApplyImpulses(splits);
 	SatisfyContactConstraints();

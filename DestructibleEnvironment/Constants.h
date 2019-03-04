@@ -10,5 +10,5 @@ public:
 	static int constexpr AverageNumTris = AverageNumFaces;
 	static int constexpr AverageNumIndicies = AverageNumTris * 3;
 
-	static int constexpr MaxNumShapes = 200;
+	static int constexpr MaxNumShapes = 1000;
 };

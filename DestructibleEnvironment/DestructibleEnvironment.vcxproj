@@ -226,6 +226,7 @@
     <ClInclude Include="IntersectionLoop.h" />
     <ClInclude Include="IOnPhysicsWorldUpdated.h" />
     <ClInclude Include="IterationAboutShape.h" />
+    <ClInclude Include="LastCheckedAgainst.h" />
     <ClInclude Include="MapToFaceRelationship.h" />
     <ClInclude Include="MapToNewEdges.h" />
     <ClInclude Include="MapToPointPlaneRelationship.h" />

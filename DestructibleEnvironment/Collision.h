@@ -5,42 +5,56 @@
 #include "CollisionResponder.h"
 #include "Rigidbody.h"
 #include "StaticBody.h"
+#include "HGrid.h"
 
 class Collision
 {
-private:
-	void HandleCollision(PhysicsObject& body1, PhysicsObject& body2)
+public:
+	Collision() : m_DynamicsPartition(2.0f, 0.2f)
 	{
-		m_Contacts.clear();
-		m_Detector.FindContacts(body1, body2, m_Contacts);
-
-		for (auto& c : m_Contacts)
-			m_Responder.CalculateResponse(c, body1, body2);
 	}
 
-public:
-	void DetectAndRespond(const std::vector <std::unique_ptr<StaticBody>>& staticBodies,
-		const std::vector <std::unique_ptr<Rigidbody>>& dynamicBodies)
+	void RunNarrowPhaseCheckForCollision(Shape& shapeA, Shape& shapeB)
 	{
+		ContactManifold contact;
+		if (m_Detector.FindContact(shapeA, shapeB, contact))
+			m_Responder.CalculateResponse(contact, *shapeA.GetOwner().ToPhysicsObject(), *shapeB.GetOwner().ToPhysicsObject());
+	}
+
+	void AddObject(Rigidbody& body)
+	{
+		for (auto s : body.GetSubShapes())
+			m_DynamicsPartition.AddObject(*s);
+	}
+
+	void DetectAndRespond(const std::vector<std::unique_ptr<StaticBody>>& staticBodies,
+		const std::vector<std::unique_ptr<Rigidbody>>& dynamicBodies)
+	{
+		// Handle collision between dynamic objects
+		m_DynamicsPartition.Run(*this);
+
+		// Handle collisions between static objects
+		// TODO - Partition the statics.
 		auto dynamicCount = dynamicBodies.size();
 		auto staticCount = staticBodies.size();
 
-		// TODO - partition
-
 		for (auto i = 0U; i < dynamicCount; i++)
 		{
-			auto& bodyi = *dynamicBodies[i];
-
-			for (auto j = i + 1; j < dynamicCount; j++)
-				HandleCollision(bodyi, *dynamicBodies[j]);
-
+			auto& dynamBody = *dynamicBodies[i];
 			for (auto j = 0U; j < staticCount; j++)
-				HandleCollision(bodyi, *staticBodies[j]);
+			{
+				auto& staticBody = *staticBodies[j];
+				for (auto shapeDynam : dynamBody.GetSubShapes())
+				{
+					for (auto shapeStat : staticBody.GetSubShapes())
+						RunNarrowPhaseCheckForCollision(*shapeDynam, *shapeStat);
+				}
+			}
 		}
 	}
 
 private:
 	CollisionDetector m_Detector;
 	CollisionResponder m_Responder;
-	std::vector<ContactManifold> m_Contacts;
+	HGrid<Shape, Collision> m_DynamicsPartition;
 };

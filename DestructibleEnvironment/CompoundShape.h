@@ -6,6 +6,7 @@
 
 class Shape;
 class ShapeProxy;
+class PhysicsObject;
 
 class CompoundShape
 {
@@ -65,6 +66,12 @@ public:
 	void SetProxy(ShapeProxy& p)
 	{
 		m_Proxy = &p;
+	}
+
+	virtual PhysicsObject* ToPhysicsObject()
+	{
+		assert(false);
+		return nullptr;
 	}
 
 private:

@@ -50,7 +50,7 @@ public:
 		return m_VelocityWorld + Vector3::Cross(m_AngularVelocityWorld, worldPoint - GetTransform().GetPosition());
 	}
 
-	void UpdatePosition(std::vector<SplitInfo>& splits);
+	bool UpdatePosition(std::vector<SplitInfo>& splits);
 
 	void CopyVelocity(const Rigidbody& toCopy)
 	{

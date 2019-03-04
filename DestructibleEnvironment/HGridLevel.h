@@ -2,6 +2,7 @@
 #include <vector>
 #include "ObjectInHGrid.h"
 
+template<class Tobject>
 class GridSquaresBucket
 {
 public:
@@ -10,7 +11,7 @@ public:
 		return m_Objects;
 	}
 
-	void AddObject(ObjectInHGrid& obj)
+	void AddObject(Tobject& obj)
 	{
 		m_Objects.emplace_back(&obj);
 	}
@@ -21,28 +22,43 @@ public:
 	}
 
 private:
-	std::vector<ObjectInHGrid*> m_Objects;
+	std::vector<Tobject*> m_Objects;
 };
 
+template<class Tobject>
 class HGridLevel
 {
 private:
 	int CalculateHash(int squareXIndex, int squareYIndex, int squareZIndex) const
 	{
+		static constexpr int32 h1 = 0x8da6b343;
+		static constexpr int32 h2 = 0xd8163841;
+		static constexpr int32 h3 = 0xcb1ab31f;
 
+		auto n = (h1 * squareXIndex + h2 * squareYIndex + h3 * squareZIndex) % m_Buckets.size();
+
+		if (n < 0)
+			n += m_Buckets.size();
+
+		return n;
 	}
 
 	bool BucketIsInUse(int bucketIndex) const
 	{
-
+		return m_TimeStamps[bucketIndex] == m_CurrStamp;
 	}
 
 	void SetBucketInUse(int bucketIndex)
 	{
-
+		m_TimeStamps[bucketIndex] = m_CurrStamp;
 	}
 
-	GridSquaresBucket& GetBucketLocal(int bucketIndex)
+	void ClearTimeStamps()
+	{
+		std::memset(m_TimeStamps.data(), 0, m_TimeStamps.size() * sizeof(uint64));
+	}
+
+	GridSquaresBucket<Tobject>& GetBucketLocal(int bucketIndex)
 	{
 		auto& b = m_Buckets[bucketIndex];
 
@@ -69,14 +85,18 @@ public:
 	HGridLevel(int numBuckets, float squareSize) : m_SquareSize(squareSize)
 	{
 		m_Buckets.resize(numBuckets);
+		m_TimeStamps.resize(numBuckets);
+		ClearTimeStamps();
+		m_CurrStamp = 0;
 	}
 
-	SquareRange GetRange(const ObjectInHGrid& obj) const
+	SquareRange GetRange(const Tobject& obj) const
 	{
 		SquareRange r;
 
-		auto c = obj.GetCentre();
-		auto e = obj.GetExtends();
+		auto& aabb = obj.GetWorldAABB();
+		auto c = aabb.GetCentre();
+		auto e = aabb.GetExtends();
 
 		auto max = c + e;
 		auto min = c - e;
@@ -97,17 +117,22 @@ public:
 		CalculateHash(squareXIndex, squareYIndex, squareZIndex);
 	}
 
-	const GridSquaresBucket& GetBucket(int bucketIndex)
+	const GridSquaresBucket<Tobject>& GetBucket(int bucketIndex)
 	{
 		return GetBucketLocal(bucketIndex);
 	}
 
 	void Clear()
 	{
-		// set a flag to indicate that all buckets are not in-use
+		m_CurrStamp++;
+		if (m_CurrStamp == std::numeric_limits<uint64>::max())
+		{
+			ClearTimeStamps();
+			m_CurrStamp = 1;
+		}
 	}
 
-	void Insert(ObjectInHGrid& toInsert)
+	void Insert(Tobject& toInsert)
 	{
 		auto range = GetRange(toInsert);
 
@@ -122,6 +147,9 @@ public:
 	}
 
 private:
-	std::vector<GridSquaresBucket> m_Buckets;
+	std::vector<GridSquaresBucket<Tobject>> m_Buckets;
+	std::vector<uint64> m_TimeStamps;
+
 	float m_SquareSize;
+	uint64 m_CurrStamp;
 };

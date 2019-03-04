@@ -61,7 +61,10 @@ void PhysicsEngine::UpdateBodies()
 	{
 		auto& b = **it;
 
-		b.UpdatePosition(m_Splits);
+		// Only add the object to collision if it is not split. Split results
+		// are added after the split.
+		if (!b.UpdatePosition(m_Splits))
+			m_Collision.AddObject(b);
 
 		// Must fully re-calculate the transform so that it doesnt re-calculate during collision
 		// detection whilst it may be getting accsesed from the game thread.
@@ -99,6 +102,8 @@ void PhysicsEngine::ProcessSplits()
 				newBody->CopyVelocity(toSplit);
 				newBody->CalculateMotionProperties();
 				newBody->GetTransform().ReCalculateIfDirty();
+
+				m_Collision.AddObject(*newBody);
 			}
 		}
 	}

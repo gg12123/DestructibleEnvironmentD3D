@@ -2,10 +2,10 @@
 #include "Vector3.h"
 #include "MathU.h"
 
-class Bounds
+class BoundsCalculator
 {
 public:
-	Bounds()
+	BoundsCalculator()
 	{
 		Reset();
 	}
@@ -46,11 +46,6 @@ public:
 	float GetVolume() const
 	{
 		return (m_XMax - m_XMin) * (m_YMax - m_YMin) * (m_ZMax - m_ZMin);
-	}
-
-	void ConstrcutFromCentreAndRadius(const Vector3& centre, float radius)
-	{
-
 	}
 
 	float GetXMin() const
@@ -109,16 +104,11 @@ private:
 	float m_ZMax;
 };
 
-struct RadiusBoundsType
+class AABB
 {
-};
+public:
+	Vector3 GetCentre() const;
+	Vector3 GetExtends() const;
 
-struct AABBBoundsType
-{
-};
-
-template<class T>
-struct BoundsType
-{
-	static constexpr T Value = T();
+	bool OverlapsWith(const AABB& other) const;
 };
