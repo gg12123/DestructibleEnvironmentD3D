@@ -6,20 +6,19 @@
 #include "Bounds.h"
 #include "PointInPolyCase.h"
 #include "RayCasting.h"
+#include "LastCheckedAgainst.h"
 
 class ShapePoint;
 class ShapeEdge;
 class Face;
 class CompoundShape;
 
-class Shape
+class Shape : public LastCheckedAgainst<const Shape*>
 {
 public:
 	Shape()
 	{
 	}
-
-	virtual ~Shape();
 
 	auto& GetOwner() const
 	{
@@ -117,6 +116,13 @@ public:
 
 	Shape& Duplicate() const;
 
+	void UpdateWorldAABB();
+
+	const AABB& GetWorldAABB() const
+	{
+		return m_WorldAABB;
+	}
+
 private:
 	void ReCentre(const Vector3& centre);
 	void TryCollectPoint(ShapePoint& p);
@@ -131,4 +137,7 @@ private:
 	Vector3 m_Centre;
 
 	CompoundShape* m_Owner;
+
+	AABB m_LocalAABB;
+	AABB m_WorldAABB;
 };

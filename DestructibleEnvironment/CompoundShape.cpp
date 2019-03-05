@@ -56,3 +56,9 @@ void CompoundShape::CentreAndCache(const Vector3& centre)
 	for (auto s : m_SubShapes)
 		s->CentreAndCache(centre);
 }
+
+void CompoundShape::UpdateSubShapesWorldAABBs() const
+{
+	for (auto s : m_SubShapes)
+		s->UpdateWorldAABB();
+}

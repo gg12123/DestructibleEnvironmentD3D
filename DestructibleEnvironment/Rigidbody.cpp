@@ -137,6 +137,7 @@ bool Rigidbody::UpdatePosition(std::vector<SplitInfo>& splits)
 	SatisfyContactConstraints();
 	UpdateTransform();
 	RewindIfPenetrating();
+	UpdateSubShapesWorldAABBs();
 }
 
 void Rigidbody::SatisfyContactConstraints()

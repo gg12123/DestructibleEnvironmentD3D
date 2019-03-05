@@ -11,7 +11,7 @@ class PhysicsObject;
 class CompoundShape
 {
 public:
-	~CompoundShape()
+	virtual ~CompoundShape()
 	{
 		for (auto s : m_SubShapes)
 			ShapePool::Return(*s);
@@ -39,6 +39,8 @@ public:
 
 		m_Transform.SetPosition(refTran.ToWorldPosition(c));
 		m_Transform.SetRotation(refTran.GetRotation());
+
+		UpdateSubShapesWorldAABBs();
 
 		SetDirty();
 	}
@@ -73,6 +75,9 @@ public:
 		assert(false);
 		return nullptr;
 	}
+
+protected:
+	void UpdateSubShapesWorldAABBs() const;
 
 private:
 	Vector3 CalcuateCentre() const;

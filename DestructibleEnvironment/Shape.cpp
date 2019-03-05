@@ -8,11 +8,7 @@
 #include "FaceTriangulator.h"
 #include "ShapeElementPool.h"
 #include "ShapeDuplicater.h"
-
-Shape::~Shape()
-{
-	// TODO - return everything to pool.
-}
+#include "CompoundShape.h"
 
 bool Shape::IntersectsRay(const Ray& localRay, Vector3& intPoint)
 {
@@ -22,6 +18,7 @@ bool Shape::IntersectsRay(const Ray& localRay, Vector3& intPoint)
 
 	for (auto f : m_Faces)
 	{
+		// TODO - seeing as the shape is now convex, this can be done faster.
 		if (localRay.IntersectsPlane(f->GetPlaneP0(), f->GetNormal(), p) &&
 			f->PointIsOnFace(p))
 		{
@@ -107,17 +104,47 @@ void Shape::ResetBeenCollectedFlag()
 		e->ClearBeenCollected();
 }
 
+static BoundsCalculator BoundsCalc;
+
 void Shape::ReCentre(const Vector3& ownersCentre)
 {
+	BoundsCalc.Reset();
+
 	m_CachedPoints.clear();
 
 	for (auto it = m_PointObjects.begin(); it != m_PointObjects.end(); it++)
 	{
 		auto& p = **it;
 		p.ReCentre(ownersCentre);
-		m_CachedPoints.emplace_back(p.GetPoint());
+
+		auto& pp = p.GetPoint();
+		m_CachedPoints.emplace_back(pp);
+		BoundsCalc.Update(pp);
 	}
 	m_Centre -= ownersCentre;
+	m_LocalAABB = BoundsCalc.ToAABB();
+}
+
+void Shape::UpdateWorldAABB()
+{
+	BoundsCalc.Reset();
+
+	auto c = m_LocalAABB.GetCentre();
+	auto e = m_LocalAABB.GetExtends();
+
+	auto& t = m_Owner->GetTransform();
+
+	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(e.x, e.y, e.z)));
+	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(-e.x, e.y, e.z)));
+	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(-e.x, e.y, -e.z)));
+	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(e.x, e.y, -e.z)));
+
+	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(e.x, -e.y, e.z)));
+	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(-e.x, -e.y, e.z)));
+	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(-e.x, -e.y, -e.z)));
+	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(e.x, -e.y, -e.z)));
+
+	m_WorldAABB = BoundsCalc.ToAABB();
 }
 
 void Shape::CalculateCentre()

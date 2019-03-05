@@ -2,6 +2,51 @@
 #include "Vector3.h"
 #include "MathU.h"
 
+class AABB
+{
+public:
+	AABB()
+	{
+	}
+
+	AABB(const Vector3& centre, const Vector3& extends) : m_Centre(centre), m_Extends(extends)
+	{
+	}
+
+	Vector3 GetCentre() const
+	{
+		return m_Centre;
+	}
+
+	Vector3 GetExtends() const
+	{
+		return m_Extends;
+	}
+
+	Vector3 GetSize() const
+	{
+		return 2.0f * m_Extends;
+	}
+
+	bool OverlapsWith(const AABB& other) const
+	{
+		if (std::abs(m_Centre.x - other.m_Centre.x) > (m_Extends.x + other.m_Extends.x))
+			return false;
+
+		if (std::abs(m_Centre.y - other.m_Centre.y) > (m_Extends.y + other.m_Extends.y))
+			return false;
+
+		if (std::abs(m_Centre.z - other.m_Centre.z) > (m_Extends.z + other.m_Extends.z))
+			return false;
+
+		return true;
+	}
+
+private:
+	Vector3 m_Centre;
+	Vector3 m_Extends;
+};
+
 class BoundsCalculator
 {
 public:
@@ -41,11 +86,6 @@ public:
 
 		if (newPoint.z < m_ZMin)
 			m_ZMin = newPoint.z;
-	}
-
-	float GetVolume() const
-	{
-		return (m_XMax - m_XMin) * (m_YMax - m_YMin) * (m_ZMax - m_ZMin);
 	}
 
 	float GetXMin() const
@@ -93,6 +133,12 @@ public:
 		return m_ZMax - m_ZMin;
 	}
 
+	AABB ToAABB() const
+	{
+		return AABB(Vector3((m_XMax + m_XMin) / 2.0f, (m_YMax + m_YMin) / 2.0f, (m_ZMax + m_ZMin) / 2.0f),
+			Vector3(0.5f * GetXRange(), 0.5f * GetYRange(), 0.5f * GetZRange()));
+	}
+
 private:
 	float m_XMin;
 	float m_XMax;
@@ -102,13 +148,4 @@ private:
 
 	float m_ZMin;
 	float m_ZMax;
-};
-
-class AABB
-{
-public:
-	Vector3 GetCentre() const;
-	Vector3 GetExtends() const;
-
-	bool OverlapsWith(const AABB& other) const;
 };
