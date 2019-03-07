@@ -44,7 +44,7 @@ public:
 			c[i] = data[i];
 	}
 
-	Matrix<3> ToMatrix3()
+	Matrix<3> ToMatrix3() const
 	{
 		Matrix3 mat3;
 		auto n = MathU::Min(3, Size);

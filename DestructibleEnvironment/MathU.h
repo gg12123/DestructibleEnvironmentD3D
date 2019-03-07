@@ -63,8 +63,8 @@ public:
 	}
 
 	template<class T>
-	static inline T Clamp(T val, T min, T max)
+	static inline T Clamp(T val, T lower, T upper)
 	{
-		assert(false);
+		return Max(lower, Min(val, upper));
 	}
 };

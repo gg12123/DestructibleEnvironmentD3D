@@ -210,6 +210,7 @@
     <ClInclude Include="CollisionResponder.h" />
     <ClInclude Include="Common\DeviceResources.h" />
     <ClInclude Include="CompoundShape.h" />
+    <ClInclude Include="ContactPoints.h" />
     <ClInclude Include="EpaContact.h" />
     <ClInclude Include="FaceTriangulator.h" />
     <ClInclude Include="ConstantBufferInputTypes.h" />
@@ -270,6 +271,7 @@
     <ClInclude Include="RayShooter.h" />
     <ClInclude Include="ReadOnlyInput.h" />
     <ClInclude Include="RedundantPointRemover.h" />
+    <ClInclude Include="SequentialImpulsesSolver.h" />
     <ClInclude Include="ShapeChunkTaker.h" />
     <ClInclude Include="ShapeDuplicater.h" />
     <ClInclude Include="ShapeElementPool.h" />

@@ -17,16 +17,16 @@ public:
 	float Impact;
 };
 
-class ContactManifold
+class ContactPlane
 {
 public:
 	// The normal must point towards the associated body.
 	// So is in the same direction as the impulse if there is one.
-	ContactManifold(const Vector3& point, const Vector3& normal) : m_Normal(normal), m_Point(point)
+	ContactPlane(const Vector3& point, const Vector3& normal) : m_Normal(normal), m_Point(point)
 	{
 	}
 
-	ContactManifold()
+	ContactPlane()
 	{
 	}
 

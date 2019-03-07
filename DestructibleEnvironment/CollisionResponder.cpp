@@ -46,7 +46,7 @@ bool CollisionResponder::CalculateCollisionPoint(const std::vector<EdgeFaceInter
 	return false;
 }
 
-void CollisionResponder::CalculateResponse(const ContactManifold& worldContact1To2, PhysicsObject& body1, PhysicsObject& body2)
+void CollisionResponder::CalculateResponse(const ContactPlane& worldContact1To2, PhysicsObject& body1, PhysicsObject& body2)
 {
 	static constexpr float e = 0.5f; // TODO - get this from somewere else
 
@@ -75,10 +75,7 @@ void CollisionResponder::CalculateResponse(const ContactManifold& worldContact1T
 
 		auto impact = -signedImpact;
 
-		body1.AddImpulse(Impulse(-J * collNormalWorld1To2, collPointWorld, impact));
-		body2.AddImpulse(Impulse(J * collNormalWorld1To2, collPointWorld, impact));
+		body1.ApplyImpulse(Impulse(-J * collNormalWorld1To2, collPointWorld, impact));
+		body2.ApplyImpulse(Impulse(J * collNormalWorld1To2, collPointWorld, impact));
 	}
-
-	body1.AddContact(ContactManifold(collPointWorld, -collNormalWorld1To2));
-	body2.AddContact(ContactManifold(collPointWorld, collNormalWorld1To2));
 }

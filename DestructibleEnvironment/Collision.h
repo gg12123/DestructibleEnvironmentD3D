@@ -2,10 +2,10 @@
 #include <memory>
 #include "CollisionDetector.h"
 #include "CollisionData.h"
-#include "CollisionResponder.h"
 #include "Rigidbody.h"
 #include "StaticBody.h"
 #include "HGrid.h"
+#include "ContactPoints.h"
 
 class Collision
 {
@@ -14,11 +14,13 @@ public:
 	{
 	}
 
-	void RunNarrowPhaseCheckForCollision(Shape& shapeA, Shape& shapeB)
+	void RunNarrowPhaseCheckForCollision(const Shape& shapeA, const Shape& shapeB)
 	{
-		ContactManifold contact;
+		ContactPlane contact;
 		if (m_Detector.FindContact(shapeA, shapeB, contact))
-			m_Responder.CalculateResponse(contact, *shapeA.GetOwner().ToPhysicsObject(), *shapeB.GetOwner().ToPhysicsObject());
+		{
+			m_ContactPointFinder.Find(m_ContactPoints, shapeA, shapeB, contact);
+		}
 	}
 
 	void AddObject(Rigidbody& body)
@@ -27,9 +29,11 @@ public:
 			m_DynamicsPartition.AddObject(*s);
 	}
 
-	void DetectAndRespond(const std::vector<std::unique_ptr<StaticBody>>& staticBodies,
+	void FindContacts(const std::vector<std::unique_ptr<StaticBody>>& staticBodies,
 		const std::vector<std::unique_ptr<Rigidbody>>& dynamicBodies)
 	{
+		m_ContactPoints.clear();
+
 		// Handle collision between dynamic objects
 		m_DynamicsPartition.Run(*this);
 
@@ -53,8 +57,14 @@ public:
 		}
 	}
 
+	const auto& GetContactPoints() const
+	{
+		return m_ContactPoints;
+	}
+
 private:
 	CollisionDetector m_Detector;
-	CollisionResponder m_Responder;
 	HGrid<Shape, Collision> m_DynamicsPartition;
+	ContactPointFinder m_ContactPointFinder;
+	std::vector<ContactPoint> m_ContactPoints;
 };

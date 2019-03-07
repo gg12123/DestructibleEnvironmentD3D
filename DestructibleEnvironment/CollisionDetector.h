@@ -9,11 +9,11 @@
 class CollisionDetector
 {
 private:
-	ContactManifold CalculateCantact1To2(const GjkInputShape& shape1, const GjkInputShape& shape2)
+	ContactPlane CalculateCantact1To2(const GjkInputShape& shape1, const GjkInputShape& shape2)
 	{
 		auto localContact = m_ContactFinder.FindContact(shape1, shape2, m_Detector.GetQ());
 
-		return ContactManifold(m_ActiveTransform->ToWorldPosition(localContact.GetPoint()),
+		return ContactPlane(m_ActiveTransform->ToWorldPosition(localContact.GetPoint()),
 			m_ActiveTransform->ToWorldDirection(localContact.GetNormal().InDirectionOf(shape2.GetCentroid() - shape1.GetCentroid())));
 	}
 
@@ -30,20 +30,7 @@ private:
 		return GjkInputShape(m_TransformedPoints, m_ToShape1sSpace * shape2.GetCentre());
 	}
 
-	bool FindContact(const Shape& shape1, const Shape& shape2, ContactManifold& contact)
-	{
-		auto gjkShape1 = GjkInputShape(shape1.GetCachedPoints(), shape1.GetCentre());
-		auto gjkShape2 = TransformToShape1sSpace(shape2);
-
-		if (m_Detector.Run(gjkShape1, gjkShape2))
-		{
-			contact = CalculateCantact1To2(gjkShape1, gjkShape2);
-			return true;
-		}
-		return false;
-	}
-
-	void InitTransformMatrix(CompoundShape& shape1, CompoundShape& shape2)
+	void InitTransformMatrix(const CompoundShape& shape1, const CompoundShape& shape2)
 	{
 		auto& t1 = shape1.GetTransform();
 		auto& t2 = shape2.GetTransform();
@@ -53,10 +40,19 @@ private:
 	}
 
 public:
-	bool FindContact(Shape& shape1, Shape& shape2, ContactManifold& contact1To2)
+	bool FindContact(const Shape& shape1, const Shape& shape2, ContactPlane& contact1To2)
 	{
 		InitTransformMatrix(shape1.GetOwner(), shape2.GetOwner());
-		return FindContact(shape1, shape2, contact1To2);
+
+		auto gjkShape1 = GjkInputShape(shape1.GetCachedPoints(), shape1.GetCentre());
+		auto gjkShape2 = TransformToShape1sSpace(shape2);
+
+		if (m_Detector.Run(gjkShape1, gjkShape2))
+		{
+			contact1To2 = CalculateCantact1To2(gjkShape1, gjkShape2);
+			return true;
+		}
+		return false;
 	}
 
 private:
@@ -64,5 +60,5 @@ private:
 	GjkCollisionDetection m_Detector;
 	EpaContact m_ContactFinder;
 	Matrix4 m_ToShape1sSpace;
-	Transform* m_ActiveTransform;
+	const Transform* m_ActiveTransform;
 };

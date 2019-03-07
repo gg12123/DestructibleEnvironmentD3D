@@ -85,7 +85,7 @@ private:
 			return m_N;
 		}
 
-		ContactManifold ToContact(const GjkInputShape& shapeA, const GjkInputShape& shapeB, const std::vector<MinowPoint>& points) const
+		ContactPlane ToContact(const GjkInputShape& shapeA, const GjkInputShape& shapeB, const std::vector<MinowPoint>& points) const
 		{
 			auto p = m_D * m_N;
 
@@ -97,7 +97,7 @@ private:
 
 			auto pen = (pointOnA - pointOnB).Magnitude();
 
-			return ContactManifold((pointOnA + pointOnB) / 2.0f, m_N);
+			return ContactPlane((pointOnA + pointOnB) / 2.0f, m_N);
 		}
 
 		const auto& P0() const
@@ -216,7 +216,7 @@ private:
 	}
 
 public:
-	ContactManifold FindContact(const GjkInputShape& shapeA, const GjkInputShape& shapeB,
+	ContactPlane FindContact(const GjkInputShape& shapeA, const GjkInputShape& shapeB,
 		const GjkCollisionDetection::SetQ& q)
 	{
 		InitPoints(q);

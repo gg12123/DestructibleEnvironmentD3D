@@ -64,45 +64,15 @@ void Rigidbody::CalculateMotionProperties()
 	m_AngularDrag = 3.5f;
 }
 
-void Rigidbody::ApplyImpulses(std::vector<SplitInfo>& splits)
-{
-	TransferAdditionalImpulses();
-
-	Impulse* biggest = nullptr;
-	auto biggestImpact = 0.0f;
-
-	for  (auto it = m_Impulses.begin(); it != m_Impulses.end(); it++)
-	{
-		auto& imp = *it;
-		auto impact = imp.Impact;
-
-		ApplyImpulse(imp);
-
-		if (impact > biggestImpact)
-		{
-			biggest = &imp;
-			biggestImpact = impact;
-		}
-	}
-
-	m_Impulses.clear();
-
-	static constexpr auto impactNeededForSplit = 1000.0f;
-
-	if (biggest && (biggest->Impact > impactNeededForSplit))
-	{
-		splits.emplace_back(SplitInfo(*this, *biggest));
-	}
-}
-
 void Rigidbody::UpdateTransform()
 {
 	auto& t = GetTransform();
-
-	t.SetPosition(t.GetPosition() + m_VelocityWorld * PhysicsTime::FixedDeltaTime);
-
 	auto& q = t.GetRotation();
-	t.SetRotation(q + m_AngularVelocityWorld * q * 0.5f * PhysicsTime::FixedDeltaTime);
+
+	auto pos = t.GetPosition() + m_VelocityWorld * PhysicsTime::FixedDeltaTime;
+	auto rot = q + m_AngularVelocityWorld * q * 0.5f * PhysicsTime::FixedDeltaTime;
+	
+	t.SetPositionAndRotation(pos, rot);
 }
 
 void Rigidbody::ApplyImpulse(const Impulse& impulse)
@@ -113,68 +83,35 @@ void Rigidbody::ApplyImpulse(const Impulse& impulse)
 	auto& J = impulse.WorldImpulse;
 
 	m_AngularVelocityWorld += (GetInertiaInverseWorld() * Vector3::Cross(r, J));
+
+	static constexpr auto impactNeededForSplit = 1000.0f;
+
+	if (impulse.Impact > impactNeededForSplit)
+		m_IsSplit = true;
 }
 
-void Rigidbody::ApplyExternalForces()
+void Rigidbody::ApplyExternalForcesAndImpulses()
 {
 	static constexpr float g = 9.8f;
 
-	m_AddedForceWorld -= GetMass() * g * Vector3::Up();
-	m_AddedForceWorld -= m_Drag * m_VelocityWorld;
+	m_ExternalForceWorld -= GetMass() * g * Vector3::Up();
+	m_ExternalForceWorld -= m_Drag * m_VelocityWorld;
 
-	m_AddedMomentsWorld -= m_AngularDrag * m_AngularVelocityWorld;
+	m_ExternalMomentsWorld -= m_AngularDrag * m_AngularVelocityWorld;
 
-	m_VelocityWorld += (m_AddedForceWorld / GetMass()) * PhysicsTime::FixedDeltaTime;
-	m_AngularVelocityWorld += (GetInertiaInverseWorld() * m_AddedMomentsWorld) * PhysicsTime::FixedDeltaTime;
+	m_VelocityWorld += (m_ExternalForceWorld / GetMass()) * PhysicsTime::FixedDeltaTime;
+	m_AngularVelocityWorld += (GetInertiaInverseWorld() * m_ExternalMomentsWorld) * PhysicsTime::FixedDeltaTime;
 
-	m_AddedForceWorld = Vector3::Zero();
-	m_AddedMomentsWorld = Vector3::Zero();
+	for (auto& imp : m_ExternalImpulses)
+		ApplyImpulse(imp);
+
+	m_ExternalForceWorld = Vector3::Zero();
+	m_ExternalMomentsWorld = Vector3::Zero();
+	m_ExternalImpulses.clear();
 }
 
-bool Rigidbody::UpdatePosition(std::vector<SplitInfo>& splits)
+void Rigidbody::UpdatePosition()
 {
-	ApplyImpulses(splits);
-	SatisfyContactConstraints();
 	UpdateTransform();
-	RewindIfPenetrating();
 	UpdateSubShapesWorldAABBs();
-}
-
-void Rigidbody::SatisfyContactConstraints()
-{
-	for (auto& c : m_Contacts)
-	{
-		auto n = c.GetNormal();
-		auto p = c.GetPoint();
-
-		// First modify the linear velocity to statisfy the contact constraint
-		auto pointVelDotN = Vector3::Dot(WorldVelocityAt(p), n);
-		if (pointVelDotN < 0.0f)
-			m_VelocityWorld -= pointVelDotN * n;
-	}
-
-	for (auto& c : m_Contacts)
-	{
-		auto n = c.GetNormal();
-		auto p = c.GetPoint();
-
-		if (Vector3::Dot(WorldVelocityAt(p), n) < 0.0f)
-		{
-			// The constraint is still not statisfied so zero the linear velocity
-			m_VelocityWorld -= MathU::Min(0.0f, Vector3::Dot(m_VelocityWorld, n)) * n;
-
-			static constexpr float zeroAngVelTol = 0.0001f;
-
-			// If still not satisfied, zero the angular velocity.
-			if (Vector3::Dot(WorldVelocityAt(p), n) < -zeroAngVelTol)
-				m_AngularVelocityWorld = Vector3::Zero();
-		}
-	}
-
-	m_Contacts.clear();
-}
-
-void Rigidbody::RewindIfPenetrating()
-{
-	// TODO
 }

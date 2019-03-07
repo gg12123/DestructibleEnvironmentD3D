@@ -462,6 +462,12 @@
     <ClInclude Include="LastCheckedAgainst.h">
       <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
+    <ClInclude Include="ContactPoints.h">
+      <Filter>Physics\CollisionStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="SequentialImpulsesSolver.h">
+      <Filter>Physics\CollisionStuff</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">

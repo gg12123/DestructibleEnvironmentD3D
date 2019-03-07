@@ -5,6 +5,13 @@
 
 class Transform
 {
+private:
+	void ReCalculate()
+	{
+		m_LocalToWorld = Matrix4::FromTranslation(m_Position) * Matrix4::FromRotation(m_Rotation);
+		m_WorldToLocal = Matrix4::FromRotation(m_Rotation.Conj()) * Matrix4::FromTranslation(-m_Position);
+	}
+
 public:
 	const Vector3& GetPosition() const
 	{
@@ -19,36 +26,31 @@ public:
 	void SetPosition(const Vector3& pos)
 	{
 		m_Position = pos;
-		m_Dirty = true;
+		ReCalculate();
 	}
 
 	void SetRotation(const Quaternion& rot)
 	{
 		m_Rotation = rot;
 		m_Rotation.Normalize();
-		m_Dirty = true;
+		ReCalculate();
+	}
+
+	void SetPositionAndRotation(const Vector3& pos, const Quaternion& rot)
+	{
+		m_Position = pos;
+		m_Rotation = rot;
+		m_Rotation.Normalize();
+		ReCalculate();
 	}
 
 	void SetEqualTo(const Transform& other)
 	{
-		m_Position = other.GetPosition();
-		m_Rotation = other.GetRotation();
-		m_Dirty = true;
+		SetPositionAndRotation(other.GetPosition(), other.GetRotation());
 	}
 
-	void ReCalculateIfDirty()
+	Vector3 ToLocalPosition(const Vector3& worldPos) const
 	{
-		if (m_Dirty)
-		{
-			m_LocalToWorld = Matrix4::FromTranslation(m_Position) * Matrix4::FromRotation(m_Rotation);
-			m_WorldToLocal = Matrix4::FromRotation(m_Rotation.Conj()) * Matrix4::FromTranslation(-m_Position);
-			m_Dirty = false;
-		}
-	}
-
-	Vector3 ToLocalPosition(const Vector3& worldPos)
-	{
-		ReCalculateIfDirty();
 		return m_WorldToLocal * worldPos;
 	}
 
@@ -57,34 +59,29 @@ public:
 		return GetWorldToLocalRotation().RotateV(worldDir);
 	}
 
-	Vector3 ToWorldPosition(const Vector3& localPos)
+	Vector3 ToWorldPosition(const Vector3& localPos) const
 	{
-		ReCalculateIfDirty();
 		return m_LocalToWorld * localPos;
 	}
 
-	Vector3 ToWorldDirection(const Vector3& localDir)
+	Vector3 ToWorldDirection(const Vector3& localDir) const
 	{
 		return GetLocalToWorldRotation().RotateV(localDir);
 	}
 
-	Matrix3 ApplySimilarityTransform(const Matrix3& localMatrix)
+	Matrix3 ApplySimilarityTransform(const Matrix3& localMatrix) const
 	{
-		ReCalculateIfDirty();
 		auto rotMat = m_LocalToWorld.ToMatrix3();
-
 		return rotMat * localMatrix * rotMat.Transposed();
 	}
 
-	Matrix4 GetLocalToWorldMatrix()
+	Matrix4 GetLocalToWorldMatrix() const
 	{
-		ReCalculateIfDirty();
 		return m_LocalToWorld;
 	}
 
-	Matrix4 GetWorldToLocalMatrix()
+	Matrix4 GetWorldToLocalMatrix() const
 	{
-		ReCalculateIfDirty();
 		return m_WorldToLocal;
 	}
 
@@ -98,21 +95,18 @@ public:
 		return m_Rotation.Conj();
 	}
 
-	Vector3 GetForward()
+	Vector3 GetForward() const
 	{
-		ReCalculateIfDirty();
 		return FromColumn(m_LocalToWorld.M[2]);
 	}
 
-	Vector3 GetUp()
+	Vector3 GetUp() const
 	{
-		ReCalculateIfDirty();
 		return FromColumn(m_LocalToWorld.M[1]);
 	}
 
-	Vector3 GetRight()
+	Vector3 GetRight() const
 	{
-		ReCalculateIfDirty();
 		return FromColumn(m_LocalToWorld.M[0]);
 	}
 
@@ -127,6 +121,4 @@ private:
 
 	Matrix4 m_LocalToWorld;
 	Matrix4 m_WorldToLocal;
-
-	bool m_Dirty;
 };

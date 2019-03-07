@@ -55,6 +55,11 @@ public:
 		m_Dirty = false;
 	}
 
+	const auto& GetTransform() const
+	{
+		return m_Transform;
+	}
+
 	auto& GetTransform()
 	{
 		return m_Transform;

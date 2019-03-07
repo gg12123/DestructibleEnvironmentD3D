@@ -15,12 +15,14 @@ void PhysicsEngine::Run()
 
 	while (m_Running)
 	{
-		ApplyExternalForces();
+		ApplyExternalForcesAndImpulses();
 
 		m_SafeToSync = true;
-		DoCollisionDetectionResponse();
+		FindContacts();
 		while (m_SafeToSync)
 			;
+
+		SatisfyConstraints();
 
 		UpdateBodies();
 
@@ -40,15 +42,20 @@ RayCastHit<CompoundShape> PhysicsEngine::RayCast(const Ray& r) const
 	return cast.ToRayCastHit();
 }
 
-void PhysicsEngine::ApplyExternalForces() const
+void PhysicsEngine::ApplyExternalForcesAndImpulses() const
 {
 	for (auto& b : m_DynamicBodies)
-		b->ApplyExternalForces();
+		b->ApplyExternalForcesAndImpulses();
 }
 
-void PhysicsEngine::DoCollisionDetectionResponse()
+void PhysicsEngine::FindContacts()
 {
-	m_Collision.DetectAndRespond(m_StaticBodies, m_DynamicBodies);
+	m_Collision.FindContacts(m_StaticBodies, m_DynamicBodies);
+}
+
+void PhysicsEngine::SatisfyConstraints()
+{
+	m_Solver.Solve(m_Collision.GetContactPoints());
 }
 
 void PhysicsEngine::UpdateBodies()
@@ -63,12 +70,17 @@ void PhysicsEngine::UpdateBodies()
 
 		// Only add the object to collision if it is not split. Split results
 		// are added after the split.
-		if (!b.UpdatePosition(m_Splits))
-			m_Collision.AddObject(b);
+		b.UpdatePosition();
 
-		// Must fully re-calculate the transform so that it doesnt re-calculate during collision
-		// detection whilst it may be getting accsesed from the game thread.
-		b.GetTransform().ReCalculateIfDirty();
+		if (b.IsSplit())
+		{
+			m_Splits.emplace_back(&b);
+			b.ClearSplit();
+		}
+		else
+		{
+			m_Collision.AddObject(b);
+		}
 	}
 	
 	ProcessSplits();
@@ -82,8 +94,7 @@ void PhysicsEngine::ProcessSplits()
 	{
 		for (auto it = m_Splits.begin(); it != m_Splits.end(); it++)
 		{
-			auto& s = *it;
-			auto& toSplit = *s.ToSplit;
+			auto& toSplit = **it;
 
 			m_NewBodiesFromSplit.clear();
 			m_ShapeChunker.Chunk(toSplit, m_NewBodiesFromSplit);
@@ -98,7 +109,6 @@ void PhysicsEngine::ProcessSplits()
 
 				newBody->CopyVelocity(toSplit);
 				newBody->CalculateMotionProperties();
-				newBody->GetTransform().ReCalculateIfDirty();
 
 				m_Collision.AddObject(*newBody);
 			}

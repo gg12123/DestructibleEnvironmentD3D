@@ -12,6 +12,7 @@
 #include "FixedTimeStepTime.h"
 #include "ShapeChunkTaker.h"
 #include "RayCasting.h"
+#include "SequentialImpulsesSolver.h"
 
 class PhysicsEngine
 {
@@ -67,11 +68,12 @@ public:
 private:
 	void Run();
 
-	void DoCollisionDetectionResponse();
+	void FindContacts();
 	void UpdateBodies();
+	void SatisfyConstraints();
 	void ExecuteGameToPhysicsActions();
 	void ProcessSplits();
-	void ApplyExternalForces() const;
+	void ApplyExternalForcesAndImpulses() const;
 
 	std::atomic<bool> m_Running = true;
 	std::atomic<bool> m_SafeToSync = false;
@@ -88,8 +90,9 @@ private:
 	std::vector<std::unique_ptr<StaticBody>> m_StaticBodies;
 
 	Collision m_Collision;
+	SequentialImpulsesSolver m_Solver;
 
-	std::vector<SplitInfo> m_Splits;
+	std::vector<Rigidbody*> m_Splits;
 	ShapeChunkTaker<Rigidbody> m_ShapeChunker;
 	std::vector<Rigidbody*> m_NewBodiesFromSplit;
 

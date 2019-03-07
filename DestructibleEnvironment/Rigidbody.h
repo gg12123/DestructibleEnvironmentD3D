@@ -8,21 +8,9 @@
 class Rigidbody : public PhysicsObject
 {
 public:
-	void AddImpulse(const Impulse& impulse) override
+	void AddExternalImpulse(const Impulse& impulse)
 	{
-		// Impulses added by collision response
-		m_Impulses.emplace_back(impulse);
-	}
-
-	void AddAdditionalImpulse(const Impulse& impulse)
-	{
-		// Impulses added by the game thread
-		m_AdditionalImpulses.emplace_back(impulse);
-	}
-
-	void AddContact(const ContactManifold& contact) override
-	{
-		m_Contacts.emplace_back(contact);
+		m_ExternalImpulses.emplace_back(impulse);
 	}
 
 	const Vector3& GetVelocityWorld() const
@@ -50,7 +38,7 @@ public:
 		return m_VelocityWorld + Vector3::Cross(m_AngularVelocityWorld, worldPoint - GetTransform().GetPosition());
 	}
 
-	bool UpdatePosition(std::vector<SplitInfo>& splits);
+	void UpdatePosition();
 
 	void CopyVelocity(const Rigidbody& toCopy)
 	{
@@ -69,12 +57,12 @@ public:
 
 	void AddForce(const Vector3& forceWorld)
 	{
-		m_AddedForceWorld += forceWorld;
+		m_ExternalForceWorld += forceWorld;
 	}
 
 	void AddMoment(const Vector3& momentWorld)
 	{
-		m_AddedMomentsWorld += momentWorld;
+		m_ExternalMomentsWorld += momentWorld;
 	}
 
 	void SetDrag(float drag)
@@ -87,32 +75,33 @@ public:
 		m_AngularDrag = angDrag;
 	}
 
-	void ApplyExternalForces();
+	void ApplyExternalForcesAndImpulses();
 
-private:
-	void TransferAdditionalImpulses()
+	bool IsSplit() const
 	{
-		m_Impulses.insert(m_Impulses.end(), m_AdditionalImpulses.begin(), m_AdditionalImpulses.end());
-		m_AdditionalImpulses.clear();
+		return m_IsSplit;
 	}
 
-	void UpdateTransform();
-	void RewindIfPenetrating();
-	void SatisfyContactConstraints();
-	void ApplyImpulses(std::vector<SplitInfo>& splits);
-	void ApplyImpulse(const Impulse& impulse);
-	void CalculateInertia();
+	void ClearSplit()
+	{
+		m_IsSplit = false;
+	}
 
-	std::vector<Impulse> m_Impulses;
-	std::vector<Impulse> m_AdditionalImpulses;
-	std::vector<ContactManifold> m_Contacts;
+	void ApplyImpulse(const Impulse& impulse) override;
+
+private:
+	void UpdateTransform();
+	void CalculateInertia();
 
 	Vector3 m_VelocityWorld;
 	Vector3 m_AngularVelocityWorld;
 
-	Vector3 m_AddedForceWorld;
-	Vector3 m_AddedMomentsWorld;
+	Vector3 m_ExternalForceWorld;
+	Vector3 m_ExternalMomentsWorld;
+	std::vector<Impulse> m_ExternalImpulses;
 
 	float m_Drag;
 	float m_AngularDrag;
+
+	bool m_IsSplit = false;
 };

@@ -11,7 +11,7 @@ private:
 	class LevelWithObjects
 	{
 	private:
-		void Query(const Tobject& obj, int bucketIndex, TcollisionHandler& collHandler)
+		void Query(Tobject& obj, int bucketIndex, TcollisionHandler& collHandler)
 		{
 			auto& bucket = m_Level.GetBucket(bucketIndex);
 
@@ -24,7 +24,7 @@ private:
 				{
 					other->SetLastCheckedAgainst(&obj);
 
-					if (other->GetAABB().OverlapsWith(obj.GetAABB()))
+					if (other->GetWorldAABB().OverlapsWith(obj.GetWorldAABB()))
 						collHandler.RunNarrowPhaseCheckForCollision(obj, *other);
 				}
 			}
@@ -40,7 +40,7 @@ private:
 			m_Objects.push(&obj);
 		}
 
-		void Query(const Tobject& obj, TcollisionHandler& collHandler) // also pass in an object to call back to for handling the collision test
+		void Query(Tobject& obj, TcollisionHandler& collHandler) // also pass in an object to call back to for handling the collision test
 		{
 			auto range = m_Level.GetRange(obj);
 
@@ -122,7 +122,7 @@ private:
 			// Test for collisions against its own level, and all levels
 			// that contain larger objects
 			for (auto i = levelIndex; i >= 0; i--)
-				m_ActiveLevels[i]->Query(*nextObj);
+				m_ActiveLevels[i]->Query(*nextObj, collHandler);
 
 			// Now insert the object into its level.
 			level.InsertNext();
@@ -167,7 +167,7 @@ public:
 		CollectActiveLevels();
 
 		for (auto i = 0u; i < m_ActiveLevels.size(); i++)
-			HandleActiveLevel(i);
+			HandleActiveLevel(i, collHandler);
 	}
 
 private:

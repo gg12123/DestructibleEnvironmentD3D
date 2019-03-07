@@ -30,5 +30,5 @@ void DynamicBodyProxy::AddTorque(const Vector3& torque)
 void DynamicBodyProxy::AddImpulse(const Impulse& imp)
 {
 	assert(Physics::AcceptingGameInput());
-	m_Body->AddAdditionalImpulse(imp);
+	m_Body->AddExternalImpulse(imp);
 }

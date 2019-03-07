@@ -101,20 +101,20 @@ public:
 		auto max = c + e;
 		auto min = c - e;
 
-		r.XStart = std::floorf(min.x / m_SquareSize);
-		r.YStart = std::floorf(min.y / m_SquareSize);
-		r.ZStart = std::floorf(min.z / m_SquareSize);
+		r.XStart = static_cast<int>(std::floorf(min.x / m_SquareSize));
+		r.YStart = static_cast<int>(std::floorf(min.y / m_SquareSize));
+		r.ZStart = static_cast<int>(std::floorf(min.z / m_SquareSize));
 
-		r.XEnd = std::floorf(max.x / m_SquareSize) + 1;
-		r.YEnd = std::floorf(max.y / m_SquareSize) + 1;
-		r.ZEnd = std::floorf(max.z / m_SquareSize) + 1;
+		r.XEnd = static_cast<int>(std::floorf(max.x / m_SquareSize)) + 1;
+		r.YEnd = static_cast<int>(std::floorf(max.y / m_SquareSize)) + 1;
+		r.ZEnd = static_cast<int>(std::floorf(max.z / m_SquareSize)) + 1;
 
 		return r;
 	}
 
 	int GetBucketIndex(int squareXIndex, int squareYIndex, int squareZIndex) const
 	{
-		CalculateHash(squareXIndex, squareYIndex, squareZIndex);
+		return CalculateHash(squareXIndex, squareYIndex, squareZIndex);
 	}
 
 	const GridSquaresBucket<Tobject>& GetBucket(int bucketIndex)
@@ -125,7 +125,7 @@ public:
 	void Clear()
 	{
 		m_CurrStamp++;
-		if (m_CurrStamp == std::numeric_limits<uint64>::max())
+		if (m_CurrStamp == (std::numeric_limits<uint64>::max)())
 		{
 			ClearTimeStamps();
 			m_CurrStamp = 1;
