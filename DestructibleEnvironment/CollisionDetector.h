@@ -9,12 +9,13 @@
 class CollisionDetector
 {
 private:
-	ContactPlane CalculateCantact1To2(const GjkInputShape& shape1, const GjkInputShape& shape2)
+	ContactPlane CalculateCantact(const GjkInputShape& shape1, const GjkInputShape& shape2)
 	{
 		auto localContact = m_ContactFinder.FindContact(shape1, shape2, m_Detector.GetQ());
 
 		return ContactPlane(m_ActiveTransform->ToWorldPosition(localContact.GetPoint()),
-			m_ActiveTransform->ToWorldDirection(localContact.GetNormal().InDirectionOf(shape2.GetCentroid() - shape1.GetCentroid())));
+			m_ActiveTransform->ToWorldDirection(localContact.GetNormal()),
+			localContact.GetPeneration());
 	}
 
 	GjkInputShape TransformToShape1sSpace(const Shape& shape2)
@@ -40,7 +41,7 @@ private:
 	}
 
 public:
-	bool FindContact(const Shape& shape1, const Shape& shape2, ContactPlane& contact1To2)
+	bool FindContact(const Shape& shape1, const Shape& shape2, ContactPlane& contact)
 	{
 		InitTransformMatrix(shape1.GetOwner(), shape2.GetOwner());
 
@@ -49,7 +50,7 @@ public:
 
 		if (m_Detector.Run(gjkShape1, gjkShape2))
 		{
-			contact1To2 = CalculateCantact1To2(gjkShape1, gjkShape2);
+			contact = CalculateCantact(gjkShape1, gjkShape2);
 			return true;
 		}
 		return false;

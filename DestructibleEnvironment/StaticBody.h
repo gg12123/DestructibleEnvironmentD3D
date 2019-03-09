@@ -6,6 +6,7 @@ class StaticBody : public PhysicsObject
 public:
 	StaticBody()
 	{
-		SetMass(1000000.0f);
+		SetInvMass(0.0f);
+		SetInvInertia(Matrix3(0.0f));
 	}
 };

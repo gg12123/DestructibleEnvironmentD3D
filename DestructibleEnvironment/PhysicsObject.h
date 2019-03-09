@@ -7,8 +7,6 @@ class PhysicsObject : public CompoundShape
 public:
 	PhysicsObject()
 	{
-		m_Inertia = Matrix3::Indentity();
-		m_InertiaInverse = Matrix3::Indentity();
 	}
 
 	virtual void ApplyImpulse(const Impulse& impulse)
@@ -17,22 +15,17 @@ public:
 
 	float GetMass() const
 	{
-		return m_Mass;
+		return m_InvMass > 0.0f ? 1.0f / m_InvMass : MathU::Infinity;
 	}
 
-	const Matrix3& GetInertiaLocal() const
+	float GetInvMass() const
 	{
-		return m_Inertia;
+		return m_InvMass;
 	}
 
 	const Matrix3& GetInertiaInverseLocal() const
 	{
 		return m_InertiaInverse;
-	}
-
-	Matrix3 GetInertiaWorld()
-	{
-		return GetTransform().ApplySimilarityTransform(m_Inertia);
 	}
 
 	Matrix3 GetInertiaInverseWorld()
@@ -47,7 +40,12 @@ public:
 
 	void SetMass(float mass)
 	{
-		m_Mass = mass;
+		m_InvMass = 1.0f / mass;
+	}
+
+	void SetInvMass(float invMass)
+	{
+		m_InvMass = invMass;
 	}
 
 	PhysicsObject* ToPhysicsObject() override
@@ -58,12 +56,15 @@ public:
 protected:
 	void SetInertia(const Matrix3& inertia)
 	{
-		m_Inertia = inertia;
 		m_InertiaInverse = Matrix3::Inverse(inertia);
 	}
 
+	void SetInvInertia(const Matrix3& invInertia)
+	{
+		m_InertiaInverse = invInertia;
+	}
+
 private:
-	float m_Mass;
-	Matrix3 m_Inertia;
+	float m_InvMass;
 	Matrix3 m_InertiaInverse;
 };

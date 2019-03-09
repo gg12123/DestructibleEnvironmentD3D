@@ -46,14 +46,13 @@ public:
 		m_AngularVelocityWorld = toCopy.m_AngularVelocityWorld;
 	}
 
-	void CopyMotionProperties(const Rigidbody& toCopy)
+	void CopyDrag(const Rigidbody& toCopy)
 	{
 		m_Drag = toCopy.m_Drag;
 		m_AngularDrag = toCopy.m_AngularDrag;
-		SetMass(toCopy.GetMass());
 	}
 
-	void CalculateMotionProperties();
+	void CalculateMassProperties();
 
 	void AddForce(const Vector3& forceWorld)
 	{

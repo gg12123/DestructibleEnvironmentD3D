@@ -24,15 +24,15 @@ float CollisionResponder::CalculateImpulse(const ContactPlane& worldContact1To2,
 	auto s1 = CalculateS(collNormalWorld1To2, collPointWorld - t1.GetPosition(), body1.GetInertiaInverseWorld());
 	auto s2 = CalculateS(collNormalWorld1To2, collPointWorld - t2.GetPosition(), body2.GetInertiaInverseWorld());
 
-	auto m1 = body1.GetMass();
-	auto m2 = body2.GetMass();
+	auto m1Inv = body1.GetInvMass();
+	auto m2Inv = body2.GetInvMass();
 
 	static constexpr auto beta = 0.1f;
 	static constexpr auto slop = 0.01f;
 	auto vBias = (beta / PhysicsTime::FixedDeltaTime) * MathU::Max(worldContact1To2.GetPeneration() - slop, 0.0f);
 
 	auto vr = v2 - v1;
-	auto J = (-Vector3::Dot(vr, collNormalWorld1To2) + vBias) / ((1.0f / m1) + (1.0f / m2) + s1 + s2);
+	auto J = (-Vector3::Dot(vr, collNormalWorld1To2) + vBias) / (m1Inv + m2Inv + s1 + s2);
 
 	return J;
 }

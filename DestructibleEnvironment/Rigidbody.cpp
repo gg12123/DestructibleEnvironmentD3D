@@ -54,14 +54,10 @@ void Rigidbody::CalculateInertia()
 	SetInertia(inertia);
 }
 
-void Rigidbody::CalculateMotionProperties()
+void Rigidbody::CalculateMassProperties()
 {
 	SetMass(1.0f); // TODO
 	CalculateInertia();
-
-	// TODO - not sure how to calculate these...
-	m_Drag = 1.5f;
-	m_AngularDrag = 3.5f;
 }
 
 void Rigidbody::UpdateTransform()
@@ -77,7 +73,7 @@ void Rigidbody::UpdateTransform()
 
 void Rigidbody::ApplyImpulse(const Impulse& impulse)
 {
-	m_VelocityWorld += impulse.WorldImpulse / GetMass();
+	m_VelocityWorld += GetInvMass() * impulse.WorldImpulse;
 
 	auto& r = impulse.WorldImpulsePoint - GetTransform().GetPosition();
 	auto& J = impulse.WorldImpulse;
@@ -99,7 +95,7 @@ void Rigidbody::ApplyExternalForcesAndImpulses()
 
 	m_ExternalMomentsWorld -= m_AngularDrag * m_AngularVelocityWorld;
 
-	m_VelocityWorld += (m_ExternalForceWorld / GetMass()) * PhysicsTime::FixedDeltaTime;
+	m_VelocityWorld += (GetInvMass() * m_ExternalForceWorld) * PhysicsTime::FixedDeltaTime;
 	m_AngularVelocityWorld += (GetInertiaInverseWorld() * m_ExternalMomentsWorld) * PhysicsTime::FixedDeltaTime;
 
 	for (auto& imp : m_ExternalImpulses)

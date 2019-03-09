@@ -5,23 +5,23 @@
 class SequentialImpulsesSolver
 {
 private:
-	void ApplyImpulseAt(ContactPoint& p)
+	void ApplyImpulseAt(ContactConstraint& constraint)
 	{
-		auto prevAccImpulse = p.GetAccumulatedImpulse();
+		auto prevAccImpulse = constraint.GetAccumulatedImpulse();
 
-		auto delta = p.CalculateImpulse();
-		p.SetAccumulatedImpulse(MathU::Max(prevAccImpulse + delta, 0.0f));
+		auto delta = constraint.CalculateImpulse();
+		constraint.SetAccumulatedImpulse(MathU::Max(prevAccImpulse + delta, 0.0f));
 
-		auto change = p.GetAccumulatedImpulse() - prevAccImpulse;
-		p.ApplyImpulse(change);
+		auto change = constraint.GetAccumulatedImpulse() - prevAccImpulse;
+		constraint.ApplyImpulse(change);
 	}
 
 public:
-	void Solve(std::vector<ContactPoint>& contactPoints)
+	void Solve(std::vector<ContactConstraint>& contactc)
 	{
 		for (auto i = 0; i < 10; i++)
 		{
-			for (auto& c : contactPoints)
+			for (auto& c : contactc)
 				ApplyImpulseAt(c);
 		}
 	}

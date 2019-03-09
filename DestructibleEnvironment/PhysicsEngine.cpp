@@ -55,7 +55,7 @@ void PhysicsEngine::FindContacts()
 
 void PhysicsEngine::SatisfyConstraints()
 {
-	m_Solver.Solve(m_Collision.GetContactPoints());
+	m_Solver.Solve(m_Collision.GetContactConstraints());
 }
 
 void PhysicsEngine::UpdateBodies()
@@ -108,7 +108,8 @@ void PhysicsEngine::ProcessSplits()
 				}
 
 				newBody->CopyVelocity(toSplit);
-				newBody->CalculateMotionProperties();
+				newBody->CopyDrag(toSplit);
+				newBody->CalculateMassProperties();
 
 				m_Collision.AddObject(*newBody);
 			}

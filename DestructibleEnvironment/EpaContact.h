@@ -97,7 +97,7 @@ private:
 
 			auto pen = (pointOnA - pointOnB).Magnitude();
 
-			return ContactPlane((pointOnA + pointOnB) / 2.0f, m_N);
+			return ContactPlane((pointOnA + pointOnB) / 2.0f, m_N, pen);
 		}
 
 		const auto& P0() const
