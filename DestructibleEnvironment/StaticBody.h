@@ -6,6 +6,6 @@ class StaticBody : public PhysicsObject
 public:
 	StaticBody()
 	{
-		SetMass(10000.0f);
+		SetMass(1000000.0f);
 	}
 };

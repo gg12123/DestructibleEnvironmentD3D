@@ -5,13 +5,19 @@
 class SequentialImpulsesSolver
 {
 private:
-	void ApplyImpulseAt(const ContactPoint& p)
+	void ApplyImpulseAt(ContactPoint& p)
 	{
-		m_Reponder.CalculateResponse(ContactPlane(p.Point, p.Normal1To2), *p.Body1, *p.Body2);
+		auto prevAccImpulse = p.GetAccumulatedImpulse();
+
+		auto delta = p.CalculateImpulse();
+		p.SetAccumulatedImpulse(MathU::Max(prevAccImpulse + delta, 0.0f));
+
+		auto change = p.GetAccumulatedImpulse() - prevAccImpulse;
+		p.ApplyImpulse(change);
 	}
 
 public:
-	void Solve(const std::vector<ContactPoint>& contactPoints)
+	void Solve(std::vector<ContactPoint>& contactPoints)
 	{
 		for (auto i = 0; i < 10; i++)
 		{
@@ -19,7 +25,4 @@ public:
 				ApplyImpulseAt(c);
 		}
 	}
-
-private:
-	CollisionResponder m_Reponder;
 };

@@ -57,7 +57,7 @@ public:
 		}
 	}
 
-	const auto& GetContactPoints() const
+	auto& GetContactPoints()
 	{
 		return m_ContactPoints;
 	}
