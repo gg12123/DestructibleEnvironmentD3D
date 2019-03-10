@@ -2,6 +2,8 @@
 #include <vector>
 #include "MathU.h"
 
+// TODO - this needs to be specialized for bools.
+
 template<class T>
 class DynamicArray
 {

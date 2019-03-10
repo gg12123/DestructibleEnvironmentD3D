@@ -468,6 +468,9 @@
     <ClInclude Include="SequentialImpulsesSolver.h">
       <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
+    <ClInclude Include="ShapeDisconnector.h">
+      <Filter>Physics\ShapeAndSplitRelated</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">

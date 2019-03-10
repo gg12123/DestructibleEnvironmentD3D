@@ -7,13 +7,14 @@
 #include "PointInPolyCase.h"
 #include "RayCasting.h"
 #include "LastCheckedAgainst.h"
+#include "ObjectWithHash.h"
 
 class ShapePoint;
 class ShapeEdge;
 class Face;
 class CompoundShape;
 
-class Shape : public LastCheckedAgainst<const Shape*>
+class Shape : public LastCheckedAgainst<const Shape*>, public ObjectWithHash<Shape>
 {
 public:
 	Shape()
@@ -67,6 +68,26 @@ public:
 		m_EdgeObjects.clear();
 		m_EdgeIndexes.clear();
 		m_PointObjects.clear();
+		m_LinkedShapes.clear();
+	}
+
+	void AddLink(Shape& link)
+	{
+		m_LinkedShapes.emplace_back(&link);
+		link.m_LinkedShapes.emplace_back(this);
+	}
+
+	void DisconnectLinks()
+	{
+		for (auto link : m_LinkedShapes)
+			CollectionU::Remove(link->m_LinkedShapes, this);
+
+		m_LinkedShapes.clear();
+	}
+
+	const auto& GetLinkedShapes() const
+	{
+		return m_LinkedShapes;
 	}
 
 	void AddFace(Face& f)
@@ -140,4 +161,6 @@ private:
 
 	AABB m_LocalAABB;
 	AABB m_WorldAABB;
+
+	std::vector<Shape*> m_LinkedShapes;
 };

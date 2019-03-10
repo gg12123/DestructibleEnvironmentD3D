@@ -273,6 +273,7 @@
     <ClInclude Include="RedundantPointRemover.h" />
     <ClInclude Include="SequentialImpulsesSolver.h" />
     <ClInclude Include="ShapeChunkTaker.h" />
+    <ClInclude Include="ShapeDisconnector.h" />
     <ClInclude Include="ShapeDuplicater.h" />
     <ClInclude Include="ShapeElementPool.h" />
     <ClInclude Include="ShapePoint.h" />
