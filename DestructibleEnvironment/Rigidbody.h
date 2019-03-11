@@ -8,6 +8,10 @@
 class Rigidbody : public PhysicsObject
 {
 public:
+	Rigidbody()
+	{
+	}
+
 	void AddExternalImpulse(const Impulse& impulse)
 	{
 		m_ExternalImpulses.emplace_back(impulse);
@@ -86,6 +90,11 @@ public:
 		m_IsSplit = false;
 	}
 
+	const auto& GetSplittingImpulse() const
+	{
+		return m_SplittingImpulse;
+	}
+
 	void ApplyImpulse(const Impulse& impulse) override;
 
 private:
@@ -103,4 +112,5 @@ private:
 	float m_AngularDrag;
 
 	bool m_IsSplit = false;
+	Impulse m_SplittingImpulse;
 };

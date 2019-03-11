@@ -468,7 +468,7 @@
     <ClInclude Include="SequentialImpulsesSolver.h">
       <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
-    <ClInclude Include="ShapeDisconnector.h">
+    <ClInclude Include="ShapeDestructor.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
   </ItemGroup>

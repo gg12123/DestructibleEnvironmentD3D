@@ -8,6 +8,7 @@
 #include "RayCasting.h"
 #include "LastCheckedAgainst.h"
 #include "ObjectWithHash.h"
+#include "CollectionU.h"
 
 class ShapePoint;
 class ShapeEdge;

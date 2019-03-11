@@ -5,6 +5,10 @@
 class Impulse
 {
 public:
+	Impulse()
+	{
+	}
+
 	Impulse(const Vector3& worldImpulse, const Vector3& worldCollPoint, float impact) : 
 		WorldImpulse(worldImpulse),
 		WorldImpulsePoint(worldCollPoint),

@@ -83,7 +83,10 @@ void Rigidbody::ApplyImpulse(const Impulse& impulse)
 	static constexpr auto impactNeededForSplit = 1000.0f;
 
 	if (impulse.Impact > impactNeededForSplit)
+	{
 		m_IsSplit = true;
+		m_SplittingImpulse = impulse;
+	}
 }
 
 void Rigidbody::ApplyExternalForcesAndImpulses()

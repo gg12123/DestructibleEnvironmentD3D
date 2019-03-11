@@ -10,7 +10,7 @@
 #include "SplitInfo.h"
 #include "Collision.h"
 #include "FixedTimeStepTime.h"
-#include "ShapeChunkTaker.h"
+#include "ShapeDestructor.h"
 #include "RayCasting.h"
 #include "SequentialImpulsesSolver.h"
 
@@ -92,9 +92,9 @@ private:
 	Collision m_Collision;
 	SequentialImpulsesSolver m_Solver;
 
-	std::vector<Rigidbody*> m_Splits;
-	ShapeChunkTaker<Rigidbody> m_ShapeChunker;
-	std::vector<Rigidbody*> m_NewBodiesFromSplit;
+	std::vector<SplitInfo> m_Splits;
+	ShapeDestructor<Rigidbody> m_ShapeDestructor;
+	std::vector<Rigidbody*> m_NewBodiesFromDestruct;
 
 	FixedTimeStepTime m_Time;
 

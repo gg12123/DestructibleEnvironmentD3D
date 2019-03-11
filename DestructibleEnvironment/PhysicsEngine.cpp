@@ -68,17 +68,17 @@ void PhysicsEngine::UpdateBodies()
 	{
 		auto& b = **it;
 
-		// Only add the object to collision if it is not split. Split results
-		// are added after the split.
 		b.UpdatePosition();
 
 		if (b.IsSplit())
 		{
-			m_Splits.emplace_back(&b);
+			m_Splits.emplace_back(SplitInfo(b, b.GetSplittingImpulse()));
 			b.ClearSplit();
 		}
 		else
 		{
+			// Only add the object to collision if it is not split. Split results
+			// are added after the split.
 			m_Collision.AddObject(b);
 		}
 	}
@@ -92,14 +92,14 @@ void PhysicsEngine::ProcessSplits()
 
 	if (doSplits)
 	{
-		for (auto it = m_Splits.begin(); it != m_Splits.end(); it++)
+		for (auto& data : m_Splits)
 		{
-			auto& toSplit = **it;
+			auto& toSplit = *data.ToSplit;
 
-			m_NewBodiesFromSplit.clear();
-			m_ShapeChunker.Chunk(toSplit, m_NewBodiesFromSplit);
+			m_NewBodiesFromDestruct.clear();
+			m_ShapeDestructor.Destruct(toSplit, data.CauseImpulse, m_NewBodiesFromDestruct);
 
-			for (auto newBody : m_NewBodiesFromSplit)
+			for (auto newBody : m_NewBodiesFromDestruct)
 			{
 				if (newBody != &toSplit)
 				{
