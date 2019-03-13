@@ -19,7 +19,7 @@ public:
 		ContactPlane contact;
 		if (m_Detector.FindContact(shapeA, shapeB, contact))
 		{
-			m_ContactPointFinder.Find(m_ContactConstraints, shapeA, shapeB, contact);
+			m_ContactPointFinder.Find(m_ContactConstraints, m_Manifolds, shapeA, shapeB, contact);
 		}
 	}
 
@@ -33,6 +33,7 @@ public:
 		const std::vector<std::unique_ptr<Rigidbody>>& dynamicBodies)
 	{
 		m_ContactConstraints.clear();
+		m_Manifolds.clear();
 
 		// Handle collision between dynamic objects
 		m_DynamicsPartition.Run(*this);
@@ -62,9 +63,15 @@ public:
 		return m_ContactConstraints;
 	}
 
+	auto& GetManifolds()
+	{
+		return m_Manifolds;
+	}
+
 private:
 	CollisionDetector m_Detector;
 	HGrid<Shape, Collision> m_DynamicsPartition;
 	ContactPointFinder m_ContactPointFinder;
-	std::vector<ContactConstraint> m_ContactConstraints;
+	std::vector<NormalContactConstraint> m_ContactConstraints;
+	std::vector<ContactManifold> m_Manifolds;
 };
