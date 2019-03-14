@@ -152,7 +152,7 @@ public:
 
 		auto delta = CalculateCurrentImpulse();
 		
-		static constexpr float mu = 0.5f;
+		static constexpr float mu = 0.6f;
 		SetAccumulatedImpulse(MathU::Clamp(prevAccImpulse + delta, -mu * Jn, mu * Jn));
 
 		auto change = GetAccumulatedImpulse() - prevAccImpulse;
@@ -243,7 +243,12 @@ private:
 		
 		auto n = constraints[m_StartOfCurrManifold].GetDirection();
 
-		auto dirA = Vector3::OrthogonalDirection(n);
+		auto vr = shape1.GetOwner().ToPhysicsObject()->WorldVelocityAt(centre) -
+			shape2.GetOwner().ToPhysicsObject()->WorldVelocityAt(centre);
+
+		auto vrProj = Vector3::ProjectOnPlane(n, vr);
+
+		auto dirA = vrProj.MagnitudeSqr() > 0.001f ? vrProj.Normalized() : Vector3::OrthogonalDirection(n);
 		auto dirB = Vector3::Cross(n, dirA);
 
 		return ContactManifold(shape1, shape2, m_StartOfCurrManifold, end, dirA, dirB, centre);
@@ -251,7 +256,7 @@ private:
 
 	Vector3 ProjectOntoContactPlane(const Vector3& p)
 	{
-
+		return p + Vector3::Dot(m_ContactPlane.GetPoint() - p, m_ContactPlane.GetNormal()) * m_ContactPlane.GetNormal();
 	}
 
 	bool PointIsAlreadyAdded(const std::vector<NormalContactConstraint>& constraints, const Vector3& p)
@@ -259,7 +264,7 @@ private:
 		static constexpr auto equalTol = 0.0001f;
 		auto pOnPlane = ProjectOntoContactPlane(p);
 
-		for (int i = m_StartOfCurrManifold; i < constraints.size(); i++)
+		for (int i = m_StartOfCurrManifold; i < static_cast<int>(constraints.size()); i++)
 		{
 			auto x = ProjectOntoContactPlane(constraints[i].GetPoint());
 			if ((x - pOnPlane).MagnitudeSqr() < equalTol)
