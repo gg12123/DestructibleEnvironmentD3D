@@ -217,7 +217,8 @@ private:
 
 		for (auto& p : shapePoints.GetCachedPoints())
 		{
-			if (Vector3::Dot(p - p0, n) >= 0.0f)
+			// TODO - add this optimisation back in but make it more robust.
+			//if (Vector3::Dot(p - p0, n) >= 0.0f)
 			{
 				auto pWorld = tPoints.ToWorldPosition(p);
 				if (PointIsInsideShape(shapeOther, pWorld) && !PointIsAlreadyAdded(constraints, pWorld))

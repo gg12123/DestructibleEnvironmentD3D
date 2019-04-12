@@ -5,6 +5,9 @@
 #include "CollisionData.h"
 #include "CompoundShape.h"
 #include "Shape.h"
+#include "SatCollisionDetection.h"
+
+#define USE_SAT_COLLISION_DETECTION
 
 class CollisionDetector
 {
@@ -43,6 +46,15 @@ private:
 public:
 	bool FindContact(const Shape& shape1, const Shape& shape2, ContactPlane& contact)
 	{
+#ifdef USE_SAT_COLLISION_DETECTION
+
+		if (m_SatDetector.AreColliding(shape1, shape2))
+		{
+			contact = m_SatDetector.GetCurrentContactPlane();
+			return true;
+		}
+		return false;
+#else
 		InitTransformMatrix(shape1.GetOwner(), shape2.GetOwner());
 
 		auto gjkShape1 = GjkInputShape(shape1.GetCachedPoints(), shape1.GetCentre());
@@ -54,11 +66,13 @@ public:
 			return true;
 		}
 		return false;
+#endif
 	}
 
 private:
 	std::vector<Vector3> m_TransformedPoints;
 	GjkCollisionDetection m_Detector;
+	SatCollisionDetection m_SatDetector;
 	EpaContact m_ContactFinder;
 	Matrix4 m_ToShape1sSpace;
 	const Transform* m_ActiveTransform;

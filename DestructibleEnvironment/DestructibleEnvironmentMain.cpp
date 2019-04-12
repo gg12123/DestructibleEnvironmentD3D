@@ -107,14 +107,14 @@ void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 	auto bodyPos1 = bodiesCentre + Vector3::Right();
 	auto bodyPos2 = bodiesCentre - Vector3::Right();
 	auto bodyPos3 = bodiesCentre + Vector3::Up();
+	auto bodyPos4 = bodiesCentre + Vector3::Foward();
+	auto bodyPos5 = bodiesCentre - Vector3::Foward();
 	
-	//m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodyPos1, RandRot(), 1.0f, 1.0f)));
-	//m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodyPos2, RandRot(), 1.0f, 1.0f)));
-	//m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodyPos3, RandRot(), 1.0f, 1.0f)));
-
-	m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodiesCentre,
-		Quaternion::Identity(),
-		1.0f, 2.0f)));
+	m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodyPos1, RandRot(), 1.0f, 1.0f)));
+	m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodyPos2, RandRot(), 1.0f, 1.0f)));
+	m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodyPos3, RandRot(), 1.0f, 1.0f)));
+	m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodyPos4, RandRot(), 1.0f, 1.0f)));
+	m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodyPos5, RandRot(), 1.0f, 1.0f)));
 
 	//CreateRandomBodies(m_World);
 
