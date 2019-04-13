@@ -38,7 +38,7 @@ DestructibleEnvironmentMain::~DestructibleEnvironmentMain()
 }
 
 // ###################### to be deleted #####################################
-static Vector3 bodiesCentre = Vector3(0.0f, 6.0f, 0.0f);
+static Vector3 bodiesCentre = Vector3(0.0f, 2.0f, 0.0f);
 static float bodiesRadius = 20.0f;
 static uint16 bodiesCount = 5;
 static float sizeMax = 2.0f;

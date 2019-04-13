@@ -91,12 +91,12 @@ void Rigidbody::InitMassProperties(const Transform& refTran)
 	auto mass = intg[0];
 	auto cm = Vector3(intg[1] / mass, intg[2] / mass, intg[3] / mass);
 
-	auto Ixx = intg[5] + intg[6] - mass * (cm.y * cm.y + cm.z * cm.z);
-	auto Iyy = intg[4] + intg[6] - mass * (cm.z * cm.z + cm.x * cm.x);
-	auto Izz = intg[4] + intg[5] - mass * (cm.x * cm.x + cm.y * cm.y);
-	auto Ixy = -(intg[7] - mass * cm.x * cm.y);
-	auto Iyz = -(intg[8] - mass * cm.y * cm.z);
-	auto Ixz = -(intg[9] - mass * cm.z * cm.x);
+	auto Ixx = (intg[5] + intg[6] - mass * (cm.y * cm.y + cm.z * cm.z));
+	auto Iyy = (intg[4] + intg[6] - mass * (cm.z * cm.z + cm.x * cm.x));
+	auto Izz = (intg[4] + intg[5] - mass * (cm.x * cm.x + cm.y * cm.y));
+	auto Ixy = (-(intg[7] - mass * cm.x * cm.y));
+	auto Iyz = (-(intg[8] - mass * cm.y * cm.z));
+	auto Ixz = (-(intg[9] - mass * cm.z * cm.x));
 
 	Matrix3 inertia;
 	auto col0 = inertia.M[0];

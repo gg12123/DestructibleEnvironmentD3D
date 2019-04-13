@@ -15,7 +15,7 @@ private:
 			m_CurrentContactPlane = ContactPlane(activeTran.ToWorldPosition(p0), activeTran.ToWorldDirection(n), pen);
 	}
 
-	float CalculateSeperation(const Shape& s, const Vector3& p0, const Vector3& n)
+	float CalculateSeperation(const Shape& s, const Vector3& p0, const Vector3& n, Vector3& closestPoint)
 	{
 		auto minVal = MathU::Infinity;
 
@@ -23,7 +23,10 @@ private:
 		{
 			auto val = Vector3::Dot(p - p0, n);
 			if (val < minVal)
+			{
 				minVal = val;
+				closestPoint = p;
+			}
 		}
 		return minVal;
 	}
@@ -39,11 +42,12 @@ private:
 			auto p0 = tOther.ToLocalPosition(tFaces.ToWorldPosition(f->GetPlaneP0()));
 			auto n = tOther.ToLocalDirection(tFaces.ToWorldDirection(f->GetNormal()));
 
-			auto sep = CalculateSeperation(shapeOther, p0, n);
+			Vector3 closestPoint;
+			auto sep = CalculateSeperation(shapeOther, p0, n, closestPoint);
 			if (sep > 0.0f)
 				return true;
 
-			UpdateCurrentContactPlane(p0, n, sep, tOther);
+			UpdateCurrentContactPlane(closestPoint, n, sep, tOther);
 		}
 		return false;
 	}
@@ -102,7 +106,11 @@ private:
 					return true;
 
 				auto sep = -MathU::Min(aBounds.GetMax() - bBounds.GetMin(), bBounds.GetMax() - aBounds.GetMin());
-				UpdateCurrentContactPlane(p0A, n, sep, tB);
+
+				Vector3 closest1, closest2;
+				Vector3::ClosestPointsBetweenLines(p0A, p1A, p0B, p1B, closest1, closest2);
+				auto contactPoint = (closest1 + closest2) / 2.0f;
+				UpdateCurrentContactPlane(contactPoint, n, sep, tB);
 			}
 		}
 		return false;
