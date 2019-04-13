@@ -109,8 +109,8 @@ static BoundsCalculator BoundsCalc;
 void Shape::ReCentre(const Vector3& ownersCentre)
 {
 	BoundsCalc.Reset();
-
 	m_CachedPoints.clear();
+	m_Centre = Vector3::Zero();
 
 	for (auto it = m_PointObjects.begin(); it != m_PointObjects.end(); it++)
 	{
@@ -118,11 +118,14 @@ void Shape::ReCentre(const Vector3& ownersCentre)
 		p.ReCentre(ownersCentre);
 
 		auto& pp = p.GetPoint();
+
 		m_CachedPoints.emplace_back(pp);
 		BoundsCalc.Update(pp);
+		m_Centre += pp;
 	}
-	m_Centre -= ownersCentre;
+
 	m_LocalAABB = BoundsCalc.ToAABB();
+	m_Centre /= static_cast<float>(m_PointObjects.size());
 }
 
 void Shape::UpdateWorldAABB()
@@ -147,16 +150,6 @@ void Shape::UpdateWorldAABB()
 	m_WorldAABB = BoundsCalc.ToAABB();
 }
 
-void Shape::CalculateCentre()
-{
-	m_Centre = Vector3::Zero();
-
-	for (auto p : m_PointObjects)
-		m_Centre += p->GetPoint();
-
-	m_Centre /= static_cast<float>(m_PointObjects.size());
-}
-
 void Shape::InitFacesPointsEdges()
 {
 	for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
@@ -173,12 +166,12 @@ Shape& Shape::Duplicate() const
 
 void Shape::OnReturnedToPool()
 {
-	for (auto& e : m_EdgeObjects)
+	for (auto e : m_EdgeObjects)
 		EdgePool::Return(*e);
 
-	for (auto& f : m_Faces)
+	for (auto f : m_Faces)
 		FacePool::Return(*f);
 
-	for (auto& p : m_PointObjects)
+	for (auto p : m_PointObjects)
 		PointPool::Return(*p);
 }

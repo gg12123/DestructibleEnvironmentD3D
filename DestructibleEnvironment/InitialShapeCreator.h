@@ -10,7 +10,7 @@
 class InitialShapeCreator
 {
 public:
-	void Create(CompoundShape& shape, float width, float height, Transform& transform)
+	void Create(CompoundShape& shape, float width, float height)
 	{
 		auto w = width / 2.0f;;
 		auto h = height / 2.0f;
@@ -22,7 +22,6 @@ public:
 		subShape.CollectShapeElementsAndResetHashes();
 
 		shape.AddSubShape(subShape);
-		shape.CentreAndCache(transform);
 	}
 
 private:

@@ -38,19 +38,6 @@ bool CompoundShape::IntersectsRay(const Ray& worldRay, Vector3& intPoint)
 	return hit;
 }
 
-Vector3 CompoundShape::CalcuateCentre() const
-{
-	auto c = Vector3::Zero();
-	auto count = 0u;
-
-	for (auto s : m_SubShapes)
-	{
-		s->CalculateCentre();
-		c += s->GetCentre();
-	}
-	return c / static_cast<float>(m_SubShapes.size());
-}
-
 void CompoundShape::CentreAndCache(const Vector3& centre)
 {
 	for (auto s : m_SubShapes)

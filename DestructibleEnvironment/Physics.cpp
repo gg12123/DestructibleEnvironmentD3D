@@ -20,9 +20,10 @@ void Physics::AddNewProxy(ShapeProxy& proxy, CompoundShape& physicsShape)
 CompoundShape & Physics::AddStaticRigidbody(StaticShapeProxy& proxy)
 {
 	auto body = std::unique_ptr<StaticBody>(new StaticBody());
-	m_ShapeCreator.Create(*body, proxy.GetInitialWidth(), proxy.GetInitialHeight(), proxy.GetTransform());
+	m_ShapeCreator.Create(*body, proxy.GetInitialWidth(), proxy.GetInitialHeight());
 
 	auto& toRet = *body;
+	toRet.InitMassProperties(proxy.GetTransform());
 
 	m_GameToPhysicsActions.emplace_back(std::unique_ptr<IGameTheadToPhysicsThreadAction>(new AddStaticRigidbodyAction(std::move(body))));
 
@@ -34,13 +35,13 @@ CompoundShape & Physics::AddStaticRigidbody(StaticShapeProxy& proxy)
 Rigidbody & Physics::AddDynamicRigidbody(DynamicBodyProxy& proxy)
 {
 	auto body = std::unique_ptr<Rigidbody>(new Rigidbody());
-	m_ShapeCreator.Create(*body, proxy.GetInitialWidth(), proxy.GetInitialHeight(), proxy.GetTransform());
+	m_ShapeCreator.Create(*body, proxy.GetInitialWidth(), proxy.GetInitialHeight());
 
 	auto& b = *body;
 
-	b.CalculateMassProperties();
 	b.SetDrag(1.0f);
 	b.SetAngularDrag(0.5f);
+	b.InitMassProperties(proxy.GetTransform());
 
 	m_GameToPhysicsActions.emplace_back(std::unique_ptr<IGameTheadToPhysicsThreadAction>(new AddDynamicRigidbodyAction(std::move(body))));
 

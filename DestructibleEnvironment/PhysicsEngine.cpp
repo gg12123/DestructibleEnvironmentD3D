@@ -109,7 +109,6 @@ void PhysicsEngine::ProcessSplits()
 
 				newBody->CopyVelocity(toSplit);
 				newBody->CopyDrag(toSplit);
-				newBody->CalculateMassProperties();
 
 				m_Collision.AddObject(*newBody);
 			}

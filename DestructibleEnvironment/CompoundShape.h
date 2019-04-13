@@ -31,20 +31,6 @@ public:
 		m_SubShapes.clear();
 	}
 
-	// All sub-shapes are expressed in the ref transforms space
-	void CentreAndCache(Transform& refTran)
-	{
-		auto c = CalcuateCentre();
-		CentreAndCache(c);
-
-		m_Transform.SetPosition(refTran.ToWorldPosition(c));
-		m_Transform.SetRotation(refTran.GetRotation());
-
-		UpdateSubShapesWorldAABBs();
-
-		SetDirty();
-	}
-
 	bool IsDirty()
 	{
 		return m_Dirty;
@@ -84,8 +70,20 @@ public:
 protected:
 	void UpdateSubShapesWorldAABBs() const;
 
+	// All sub-shapes and the input centre are expressed in the ref transforms space
+	void CentreAndCache(const Transform& refTran, const Vector3& c)
+	{
+		CentreAndCache(c);
+
+		m_Transform.SetPosition(refTran.ToWorldPosition(c));
+		m_Transform.SetRotation(refTran.GetRotation());
+
+		UpdateSubShapesWorldAABBs();
+
+		SetDirty();
+	}
+
 private:
-	Vector3 CalcuateCentre() const;
 	void CentreAndCache(const Vector3& centre);
 
 	void SetDirty()

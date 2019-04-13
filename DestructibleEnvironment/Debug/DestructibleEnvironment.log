@@ -1,14 +1,20 @@
 ﻿  App.cpp
   Camera.cpp
+  CollisionResponder.cpp
+  CompoundShape.cpp
   DestructibleEnvironmentMain.cpp
   DynamicBodyProxy.cpp
   DynamicMesh.cpp
+  Face.cpp
   GameControlledDynamicBody.cpp
   GameTheadToPhysicsThreadAction.cpp
   Light.cpp
   Physics.cpp
   PhysicsEngine.cpp
   RayShooter.cpp
+  Rigidbody.cpp
+  Shape.cpp
+  ShapeEdge.cpp
   ShapeProxy.cpp
   StaticShapeProxy.cpp
   World.cpp

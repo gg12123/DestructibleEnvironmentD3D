@@ -127,8 +127,6 @@ public:
 		return m_Centre;
 	}
 
-	void CalculateCentre();
-
 	void OnTakenFromPool()
 	{
 		Clear();

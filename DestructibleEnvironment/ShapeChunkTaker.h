@@ -71,11 +71,11 @@ private:
 		return *below;
 	}
 
-	Tshape& MakeShape(Tshape& shape, Shape& geometry, Transform& refTran)
+	Tshape& MakeShape(Tshape& shape, Shape& geometry, const Transform& refTran)
 	{
 		shape.ClearSubShapes();
 		shape.AddSubShape(geometry);
-		shape.CentreAndCache(refTran);
+		shape.InitMassProperties(refTran);
 		return shape;
 	}
 

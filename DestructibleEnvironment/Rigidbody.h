@@ -12,6 +12,8 @@ public:
 	{
 	}
 
+	void InitMassProperties(const Transform& refTran);
+
 	void AddExternalImpulse(const Impulse& impulse)
 	{
 		m_ExternalImpulses.emplace_back(impulse);
@@ -56,8 +58,6 @@ public:
 		m_AngularDrag = toCopy.m_AngularDrag;
 	}
 
-	void CalculateMassProperties();
-
 	void AddForce(const Vector3& forceWorld)
 	{
 		m_ExternalForceWorld += forceWorld;
@@ -99,7 +99,6 @@ public:
 
 private:
 	void UpdateTransform();
-	void CalculateInertia();
 
 	Vector3 m_VelocityWorld;
 	Vector3 m_AngularVelocityWorld;
