@@ -20,7 +20,7 @@ void Physics::AddNewProxy(ShapeProxy& proxy, CompoundShape& physicsShape)
 CompoundShape & Physics::AddStaticRigidbody(StaticShapeProxy& proxy)
 {
 	auto body = std::unique_ptr<StaticBody>(new StaticBody());
-	m_ShapeCreator.Create(*body, proxy.GetInitialWidth(), proxy.GetInitialHeight());
+	m_ShapeCreator.Create(*body, proxy);
 
 	auto& toRet = *body;
 	toRet.InitMassProperties(proxy.GetTransform());
@@ -35,7 +35,7 @@ CompoundShape & Physics::AddStaticRigidbody(StaticShapeProxy& proxy)
 Rigidbody & Physics::AddDynamicRigidbody(DynamicBodyProxy& proxy)
 {
 	auto body = std::unique_ptr<Rigidbody>(new Rigidbody());
-	m_ShapeCreator.Create(*body, proxy.GetInitialWidth(), proxy.GetInitialHeight());
+	m_ShapeCreator.Create(*body, proxy);
 
 	auto& b = *body;
 

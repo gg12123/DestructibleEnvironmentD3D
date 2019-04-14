@@ -23,7 +23,7 @@ private:
 		m_BeenVisited[s.GetHash()] = 1;
 	}
 
-	Tshape& CreateNewCompoundShape(Tshape& newShape, Shape& rootSubShape)
+	Tshape& CreateNewCompoundShape(Tshape& newShape, Shape& rootSubShape, const Transform& transform)
 	{
 		newShape.ClearSubShapes();
 
@@ -45,6 +45,8 @@ private:
 					m_ShapeStack.push(link);
 			}
 		}
+
+		newShape.GetTransform().SetEqualTo(transform);
 		return newShape;
 	}
 
@@ -71,12 +73,14 @@ public:
 
 		m_BeenVisited.Zero();
 
-		results.emplace_back(&CreateNewCompoundShape(owner, *FindUnVisitedSubShape()));
+		auto& t = owner.GetTransform();
+
+		results.emplace_back(&CreateNewCompoundShape(owner, *FindUnVisitedSubShape(), t));
 
 		auto root = FindUnVisitedSubShape();
 		while (root)
 		{
-			results.emplace_back(&CreateNewCompoundShape(*(new Tshape()), *root));
+			results.emplace_back(&CreateNewCompoundShape(*(new Tshape()), *root, t));
 			root = FindUnVisitedSubShape();
 		}
 
@@ -147,6 +151,11 @@ public:
 		m_Disconnector.Disconnect(toDiscon, shape, results);
 
 		auto& toChunk = FindAndRemoveShapeToChunk(results, toDiscon);
+
+		auto refTran = shape.GetTransform();
+		for (auto disconShape : results)
+			disconShape->InitMassProperties(refTran);
+
 		m_ChunkTaker.Chunk(toChunk, results);
 	}
 

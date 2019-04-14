@@ -38,7 +38,7 @@ DestructibleEnvironmentMain::~DestructibleEnvironmentMain()
 }
 
 // ###################### to be deleted #####################################
-static Vector3 bodiesCentre = Vector3(0.0f, 2.0f, 0.0f);
+static Vector3 bodiesCentre = Vector3(0.0f, 5.0f, 0.0f);
 static float bodiesRadius = 20.0f;
 static uint16 bodiesCount = 5;
 static float sizeMax = 2.0f;
@@ -61,13 +61,20 @@ static float RandSize()
 	return Random::Range(sizeMin, sizeMax);
 }
 
-static DynamicBodyProxy* CreateBody(const Vector3& pos, const Quaternion& rot, float width, float height)
+static DynamicBodyProxy* CreateBody(const Vector3& pos, const Quaternion& rot,
+	const std::vector<SubShapeData>& subShapes,
+	const std::vector<SubShapeLink>& links)
 {
 	auto body = new DynamicBodyProxy();
 	body->GetTransform().SetPosition(pos);
 	body->GetTransform().SetRotation(rot);
-	body->SetInitialHeight(height);
-	body->SetInitialWidth(width);
+
+	for (auto& ss : subShapes)
+		body->AddSubShapeData(ss);
+
+	for (auto& l : links)
+		body->AddSubShapeLink(l);
+
 	return body;
 }
 
@@ -79,11 +86,10 @@ void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 	auto bodyPos4 = bodiesCentre + Vector3::Foward();
 	auto bodyPos5 = bodiesCentre - Vector3::Foward();
 	
-	m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodyPos1, RandRot(), 1.0f, 1.0f)));
-	m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodyPos2, RandRot(), 1.0f, 1.0f)));
-	m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodyPos3, RandRot(), 1.0f, 1.0f)));
-	m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodyPos4, RandRot(), 1.0f, 1.0f)));
-	m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodyPos5, RandRot(), 1.0f, 1.0f)));
+	m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodyPos1, Quaternion::Identity(),
+		{ SubShapeData(Vector3::Zero(), Vector3(1.0f, 2.0f, 1.0f)),
+		SubShapeData(Vector3(0.0f, 1.5f, 0.0f), Vector3(2.0f, 1.0f, 1.0f)) },
+		{ SubShapeLink(0, 1) })));
 
 	//CreateRandomBodies(m_World);
 
@@ -91,8 +97,7 @@ void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 	auto floorPos = Vector3(0.0f, 0.0f, 0.0f);
 	floor->GetTransform().SetPosition(floorPos);
 	floor->GetTransform().SetRotation(Quaternion::Identity());
-	floor->SetInitialHeight(1.0f);
-	floor->SetInitialWidth(20.0f);
+	floor->AddSubShapeData(SubShapeData(Vector3::Zero(), Vector3(20.0f, 1.0f, 20.0f)));
 	m_World.RegisterEntity(std::unique_ptr<Entity>(floor));
 
 	auto cam = new Camera();

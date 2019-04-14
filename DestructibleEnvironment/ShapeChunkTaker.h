@@ -25,13 +25,15 @@ private:
 			m_OrigVerts[3] = Vector3(0.0f, 0.0f, 1.0f);
 		}
 
-		void ApplyRandomTransform()
+		void ApplyRandomTransform(const Vector3& centre)
 		{
 			auto r = Quaternion(Random::Range(0.1f, 1.0f), Random::Range(0.1f, 1.0f), Random::Range(0.1f, 1.0f), Random::Range(0.1f, 1.0f));
 			r.Normalize();
 
+			auto M = Matrix4::FromTranslation(centre) * Matrix4::FromRotation(r);
+
 			for (auto i = 0u; i < m_OrigVerts.size(); i++)
-				Verts[i] = r.RotateV(m_OrigVerts[i]);
+				Verts[i] = M * m_OrigVerts[i];
 		}
 
 	private:
@@ -43,13 +45,13 @@ private:
 		return s.Duplicate();
 	}
 
-	void CalculatePlanes(const Vector3& t0, const Vector3& t1, const Vector3& t2, std::array<Plane, 3>& planes)
+	void CalculatePlanes(const Vector3& t0, const Vector3& t1, const Vector3& t2, const Vector3& centre, std::array<Plane, 3>& planes)
 	{
-		auto c = (t0 + t1 + t2) / 2.0f;
+		auto c = (t0 + t1 + t2) / 3.0f;
 
-		auto n0 = Vector3::Cross(t0, t1).InDirectionOf(t0 - c).Normalized();
-		auto n1 = Vector3::Cross(t1, t2).InDirectionOf(t1 - c).Normalized();
-		auto n2 = Vector3::Cross(t2, t0).InDirectionOf(t2 - c).Normalized();
+		auto n0 = Vector3::Cross(t0 - centre, t1 - centre).InDirectionOf(t0 - c).Normalized();
+		auto n1 = Vector3::Cross(t1 - centre, t2 - centre).InDirectionOf(t1 - c).Normalized();
+		auto n2 = Vector3::Cross(t2 - centre, t0 - centre).InDirectionOf(t2 - c).Normalized();
 
 		planes[0] = Plane(n0, t0);
 		planes[1] = Plane(n1, t1);
@@ -87,22 +89,23 @@ public:
 		auto& shape = *toChunk.GetSubShapes()[0];
 		auto refTran = toChunk.GetTransform();
 
-		m_Tetra.ApplyRandomTransform();
+		auto centre = shape.GetCentre();
+		m_Tetra.ApplyRandomTransform(centre);
 		m_NewShapes.clear();
 
 		auto& verts = m_Tetra.Verts;
 		std::array<Plane, 3> planes;
 
-		CalculatePlanes(verts[0], verts[1], verts[2], planes);
+		CalculatePlanes(verts[0], verts[1], verts[2], centre, planes);
 		m_NewShapes.emplace_back(&TakeChunk(Duplicate(shape), planes));
 
-		CalculatePlanes(verts[1], verts[2], verts[3], planes);
+		CalculatePlanes(verts[1], verts[2], verts[3], centre, planes);
 		m_NewShapes.emplace_back(&TakeChunk(Duplicate(shape), planes));
 
-		CalculatePlanes(verts[0], verts[1], verts[3], planes);
+		CalculatePlanes(verts[0], verts[1], verts[3], centre, planes);
 		m_NewShapes.emplace_back(&TakeChunk(Duplicate(shape), planes));
 
-		CalculatePlanes(verts[0], verts[2], verts[3], planes);
+		CalculatePlanes(verts[0], verts[2], verts[3], centre, planes);
 		m_NewShapes.emplace_back(&TakeChunk(shape, planes)); // No need to duplicate on the final chunk
 
 		chunks.emplace_back(&MakeShape(toChunk, *m_NewShapes[0], refTran));

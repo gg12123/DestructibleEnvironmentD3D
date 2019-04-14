@@ -1,9 +1,34 @@
 #pragma once
 #include "DynamicMesh.h"
+#include <vector>
 
 class CompoundShape;
 
-// TODO - not all shapes need a dynamic mesh to this needs sorting at some point.
+struct SubShapeData
+{
+	Vector3 Centre;
+	Vector3 Size;
+
+	SubShapeData(const Vector3& c, const Vector3& s)
+	{
+		Centre = c;
+		Size = s;
+	}
+};
+
+struct SubShapeLink
+{
+	int ShapeAIndex;
+	int ShapeBIndex;
+
+	SubShapeLink(int aIndex, int bIndex)
+	{
+		ShapeAIndex = aIndex;
+		ShapeBIndex = bIndex;
+	}
+};
+
+// TODO - not all shapes need a dynamic mesh so this needs sorting at some point.
 // could just specify the required buffer type to the base.
 // I think verts could still be inserted using the same map in sync method
 // because non dynamic buffers still allow CPU to write.
@@ -14,29 +39,29 @@ public:
 	{
 	}
 
-	// special constructor used when a shape is added by the physics engine.
+	// Special constructor used when a shape is added by the physics engine.
 	ShapeProxy(CompoundShape& shape);
 
 	void Syncronise();
 
-	float GetInitialWidth() const
+	const auto& GetSubShapeData() const
 	{
-		return m_InitialWidth;
+		return m_SubShapes;
 	}
 
-	float GetInitialHeight() const
+	const auto& GetSubShapeLinks() const
 	{
-		return m_InitialHeight;
+		return m_SubShapeLinks;
 	}
 
-	void SetInitialWidth(float val)
+	void AddSubShapeData(const SubShapeData& subShape)
 	{
-		m_InitialWidth = val;
+		m_SubShapes.emplace_back(subShape);
 	}
 
-	void SetInitialHeight(float val)
+	void AddSubShapeLink(const SubShapeLink& link)
 	{
-		m_InitialHeight = val;
+		m_SubShapeLinks.emplace_back(link);
 	}
 
 protected:
@@ -45,7 +70,6 @@ protected:
 	virtual CompoundShape& RegisterWithPhysics() = 0;
 private:
 	CompoundShape * m_Shape = nullptr;
-
-	float m_InitialWidth;
-	float m_InitialHeight;
+	std::vector<SubShapeData> m_SubShapes;
+	std::vector<SubShapeLink> m_SubShapeLinks;
 };

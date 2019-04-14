@@ -97,44 +97,22 @@ private:
 		auto forwardRot = q.RotateV(Vector3::Foward());
 
 		shape.AddFace(CreateFace(m_Face0, upRot));
-		//shape.AddFace(CreateFace(m_Face1, upRot));
-
 		shape.AddFace(CreateFace(m_Face1, rightRot));
-		//shape.AddFace(CreateFace(m_Face3, rightRot));
-
 		shape.AddFace(CreateFace(m_Face2, -forwardRot));
-		//shape.AddFace(CreateFace(m_Face5, -forwardRot));
-
 		shape.AddFace(CreateFace(m_Face3, -rightRot));
-		//shape.AddFace(CreateFace(m_Face7, -rightRot));
-
 		shape.AddFace(CreateFace(m_Face4, forwardRot));
-		//shape.AddFace(CreateFace(m_Face9, forwardRot));
-
 		shape.AddFace(CreateFace(m_Face5, -upRot));
-		//shape.AddFace(CreateFace(m_Face11, -upRot));
 	}
 
 public:
 	CubeFacesCreator()
 	{
 		m_Face0 = { 1, 0, 3, 2 };
-		//m_Face1 = { 3, 2, 1 };
-
 		m_Face1 = { 0, 4, 7, 3 };
-		//m_Face3 = { 7, 3, 0 };
-
 		m_Face2 = { 3, 7, 6, 2 };
-		//m_Face5 = { 6, 2, 3 };
-
 		m_Face3 = { 2, 6, 5, 1 };
-		//m_Face7 = { 5, 1, 2 };
-
 		m_Face4 = { 1, 5, 4, 0 };
-		//m_Face9 = { 4, 0, 1 };
-
 		m_Face5 = { 4, 5, 6, 7 };
-		//m_Face11 = { 6, 7, 4 };
 	}
 
 	void CreateFaces(Shape& shape, const Matrix4& M, const Quaternion& MsRot)
