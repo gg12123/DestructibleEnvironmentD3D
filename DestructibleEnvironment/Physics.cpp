@@ -39,8 +39,8 @@ Rigidbody & Physics::AddDynamicRigidbody(DynamicBodyProxy& proxy)
 
 	auto& b = *body;
 
-	b.SetDrag(1.0f);
-	b.SetAngularDrag(0.5f);
+	b.SetDrag(0.25f);
+	b.SetAngularDrag(0.1f);
 	b.InitMassProperties(proxy.GetTransform());
 
 	m_GameToPhysicsActions.emplace_back(std::unique_ptr<IGameTheadToPhysicsThreadAction>(new AddDynamicRigidbodyAction(std::move(body))));

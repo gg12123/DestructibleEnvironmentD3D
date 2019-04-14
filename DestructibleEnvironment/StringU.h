@@ -23,4 +23,10 @@ public:
 	{
 		return val;
 	}
+
+	//template<>
+	//static std::string ToString<char*>(const char*& val)
+	//{
+	//	return std::string(val);
+	//}
 };

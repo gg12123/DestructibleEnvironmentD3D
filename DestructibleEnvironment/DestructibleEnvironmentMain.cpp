@@ -71,37 +71,6 @@ static DynamicBodyProxy* CreateBody(const Vector3& pos, const Quaternion& rot, f
 	return body;
 }
 
-static void CreateRandomBodies(World& world)
-{
-	std::vector<DynamicBodyProxy*> added;
-
-	for (auto i = 0U; i < bodiesCount; i++)
-	{
-		auto pos = bodiesCentre + Random::Range(0.0f, bodiesRadius) * RandDir();
-		auto validPos = true;
-
-		for (auto it = added.begin(); it != added.end(); it++)
-		{
-			auto& other = **it;
-
-			auto dist = (pos - other.GetTransform().GetPosition()).Magnitude();
-
-			if (dist < sizeMax)
-			{
-				validPos = false;
-				break;
-			}
-		}
-
-		if (validPos)
-		{
-			auto b = CreateBody(pos, RandRot(), RandSize(), RandSize());
-			added.emplace_back(b);
-			world.RegisterEntity(std::unique_ptr<Entity>(b));
-		}
-	}
-}
-
 void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 {
 	auto bodyPos1 = bodiesCentre + Vector3::Right();
@@ -146,7 +115,6 @@ void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 	shooter->GetTransform().SetRotation(Quaternion::Identity());
 	m_World.RegisterEntity(std::unique_ptr<Entity>(shooter));
 }
-
 // ###############################################################
 
 // Updates application state when the window size changes (e.g. device orientation change)

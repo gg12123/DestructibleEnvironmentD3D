@@ -169,6 +169,9 @@
     <ClCompile Include="CompoundShape.cpp">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClCompile>
+    <ClCompile Include="Debug.cpp">
+      <Filter>Debuging</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -473,6 +476,9 @@
     </ClInclude>
     <ClInclude Include="SatCollisionDetection.h">
       <Filter>Physics\CollisionStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.h">
+      <Filter>Debuging</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

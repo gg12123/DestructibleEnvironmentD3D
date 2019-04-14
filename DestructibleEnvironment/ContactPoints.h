@@ -152,7 +152,7 @@ public:
 
 		auto delta = CalculateCurrentImpulse();
 		
-		static constexpr float mu = 0.6f;
+		static constexpr float mu = 2.5f;
 		SetAccumulatedImpulse(MathU::Clamp(prevAccImpulse + delta, -mu * Jn, mu * Jn));
 
 		auto change = GetAccumulatedImpulse() - prevAccImpulse;

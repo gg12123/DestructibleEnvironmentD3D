@@ -211,6 +211,7 @@
     <ClInclude Include="Common\DeviceResources.h" />
     <ClInclude Include="CompoundShape.h" />
     <ClInclude Include="ContactPoints.h" />
+    <ClInclude Include="Debug.h" />
     <ClInclude Include="EpaContact.h" />
     <ClInclude Include="FaceTriangulator.h" />
     <ClInclude Include="ConstantBufferInputTypes.h" />
@@ -313,6 +314,7 @@
     <ClCompile Include="CollisionResponder.cpp" />
     <ClCompile Include="Common\DeviceResources.cpp" />
     <ClCompile Include="CompoundShape.cpp" />
+    <ClCompile Include="Debug.cpp" />
     <ClCompile Include="DestructibleEnvironmentMain.cpp" />
     <ClCompile Include="Content\SampleFpsTextRenderer.cpp" />
     <ClCompile Include="Content\Sample3DSceneRenderer.cpp" />

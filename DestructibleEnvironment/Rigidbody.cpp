@@ -5,6 +5,7 @@
 #include "Shape.h"
 #include "Face.h"
 #include "ShapePoint.h"
+#include "Debug.h"
 
 static void SubExpressions(float w0, float w1, float w2, float& f1, float& f2, float& f3, float& g0, float& g1, float& g2)
 {
@@ -97,6 +98,25 @@ void Rigidbody::InitMassProperties(const Transform& refTran)
 	auto Ixy = (-(intg[7] - mass * cm.x * cm.y));
 	auto Iyz = (-(intg[8] - mass * cm.y * cm.z));
 	auto Ixz = (-(intg[9] - mass * cm.z * cm.x));
+
+	// TODO - enforcing a min inertia and mass keeps the simulation stable but the
+	// dynamics do not look right for tiny objects - find another way!
+
+	static constexpr auto minInertia = 0.01f;
+	auto Imin = MathU::Min(MathU::Min(Ixx, Iyy), Izz);
+	if (Imin < minInertia)
+	{
+		auto multi = minInertia / Imin;
+		Ixx *= multi;
+		Iyy *= multi;
+		Izz *= multi;
+		Ixy *= multi;
+		Iyz *= multi;
+		Ixz *= multi;
+	}
+	
+	static constexpr auto minMass = 0.1f;
+	mass = MathU::Max(mass, minMass);
 
 	Matrix3 inertia;
 	auto col0 = inertia.M[0];
