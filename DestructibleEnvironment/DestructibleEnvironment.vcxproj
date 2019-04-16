@@ -273,6 +273,7 @@
     <ClInclude Include="ReadOnlyInput.h" />
     <ClInclude Include="RedundantPointRemover.h" />
     <ClInclude Include="SatCollisionDetection.h" />
+    <ClInclude Include="SatOptimisedCollisionDetection.h" />
     <ClInclude Include="SequentialImpulsesSolver.h" />
     <ClInclude Include="ShapeChunkTaker.h" />
     <ClInclude Include="ShapeDestructor.h" />

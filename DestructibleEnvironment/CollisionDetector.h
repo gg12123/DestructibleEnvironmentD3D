@@ -1,40 +1,31 @@
 #pragma once
 #include <vector>
-#include "GjkCollisionDetection.h"
-#include "EpaContact.h"
 #include "CollisionData.h"
 #include "CompoundShape.h"
 #include "Shape.h"
-#include "SatCollisionDetection.h"
-
-#define USE_SAT_COLLISION_DETECTION
+#include "SatOptimisedCollisionDetection.h"
+#include "Debug.h"
 
 class CollisionDetector
 {
 private:
-	ContactPlane CalculateCantact(const GjkInputShape& shape1, const GjkInputShape& shape2)
+	struct CollisionContext
 	{
-		auto localContact = m_ContactFinder.FindContact(shape1, shape2, m_Detector.GetQ());
+		Vector3 Vector = Vector3(1.0f, 0.0f, 0.0f);
+		bool SeperatedOnPrevTick = false;
+	};
 
-		return ContactPlane(m_ActiveTransform->ToWorldPosition(localContact.GetPoint()),
-			m_ActiveTransform->ToWorldDirection(localContact.GetNormal()),
-			localContact.GetPeneration());
-	}
-
-	GjkInputShape TransformToShape1sSpace(const Shape& shape2)
+	SatInputShape TransformToShape1sSpace(const Shape& shape2)
 	{
-		// TODO - Gjk can run without having all the points transformed upfront.
-		// It coud be done lazily.
-
 		m_TransformedPoints.clear();
 
 		for (auto& p : shape2.GetCachedPoints())
 			m_TransformedPoints.emplace_back(m_ToShape1sSpace * p);
 
-		return GjkInputShape(m_TransformedPoints, m_ToShape1sSpace * shape2.GetCentre());
+		
 	}
 
-	void InitTransformMatrix(const CompoundShape& shape1, const CompoundShape& shape2)
+	void InitTransformMatrixForShape1Space(const CompoundShape& shape1, const CompoundShape& shape2)
 	{
 		auto& t1 = shape1.GetTransform();
 		auto& t2 = shape2.GetTransform();
@@ -43,37 +34,72 @@ private:
 		m_ActiveTransform = &t1;
 	}
 
-public:
-	bool FindContact(const Shape& shape1, const Shape& shape2, ContactPlane& contact)
+	CollisionContext& GetCollisionContext(const Shape& shape1, const Shape& shape2)
 	{
-#ifdef USE_SAT_COLLISION_DETECTION
 
-		if (m_SatDetector.AreColliding(shape1, shape2))
+	}
+
+public:
+	bool FindContact(const Shape& shape1In, const Shape& shape2In, ContactPlane& contact)
+	{
+		auto shape1 = &shape1In;
+		auto shape2 = &shape2In;
+
+		auto numPoints1 = shape1In.GetCachedPoints().size();
+		auto numPoints2 = shape2In.GetCachedPoints().size();
+
+		// Ensure shape1 is the shape with more points. If both shapes have equal
+		// point count, ensure shap1 is the shape with greater ID.
+		// So if this is called multiple times for the same two shapes, shape1 and
+		// shape2 will be assigned the same each time.
+		if ((numPoints1 < numPoints2) ||
+			(numPoints1 == numPoints2 && shape1->GetShapeId() < shape2->GetShapeId()))
 		{
-			contact = m_SatDetector.GetCurrentContactPlane();
+			shape1 = &shape2In;
+			shape2 = &shape1In;
+		}
+
+		auto context = GetCollisionContext(*shape1, *shape2);
+
+		if (context.SeperatedOnPrevTick)
+		{
+			// Use CW first
+			// If seperation detected, update the vector in the context and return false
+		}
+
+		// Either CW failed to find seperation or the shapes were in contact
+		// on prev tick so use SAT
+
+		InitTransformMatrixForShape1Space(shape1->GetOwner(), shape2->GetOwner());
+
+		auto satShape1 = SatInputShape();
+		auto satShape2 = TransformToShape1sSpace(*shape2);
+
+		if (m_SatDetector.DetectCollision(satShape1, satShape2))
+		{
+			auto localContact = m_SatDetector.GetContactPlane();
+
+			contact = ContactPlane(m_ActiveTransform->ToWorldPosition(localContact.GetPoint()),
+				m_ActiveTransform->ToWorldDirection(localContact.GetNormal()),
+				localContact.GetPeneration());
+
+			context.SeperatedOnPrevTick = false;
+			context.Vector = localContact.GetNormal();
+
 			return true;
 		}
-		return false;
-#else
-		InitTransformMatrix(shape1.GetOwner(), shape2.GetOwner());
 
-		auto gjkShape1 = GjkInputShape(shape1.GetCachedPoints(), shape1.GetCentre());
-		auto gjkShape2 = TransformToShape1sSpace(shape2);
-
-		if (m_Detector.Run(gjkShape1, gjkShape2))
-		{
-			contact = CalculateCantact(gjkShape1, gjkShape2);
-			return true;
-		}
+		// No collision so use the seperation vector found in SAT to init CW
+		// for next tick.
+		context.SeperatedOnPrevTick = true;
+		context.Vector = m_SatDetector.GetSeperationDirection();
 		return false;
-#endif
 	}
 
 private:
 	std::vector<Vector3> m_TransformedPoints;
-	GjkCollisionDetection m_Detector;
-	SatCollisionDetection m_SatDetector;
-	EpaContact m_ContactFinder;
+	std::vector<Vector3> m_TransformedNormals;
 	Matrix4 m_ToShape1sSpace;
 	const Transform* m_ActiveTransform;
+	SatOptimisedCollisionDetection m_SatDetector;
 };

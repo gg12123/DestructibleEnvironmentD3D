@@ -152,7 +152,7 @@ public:
 
 		auto delta = CalculateCurrentImpulse();
 		
-		static constexpr float mu = 2.5f;
+		static constexpr float mu = 3.5f;
 		SetAccumulatedImpulse(MathU::Clamp(prevAccImpulse + delta, -mu * Jn, mu * Jn));
 
 		auto change = GetAccumulatedImpulse() - prevAccImpulse;
@@ -209,6 +209,8 @@ private:
 	void FindConstraints(std::vector<NormalContactConstraint>& constraints,
 		const Shape& shapePoints, const Shape& shapeOther, const ContactPlane& worldContactPlane)
 	{
+		// TODO - this is wrong. Needs fixing.
+
 		auto& tPoints = shapePoints.GetOwner().GetTransform();
 		auto p0 = tPoints.ToLocalPosition(worldContactPlane.GetPoint());
 
@@ -217,7 +219,6 @@ private:
 
 		for (auto& p : shapePoints.GetCachedPoints())
 		{
-			// TODO - add this optimisation back in but make it more robust.
 			//if (Vector3::Dot(p - p0, n) >= 0.0f)
 			{
 				auto pWorld = tPoints.ToWorldPosition(p);

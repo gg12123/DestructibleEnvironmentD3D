@@ -22,6 +22,11 @@ public:
 	{
 	}
 
+	int GetShapeId() const
+	{
+
+	}
+
 	auto& GetOwner() const
 	{
 		return *m_Owner;

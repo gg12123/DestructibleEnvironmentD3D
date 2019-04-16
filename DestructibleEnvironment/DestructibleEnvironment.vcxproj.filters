@@ -480,6 +480,9 @@
     <ClInclude Include="Debug.h">
       <Filter>Debuging</Filter>
     </ClInclude>
+    <ClInclude Include="SatOptimisedCollisionDetection.h">
+      <Filter>Physics\CollisionStuff</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">
