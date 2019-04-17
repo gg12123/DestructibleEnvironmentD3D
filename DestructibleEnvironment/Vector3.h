@@ -98,7 +98,7 @@ public:
 	static inline Vector3 Foward();
 	static  Vector3 OrthogonalDirection(const Vector3& v);
 	static inline void CalculateBaryCords(const Vector3& A, const Vector3& B, const Vector3& C, const Vector3& p, float& a, float& b, float& c);
-	static inline void ClosestPointsBetweenLines(const Vector3& l0A, const Vector3& l0B, const Vector3& l1A, const Vector3& l1B, Vector3& l0p, Vector3& l1p);
+	static inline bool FindClosestPointsBetweenLines(const Vector3& l0A, const Vector3& l0B, const Vector3& l1A, const Vector3& l1B, Vector3& l0p, Vector3& l1p);
 };
 
 inline Vector3 operator+(const Vector3& lhs, const Vector3& rhs)
@@ -233,7 +233,7 @@ inline void Vector3::CalculateBaryCords(const Vector3& A, const Vector3& B, cons
 	a = 1 - b - c;
 }
 
-inline void Vector3::ClosestPointsBetweenLines(const Vector3& p1, const Vector3& q1, const Vector3& p2, const Vector3& q2, Vector3& c1, Vector3& c2)
+inline bool Vector3::FindClosestPointsBetweenLines(const Vector3& p1, const Vector3& q1, const Vector3& p2, const Vector3& q2, Vector3& c1, Vector3& c2)
 {
 	auto d1 = q1 - p1;
 	auto d2 = q2 - p2;
@@ -244,11 +244,17 @@ inline void Vector3::ClosestPointsBetweenLines(const Vector3& p1, const Vector3&
 	auto c = Vector3::Dot(d1, r);
 	auto e = Vector3::Dot(d2, d2);
 	auto f = Vector3::Dot(d2, r);
-
 	auto d = a * e - b * b;
-	auto s = (b * f - c * e) / d;
-	auto t = (a * f - b * c) / d;
 
-	c1 = p1 + s * d1;
-	c2 = p2 + t * d2;
+	if (MathU::Abs(d) > MathU::Epsilon)
+	{
+		auto s = (b * f - c * e) / d;
+		auto t = (a * f - b * c) / d;
+
+		c1 = p1 + s * d1;
+		c2 = p2 + t * d2;
+
+		return true;
+	}
+	return false;
 }

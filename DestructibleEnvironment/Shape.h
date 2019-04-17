@@ -52,9 +52,9 @@ public:
 		return m_CachedPoints;
 	}
 
-	const auto& GetEdgeIndexes() const
+	const auto& GetEdgeIndexesPoints() const
 	{
-		return m_EdgeIndexes;
+		return m_EdgeIndexesPoints;
 	}
 
 	const auto& GetEdgeObjects() const
@@ -71,8 +71,11 @@ public:
 	{
 		m_Faces.clear();
 		m_CachedPoints.clear();
+		m_CachedFaceNormals.clear();
 		m_EdgeObjects.clear();
-		m_EdgeIndexes.clear();
+		m_EdgeIndexesPoints.clear();
+		m_EdgeIndexesFaces.clear();
+		m_FaceP0Indexes.clear();
 		m_PointObjects.clear();
 		m_LinkedShapes.clear();
 	}
@@ -98,6 +101,7 @@ public:
 
 	void AddFace(Face& f)
 	{
+		f.SetIndexInShape(m_Faces.size());
 		m_Faces.emplace_back(&f);
 	}
 
@@ -155,10 +159,14 @@ private:
 	void InitFacesPointsEdges();
 
 	std::vector<Face*> m_Faces;
-	std::vector<Vector3> m_CachedPoints;
 	std::vector<ShapePoint*> m_PointObjects;
 	std::vector<ShapeEdge*> m_EdgeObjects;
-	std::vector<int> m_EdgeIndexes;
+
+	std::vector<Vector3> m_CachedPoints;
+	std::vector<Vector3> m_CachedFaceNormals;
+	std::vector<int> m_FaceP0Indexes;
+	std::vector<int> m_EdgeIndexesPoints;
+	std::vector<int> m_EdgeIndexesFaces;
 	Vector3 m_Centre;
 
 	CompoundShape* m_Owner;

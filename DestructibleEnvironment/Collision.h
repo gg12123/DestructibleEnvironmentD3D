@@ -16,10 +16,11 @@ public:
 
 	void RunNarrowPhaseCheckForCollision(const Shape& shapeA, const Shape& shapeB)
 	{
-		ContactPlane contact;
-		if (m_Detector.FindContact(shapeA, shapeB, contact))
+		ContactPlane contactPlane;
+		m_ContactPoints.clear();
+		if (m_Detector.FindContact(shapeA, shapeB, contactPlane, m_ContactPoints))
 		{
-			m_ContactPointFinder.Find(m_ContactConstraints, m_Manifolds, shapeA, shapeB, contact);
+			m_ManifoldInit.InitManifold(m_ContactConstraints, m_Manifolds, shapeA, shapeB, m_ContactPoints, contactPlane);
 		}
 	}
 
@@ -71,7 +72,8 @@ public:
 private:
 	CollisionDetector m_Detector;
 	HGrid<Shape, Collision> m_DynamicsPartition;
-	ContactPointFinder m_ContactPointFinder;
+	ManifoldInitializer m_ManifoldInit;
 	std::vector<NormalContactConstraint> m_ContactConstraints;
 	std::vector<ContactManifold> m_Manifolds;
+	std::vector<Vector3> m_ContactPoints;
 };

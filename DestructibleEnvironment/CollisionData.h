@@ -26,18 +26,13 @@ class ContactPlane
 public:
 	// The normal must point towards the associated body.
 	// So is in the same direction as the impulse if there is one.
-	ContactPlane(const Vector3& point, const Vector3& normal, float penetration) :
-		m_Normal(normal), m_Point(point), m_Peneration(penetration)
+	ContactPlane(float contactMin, float contactMax, const Vector3& normal) :
+		m_Normal(normal), m_ContactMin(contactMin), m_ContactMax(contactMax)
 	{
 	}
 
 	ContactPlane()
 	{
-	}
-
-	auto GetPoint() const
-	{
-		return m_Point;
 	}
 
 	auto GetNormal() const
@@ -47,11 +42,22 @@ public:
 
 	auto GetPeneration() const
 	{
-		return m_Peneration;
+		return m_ContactMax - m_ContactMin;
+	}
+
+	auto GetContactMin() const
+	{
+		return m_ContactMin;
+	}
+
+	auto GetContactMax() const
+	{
+		return m_ContactMax;
 	}
 
 private:
 	Vector3 m_Normal;
 	Vector3 m_Point;
-	float m_Peneration;
+	float m_ContactMin;
+	float m_ContactMax;
 };

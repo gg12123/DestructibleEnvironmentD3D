@@ -182,6 +182,16 @@ public:
 		Clear();
 	}
 
+	auto GetIndexInShape()
+	{
+		return m_IndexInShape;
+	}
+
+	void SetIndexInShape(int val)
+	{
+		m_IndexInShape = val;
+	}
+
 	void OnReturnedToPool(){}
 
 	void MergeWith(const Face& other, const ShapeEdge& commonEdge);
@@ -203,6 +213,8 @@ private:
 	std::vector<Vector3> m_CachedPoints;
 	std::vector<ShapePoint*> m_PointObjects;
 	std::vector<ShapeEdge*> m_EdgeObjects;
+
+	int m_IndexInShape;
 
 	Shape* m_OwnerShape = nullptr;
 	Polygon2 m_FacePoly;

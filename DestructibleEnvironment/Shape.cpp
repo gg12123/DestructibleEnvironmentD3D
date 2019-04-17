@@ -53,8 +53,11 @@ void Shape::TryCollectEdge(ShapeEdge& e)
 	{
 		m_EdgeObjects.emplace_back(&e);
 
-		m_EdgeIndexes.emplace_back(e.GetP0().GetIndexInShape());
-		m_EdgeIndexes.emplace_back(e.GetP1().GetIndexInShape());
+		m_EdgeIndexesPoints.emplace_back(e.GetP0().GetIndexInShape());
+		m_EdgeIndexesPoints.emplace_back(e.GetP1().GetIndexInShape());
+
+		m_EdgeIndexesFaces.emplace_back(e.GetFace1().GetIndexInShape());
+		m_EdgeIndexesFaces.emplace_back(e.GetFace2().GetIndexInShape());
 
 		e.SetBeenCollected();
 	}
@@ -69,8 +72,11 @@ void Shape::CollectShapeElementsAndResetHashes()
 	// after implementing that.
 
 	m_EdgeObjects.clear();
-	m_EdgeIndexes.clear();
+	m_EdgeIndexesPoints.clear();
+	m_EdgeIndexesFaces.clear();
+	m_FaceP0Indexes.clear();
 	m_PointObjects.clear();
+	m_CachedFaceNormals.clear();
 
 	for (auto it = m_Faces.begin(); it != m_Faces.end(); it++)
 	{
@@ -91,6 +97,10 @@ void Shape::CollectShapeElementsAndResetHashes()
 			edges[i]->ResetHash();
 			points[i]->ResetHash();
 		}
+
+		m_FaceP0Indexes.emplace_back(points[0]->GetIndexInShape());
+		m_CachedFaceNormals.emplace_back(face.GetNormal());
+
 		face.ResetHash();
 	}
 }

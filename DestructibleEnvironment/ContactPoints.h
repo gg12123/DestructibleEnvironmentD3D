@@ -106,10 +106,9 @@ private:
 	}
 
 public:
-	NormalContactConstraint(const Shape& s1, const Shape& s2, const ContactPlane& contactPlane) :
-		ContactConstraint(*s1.GetOwner().ToPhysicsObject(), *s2.GetOwner().ToPhysicsObject(),
-			contactPlane.GetNormal(), contactPlane.GetPoint()),
-		m_Penetration(contactPlane.GetPeneration())
+	NormalContactConstraint(const Shape& s1, const Shape& s2, const Vector3& normal, const Vector3& point, float pen) :
+		ContactConstraint(*s1.GetOwner().ToPhysicsObject(), *s2.GetOwner().ToPhysicsObject(), normal, point),
+		m_Penetration(pen)
 	{
 		auto refN = GetBody2().GetTransform().ToWorldPosition(s2.GetCentre()) - GetBody1().GetTransform().ToWorldPosition(s1.GetCentre());
 		OrientateDirection(refN);
@@ -191,46 +190,9 @@ private:
 	FrictionContactConstraint m_FrictionB;
 };
 
-class ContactPointFinder
+class ManifoldInitializer
 {
 private:
-	bool PointIsInsideShape(const Shape& shape, const Vector3& worldPoint) const
-	{
-		auto localPoint = shape.GetOwner().GetTransform().ToLocalPosition(worldPoint);
-
-		for (auto f : shape.GetFaces())
-		{
-			if (Vector3::Dot(localPoint - f->GetPlaneP0(), f->GetNormal()) > 0.0f)
-				return false;
-		}
-		return true;
-	}
-
-	void FindConstraints(std::vector<NormalContactConstraint>& constraints,
-		const Shape& shapePoints, const Shape& shapeOther, const ContactPlane& worldContactPlane)
-	{
-		// TODO - this is wrong. Needs fixing.
-
-		auto& tPoints = shapePoints.GetOwner().GetTransform();
-		auto p0 = tPoints.ToLocalPosition(worldContactPlane.GetPoint());
-
-		// Make the normal point away from shapePoints
-		auto n = tPoints.ToLocalDirection(worldContactPlane.GetNormal()).InDirectionOf(p0);
-
-		for (auto& p : shapePoints.GetCachedPoints())
-		{
-			//if (Vector3::Dot(p - p0, n) >= 0.0f)
-			{
-				auto pWorld = tPoints.ToWorldPosition(p);
-				if (PointIsInsideShape(shapeOther, pWorld) && !PointIsAlreadyAdded(constraints, pWorld))
-				{
-					constraints.emplace_back(NormalContactConstraint(shapePoints, shapeOther,
-						ContactPlane(pWorld, worldContactPlane.GetNormal(), worldContactPlane.GetPeneration())));
-				}
-			}
-		}
-	}
-
 	ContactManifold SetUpManifold(const Shape& shape1, const Shape& shape2, std::vector<NormalContactConstraint>& constraints) const
 	{
 		auto centre = Vector3::Zero();
@@ -256,41 +218,21 @@ private:
 		return ContactManifold(shape1, shape2, m_StartOfCurrManifold, end, dirA, dirB, centre);
 	}
 
-	Vector3 ProjectOntoContactPlane(const Vector3& p)
-	{
-		return p + Vector3::Dot(m_ContactPlane.GetPoint() - p, m_ContactPlane.GetNormal()) * m_ContactPlane.GetNormal();
-	}
-
-	bool PointIsAlreadyAdded(const std::vector<NormalContactConstraint>& constraints, const Vector3& p)
-	{
-		static constexpr auto equalTol = 0.0001f;
-		auto pOnPlane = ProjectOntoContactPlane(p);
-
-		for (int i = m_StartOfCurrManifold; i < static_cast<int>(constraints.size()); i++)
-		{
-			auto x = ProjectOntoContactPlane(constraints[i].GetPoint());
-			if ((x - pOnPlane).MagnitudeSqr() < equalTol)
-				return true;
-		}
-		return false;
-	}
-
 public:
-	void Find(std::vector<NormalContactConstraint>& constraints, std::vector<ContactManifold>& manifolds, const Shape& shape1, const Shape& shape2, const ContactPlane& contactPlane)
+	void InitManifold(std::vector<NormalContactConstraint>& normalConstraints, std::vector<ContactManifold>& manifolds,
+		const Shape& shape1, const Shape& shape2, const std::vector<Vector3>& contactPoints, const ContactPlane& contactPlane)
 	{
-		m_StartOfCurrManifold = constraints.size();
-		m_ContactPlane = contactPlane;
+		m_StartOfCurrManifold = normalConstraints.size();
 
-		FindConstraints(constraints, shape1, shape2, contactPlane);
-		FindConstraints(constraints, shape2, shape1, contactPlane);
+		auto n = contactPlane.GetNormal();
+		auto pen = contactPlane.GetPeneration();
 
-		if (!PointIsAlreadyAdded(constraints, contactPlane.GetPoint()))
-			constraints.emplace_back(NormalContactConstraint(shape1, shape2, contactPlane));
+		for (auto& p : contactPoints)
+			normalConstraints.emplace_back(NormalContactConstraint(shape1, shape2, n, p, pen));
 
-		manifolds.emplace_back(SetUpManifold(shape1, shape2, constraints));
+		manifolds.emplace_back(SetUpManifold(shape1, shape2, normalConstraints));
 	}
 
 private:
 	int m_StartOfCurrManifold;
-	ContactPlane m_ContactPlane;
 };

@@ -40,7 +40,7 @@ private:
 	}
 
 public:
-	bool FindContact(const Shape& shape1In, const Shape& shape2In, ContactPlane& contact)
+	bool FindContact(const Shape& shape1In, const Shape& shape2In, ContactPlane& contact, std::vector<Vector3>& contactPoints)
 	{
 		auto shape1 = &shape1In;
 		auto shape2 = &shape2In;
@@ -79,9 +79,11 @@ public:
 		{
 			auto localContact = m_SatDetector.GetContactPlane();
 
-			contact = ContactPlane(m_ActiveTransform->ToWorldPosition(localContact.GetPoint()),
-				m_ActiveTransform->ToWorldDirection(localContact.GetNormal()),
-				localContact.GetPeneration());
+			contact = ContactPlane(localContact.GetContactMin(), localContact.GetContactMax(),
+				m_ActiveTransform->ToWorldDirection(localContact.GetNormal()));
+
+			for (auto& p : m_ContactPointFinder.FindContactPoints(satShape1, satShape2, localContact))
+				contactPoints.emplace_back(m_ActiveTransform->ToWorldPosition(p));
 
 			context.SeperatedOnPrevTick = false;
 			context.Vector = localContact.GetNormal();
@@ -102,4 +104,5 @@ private:
 	Matrix4 m_ToShape1sSpace;
 	const Transform* m_ActiveTransform;
 	SatOptimisedCollisionDetection m_SatDetector;
+	ContactPointFinder m_ContactPointFinder;
 };
