@@ -24,7 +24,7 @@ public:
 
 	int GetShapeId() const
 	{
-
+		return m_ShapeId;
 	}
 
 	auto& GetOwner() const
@@ -52,6 +52,11 @@ public:
 		return m_CachedPoints;
 	}
 
+	const auto& GetCachedFaceNormals() const
+	{
+		return m_CachedFaceNormals;
+	}
+
 	const auto& GetEdgeIndexesPoints() const
 	{
 		return m_EdgeIndexesPoints;
@@ -65,6 +70,16 @@ public:
 	const auto& GetPointObjects() const
 	{
 		return m_PointObjects;
+	}
+
+	const auto& GetEdgeIndexsFaces() const
+	{
+		return m_EdgeIndexesFaces;
+	}
+
+	const auto& GetFaceP0Indexes() const
+	{
+		return m_FaceP0Indexes;
 	}
 
 	void Clear()
@@ -99,11 +114,7 @@ public:
 		return m_LinkedShapes;
 	}
 
-	void AddFace(Face& f)
-	{
-		f.SetIndexInShape(m_Faces.size());
-		m_Faces.emplace_back(&f);
-	}
+	void AddFace(Face& f);
 
 	void AddPoint(ShapePoint& p)
 	{
@@ -139,6 +150,8 @@ public:
 	void OnTakenFromPool()
 	{
 		Clear();
+		m_NextShapeId++;
+		m_ShapeId = m_NextShapeId;
 	}
 
 	void OnReturnedToPool();
@@ -175,4 +188,7 @@ private:
 	AABB m_WorldAABB;
 
 	std::vector<Shape*> m_LinkedShapes;
+
+	static int m_NextShapeId;
+	int m_ShapeId;
 };

@@ -2,13 +2,26 @@
 #include <vector>
 #include "Vector3.h"
 #include "CollisionData.h"
+#include "Shape.h"
 
 class SatInputShape
 {
 public:
 	Vector3 FindSupportVertex(const Vector3& dir) const
 	{
+		auto maxComp = MathU::NegativeInfinity;
+		const Vector3* support = nullptr;
 
+		for (auto& p : *m_Points)
+		{
+			auto comp = Vector3::Dot(p, dir);
+			if (comp > maxComp)
+			{
+				maxComp = comp;
+				support = &p;
+			}
+		}
+		return *support;
 	}
 
 	const auto& GetPoints() const
@@ -39,6 +52,18 @@ public:
 	const auto& GetCentre() const
 	{
 		return m_Centre;
+	}
+
+	SatInputShape(const std::vector<int>& edgeIndexesPoints, const std::vector<int>& edgeIndexesFaces,
+		const std::vector<Vector3>& points, const std::vector<Vector3>& faceNormals,
+		const std::vector<int>& faceP0Indexs, const Vector3& centre) :
+		m_EdgeIndexsPoints(&edgeIndexesPoints),
+		m_EdgeIndexsFaces(&edgeIndexesFaces),
+		m_Points(&points),
+		m_FaceNormals(&faceNormals),
+		m_FaceP0Indexs(&faceP0Indexs),
+		m_Centre(centre)
+	{
 	}
 
 private:
@@ -163,17 +188,29 @@ private:
 				}
 			}
 		}
+		return false;
 	}
 
 public:
 	bool DetectCollision(const SatInputShape& shapeA, const SatInputShape& shapeB)
 	{
 		m_CurrentContactPlane = ContactPlane(0.0f, MathU::Infinity, Vector3::Zero());
+
+		if (CheckFaceNormals(shapeA, shapeB))
+			return false;
+
+		if (CheckFaceNormals(shapeB, shapeA))
+			return false;
+
+		if (CheckEdgeNormals(shapeA, shapeB))
+			return false;
+
+		return true;
 	}
 
 	const Vector3& GetSeperationDirection() const
 	{
-		m_SeperationDirection;
+		return m_SeperationDirection;
 	}
 
 	const ContactPlane& GetContactPlane() const

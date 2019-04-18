@@ -5,10 +5,10 @@
 #include "EdgeFaceIntersection.h"
 #include "CollisionData.h"
 
-class PhysicsObject;
-
-class CollisionResponder
-{
-public:
-	static float CalculateImpulse(const ContactPlane& contact1To2, PhysicsObject& body1, PhysicsObject& body2);
-};
+//class PhysicsObject;
+//
+//class CollisionResponder
+//{
+//public:
+//	static float CalculateImpulse(const ContactPlane& contact1To2, PhysicsObject& body1, PhysicsObject& body2);
+//};

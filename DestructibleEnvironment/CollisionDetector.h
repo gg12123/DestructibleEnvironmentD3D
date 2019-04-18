@@ -5,6 +5,8 @@
 #include "Shape.h"
 #include "SatOptimisedCollisionDetection.h"
 #include "Debug.h"
+#include "CwSeperationFinder.h"
+#include "DynamicTriangleArray.h"
 
 class CollisionDetector
 {
@@ -18,25 +20,28 @@ private:
 	SatInputShape TransformToShape1sSpace(const Shape& shape2)
 	{
 		m_TransformedPoints.clear();
+		m_TransformedNormals.clear();
 
 		for (auto& p : shape2.GetCachedPoints())
 			m_TransformedPoints.emplace_back(m_ToShape1sSpace * p);
 
-		
+		for (auto& p : shape2.GetCachedFaceNormals())
+			m_TransformedNormals.emplace_back(m_ToShape1sSpace * p);
 	}
 
-	void InitTransformMatrixForShape1Space(const CompoundShape& shape1, const CompoundShape& shape2)
+	void InitTransformMatrices(const CompoundShape& shape1, const CompoundShape& shape2)
 	{
 		auto& t1 = shape1.GetTransform();
 		auto& t2 = shape2.GetTransform();
 
 		m_ToShape1sSpace = t1.GetWorldToLocalMatrix() * t2.GetLocalToWorldMatrix();
+		m_ToShape2sSpace = t2.GetWorldToLocalMatrix() * t1.GetLocalToWorldMatrix();
 		m_ActiveTransform = &t1;
 	}
 
 	CollisionContext& GetCollisionContext(const Shape& shape1, const Shape& shape2)
 	{
-
+		return m_CollisionContexts.Get(shape1.GetShapeId(), shape2.GetShapeId());
 	}
 
 public:
@@ -63,17 +68,24 @@ public:
 
 		if (context.SeperatedOnPrevTick)
 		{
-			// Use CW first
-			// If seperation detected, update the vector in the context and return false
+			auto cwShapeA = CwInputShapeA(shape1->GetCachedPoints());
+			auto cwShapeB = CwInputShapeB(shape2->GetCachedPoints(), m_ToShape2sSpace, m_ToShape1sSpace);
+
+			// The sep finder will write the seperation vector back into the context vector
+			if (m_CwSepFinder.FindSeperation(cwShapeA, cwShapeB, context.Vector))
+				return false;
 		}
 
 		// Either CW failed to find seperation or the shapes were in contact
 		// on prev tick so use SAT
 
-		InitTransformMatrixForShape1Space(shape1->GetOwner(), shape2->GetOwner());
+		InitTransformMatrices(shape1->GetOwner(), shape2->GetOwner());
 
-		auto satShape1 = SatInputShape();
-		auto satShape2 = TransformToShape1sSpace(*shape2);
+		auto satShape1 = SatInputShape(shape1->GetEdgeIndexesPoints(), shape1->GetEdgeIndexsFaces(),
+			shape1->GetCachedPoints(), shape1->GetCachedFaceNormals(), shape1->GetFaceP0Indexes(), shape1->GetCentre());
+
+		auto satShape2 = SatInputShape(shape2->GetEdgeIndexesPoints(), shape2->GetEdgeIndexsFaces(),
+			m_TransformedPoints, m_TransformedNormals, shape2->GetFaceP0Indexes(), m_ToShape1sSpace * shape2->GetCentre());
 
 		if (m_SatDetector.DetectCollision(satShape1, satShape2))
 		{
@@ -102,7 +114,10 @@ private:
 	std::vector<Vector3> m_TransformedPoints;
 	std::vector<Vector3> m_TransformedNormals;
 	Matrix4 m_ToShape1sSpace;
+	Matrix4 m_ToShape2sSpace;
 	const Transform* m_ActiveTransform;
 	SatOptimisedCollisionDetection m_SatDetector;
 	ContactPointFinder m_ContactPointFinder;
+	CwSeperationFinder m_CwSepFinder;
+	DynamicTriangleArray<CollisionContext> m_CollisionContexts;
 };

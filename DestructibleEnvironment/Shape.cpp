@@ -10,6 +10,8 @@
 #include "ShapeDuplicater.h"
 #include "CompoundShape.h"
 
+int Shape::m_NextShapeId = -1;
+
 bool Shape::IntersectsRay(const Ray& localRay, Vector3& intPoint)
 {
 	Vector3 p;
@@ -33,6 +35,12 @@ bool Shape::IntersectsRay(const Ray& localRay, Vector3& intPoint)
 	}
 
 	return hit;
+}
+
+void Shape::AddFace(Face& f)
+{
+	f.SetIndexInShape(m_Faces.size());
+	m_Faces.emplace_back(&f);
 }
 
 void Shape::TryCollectPoint(ShapePoint& p)
