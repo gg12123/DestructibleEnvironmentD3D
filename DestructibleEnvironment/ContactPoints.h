@@ -145,17 +145,19 @@ public:
 	{
 	}
 
-	void ApplyNextImpulse(float Jn)
+	float ApplyNextImpulse(float Jn)
 	{
 		auto prevAccImpulse = GetAccumulatedImpulse();
 
 		auto delta = CalculateCurrentImpulse();
 		
-		static constexpr float mu = 3.5f;
+		static constexpr float mu = 1.0f;
 		SetAccumulatedImpulse(MathU::Clamp(prevAccImpulse + delta, -mu * Jn, mu * Jn));
 
 		auto change = GetAccumulatedImpulse() - prevAccImpulse;
 		ApplyImpulse(change);
+
+		return change;
 	}
 };
 
@@ -167,20 +169,25 @@ public:
 	{
 	}
 
-	void ApplyImpulses(std::vector<NormalContactConstraint>& contactPoints)
+	float ApplyImpulses(std::vector<NormalContactConstraint>& contactPoints)
 	{
-		auto aveJn = 0.0f;
+		auto aveJnAcc = 0.0f;
+		auto maxImp = 0.0f;
+
 		for (auto i = m_Start; i < m_End; i++)
 		{
-			aveJn += contactPoints[i].ApplyNextImpulse();
+			auto& cp = contactPoints[i];
+			maxImp = MathU::Max(MathU::Abs(cp.ApplyNextImpulse()), maxImp);
+
+			aveJnAcc += cp.GetAccumulatedImpulse();
 		}
 
-		if (aveJn > 0.0f)
-		{
-			aveJn /= static_cast<float>(m_End - m_Start);
-			m_FrictionA.ApplyNextImpulse(aveJn);
-			m_FrictionB.ApplyNextImpulse(aveJn);
-		}
+		aveJnAcc /= static_cast<float>(m_End - m_Start);
+
+		maxImp = MathU::Max(MathU::Abs(m_FrictionA.ApplyNextImpulse(aveJnAcc)), maxImp);
+		maxImp = MathU::Max(MathU::Abs(m_FrictionB.ApplyNextImpulse(aveJnAcc)), maxImp);
+
+		return maxImp;
 	}
 
 private:
@@ -222,6 +229,12 @@ public:
 	void InitManifold(std::vector<NormalContactConstraint>& normalConstraints, std::vector<ContactManifold>& manifolds,
 		const Shape& shape1, const Shape& shape2, const std::vector<Vector3>& contactPoints, const ContactPlane& contactPlane)
 	{
+		if (contactPoints.size() == 0u)
+		{
+			Debug::Log(std::string("ERROR - init manifold called with zero contact points."));
+			return;
+		}
+
 		m_StartOfCurrManifold = normalConstraints.size();
 
 		auto n = contactPlane.GetNormal();

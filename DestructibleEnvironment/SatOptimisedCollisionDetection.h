@@ -150,7 +150,7 @@ private:
 		auto itPointsA = edgesPointsA.begin();
 		auto itFacesA = edgesFacesA.begin();
 
-		for (; itPointsA != edgesPointsA.end(); itPointsA++, itFacesA++)
+		for (; itPointsA != edgesPointsA.end(); itPointsA += 2, itFacesA += 2)
 		{
 			auto n0A = faceNormalsA[*itFacesA];
 			auto n1A = faceNormalsA[*(itFacesA + 1)];
@@ -161,7 +161,7 @@ private:
 			auto itPointsB = edgesPointsB.begin();
 			auto itFacesB = edgesFacesB.begin();
 
-			for (; itPointsB != edgesPointsB.end(); itPointsB++, itFacesB++)
+			for (; itPointsB != edgesPointsB.end(); itPointsB += 2, itFacesB += 2)
 			{
 				auto n0B = faceNormalsB[*itFacesB];
 				auto n1B = faceNormalsB[*(itFacesB + 1)];
@@ -169,7 +169,7 @@ private:
 				auto p0B = pointsB[*itPointsB];
 				auto p1B = pointsB[*(itPointsB + 1)];
 
-				if (EdgesAreOnMinowskiDiff(n0A, n1A, n0B, n1B))
+				if (EdgesAreOnMinowskiDiff(n0A, n1A, -n0B, -n1B))
 				{
 					// The face normal points from A to B
 					auto sepNormal = Vector3::Cross(p1A - p0A, p1B - p0B).
@@ -293,8 +293,8 @@ private:
 
 			for (auto j = 0u; j < m_ShapeBEdgesInContact.size(); j += 2u)
 			{
-				auto& p0B = pointsB[m_ShapeBEdgesInContact[i]];
-				auto& p1B = pointsB[m_ShapeBEdgesInContact[i + 1]];
+				auto& p0B = pointsB[m_ShapeBEdgesInContact[j]];
+				auto& p1B = pointsB[m_ShapeBEdgesInContact[j + 1]];
 
 				if (EdgesOverlapInContactPlane(p0A, p1A, p0B, p1B))
 				{

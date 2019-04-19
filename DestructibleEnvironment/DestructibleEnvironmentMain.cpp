@@ -88,7 +88,7 @@ void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 	
 	m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodyPos1, Quaternion::Identity(),
 		{ SubShapeData(Vector3::Zero(), Vector3(1.0f, 2.0f, 1.0f)),
-		SubShapeData(Vector3(0.0f, 1.5f, 0.0f), Vector3(2.0f, 1.0f, 1.0f)) },
+		SubShapeData(Vector3(0.0f, 1.5f, 0.0f), Vector3(1.0f, 1.0f, 2.0f)) },
 		{ SubShapeLink(0, 1) })));
 
 	//CreateRandomBodies(m_World);

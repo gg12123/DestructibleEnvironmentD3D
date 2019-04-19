@@ -16,6 +16,9 @@ public:
 
 	void RunNarrowPhaseCheckForCollision(const Shape& shapeA, const Shape& shapeB)
 	{
+		if (&shapeA.GetOwner() == &shapeB.GetOwner())
+			return;
+
 		ContactPlane contactPlane;
 		m_ContactPoints.clear();
 		if (m_Detector.FindContact(shapeA, shapeB, contactPlane, m_ContactPoints))

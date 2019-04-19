@@ -17,7 +17,7 @@ private:
 		bool SeperatedOnPrevTick = false;
 	};
 
-	SatInputShape TransformToShape1sSpace(const Shape& shape2)
+	void TransformToShape1sSpace(const Shape& shape2)
 	{
 		m_TransformedPoints.clear();
 		m_TransformedNormals.clear();
@@ -25,8 +25,8 @@ private:
 		for (auto& p : shape2.GetCachedPoints())
 			m_TransformedPoints.emplace_back(m_ToShape1sSpace * p);
 
-		for (auto& p : shape2.GetCachedFaceNormals())
-			m_TransformedNormals.emplace_back(m_ToShape1sSpace * p);
+		for (auto& n : shape2.GetCachedFaceNormals())
+			m_TransformedNormals.emplace_back(m_DirToShape1sSpace.RotateV(n));
 	}
 
 	void InitTransformMatrices(const CompoundShape& shape1, const CompoundShape& shape2)
@@ -35,7 +35,9 @@ private:
 		auto& t2 = shape2.GetTransform();
 
 		m_ToShape1sSpace = t1.GetWorldToLocalMatrix() * t2.GetLocalToWorldMatrix();
+		m_DirToShape1sSpace = t1.GetWorldToLocalRotation() * t2.GetLocalToWorldRotation();
 		m_ToShape2sSpace = t2.GetWorldToLocalMatrix() * t1.GetLocalToWorldMatrix();
+		m_DirToShape2sSpace = m_DirToShape1sSpace.Conj();
 		m_ActiveTransform = &t1;
 	}
 
@@ -64,12 +66,14 @@ public:
 			shape2 = &shape1In;
 		}
 
-		auto context = GetCollisionContext(*shape1, *shape2);
+		InitTransformMatrices(shape1->GetOwner(), shape2->GetOwner());
+
+		auto& context = GetCollisionContext(*shape1, *shape2);
 
 		if (context.SeperatedOnPrevTick)
 		{
 			auto cwShapeA = CwInputShapeA(shape1->GetCachedPoints());
-			auto cwShapeB = CwInputShapeB(shape2->GetCachedPoints(), m_ToShape2sSpace, m_ToShape1sSpace);
+			auto cwShapeB = CwInputShapeB(shape2->GetCachedPoints(), m_DirToShape2sSpace, m_ToShape1sSpace);
 
 			// The sep finder will write the seperation vector back into the context vector
 			if (m_CwSepFinder.FindSeperation(cwShapeA, cwShapeB, context.Vector))
@@ -78,8 +82,7 @@ public:
 
 		// Either CW failed to find seperation or the shapes were in contact
 		// on prev tick so use SAT
-
-		InitTransformMatrices(shape1->GetOwner(), shape2->GetOwner());
+		TransformToShape1sSpace(*shape2);
 
 		auto satShape1 = SatInputShape(shape1->GetEdgeIndexesPoints(), shape1->GetEdgeIndexsFaces(),
 			shape1->GetCachedPoints(), shape1->GetCachedFaceNormals(), shape1->GetFaceP0Indexes(), shape1->GetCentre());
@@ -115,6 +118,8 @@ private:
 	std::vector<Vector3> m_TransformedNormals;
 	Matrix4 m_ToShape1sSpace;
 	Matrix4 m_ToShape2sSpace;
+	Quaternion m_DirToShape1sSpace;
+	Quaternion m_DirToShape2sSpace;
 	const Transform* m_ActiveTransform;
 	SatOptimisedCollisionDetection m_SatDetector;
 	ContactPointFinder m_ContactPointFinder;

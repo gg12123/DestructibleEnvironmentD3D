@@ -2,6 +2,7 @@
 #include <vector>
 #include "Vector3.h"
 #include "Matrix.h"
+#include "Debug.h"
 
 class CwInputShape
 {
@@ -49,7 +50,7 @@ public:
 class CwInputShapeB : CwInputShape
 {
 public:
-	CwInputShapeB(const std::vector<Vector3>& points, const Matrix4& toB, const Matrix4& toA) :
+	CwInputShapeB(const std::vector<Vector3>& points, const Quaternion& toB, const Matrix4& toA) :
 		CwInputShape(points),
 		m_ToASpace(toA),
 		m_ToBSpace(toB)
@@ -58,11 +59,11 @@ public:
 
 	Vector3 FindSupportPoint(const Vector3& dir) const
 	{
-		return m_ToASpace * FindSupportPointLocal(m_ToBSpace * dir);
+		return m_ToASpace * FindSupportPointLocal(m_ToBSpace.RotateV(dir));
 	}
 
 private:
-	Matrix4 m_ToBSpace;
+	Quaternion m_ToBSpace;
 	Matrix4 m_ToASpace;
 };
 
@@ -78,7 +79,7 @@ public:
 			auto supportA = shapeA.FindSupportPoint(sepDir);
 			auto supportB = shapeB.FindSupportPoint(-sepDir);
 
-			if (Vector3::Dot(supportA, sepDir) < Vector3::Dot(supportB, -sepDir))
+			if (Vector3::Dot(supportB - supportA, sepDir) > 0.0f)
 				return true;
 
 			auto r = (supportB - supportA).Normalized();
