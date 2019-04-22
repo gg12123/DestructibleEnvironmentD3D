@@ -92,6 +92,9 @@
     <Filter Include="Input">
       <UniqueIdentifier>{5d096711-e1d8-4015-aa15-5b95b2c607fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Physics\Dynamics">
+      <UniqueIdentifier>{9df25d8f-0bd6-42ff-a5c7-914dfd016a5b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
@@ -468,9 +471,6 @@
     <ClInclude Include="ContactPoints.h">
       <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
-    <ClInclude Include="SequentialImpulsesSolver.h">
-      <Filter>Physics\CollisionStuff</Filter>
-    </ClInclude>
     <ClInclude Include="ShapeDestructor.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
@@ -484,6 +484,18 @@
       <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
     <ClInclude Include="CwSeperationFinder.h">
+      <Filter>Physics\CollisionStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="SequentialImpulsesSolver.h">
+      <Filter>Physics\Dynamics</Filter>
+    </ClInclude>
+    <ClInclude Include="Constraints.h">
+      <Filter>Physics\Dynamics</Filter>
+    </ClInclude>
+    <ClInclude Include="ContactManifold.h">
+      <Filter>Physics\CollisionStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="ContactPointFinder.h">
       <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
   </ItemGroup>
