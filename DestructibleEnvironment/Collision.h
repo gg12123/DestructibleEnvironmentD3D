@@ -5,7 +5,7 @@
 #include "Rigidbody.h"
 #include "StaticBody.h"
 #include "HGrid.h"
-#include "ContactPoints.h"
+#include "ContactManifold.h"
 
 class Collision
 {
@@ -19,11 +19,28 @@ public:
 		if (&shapeA.GetOwner() == &shapeB.GetOwner())
 			return;
 
+		auto shape1 = &shapeA;
+		auto shape2 = &shapeB;
+
+		auto numPoints1 = shapeA.GetCachedPoints().size();
+		auto numPoints2 = shapeB.GetCachedPoints().size();
+
+		// Ensure shape1 is the shape with more points. If both shapes have equal
+		// point count, ensure shap1 is the shape with greater ID.
+		// So if this is called multiple times for the same two shapes (across different frames),
+		// shape1 and shape2 will be assigned the same each time.
+		if ((numPoints1 < numPoints2) ||
+			(numPoints1 == numPoints2 && shape1->GetShapeId() < shape2->GetShapeId()))
+		{
+			shape1 = &shapeB;
+			shape2 = &shapeA;
+		}
+
 		ContactPlane contactPlane;
 		m_ContactPoints.clear();
-		if (m_Detector.FindContact(shapeA, shapeB, contactPlane, m_ContactPoints))
+		if (m_Detector.FindContact(*shape1, *shape2, contactPlane, m_ContactPoints))
 		{
-			m_ManifoldInit.InitManifold(m_ContactConstraints, m_Manifolds, shapeA, shapeB, m_ContactPoints, contactPlane);
+			m_ManifoldInit.InitManifold(*shape1, *shape2, m_ContactPoints, contactPlane);
 		}
 	}
 
@@ -36,9 +53,6 @@ public:
 	void FindContacts(const std::vector<std::unique_ptr<StaticBody>>& staticBodies,
 		const std::vector<std::unique_ptr<Rigidbody>>& dynamicBodies)
 	{
-		m_ContactConstraints.clear();
-		m_Manifolds.clear();
-
 		// Handle collision between dynamic objects
 		m_DynamicsPartition.Run(*this);
 
@@ -64,19 +78,22 @@ public:
 
 	auto& GetContactConstraints()
 	{
-		return m_ContactConstraints;
+		return m_ManifoldInit.GetNormalContactConstraints();
 	}
 
 	auto& GetManifolds()
 	{
-		return m_Manifolds;
+		return m_ManifoldInit.GetManifolds();
+	}
+
+	void StoreAccImpulses()
+	{
+		m_ManifoldInit.StoreAccumulatedImpulsesForNextTick();
 	}
 
 private:
 	CollisionDetector m_Detector;
 	HGrid<Shape, Collision> m_DynamicsPartition;
 	ManifoldInitializer m_ManifoldInit;
-	std::vector<NormalContactConstraint> m_ContactConstraints;
-	std::vector<ContactManifold> m_Manifolds;
 	std::vector<Vector3> m_ContactPoints;
 };

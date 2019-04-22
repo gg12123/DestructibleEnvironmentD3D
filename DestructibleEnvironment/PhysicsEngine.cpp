@@ -56,6 +56,7 @@ void PhysicsEngine::FindContacts()
 void PhysicsEngine::SatisfyConstraints()
 {
 	m_Solver.Solve(m_Collision.GetContactConstraints(), m_Collision.GetManifolds());
+	m_Collision.StoreAccImpulses();
 }
 
 void PhysicsEngine::UpdateBodies()

@@ -213,7 +213,6 @@
     <ClInclude Include="Constraints.h" />
     <ClInclude Include="ContactManifold.h" />
     <ClInclude Include="ContactPointFinder.h" />
-    <ClInclude Include="ContactPoints.h" />
     <ClInclude Include="CwSeperationFinder.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="EpaContact.h" />

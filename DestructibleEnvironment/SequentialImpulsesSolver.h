@@ -1,5 +1,4 @@
 #pragma once
-#include "ContactPoints.h"
 #include "CollisionResponder.h"
 #include "StringU.h"
 
@@ -11,7 +10,7 @@ public:
 		if (manifolds.size() == 0u)
 			return;
 
-		for (auto i = 0; i < 30; i++)
+		for (auto i = 0; i < 10; i++)
 		{
 			auto impulsesSum = 0.0f;
 			for (auto& c : manifolds)

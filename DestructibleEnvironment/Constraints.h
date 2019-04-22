@@ -127,6 +127,12 @@ public:
 		return change;
 	}
 
+	void WarmStart(float accImpulse)
+	{
+		SetAccumulatedImpulse(accImpulse);
+		ApplyImpulse(accImpulse);
+	}
+
 private:
 	float m_Penetration;
 };
@@ -151,7 +157,7 @@ public:
 
 		auto delta = CalculateCurrentImpulse();
 
-		static constexpr float mu = 1.0f;
+		static constexpr float mu = 0.5f;
 		SetAccumulatedImpulse(MathU::Clamp(prevAccImpulse + delta, -mu * Jn, mu * Jn));
 
 		auto change = GetAccumulatedImpulse() - prevAccImpulse;

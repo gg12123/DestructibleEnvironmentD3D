@@ -7,6 +7,7 @@
 #include "Debug.h"
 #include "CwSeperationFinder.h"
 #include "DynamicTriangleArray.h"
+#include "ContactPointFinder.h"
 
 class CollisionDetector
 {
@@ -47,33 +48,16 @@ private:
 	}
 
 public:
-	bool FindContact(const Shape& shape1In, const Shape& shape2In, ContactPlane& contact, std::vector<Vector3>& contactPoints)
+	bool FindContact(const Shape& shape1, const Shape& shape2, ContactPlane& contact, std::vector<Vector3>& contactPoints)
 	{
-		auto shape1 = &shape1In;
-		auto shape2 = &shape2In;
+		InitTransformMatrices(shape1.GetOwner(), shape2.GetOwner());
 
-		auto numPoints1 = shape1In.GetCachedPoints().size();
-		auto numPoints2 = shape2In.GetCachedPoints().size();
-
-		// Ensure shape1 is the shape with more points. If both shapes have equal
-		// point count, ensure shap1 is the shape with greater ID.
-		// So if this is called multiple times for the same two shapes, shape1 and
-		// shape2 will be assigned the same each time.
-		if ((numPoints1 < numPoints2) ||
-			(numPoints1 == numPoints2 && shape1->GetShapeId() < shape2->GetShapeId()))
-		{
-			shape1 = &shape2In;
-			shape2 = &shape1In;
-		}
-
-		InitTransformMatrices(shape1->GetOwner(), shape2->GetOwner());
-
-		auto& context = GetCollisionContext(*shape1, *shape2);
+		auto& context = GetCollisionContext(shape1, shape2);
 
 		if (context.SeperatedOnPrevTick)
 		{
-			auto cwShapeA = CwInputShapeA(shape1->GetCachedPoints());
-			auto cwShapeB = CwInputShapeB(shape2->GetCachedPoints(), m_DirToShape2sSpace, m_ToShape1sSpace);
+			auto cwShapeA = CwInputShapeA(shape1.GetCachedPoints());
+			auto cwShapeB = CwInputShapeB(shape2.GetCachedPoints(), m_DirToShape2sSpace, m_ToShape1sSpace);
 
 			// The sep finder will write the seperation vector back into the context vector
 			if (m_CwSepFinder.FindSeperation(cwShapeA, cwShapeB, context.Vector))
@@ -82,13 +66,13 @@ public:
 
 		// Either CW failed to find seperation or the shapes were in contact
 		// on prev tick so use SAT
-		TransformToShape1sSpace(*shape2);
+		TransformToShape1sSpace(shape2);
 
-		auto satShape1 = SatInputShape(shape1->GetEdgeIndexesPoints(), shape1->GetEdgeIndexsFaces(),
-			shape1->GetCachedPoints(), shape1->GetCachedFaceNormals(), shape1->GetFaceP0Indexes(), shape1->GetCentre());
+		auto satShape1 = SatInputShape(shape1.GetEdgeIndexesPoints(), shape1.GetEdgeIndexsFaces(),
+			shape1.GetCachedPoints(), shape1.GetCachedFaceNormals(), shape1.GetFaceP0Indexes(), shape1.GetCentre());
 
-		auto satShape2 = SatInputShape(shape2->GetEdgeIndexesPoints(), shape2->GetEdgeIndexsFaces(),
-			m_TransformedPoints, m_TransformedNormals, shape2->GetFaceP0Indexes(), m_ToShape1sSpace * shape2->GetCentre());
+		auto satShape2 = SatInputShape(shape2.GetEdgeIndexesPoints(), shape2.GetEdgeIndexsFaces(),
+			m_TransformedPoints, m_TransformedNormals, shape2.GetFaceP0Indexes(), m_ToShape1sSpace * shape2.GetCentre());
 
 		if (m_SatDetector.DetectCollision(satShape1, satShape2))
 		{

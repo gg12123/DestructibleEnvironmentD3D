@@ -1,26 +1,19 @@
 #pragma once
 #include "SatOptimisedCollisionDetection.h"
-#include "ContactPoints.h"
 
 class ContactPointFinder
 {
 private:
 	static constexpr auto Tol = 0.0001f;
 
-	bool ContactPointExistsAlready(const Vector3& p) const
+	void AddNewContactPoint(const Vector3& p)
 	{
-		for (auto& existing : m_EcContactPoints)
+		for (auto& existing : m_ContactPoints)
 		{
-			if (Vector3::ProjectOnPlane(m_ContactPlaneNormal, p - existing.Point).MagnitudeSqr() < Tol)
-				return true;
+			if (Vector3::ProjectOnPlane(m_ContactPlaneNormal, p - existing).MagnitudeSqr() < Tol)
+				return;
 		}
-
-		for (auto& existing : m_PipContactPoints)
-		{
-			if (Vector3::ProjectOnPlane(m_ContactPlaneNormal, p - existing.Point).MagnitudeSqr() < Tol)
-				return true;
-		}
-		return false;
+		m_ContactPoints.emplace_back(p);
 	}
 
 	void FindPointsInContact(const SatInputShape& shape, std::vector<bool>& isInContact, std::vector<Vector3>& pointsInContact, const ContactPlane& contactPlane)
@@ -51,7 +44,8 @@ private:
 			auto e1 = edges[i + 1];
 			if (pointIsInContact[e0] && pointIsInContact[e1])
 			{
-				edgesInContact.emplace_back(i);
+				edgesInContact.emplace_back(e0);
+				edgesInContact.emplace_back(e1);
 			}
 		}
 	}
@@ -68,33 +62,23 @@ private:
 	void FindEdgeOverlapContactPoints(const SatInputShape& shapeA, const SatInputShape& shapeB)
 	{
 		auto& pointsA = shapeA.GetPoints();
-		auto& edgesA = shapeA.GetEdgeIndexsPoints();
 		auto& pointsB = shapeB.GetPoints();
-		auto& edgesB = shapeB.GetEdgeIndexsPoints();
 
-		for (auto i = 0u; i < m_ShapeAEdgesInContact.size(); i++)
+		for (auto i = 0u; i < m_ShapeAEdgesInContact.size(); i += 2u)
 		{
-			auto edgeIndexA = m_ShapeAEdgesInContact[i];
+			auto& p0A = pointsA[m_ShapeAEdgesInContact[i]];
+			auto& p1A = pointsA[m_ShapeAEdgesInContact[i + 1]];
 
-			auto& p0A = pointsA[edgesA[edgeIndexA]];
-			auto& p1A = pointsA[edgesA[edgeIndexA + 1]];
-
-			for (auto j = 0u; j < m_ShapeBEdgesInContact.size(); j++)
+			for (auto j = 0u; j < m_ShapeBEdgesInContact.size(); j += 2u)
 			{
-				auto edgeIndexB = m_ShapeBEdgesInContact[j];
-
-				auto& p0B = pointsB[edgesB[edgeIndexB]];
-				auto& p1B = pointsB[edgesB[edgeIndexB + 1]];
+				auto& p0B = pointsB[m_ShapeBEdgesInContact[j]];
+				auto& p1B = pointsB[m_ShapeBEdgesInContact[j + 1]];
 
 				if (EdgesOverlapInContactPlane(p0A, p1A, p0B, p1B))
 				{
 					Vector3 c, d;
 					if (Vector3::FindClosestPointsBetweenLines(p0A, p1A, p0B, p1B, c, d))
-					{
-						auto p = (c + d) / 2.0f;
-						if (!ContactPointExistsAlready(p))
-							m_EcContactPoints.emplace_back(ContactPointEC(p, edgeIndexA, edgeIndexB));
-					}
+						AddNewContactPoint((c + d) / 2.0f);
 				}
 			}
 		}
@@ -122,19 +106,15 @@ private:
 
 	void FindPointInPolyContactPoints(const SatInputShape& shape, const std::vector<Vector3>& points)
 	{
-		for (auto i = 0u; i < points.size(); i++)
+		for (auto& p : points)
 		{
-			auto& p = points[i];
-
-			if (PointIsInShape(shape, p) && !ContactPointExistsAlready(p))
-			{
-				m_PipContactPoints.emplace_back(ContactPointPIP(p, i, shape.GetId()));
-			}
+			if (PointIsInShape(shape, p))
+				AddNewContactPoint(p);
 		}
 	}
 
 public:
-	void FindContactPoints(const SatInputShape& shapeA, const SatInputShape& shapeB, const ContactPlane& contactPlane)
+	const auto& FindContactPoints(const SatInputShape& shapeA, const SatInputShape& shapeB, const ContactPlane& contactPlane)
 	{
 		m_ContactPlaneNormal = contactPlane.GetNormal();
 
@@ -144,8 +124,7 @@ public:
 		m_ShapeBInContactPoints.clear();
 		m_ShapeAEdgesInContact.clear();
 		m_ShapeBEdgesInContact.clear();
-		m_EcContactPoints.clear();
-		m_PipContactPoints.clear();
+		m_ContactPoints.clear();
 
 		FindPointsInContact(shapeA, m_ShapeAPointIsInContact, m_ShapeAInContactPoints, contactPlane);
 		FindPointsInContact(shapeB, m_ShapeBPointIsInContact, m_ShapeBInContactPoints, contactPlane);
@@ -156,16 +135,8 @@ public:
 		FindEdgeOverlapContactPoints(shapeA, shapeB);
 		FindPointInPolyContactPoints(shapeA, m_ShapeBInContactPoints);
 		FindPointInPolyContactPoints(shapeB, m_ShapeAInContactPoints);
-	}
 
-	const auto GetEcContactPoints() const
-	{
-		return m_EcContactPoints;
-	}
-
-	const auto GetPipContactPoints() const
-	{
-		return m_PipContactPoints;
+		return m_ContactPoints;
 	}
 
 private:
@@ -178,8 +149,7 @@ private:
 	std::vector<int> m_ShapeAEdgesInContact;
 	std::vector<int> m_ShapeBEdgesInContact;
 
-	std::vector<ContactPointEC> m_EcContactPoints;
-	std::vector<ContactPointPIP> m_PipContactPoints;
+	std::vector<Vector3> m_ContactPoints;
 
 	Vector3 m_ContactPlaneNormal;
 };

@@ -56,20 +56,14 @@ public:
 
 	SatInputShape(const std::vector<int>& edgeIndexesPoints, const std::vector<int>& edgeIndexesFaces,
 		const std::vector<Vector3>& points, const std::vector<Vector3>& faceNormals,
-		const std::vector<int>& faceP0Indexs, const Vector3& centre, int id) :
+		const std::vector<int>& faceP0Indexs, const Vector3& centre) :
 		m_EdgeIndexsPoints(&edgeIndexesPoints),
 		m_EdgeIndexsFaces(&edgeIndexesFaces),
 		m_Points(&points),
 		m_FaceNormals(&faceNormals),
 		m_FaceP0Indexs(&faceP0Indexs),
-		m_Centre(centre),
-		m_Id(id)
+		m_Centre(centre)
 	{
-	}
-
-	auto GetId() const
-	{
-		return m_Id;
 	}
 
 private:
@@ -81,7 +75,6 @@ private:
 	const std::vector<int>* m_FaceP0Indexs;
 
 	Vector3 m_Centre;
-	int m_Id;
 };
 
 
