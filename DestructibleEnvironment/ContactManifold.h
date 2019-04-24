@@ -35,32 +35,13 @@ class ContactManifold
 public:
 	ContactManifold(const Shape& s1, const Shape& s2,
 		const StdVectorRange& normalConstraintRange,
-		const Vector3& dirA, const Vector3& dirB, const Vector3& centre) :
+		const Vector3& dirA, const Vector3& dirB, const Vector3& centre, const Vector3& frictionWarmStart) :
 		m_NormalConstraintRange(normalConstraintRange),
 		m_FrictionA(s1, s2, centre, dirA), m_FrictionB(s1, s2, centre, dirB),
 		m_Shape1(&s1), m_Shape2(&s2)
 	{
-	}
-
-	float ApplyImpulses(std::vector<NormalContactConstraint>& contactPoints)
-	{
-		auto aveJnAcc = 0.0f;
-		auto maxImp = 0.0f;
-
-		for (auto i = m_NormalConstraintRange.Start; i < m_NormalConstraintRange.End; i++)
-		{
-			auto& cp = contactPoints[i];
-			maxImp = MathU::Max(MathU::Abs(cp.ApplyNextImpulse()), maxImp);
-
-			aveJnAcc += cp.GetAccumulatedImpulse();
-		}
-
-		aveJnAcc /= static_cast<float>(m_NormalConstraintRange.Size());
-
-		maxImp = MathU::Max(MathU::Abs(m_FrictionA.ApplyNextImpulse(aveJnAcc)), maxImp);
-		maxImp = MathU::Max(MathU::Abs(m_FrictionB.ApplyNextImpulse(aveJnAcc)), maxImp);
-
-		return maxImp;
+		m_FrictionA.WarmStart(Vector3::Dot(frictionWarmStart, m_FrictionA.GetDirection()));
+		m_FrictionB.WarmStart(Vector3::Dot(frictionWarmStart, m_FrictionB.GetDirection()));
 	}
 
 	const auto& GetNormalConstraintRange() const
@@ -76,6 +57,22 @@ public:
 	const auto& GetShape2() const
 	{
 		return *m_Shape2;
+	}
+
+	auto GetAccumulatedFrictionImpulse() const
+	{
+		return m_FrictionA.GetAccumulatedImpulse() * m_FrictionA.GetDirection() +
+			m_FrictionB.GetAccumulatedImpulse() * m_FrictionB.GetDirection();
+	}
+
+	auto ApplyFrictionAImpulse(float aveJnAcc)
+	{
+		return m_FrictionA.ApplyNextImpulse(aveJnAcc);
+	}
+
+	auto ApplyFrictionBImpulse(float aveJnAcc)
+	{
+		return m_FrictionB.ApplyNextImpulse(aveJnAcc);
 	}
 
 private:
@@ -94,6 +91,7 @@ private:
 	{
 		uint64 TimeStamp = 0;
 		StdVectorRange ContactPointsRange;
+		int FrictionImpulseIndex;
 	};
 
 	struct StoredAccImpulse
@@ -101,13 +99,14 @@ private:
 		float Impulse;
 		Vector3 ContactPoint;
 
-		StoredAccImpulse(const Vector3& p)
+		StoredAccImpulse(const Vector3& p, float impulse)
 		{
 			ContactPoint = p;
+			Impulse = impulse;
 		}
 	};
 
-	ContactManifold SetUpManifold(const Shape& shape1, const Shape& shape2, std::vector<NormalContactConstraint>& constraints) const
+	ContactManifold SetUpManifold(const Shape& shape1, const Shape& shape2, std::vector<NormalContactConstraint>& constraints, const Vector3& warmStartFriction) const
 	{
 		auto centre = Vector3::Zero();
 		auto end = static_cast<int>(constraints.size());
@@ -131,7 +130,7 @@ private:
 
 		auto ncRange = StdVectorRange(m_StartOfCurrManifold, end);
 
-		return ContactManifold(shape1, shape2, ncRange, dirA, dirB, centre);
+		return ContactManifold(shape1, shape2, ncRange, dirA, dirB, centre, warmStartFriction);
 	}
 
 	ManifoldContext* GetContext(const Shape& shape1, const Shape& shape2)
@@ -159,14 +158,13 @@ private:
 
 		for (auto i = range.Start; i < range.End; i++)
 		{
-			auto dist = Vector3::ProjectOnPlane(n, cp - m_AccImpulses[i].ContactPoint).MagnitudeSqr();
+			auto dist = Vector3::ProjectOnPlane(n, cp - m_NormalAccImpulses[i].ContactPoint).MagnitudeSqr();
 			if (dist < minDist && dist < tol)
 			{
-				imp = m_AccImpulses[i].Impulse;
+				imp = m_NormalAccImpulses[i].Impulse;
 				minDist = dist;
 			}
 		}
-
 		return imp;
 	}
 
@@ -179,6 +177,9 @@ public:
 		const std::vector<Vector3>& contactPoints,
 		const ContactPlane& contactPlane)
 	{
+		static constexpr auto doWarmStartNormal = true;
+		static constexpr auto doWarmStartFriction = true;
+
 		if (contactPoints.size() == 0u)
 		{
 			Debug::Log(std::string("ERROR - init manifold called with zero contact points."));
@@ -190,10 +191,8 @@ public:
 		auto n = contactPlane.GetNormal();
 		auto pen = contactPlane.GetPeneration();
 
-		static constexpr auto doWarmStart = true;
-
 		auto context = GetContext(shape1, shape2);
-		if (doWarmStart && context)
+		if (doWarmStartNormal && context)
 		{
 			// Warm start
 			for (auto& p : contactPoints)
@@ -202,7 +201,6 @@ public:
 				nc.WarmStart(FindWarmStartAccImpulse(*context, p, n));
 
 				m_NormalContactContraints.emplace_back(nc);
-				m_NextAccImpulses.emplace_back(StoredAccImpulse(p));
 			}
 		}
 		else
@@ -211,11 +209,14 @@ public:
 			for (auto& p : contactPoints)
 			{
 				m_NormalContactContraints.emplace_back(NormalContactConstraint(shape1, shape2, n, p, pen));
-				m_NextAccImpulses.emplace_back(StoredAccImpulse(p));
 			}
 		}
 
-		m_Manifolds.emplace_back(SetUpManifold(shape1, shape2, m_NormalContactContraints));
+		auto frictionWarmStart = doWarmStartFriction && context ?
+			m_FrictionAccImpulses[context->FrictionImpulseIndex] :
+			Vector3::Zero();
+
+		m_Manifolds.emplace_back(SetUpManifold(shape1, shape2, m_NormalContactContraints, frictionWarmStart));
 	}
 
 	void StoreAccumulatedImpulsesForNextTick()
@@ -226,23 +227,24 @@ public:
 		// Must check though.
 		assert(m_CurrTimeStamp < (std::numeric_limits<uint64>::max)());
 
+		m_FrictionAccImpulses.clear();
+		m_NormalAccImpulses.clear();
+
+		// Could optimise this with a memcpy or something. This is definitly not bottleneck
+		// though so probably doesnt matter.
+		for (auto& nc : m_NormalContactContraints)
+			m_NormalAccImpulses.emplace_back(StoredAccImpulse(nc.GetPoint(), nc.GetAccumulatedImpulse()));
+
 		for (auto& m : m_Manifolds)
 		{
-			auto& ncRange = m.GetNormalConstraintRange();
-
-			for (auto i = ncRange.Start; i < ncRange.End; i++)
-			{
-				m_NextAccImpulses[i].Impulse = m_NormalContactContraints[i].GetAccumulatedImpulse();
-			}
+			m_FrictionAccImpulses.emplace_back(m.GetAccumulatedFrictionImpulse());
 
 			auto& context = ForceGetContext(m.GetShape1(), m.GetShape2());
-			context.ContactPointsRange = ncRange;
+			context.ContactPointsRange = m.GetNormalConstraintRange();
+			context.FrictionImpulseIndex = m_FrictionAccImpulses.size() - 1;
 			context.TimeStamp = m_CurrTimeStamp;
 		}
 
-		m_AccImpulses.swap(m_NextAccImpulses);
-
-		m_NextAccImpulses.clear();
 		m_Manifolds.clear();
 		m_NormalContactContraints.clear();
 	}
@@ -263,8 +265,8 @@ private:
 	std::vector<NormalContactConstraint> m_NormalContactContraints;
 	std::vector<ContactManifold> m_Manifolds;
 
-	std::vector<StoredAccImpulse> m_AccImpulses;
-	std::vector<StoredAccImpulse> m_NextAccImpulses;
+	std::vector<StoredAccImpulse> m_NormalAccImpulses;
+	std::vector<Vector3> m_FrictionAccImpulses;
 
 	uint64 m_CurrTimeStamp;
 	DynamicTriangleArray<ManifoldContext> m_Contexts;

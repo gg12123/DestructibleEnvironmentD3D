@@ -38,12 +38,6 @@ DestructibleEnvironmentMain::~DestructibleEnvironmentMain()
 }
 
 // ###################### to be deleted #####################################
-static Vector3 bodiesCentre = Vector3(0.0f, 5.0f, 0.0f);
-static float bodiesRadius = 20.0f;
-static uint16 bodiesCount = 5;
-static float sizeMax = 2.0f;
-static float sizeMin = 0.5f;
-
 static Vector3 RandDir()
 {
 	return Vector3(Random::Range(0.1f, 1.0f), Random::Range(0.1f, 1.0f), Random::Range(0.1f, 1.0f)).Normalized();
@@ -58,6 +52,8 @@ static Quaternion RandRot()
 
 static float RandSize()
 {
+	static float sizeMax = 2.0f;
+	static float sizeMin = 0.5f;
 	return Random::Range(sizeMin, sizeMax);
 }
 
@@ -80,18 +76,16 @@ static DynamicBodyProxy* CreateBody(const Vector3& pos, const Quaternion& rot,
 
 void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 {
-	auto bodyPos1 = bodiesCentre + Vector3::Right();
-	auto bodyPos2 = bodiesCentre - Vector3::Right();
-	auto bodyPos3 = bodiesCentre + Vector3::Up();
-	auto bodyPos4 = bodiesCentre + Vector3::Foward();
-	auto bodyPos5 = bodiesCentre - Vector3::Foward();
-	
-	m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(bodyPos1, Quaternion::Identity(),
-		{ SubShapeData(Vector3::Zero(), Vector3(1.0f, 2.0f, 1.0f)),
-		SubShapeData(Vector3(0.0f, 1.5f, 0.0f), Vector3(1.0f, 1.0f, 2.0f)) },
-		{ SubShapeLink(0, 1) })));
+	auto pos = Vector3(0.0f, 1.0f, 0.0f);
 
-	//CreateRandomBodies(m_World);
+	for (auto i = 0; i < 5; i++)
+	{
+		m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(pos, Quaternion::Identity(),
+			{ SubShapeData(Vector3::Zero(), Vector3(1.0f, 1.0f, 1.0f))},
+			{})));
+
+		pos += Vector3::Up();
+	}
 
 	auto floor = new StaticShapeProxy();
 	auto floorPos = Vector3(0.0f, 0.0f, 0.0f);
@@ -102,7 +96,7 @@ void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 
 	auto cam = new Camera();
 	auto camPos = Vector3(10.0f, 6.0f, 0.0f);
-	auto camLookDir = Vector3::Normalize((bodiesCentre + floorPos) / 2.0f - camPos);
+	auto camLookDir = Vector3::Normalize((pos + floorPos) / 2.0f - camPos);
 	cam->GetTransform().SetPosition(camPos);
 	cam->GetTransform().SetRotation(Quaternion::LookRotation(camLookDir));
 	cam->SetFov(MathU::ToRadians(45.0f));

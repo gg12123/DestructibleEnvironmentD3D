@@ -72,6 +72,12 @@ public:
 		return Vector3::Dot(vr, m_Direction);
 	}
 
+	void WarmStart(float accImpulse)
+	{
+		SetAccumulatedImpulse(accImpulse);
+		ApplyImpulse(accImpulse);
+	}
+
 protected:
 	void OrientateDirection(const Vector3& refDir)
 	{
@@ -98,11 +104,7 @@ class NormalContactConstraint : public ContactConstraint
 private:
 	float CalculateCurrentImpulse() const
 	{
-		static constexpr auto beta = 0.1f;
-		static constexpr auto slop = 0.01f;
-		auto vBias = (beta / PhysicsTime::FixedDeltaTime) * MathU::Max(m_Penetration - slop, 0.0f);
-
-		return (-CalculateRelativeVelocity() + vBias) / GetDenom();
+		return (-CalculateRelativeVelocity() + m_VBias) / GetDenom();
 	}
 
 public:
@@ -112,6 +114,10 @@ public:
 	{
 		auto refN = GetBody2().GetTransform().ToWorldPosition(s2.GetCentre()) - GetBody1().GetTransform().ToWorldPosition(s1.GetCentre());
 		OrientateDirection(refN);
+
+		static constexpr auto beta = 0.1f;
+		static constexpr auto slop = 0.01f;
+		m_VBias = (beta / PhysicsTime::FixedDeltaTime) * MathU::Max(m_Penetration - slop, 0.0f);
 	}
 
 	float ApplyNextImpulse()
@@ -127,17 +133,12 @@ public:
 		return change;
 	}
 
-	void WarmStart(float accImpulse)
-	{
-		SetAccumulatedImpulse(accImpulse);
-		ApplyImpulse(accImpulse);
-	}
-
 private:
 	float m_Penetration;
+	float m_VBias;
 };
 
-class FrictionContactConstraint : ContactConstraint
+class FrictionContactConstraint : public ContactConstraint
 {
 private:
 	float CalculateCurrentImpulse() const
