@@ -427,7 +427,7 @@ private:
 		auto ab = b - a;
 		auto denom = Vector3::Dot(ab, ab);
 
-		if (denom <= MathU::Epsilon)
+		if (denom <= MathU::EpsilonSqr)
 		{
 			// Degenerate line segment - Could pick a or b.
 			pMin = a;
@@ -496,8 +496,8 @@ private:
 		auto ac = c - a;
 		auto ap = -a;
 
-		auto n = Vector3::Cross(ab, ac);	
-		if (n.MagnitudeSqr() <= MathU::Epsilon)
+		auto n = Vector3::Cross(ab, ac);
+		if (n.MagnitudeSqr() <= MathU::EpsilonSqr)
 		{
 			HandleDegenerateTriangleSimplex(simplex, pMin, searchDir);
 			return;
@@ -755,7 +755,7 @@ private:
 				return GjkResultLocal::Intersection;
 
 			auto distSq = pMin.MagnitudeSqr();
-			if (distSq <= MathU::Epsilon)
+			if (distSq <= MathU::EpsilonSqr)
 				return GjkResultLocal::DegenerateSearchDirection;
 
 			if (distSq >= prvDistSq)
@@ -766,25 +766,37 @@ private:
 			AddNextPointToSimplex(shapeA, shapeB, searchDir, simplex);
 			auto& v = simplex.Points[simplex.NumPoints - 1];
 
-			if (Vector3::Dot(v, searchDir) <= 0.0f)
+			if (Vector3::Dot(v, searchDir) < 0.0f)
 				return GjkResultLocal::NoIntersection;
 		}
 	}
 
-	GjkResult HandleDegenerateSearchDirection(const GjkInputShape& shapeA, const GjkInputShape shapeB, Simplex& simplex)
+	GjkResult CheckOnSupportFace(const GjkInputShape& shapeA, const GjkInputShape shapeB, const Vector3& n, Simplex& simplex)
+	{
+		auto& a = simplex.Points[0];
+
+		if (Vector3::Dot(a, n) >= 0.0f)
+		{
+			int iA, iB;
+			auto otherPoint = GetSupportPoint(shapeA, shapeB, -n, iA, iB);
+			simplex.AddPoint(otherPoint, iA, iB);
+			return GjkResult::Intersection;
+		}
+		return GjkResult::NoIntersection;
+	}
+
+	GjkResult CheckSimplex(const GjkInputShape& shapeA, const GjkInputShape shapeB, Simplex& simplex)
 	{
 		switch (simplex.NumPoints)
 		{
 		case 1:
 		{
-			// This means that two of the shapes points are touching. Report no intersection for now
-			// then on the next tick the shapes will most likely be intersecting properly.
+			// It is possible for the shapes to be point on point touching each other in this case.
+			// But I think it will be ok to always report no intersection
 			return GjkResult::NoIntersection;
 		}
 		case 2:
 		{
-			Debug::Log(std::string("Gjk search direction degenerated with line segment simplex."));
-
 			// TODO - although unlikely, the shapes could still be intersecting in this case.
 			// Need to handle it somehow.
 
@@ -805,12 +817,14 @@ private:
 
 			auto sPlus = GetSupportPoint(shapeA, shapeB, n, iaPlus, ibPlus);
 			if (MathU::Abs(Vector3::Dot(sPlus - a, n)) <= tol)
-				return GjkResult::NoIntersection;
+				return CheckOnSupportFace(shapeA, shapeB, n, simplex);
 
-			auto sMinus = GetSupportPoint(shapeA, shapeB, -n, iaMinus, ibMinus);
-			if (MathU::Abs(Vector3::Dot(sMinus - a, -n)) <= tol)
-				return GjkResult::NoIntersection;
+			auto minusN = -n;
+			auto sMinus = GetSupportPoint(shapeA, shapeB, minusN, iaMinus, ibMinus);
+			if (MathU::Abs(Vector3::Dot(sMinus - a, minusN)) <= tol)
+				return CheckOnSupportFace(shapeA, shapeB, minusN, simplex);
 
+			// Neither face is a support so this must be an intersection
 			if (Vector3::Dot(a, n) > 0.0f)
 				simplex.AddPoint(sMinus, iaMinus, ibMinus);
 			else
@@ -851,13 +865,9 @@ public:
 			return GjkResult::NoIntersection;
 		}
 		case GjkCollisionDetector::GjkResultLocal::DegenerateSearchDirection:
-		{
-			return HandleDegenerateSearchDirection(shapeA, shapeB, simplex);
-		}
 		case GjkCollisionDetector::GjkResultLocal::NotGettingCloser:
 		{
-			// TODO - not sure if this always means no intersection.
-			return GjkResult::NoIntersection;
+			return CheckSimplex(shapeA, shapeB, simplex);
 		}
 		default:
 			break;
