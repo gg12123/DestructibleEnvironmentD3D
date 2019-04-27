@@ -220,6 +220,7 @@ private:
 			}
 		}
 
+		// Dont clear faces next now becasue the old faces may still be needed
 		m_Faces.swap(m_FacesNext);
 	}
 
@@ -261,6 +262,15 @@ public:
 				return closestFace.ToContact(shapeA, shapeB, m_Points);
 
 			Expand(sv);
+
+			if (m_Faces.size() == 0u)
+			{
+				Debug::Log(std::string("Faces reduced to zero in EPA."));
+
+				// TODO - I think this happens when the input simplex is degenerate.
+				// Just make a guess at the contact plane for now.
+				return m_FacesNext[0].ToContact(shapeA, shapeB, m_Points);
+			}
 		}
 	}
 

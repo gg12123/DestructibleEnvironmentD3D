@@ -367,6 +367,10 @@ public:
 		std::array<int, 4> IndexesB;
 		int NumPoints;
 
+		Simplex() : NumPoints(0)
+		{
+		}
+
 		void RemovePoint(int index)
 		{
 			NumPoints--;
@@ -380,6 +384,7 @@ public:
 			Points[NumPoints] = p;
 			IndexesA[NumPoints] = iA;
 			IndexesB[NumPoints] = iB;
+			NumPoints++;
 		}
 	};
 
@@ -772,13 +777,18 @@ private:
 		{
 		case 1:
 		{
+			// This means that two of the shapes points are touching. Report no intersection for now
+			// then on the next tick the shapes will most likely be intersecting properly.
 			return GjkResult::NoIntersection;
 		}
 		case 2:
 		{
 			Debug::Log(std::string("Gjk search direction degenerated with line segment simplex."));
-			// TODO - This could be handled but I think it is pretty rare so for now just return error.
-			return GjkResult::Error;
+
+			// TODO - although unlikely, the shapes could still be intersecting in this case.
+			// Need to handle it somehow.
+
+			return GjkResult::NoIntersection;
 		}
 		case 3:
 		{
@@ -846,7 +856,7 @@ public:
 		}
 		case GjkCollisionDetector::GjkResultLocal::NotGettingCloser:
 		{
-			Debug::Log(std::string("Gjk stopped getting closer"));
+			// TODO - not sure if this always means no intersection.
 			return GjkResult::NoIntersection;
 		}
 		default:

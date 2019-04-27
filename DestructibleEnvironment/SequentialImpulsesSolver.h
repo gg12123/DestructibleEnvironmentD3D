@@ -49,7 +49,7 @@ public:
 			currIt++;
 		}
 
-		Debug::Log("Num its required: " + StringU::ToString(currIt));
-		Debug::Log("Convergence: " + StringU::ToString(impulsesSum));
+		//Debug::Log("Num its required: " + StringU::ToString(currIt));
+		//Debug::Log("Convergence: " + StringU::ToString(impulsesSum));
 	}
 };
