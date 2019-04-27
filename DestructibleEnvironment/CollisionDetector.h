@@ -5,9 +5,10 @@
 #include "Shape.h"
 #include "SatOptimisedCollisionDetection.h"
 #include "Debug.h"
-#include "CwSeperationFinder.h"
 #include "DynamicTriangleArray.h"
 #include "ContactPointFinder.h"
+#include "GjkCollisionDetection.h"
+#include "EpaContact.h"
 
 class CollisionDetector
 {
@@ -18,13 +19,17 @@ private:
 		bool SeperatedOnPrevTick = false;
 	};
 
-	void TransformToShape1sSpace(const Shape& shape2)
+	void TransformPointsToShape1sSpace(const Shape& shape2)
 	{
 		m_TransformedPoints.clear();
-		m_TransformedNormals.clear();
 
 		for (auto& p : shape2.GetCachedPoints())
 			m_TransformedPoints.emplace_back(m_ToShape1sSpace * p);
+	}
+
+	void TransformNormalsToShape1sSpace(const Shape& shape2)
+	{
+		m_TransformedNormals.clear();
 
 		for (auto& n : shape2.GetCachedFaceNormals())
 			m_TransformedNormals.emplace_back(m_DirToShape1sSpace.RotateV(n));
@@ -52,31 +57,27 @@ public:
 	{
 		InitTransformMatrices(shape1.GetOwner(), shape2.GetOwner());
 
-		auto& context = GetCollisionContext(shape1, shape2);
+		TransformPointsToShape1sSpace(shape2);
 
-		if (context.SeperatedOnPrevTick)
+		auto gjkShape1 = GjkInputShape(shape1.GetCachedPoints(), shape1.GetCentre());
+		auto gjkShape2 = GjkInputShape(m_TransformedPoints, m_ToShape1sSpace * shape2.GetCentre());
+
+		GjkCollisionDetector::Simplex simplex;
+		auto gjkRes = m_GjkDetector.Run(gjkShape1, gjkShape2, simplex);
+
+		switch (gjkRes)
 		{
-			auto cwShapeA = CwInputShapeA(shape1.GetCachedPoints());
-			auto cwShapeB = CwInputShapeB(shape2.GetCachedPoints(), m_DirToShape2sSpace, m_ToShape1sSpace);
-
-			// The sep finder will write the seperation vector back into the context vector
-			if (m_CwSepFinder.FindSeperation(cwShapeA, cwShapeB, context.Vector))
-				return false;
-		}
-
-		// Either CW failed to find seperation or the shapes were in contact
-		// on prev tick so use SAT
-		TransformToShape1sSpace(shape2);
-
-		auto satShape1 = SatInputShape(shape1.GetEdgeIndexesPoints(), shape1.GetEdgeIndexsFaces(),
-			shape1.GetCachedPoints(), shape1.GetCachedFaceNormals(), shape1.GetFaceP0Indexes(), shape1.GetCentre());
-
-		auto satShape2 = SatInputShape(shape2.GetEdgeIndexesPoints(), shape2.GetEdgeIndexsFaces(),
-			m_TransformedPoints, m_TransformedNormals, shape2.GetFaceP0Indexes(), m_ToShape1sSpace * shape2.GetCentre());
-
-		if (m_SatDetector.DetectCollision(satShape1, satShape2))
+		case GjkCollisionDetector::GjkResult::Intersection:
 		{
-			auto localContact = m_SatDetector.GetContactPlane();
+			auto localContact = m_EpaContactFinder.FindContact(gjkShape1, gjkShape2, simplex);
+
+			TransformNormalsToShape1sSpace(shape2);
+
+			auto satShape1 = SatInputShape(shape1.GetEdgeIndexesPoints(), shape1.GetEdgeIndexsFaces(),
+				shape1.GetCachedPoints(), shape1.GetCachedFaceNormals(), shape1.GetFaceP0Indexes(), shape1.GetCentre());
+
+			auto satShape2 = SatInputShape(shape2.GetEdgeIndexesPoints(), shape2.GetEdgeIndexsFaces(),
+				m_TransformedPoints, m_TransformedNormals, shape2.GetFaceP0Indexes(), m_ToShape1sSpace * shape2.GetCentre());
 
 			contact = ContactPlane(localContact.GetContactMin(), localContact.GetContactMax(),
 				m_ActiveTransform->ToWorldDirection(localContact.GetNormal()));
@@ -84,16 +85,21 @@ public:
 			for (auto& p : m_ContactPointFinder.FindContactPoints(satShape1, satShape2, localContact))
 				contactPoints.emplace_back(m_ActiveTransform->ToWorldPosition(p));
 
-			context.SeperatedOnPrevTick = false;
-			context.Vector = localContact.GetNormal();
-
 			return true;
 		}
-
-		// No collision so use the seperation vector found in SAT to init CW
-		// for next tick.
-		context.SeperatedOnPrevTick = true;
-		context.Vector = m_SatDetector.GetSeperationDirection();
+		case GjkCollisionDetector::GjkResult::NoIntersection:
+		{
+			return false;
+		}
+		case GjkCollisionDetector::GjkResult::Error:
+		{
+			// Maybe call into Sat for back up.
+			assert(false);
+		}
+		default:
+			break;
+		}
+		assert(false);
 		return false;
 	}
 
@@ -107,6 +113,7 @@ private:
 	const Transform* m_ActiveTransform;
 	SatOptimisedCollisionDetection m_SatDetector;
 	ContactPointFinder m_ContactPointFinder;
-	CwSeperationFinder m_CwSepFinder;
 	DynamicTriangleArray<CollisionContext> m_CollisionContexts;
+	GjkCollisionDetector m_GjkDetector;
+	EpaContact m_EpaContactFinder;
 };

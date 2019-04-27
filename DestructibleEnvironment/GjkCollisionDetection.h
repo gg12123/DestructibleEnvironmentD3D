@@ -1,7 +1,9 @@
 #pragma once
 #include <vector>
 #include <array>
+#include <assert.h>
 #include "Vector3.h"
+#include "Debug.h"
 
 class GjkInputShape
 {
@@ -372,9 +374,43 @@ public:
 			IndexesA[index] = IndexesA[NumPoints];
 			IndexesB[index] = IndexesB[NumPoints];
 		}
+
+		void AddPoint(const Vector3& p, int iA, int iB)
+		{
+			Points[NumPoints] = p;
+			IndexesA[NumPoints] = iA;
+			IndexesB[NumPoints] = iB;
+		}
+	};
+
+	enum class GjkResult
+	{
+		Intersection,
+		NoIntersection,
+		Error,
 	};
 
 private:
+	enum class GjkResultLocal
+	{
+		Intersection,
+		NoIntersection,
+		DegenerateSearchDirection,
+		NotGettingCloser
+	};
+
+	void InitSimplex(const GjkInputShape& shapeA, const GjkInputShape shapeB, Simplex& simplex)
+	{
+		//auto toB = shapeB.GetCentroid() - shapeA.GetCentroid();
+		//
+		//auto origA = shapeA.GetSupportVertex(toB);
+		//auto origB = shapeB.GetSupportVertex(-toB);
+		//
+		//m_Q = SetQ(MinowskiDiffPoint(shapeA.GetPointAt(origA) - shapeB.GetPointAt(origB), origA, origB));
+		auto toB = shapeB.GetCentroid() - shapeA.GetCentroid();
+		AddNextPointToSimplex(shapeA, shapeB, toB, simplex);
+	}
+
 	void UpdateLineSegmentSimplex(Simplex& simplex, Vector3& pMin, Vector3& searchDir)
 	{
 		static constexpr int aIndex = 0, bIndex = 1;
@@ -456,7 +492,7 @@ private:
 		auto ap = -a;
 
 		auto n = Vector3::Cross(ab, ac);	
-		if (n.Magnitude() <= MathU::Epsilon)
+		if (n.MagnitudeSqr() <= MathU::Epsilon)
 		{
 			HandleDegenerateTriangleSimplex(simplex, pMin, searchDir);
 			return;
@@ -661,5 +697,162 @@ private:
 		}
 
 		simplex = simplexOfClosest;
+	}
+
+	void UpdateSimplex(Simplex& simplex, Vector3& pMin, Vector3& searchDir)
+	{
+		switch (simplex.NumPoints)
+		{
+		case 1:
+		{
+			pMin = simplex.Points[0];
+			searchDir = -pMin;
+			return;
+		}
+		case 2:
+		{
+			UpdateLineSegmentSimplex(simplex, pMin, searchDir);
+			return;
+		}
+		case 3:
+		{
+			UpdateTriangleSimplex(simplex, pMin, searchDir);
+			return;
+		}
+		case 4:
+		{
+			UpdateTetrahedronSimplex(simplex, pMin, searchDir);
+			return;
+		}
+		default:
+			break;
+		}
+		assert(false);
+	}
+
+	void AddNextPointToSimplex(const GjkInputShape& shapeA, const GjkInputShape shapeB, const Vector3& searchDir, Simplex& simplex)
+	{
+		int iA, iB;
+		auto p = GetSupportPoint(shapeA, shapeB, searchDir, iA, iB);
+		simplex.AddPoint(p, iA, iB);
+	}
+
+	GjkResultLocal RunLocal(const GjkInputShape& shapeA, const GjkInputShape shapeB, Simplex& simplex)
+	{
+		auto prvDistSq = MathU::Infinity;
+		Vector3 pMin, searchDir;
+
+		while (true)
+		{
+			UpdateSimplex(simplex, pMin, searchDir);
+
+			if (simplex.NumPoints == 4)
+				return GjkResultLocal::Intersection;
+
+			auto distSq = pMin.MagnitudeSqr();
+			if (distSq <= MathU::Epsilon)
+				return GjkResultLocal::DegenerateSearchDirection;
+
+			if (distSq >= prvDistSq)
+				return GjkResultLocal::NotGettingCloser;
+
+			prvDistSq = distSq;
+
+			AddNextPointToSimplex(shapeA, shapeB, searchDir, simplex);
+			auto& v = simplex.Points[simplex.NumPoints - 1];
+
+			if (Vector3::Dot(v, searchDir) <= 0.0f)
+				return GjkResultLocal::NoIntersection;
+		}
+	}
+
+	GjkResult HandleDegenerateSearchDirection(const GjkInputShape& shapeA, const GjkInputShape shapeB, Simplex& simplex)
+	{
+		switch (simplex.NumPoints)
+		{
+		case 1:
+		{
+			return GjkResult::NoIntersection;
+		}
+		case 2:
+		{
+			Debug::Log(std::string("Gjk search direction degenerated with line segment simplex."));
+			// TODO - This could be handled but I think it is pretty rare so for now just return error.
+			return GjkResult::Error;
+		}
+		case 3:
+		{
+			auto& points = simplex.Points;
+			auto& a = points[0];
+			auto& b = points[1];
+			auto& c = points[2];
+
+			auto n = Vector3::Cross(b - a, c - a);
+			int iaPlus, ibPlus;
+			int iaMinus, ibMinus;
+
+			static constexpr auto tol = 0.0001f;
+
+			auto sPlus = GetSupportPoint(shapeA, shapeB, n, iaPlus, ibPlus);
+			if (MathU::Abs(Vector3::Dot(sPlus - a, n)) <= tol)
+				return GjkResult::NoIntersection;
+
+			auto sMinus = GetSupportPoint(shapeA, shapeB, -n, iaMinus, ibMinus);
+			if (MathU::Abs(Vector3::Dot(sMinus - a, -n)) <= tol)
+				return GjkResult::NoIntersection;
+
+			if (Vector3::Dot(a, n) > 0.0f)
+				simplex.AddPoint(sMinus, iaMinus, ibMinus);
+			else
+				simplex.AddPoint(sPlus, iaPlus, ibPlus);
+
+			return GjkResult::Intersection;
+		}
+		default:
+			break;
+		}
+		assert(false);
+		return GjkResult::Error;
+	}
+
+public:
+	static Vector3 GetSupportPoint(const GjkInputShape& shapeA, const GjkInputShape shapeB, const Vector3& searchDir, int& iA, int& iB)
+	{
+		iA = shapeA.GetSupportVertex(searchDir);
+		iB = shapeB.GetSupportVertex(-searchDir);
+		return shapeA.GetPointAt(iA) - shapeB.GetPointAt(iB);
+	}
+
+	GjkResult Run(const GjkInputShape& shapeA, const GjkInputShape shapeB, Simplex& simplex)
+	{
+		if (simplex.NumPoints == 0)
+			InitSimplex(shapeA, shapeB, simplex);
+
+		auto localRes = RunLocal(shapeA, shapeB, simplex);
+
+		switch (localRes)
+		{
+		case GjkCollisionDetector::GjkResultLocal::Intersection:
+		{
+			return GjkResult::Intersection;
+		}
+		case GjkCollisionDetector::GjkResultLocal::NoIntersection:
+		{
+			return GjkResult::NoIntersection;
+		}
+		case GjkCollisionDetector::GjkResultLocal::DegenerateSearchDirection:
+		{
+			return HandleDegenerateSearchDirection(shapeA, shapeB, simplex);
+		}
+		case GjkCollisionDetector::GjkResultLocal::NotGettingCloser:
+		{
+			Debug::Log(std::string("Gjk stopped getting closer"));
+			return GjkResult::NoIntersection;
+		}
+		default:
+			break;
+		}
+		assert(false);
+		return GjkResult::Error;
 	}
 };

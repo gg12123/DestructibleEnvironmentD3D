@@ -9,7 +9,23 @@
 class EpaContact
 {
 private:
-	using MinowPoint = GjkCollisionDetection::MinowskiDiffPoint;
+	struct MinowPoint
+	{
+		Vector3 Value;
+		int OriginalA;
+		int OriginalB;
+
+		MinowPoint(const Vector3& val, int origA, int origB)
+		{
+			Value = val;
+			OriginalA = origA;
+			OriginalB = origB;
+		}
+
+		MinowPoint()
+		{
+		}
+	};
 
 	class Edge
 	{
@@ -67,11 +83,13 @@ private:
 		{
 			static constexpr auto tol = 0.0001f;
 
-			sv = GjkCollisionDetection::GetMinowskiDiffSupportVertex(shapeA, shapeB, m_N);
+			int iA, iB;
+			auto sp = GjkCollisionDetector::GetSupportPoint(shapeA, shapeB, m_N, iA, iB);
 
 			auto x = m_D;
-			auto y = Vector3::Dot(sv.Value, m_N);
+			auto y = Vector3::Dot(sp, m_N);
 
+			sv = MinowPoint(sp, iA, iB);
 			return MathU::Abs(x - y) > tol;
 		}
 
@@ -97,7 +115,10 @@ private:
 
 			auto pen = (pointOnA - pointOnB).Magnitude();
 
-			return ContactPlane((pointOnA + pointOnB) / 2.0f, m_N, pen);
+			auto aComp = Vector3::Dot(pointOnA, m_N);
+			auto bComp = Vector3::Dot(pointOnB, m_N);
+			
+			return aComp > bComp ? ContactPlane(bComp, aComp, m_N) : ContactPlane(aComp, bComp, m_N);
 		}
 
 		const auto& P0() const
@@ -123,10 +144,17 @@ private:
 		float m_D;
 	};
 
-	void InitPoints(const GjkCollisionDetection::SetQ& q)
+	void InitPoints(const GjkCollisionDetector::Simplex& simplex)
 	{
 		m_Points.clear();
-		m_Points.insert(m_Points.begin(), q.GetPoints().begin(), q.GetPoints().end());
+		auto& points = simplex.Points;
+		auto& origA = simplex.IndexesA;
+		auto& origB = simplex.IndexesB;
+
+		// TODO - re-organise the points data so this can just memcpy.
+
+		for (auto i = 0; i < simplex.NumPoints; i++)
+			m_Points.emplace_back(MinowPoint(points[i], origA[i], origB[i]));
 	}
 
 	void InitFaces()
@@ -217,18 +245,20 @@ private:
 
 public:
 	ContactPlane FindContact(const GjkInputShape& shapeA, const GjkInputShape& shapeB,
-		const GjkCollisionDetection::SetQ& q)
+		const GjkCollisionDetector::Simplex& simplex)
 	{
-		InitPoints(q);
+		InitPoints(simplex);
 		InitFaces();
 
 		MinowPoint sv;
 		while (true)
 		{
-			auto closest = FindClosestFaceToOrigin();
+			auto closestIndex = FindClosestFaceToOrigin();
 
-			if (!m_Faces[closest].CanExpand(shapeA, shapeB, sv))
-				return m_Faces[closest].ToContact(shapeA, shapeB, m_Points);
+			auto& closestFace = m_Faces[closestIndex];
+
+			if (!closestFace.CanExpand(shapeA, shapeB, sv))
+				return closestFace.ToContact(shapeA, shapeB, m_Points);
 
 			Expand(sv);
 		}
