@@ -391,8 +391,8 @@ public:
 	enum class GjkResult
 	{
 		Intersection,
-		NoIntersection,
-		Error,
+		MaybeIntersection,
+		NoIntersection
 	};
 
 private:
@@ -777,10 +777,13 @@ private:
 
 		if (Vector3::Dot(a, n) >= 0.0f)
 		{
+			// This is a support face and the origin is behind it so this 
+			// probably means intersection.
+
 			int iA, iB;
 			auto otherPoint = GetSupportPoint(shapeA, shapeB, -n, iA, iB);
 			simplex.AddPoint(otherPoint, iA, iB);
-			return GjkResult::Intersection;
+			return GjkResult::MaybeIntersection;
 		}
 		return GjkResult::NoIntersection;
 	}
@@ -791,16 +794,34 @@ private:
 		{
 		case 1:
 		{
-			// It is possible for the shapes to be point on point touching each other in this case.
-			// But I think it will be ok to always report no intersection
+			// This could definitly mean that the shapes are point on point touching.
+			// Maybe they could also be fully intersecting???
+
+			// For now just report no intersection to save on epa calls.
+			// Hopefully this doesnt cause problems!
 			return GjkResult::NoIntersection;
 		}
 		case 2:
 		{
-			// TODO - although unlikely, the shapes could still be intersecting in this case.
-			// Need to handle it somehow.
+			// TODO - the simplex output here is very often degenerate. Needs improvement.
 
-			return GjkResult::NoIntersection;
+			auto& points = simplex.Points;
+			auto& a = points[0];
+			auto& b = points[1];
+
+			auto t = a - b;
+			auto d1 = Vector3::OrthogonalDirection(t);
+			auto d2 = Vector3::Cross(d1, t);
+
+			int iA, iB;
+
+			auto sp1 = GetSupportPoint(shapeA, shapeB, d1, iA, iB);
+			simplex.AddPoint(sp1, iA, iB);
+
+			auto sp2 = GetSupportPoint(shapeA, shapeB, d2, iA, iB);
+			simplex.AddPoint(sp2, iA, iB);
+
+			return GjkResult::MaybeIntersection;
 		}
 		case 3:
 		{
@@ -824,19 +845,19 @@ private:
 			if (MathU::Abs(Vector3::Dot(sMinus - a, minusN)) <= tol)
 				return CheckOnSupportFace(shapeA, shapeB, minusN, simplex);
 
-			// Neither face is a support so this must be an intersection
+			// Neither face is a support so this could be an intersection
 			if (Vector3::Dot(a, n) > 0.0f)
 				simplex.AddPoint(sMinus, iaMinus, ibMinus);
 			else
 				simplex.AddPoint(sPlus, iaPlus, ibPlus);
 
-			return GjkResult::Intersection;
+			return GjkResult::MaybeIntersection;
 		}
 		default:
 			break;
 		}
 		assert(false);
-		return GjkResult::Error;
+		return GjkResult::NoIntersection;
 	}
 
 public:
@@ -873,6 +894,6 @@ public:
 			break;
 		}
 		assert(false);
-		return GjkResult::Error;
+		return GjkResult::NoIntersection;
 	}
 };

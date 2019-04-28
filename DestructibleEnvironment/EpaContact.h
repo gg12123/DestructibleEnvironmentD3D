@@ -59,24 +59,47 @@ private:
 		}
 
 	public:
-		MinowskiDifferenceFace(int p0, int p1, int p2, const std::vector<MinowPoint>& points) :
+		MinowskiDifferenceFace(int p0, int p1, int p2, const std::vector<MinowPoint>& points, const Vector3& refCentre) :
 			m_P0(p0), m_P1(p1), m_P2(p2)
 		{
+			static constexpr auto degenTol = 0.0001f;
+
 			auto p0Val = points[p0].Value;
 
 			auto n = Vector3::Cross(points[p1].Value - p0Val, points[p2].Value - p0Val);
+			auto nMagSqr = n.MagnitudeSqr();
+			
+			m_IsDegenerate = true;
 
-			if (MathU::Abs(Vector3::Dot(n, p0Val)) > 0.001f)
+			if (nMagSqr > degenTol * degenTol)
 			{
-				m_N = n.InDirectionOf(p0Val).Normalized();
-			}
-			else
-			{
-				auto refP = FindPointToRefFrom(points, p0Val, n);
-				m_N = n.InDirectionOf(p0Val - refP).Normalized();
-			}
+				n /= sqrtf(nMagSqr);
+				auto refDir = p0Val - refCentre;
+				auto dot = Vector3::Dot(n, refDir);
 
-			m_D = Vector3::Dot(m_N, p0Val);
+				if (MathU::Abs(dot) <= degenTol)
+				{
+					refDir = p0Val - FindPointToRefFrom(points, p0Val, n);
+					dot = Vector3::Dot(n, refDir);
+				}
+
+				if (MathU::Abs(dot) > degenTol)
+				{
+					m_N = n.InDirectionOf(refDir);
+					m_D = Vector3::Dot(m_N, p0Val);
+					m_IsDegenerate = false;
+				}
+			}
+		}
+
+		auto IsDegenerate() const
+		{
+			return m_IsDegenerate;
+		}
+
+		auto ContainsOrigin() const
+		{
+			return m_D >= 0.0f;
 		}
 
 		bool CanExpand(const GjkInputShape& shapeA, const GjkInputShape& shapeB, MinowPoint& sv) const
@@ -93,7 +116,7 @@ private:
 			return MathU::Abs(x - y) > tol;
 		}
 
-		float ProjectedDistanceFromOrigin() const
+		float ProjectedSignedDistanceFromOrigin() const
 		{
 			return m_D;
 		}
@@ -142,6 +165,7 @@ private:
 		int m_P2;
 		Vector3 m_N;
 		float m_D;
+		bool m_IsDegenerate;
 	};
 
 	void InitPoints(const GjkCollisionDetector::Simplex& simplex)
@@ -151,19 +175,51 @@ private:
 		auto& origA = simplex.IndexesA;
 		auto& origB = simplex.IndexesB;
 
-		// TODO - re-organise the points data so this can just memcpy.
+		m_ContainedPoint = Vector3::Zero();
 
 		for (auto i = 0; i < simplex.NumPoints; i++)
-			m_Points.emplace_back(MinowPoint(points[i], origA[i], origB[i]));
+		{
+			auto& p = points[i];
+			m_ContainedPoint += p;
+			m_Points.emplace_back(MinowPoint(p, origA[i], origB[i]));
+		}
+
+		m_ContainedPoint /= static_cast<float>(simplex.NumPoints);
 	}
 
-	void InitFaces()
+	bool ProcessInitialFace(const MinowskiDifferenceFace& f)
+	{
+		if (f.IsDegenerate())
+			return false;
+
+		if (f.ContainsOrigin())
+			m_ContainsOriginCount++;
+
+		return true;
+	}
+
+	bool InitFaces()
 	{
 		m_Faces.clear();
-		m_Faces.emplace_back(MinowskiDifferenceFace(0, 1, 2, m_Points));
-		m_Faces.emplace_back(MinowskiDifferenceFace(1, 2, 3, m_Points));
-		m_Faces.emplace_back(MinowskiDifferenceFace(0, 1, 3, m_Points));
-		m_Faces.emplace_back(MinowskiDifferenceFace(0, 2, 3, m_Points));
+		m_ContainsOriginCount = 0;
+
+		m_Faces.emplace_back(MinowskiDifferenceFace(0, 1, 2, m_Points, m_ContainedPoint));
+		if (!ProcessInitialFace(m_Faces[m_Faces.size() - 1]))
+			return false;
+
+		m_Faces.emplace_back(MinowskiDifferenceFace(1, 2, 3, m_Points, m_ContainedPoint));
+		if (!ProcessInitialFace(m_Faces[m_Faces.size() - 1]))
+			return false;
+
+		m_Faces.emplace_back(MinowskiDifferenceFace(0, 1, 3, m_Points, m_ContainedPoint));
+		if (!ProcessInitialFace(m_Faces[m_Faces.size() - 1]))
+			return false;
+
+		m_Faces.emplace_back(MinowskiDifferenceFace(0, 2, 3, m_Points, m_ContainedPoint));
+		if (!ProcessInitialFace(m_Faces[m_Faces.size() - 1]))
+			return false;
+
+		return true;
 	}
 
 	int FindClosestFaceToOrigin() const
@@ -173,7 +229,30 @@ private:
 
 		for (auto i = 0u; i < m_Faces.size(); i++)
 		{
-			auto dist = m_Faces[i].ProjectedDistanceFromOrigin();
+			// Assume the face contains the origin so this distance is positive
+			auto dist = m_Faces[i].ProjectedSignedDistanceFromOrigin();
+			if (dist < closestDist)
+			{
+				closestDist = dist;
+				indexOfClosest = i;
+			}
+		}
+		return indexOfClosest;
+	}
+
+	int FindClosestNoneContainingFaceToOrigin() const
+	{
+		auto closestDist = MathU::Infinity;
+		auto indexOfClosest = 0u;
+
+		for (auto i = 0u; i < m_Faces.size(); i++)
+		{
+			auto& f = m_Faces[i];
+
+			if (f.ContainsOrigin())
+				continue;
+
+			auto dist = MathU::Abs(f.ProjectedSignedDistanceFromOrigin());
 			if (dist < closestDist)
 			{
 				closestDist = dist;
@@ -208,10 +287,13 @@ private:
 		for (auto& f : m_Faces)
 		{
 			auto& n = f.Normal();
-			auto p0 = f.ProjectedDistanceFromOrigin() * n;
+			auto p0 = f.ProjectedSignedDistanceFromOrigin() * n;
 
 			if (Vector3::Dot(svPoint - p0, n) > 0.0f)
 			{
+				if (f.ContainsOrigin())
+					m_ContainsOriginCount--;
+
 				RemoveFace(f);
 			}
 			else
@@ -230,7 +312,10 @@ private:
 		{
 			if (m_TimesRemovedFrom.Get(e.P0, e.P1) == 1)
 			{
-				m_Faces.emplace_back(MinowskiDifferenceFace(e.P0, e.P1, newPoint, m_Points));
+				m_Faces.emplace_back(MinowskiDifferenceFace(e.P0, e.P1, newPoint, m_Points, m_ContainedPoint));
+
+				if (m_Faces[m_Faces.size() - 1].ContainsOrigin())
+					m_ContainsOriginCount++;
 			}
 
 			m_TimesRemovedFrom.Get(e.P0, e.P1) = 0;
@@ -244,12 +329,47 @@ private:
 		CreateNewFaces(m_Points.size() - 1);
 	}
 
+	bool ExpandToContainOrigin(const GjkInputShape& shapeA, const GjkInputShape& shapeB)
+	{
+		if (m_ContainsOriginCount == m_Faces.size())
+			return true;
+
+		MinowPoint sv;
+		while (true)
+		{
+			auto closestIndex = FindClosestNoneContainingFaceToOrigin();
+			auto& closestFace = m_Faces[closestIndex];
+
+			// The closest none containg face to the origin cannot expand.
+			// Hence the origin is not in the minow diff.
+			if (!closestFace.CanExpand(shapeA, shapeB, sv))
+				return false;
+
+			Expand(sv);
+
+			if (m_ContainsOriginCount == m_Faces.size())
+				return true;
+		}
+	}
+
 public:
-	ContactPlane FindContact(const GjkInputShape& shapeA, const GjkInputShape& shapeB,
-		const GjkCollisionDetector::Simplex& simplex)
+	enum class EpaResult
+	{
+		NoContact,
+		Contact,
+		DegenerateSimplex,
+	};
+
+	EpaResult FindContact(const GjkInputShape& shapeA, const GjkInputShape& shapeB,
+		const GjkCollisionDetector::Simplex& simplex, ContactPlane& contactPlane)
 	{
 		InitPoints(simplex);
-		InitFaces();
+
+		if (!InitFaces())
+			return EpaResult::DegenerateSimplex;
+
+		if (!ExpandToContainOrigin(shapeA, shapeB))
+			return EpaResult::NoContact;
 
 		MinowPoint sv;
 		while (true)
@@ -259,19 +379,16 @@ public:
 			auto& closestFace = m_Faces[closestIndex];
 
 			if (!closestFace.CanExpand(shapeA, shapeB, sv))
-				return closestFace.ToContact(shapeA, shapeB, m_Points);
+			{
+				contactPlane = closestFace.ToContact(shapeA, shapeB, m_Points);
+				return EpaResult::Contact;
+			}
 
 			Expand(sv);
-
-			if (m_Faces.size() == 0u)
-			{
-				Debug::Log(std::string("Faces reduced to zero in EPA."));
-
-				// TODO - I think this happens when the input simplex is degenerate.
-				// Just make a guess at the contact plane for now.
-				return m_FacesNext[0].ToContact(shapeA, shapeB, m_Points);
-			}
 		}
+
+		assert(false);
+		return EpaResult::NoContact;
 	}
 
 private:
@@ -280,4 +397,6 @@ private:
 	std::vector<MinowPoint> m_Points;
 	DynamicTriangleArray<int> m_TimesRemovedFrom;
 	std::vector<Edge> m_EdgesRemovedFrom;
+	Vector3 m_ContainedPoint;
+	int m_ContainsOriginCount;
 };

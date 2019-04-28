@@ -16,7 +16,7 @@ uint32 GetSeed()
 template<>
 uint32 GetSeed<false>()
 {
-	return 1000u;
+	return 1556444676u;
 }
 
 static void Seed()

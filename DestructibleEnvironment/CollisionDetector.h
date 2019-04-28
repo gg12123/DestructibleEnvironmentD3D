@@ -68,8 +68,24 @@ public:
 		switch (gjkRes)
 		{
 		case GjkCollisionDetector::GjkResult::Intersection:
+		case GjkCollisionDetector::GjkResult::MaybeIntersection:
 		{
-			auto localContact = m_EpaContactFinder.FindContact(gjkShape1, gjkShape2, simplex);
+			ContactPlane localContact;
+			auto epaRes = m_EpaContactFinder.FindContact(gjkShape1, gjkShape2, simplex, localContact);
+
+			if (epaRes == EpaContact::EpaResult::NoContact)
+			{
+				if (gjkRes == GjkCollisionDetector::GjkResult::Intersection)
+					Debug::Log(std::string("Epa and gjk results are inconsistent."));
+
+				return false;
+			}
+
+			if (epaRes == EpaContact::EpaResult::DegenerateSimplex)
+			{
+				Debug::Log(std::string("Degenerate simplex fed to Epa!!!!!!"));
+				return false;
+			}
 
 			TransformNormalsToShape1sSpace(shape2);
 
@@ -79,22 +95,17 @@ public:
 			auto satShape2 = SatInputShape(shape2.GetEdgeIndexesPoints(), shape2.GetEdgeIndexsFaces(),
 				m_TransformedPoints, m_TransformedNormals, shape2.GetFaceP0Indexes(), m_ToShape1sSpace * shape2.GetCentre());
 
-			contact = ContactPlane(localContact.GetContactMin(), localContact.GetContactMax(),
-				m_ActiveTransform->ToWorldDirection(localContact.GetNormal()));
-
 			for (auto& p : m_ContactPointFinder.FindContactPoints(satShape1, satShape2, localContact))
 				contactPoints.emplace_back(m_ActiveTransform->ToWorldPosition(p));
+
+			contact = ContactPlane(localContact.GetContactMin(), localContact.GetContactMax(),
+				m_ActiveTransform->ToWorldDirection(localContact.GetNormal()));
 
 			return true;
 		}
 		case GjkCollisionDetector::GjkResult::NoIntersection:
 		{
 			return false;
-		}
-		case GjkCollisionDetector::GjkResult::Error:
-		{
-			// Maybe call into Sat for back up.
-			assert(false);
 		}
 		default:
 			break;
@@ -111,7 +122,6 @@ private:
 	Quaternion m_DirToShape1sSpace;
 	Quaternion m_DirToShape2sSpace;
 	const Transform* m_ActiveTransform;
-	SatOptimisedCollisionDetection m_SatDetector;
 	ContactPointFinder m_ContactPointFinder;
 	DynamicTriangleArray<CollisionContext> m_CollisionContexts;
 	GjkCollisionDetector m_GjkDetector;
