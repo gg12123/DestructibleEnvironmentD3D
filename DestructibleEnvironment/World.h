@@ -6,6 +6,7 @@
 #include "Entity.h"
 #include "ReadOnlyInput.h"
 #include "ViewportDimensions.h"
+#include "FixedTimeStepTime.h"
 
 class World
 {
@@ -16,7 +17,6 @@ public:
 
 	~World()
 	{
-		m_Physics.StopRunningPhysicsThread();
 	}
 
 	void Init(const std::shared_ptr<DX::DeviceResources>& deviceResources, const ReadOnlyInput& input, const ViewportDimensions& viewDims)
@@ -24,7 +24,8 @@ public:
 		m_Input = input;
 		m_Renderer.SetResources(deviceResources, viewDims);
 		m_Physics.SetWorld(*this);
-		m_Physics.StartRunningPhysicsThread();
+		m_PhysicsTime.SetFixedDeltaTime(PhysicsTime::FixedDeltaTime);
+		m_PhysicsTime.Start();
 	}
 
 	Renderer& GetRenderer()
@@ -58,4 +59,5 @@ private:
 	std::vector<Entity*> m_UpdateableEntities;
 
 	ReadOnlyInput m_Input;
+	FixedTimeStepTime m_PhysicsTime;
 };

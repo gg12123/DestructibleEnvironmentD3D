@@ -14,11 +14,6 @@ public:
 
 	void InitMassProperties(const Transform& refTran);
 
-	void AddExternalImpulse(const Impulse& impulse)
-	{
-		m_ExternalImpulses.emplace_back(impulse);
-	}
-
 	const Vector3& GetVelocityWorld() const
 	{
 		return m_VelocityWorld;
@@ -80,21 +75,6 @@ public:
 
 	void ApplyExternalForcesAndImpulses();
 
-	bool IsSplit() const
-	{
-		return m_IsSplit;
-	}
-
-	void ClearSplit()
-	{
-		m_IsSplit = false;
-	}
-
-	const auto& GetSplittingImpulse() const
-	{
-		return m_SplittingImpulse;
-	}
-
 	void ApplyImpulse(const Impulse& impulse) override;
 
 private:
@@ -105,11 +85,7 @@ private:
 
 	Vector3 m_ExternalForceWorld;
 	Vector3 m_ExternalMomentsWorld;
-	std::vector<Impulse> m_ExternalImpulses;
 
 	float m_Drag;
 	float m_AngularDrag;
-
-	bool m_IsSplit = false;
-	Impulse m_SplittingImpulse;
 };

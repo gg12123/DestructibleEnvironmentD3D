@@ -9,6 +9,8 @@ void World::RegisterEntity(std::unique_ptr<Entity>&& ent)
 
 void World::Update()
 {
+	m_PhysicsTime.WaitForNextUpdateTime();
+	m_Physics.TickPhysicsEngine();
 	m_Physics.Syncronise();
 	UpdateEntities();
 }

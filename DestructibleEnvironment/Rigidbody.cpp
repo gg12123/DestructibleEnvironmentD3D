@@ -157,15 +157,9 @@ void Rigidbody::ApplyImpulse(const Impulse& impulse)
 	auto& r = impulse.WorldImpulsePoint - GetTransform().GetPosition();
 	auto& J = impulse.WorldImpulse;
 
+	// TODO - cache the inertia inverse. The get call re-calculates it each
+	// time and this method is called loads by the solver.
 	m_AngularVelocityWorld += (GetInertiaInverseWorld() * Vector3::Cross(r, J));
-
-	static constexpr auto impactNeededForSplit = 1000.0f;
-
-	if (impulse.Impact > impactNeededForSplit)
-	{
-		m_IsSplit = true;
-		m_SplittingImpulse = impulse;
-	}
 }
 
 void Rigidbody::ApplyExternalForcesAndImpulses()
@@ -180,12 +174,8 @@ void Rigidbody::ApplyExternalForcesAndImpulses()
 	m_VelocityWorld += (GetInvMass() * m_ExternalForceWorld) * PhysicsTime::FixedDeltaTime;
 	m_AngularVelocityWorld += (GetInertiaInverseWorld() * m_ExternalMomentsWorld) * PhysicsTime::FixedDeltaTime;
 
-	for (auto& imp : m_ExternalImpulses)
-		ApplyImpulse(imp);
-
 	m_ExternalForceWorld = Vector3::Zero();
 	m_ExternalMomentsWorld = Vector3::Zero();
-	m_ExternalImpulses.clear();
 }
 
 void Rigidbody::UpdatePosition()

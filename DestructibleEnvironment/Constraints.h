@@ -86,8 +86,8 @@ protected:
 
 	void ApplyImpulse(float J) const
 	{
-		m_Body1->ApplyImpulse(Impulse(-J * m_Direction, m_Point, J));
-		m_Body2->ApplyImpulse(Impulse(J * m_Direction, m_Point, J));
+		m_Body1->ApplyImpulse(Impulse(-J * m_Direction, m_Point));
+		m_Body2->ApplyImpulse(Impulse(J * m_Direction, m_Point));
 	}
 
 private:

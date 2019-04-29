@@ -229,7 +229,6 @@
     <ClInclude Include="InputChannel.h" />
     <ClInclude Include="InputChannelWrapper.h" />
     <ClInclude Include="IntersectionLoop.h" />
-    <ClInclude Include="IOnPhysicsWorldUpdated.h" />
     <ClInclude Include="IterationAboutShape.h" />
     <ClInclude Include="LastCheckedAgainst.h" />
     <ClInclude Include="MapToFaceRelationship.h" />
@@ -256,8 +255,6 @@
     <ClInclude Include="Face.h" />
     <ClInclude Include="FaceSplitter.h" />
     <ClInclude Include="FixedTimeStepTime.h" />
-    <ClInclude Include="GameControlledDynamicBody.h" />
-    <ClInclude Include="GameThreadToPhysicsThreadAction.h" />
     <ClInclude Include="GridPartition.h" />
     <ClInclude Include="IMeshRenderer.h" />
     <ClInclude Include="InitialShapeCreator.h" />
@@ -325,8 +322,6 @@
     <ClCompile Include="DynamicBodyProxy.cpp" />
     <ClCompile Include="DynamicMesh.cpp" />
     <ClCompile Include="Face.cpp" />
-    <ClCompile Include="GameControlledDynamicBody.cpp" />
-    <ClCompile Include="GameTheadToPhysicsThreadAction.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

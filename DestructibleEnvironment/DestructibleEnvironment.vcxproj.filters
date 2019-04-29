@@ -127,16 +127,10 @@
     <ClCompile Include="Rigidbody.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
-    <ClCompile Include="GameTheadToPhysicsThreadAction.cpp">
-      <Filter>Physics</Filter>
-    </ClCompile>
     <ClCompile Include="DynamicBodyProxy.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
     <ClCompile Include="StaticShapeProxy.cpp">
-      <Filter>Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="GameControlledDynamicBody.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
     <ClCompile Include="CollisionResponder.cpp">
@@ -255,9 +249,6 @@
     <ClInclude Include="PhysicsTime.h">
       <Filter>Physics</Filter>
     </ClInclude>
-    <ClInclude Include="GameThreadToPhysicsThreadAction.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
     <ClInclude Include="StaticBody.h">
       <Filter>Physics</Filter>
     </ClInclude>
@@ -265,9 +256,6 @@
       <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="StaticShapeProxy.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="GameControlledDynamicBody.h">
       <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="FixedTimeStepTime.h">
@@ -382,9 +370,6 @@
       <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
     <ClInclude Include="RayCasting.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="IOnPhysicsWorldUpdated.h">
       <Filter>Physics</Filter>
     </ClInclude>
     <ClInclude Include="WindowsInput.h">

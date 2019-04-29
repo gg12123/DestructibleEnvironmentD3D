@@ -6,7 +6,7 @@
 #include "DynamicBodyProxy.h"
 #include "PlaneMesh.h"
 
-void RayShooter::OnPhysicsWorldUpdated()
+void RayShooter::Update()
 {
 	m_LeftMouseButton.Update();
 	if (m_LeftMouseButton.IsJustDown())
@@ -16,11 +16,6 @@ void RayShooter::OnPhysicsWorldUpdated()
 		auto mousePos = w.GetInput().GetMousePosition();
 		auto ray = w.GetRenderer().GetActiveCamera().ScreenPointToRay(mousePos);
 
-		//auto plane = new PlaneMesh(Vector2(1.0f, 1.0f));
-		//plane->GetTransform().SetPosition(ray.GetOrigin() + 10.0f * ray.GetDirection());
-		//plane->GetTransform().SetRotation(Quaternion::LookRotation(-ray.GetDirection()));
-		//w.RegisterEntity(std::unique_ptr<Entity>(plane));
-
 		auto hit = w.GetPhysics().RayCast(ray);
 		
 		if (hit.Hit())
@@ -28,9 +23,10 @@ void RayShooter::OnPhysicsWorldUpdated()
 			auto body = hit.GetHitObject()->As<DynamicBodyProxy>();
 			if (body)
 			{
-				body->AddImpulse(Impulse(ray.GetDirection(),
-					hit.GetHitPoint(),
-					2000.0f));
+				auto imp = Impulse(ray.GetDirection(), hit.GetHitPoint());
+
+				body->AddImpulse(imp);
+				GetWorld().GetPhysics().DestructBody(*body, imp);
 			}
 		}
 	}
@@ -40,6 +36,6 @@ void RayShooter::Awake()
 {
 	auto& w = GetWorld();
 
-	w.GetPhysics().AddOnPhysicsUpdatedListener(*this);
+	w.RegisterEntityForUpdate(*this);
 	m_LeftMouseButton = InputChannelWrapper(w.GetInput().GetMouseChannel(1));
 }

@@ -4,7 +4,6 @@
 #include <memory>
 #include <thread>
 #include "Constants.h"
-#include "GameThreadToPhysicsThreadAction.h"
 #include "Rigidbody.h"
 #include "StaticBody.h"
 #include "SplitInfo.h"
@@ -22,65 +21,40 @@ public:
 		m_DynamicBodies.reserve(Constants::MaxNumShapes);
 	}
 
-	auto& GetGameToPhysicsActions()
-	{
-		return m_GameToPhysicsActions;
-	}
-
 	auto& GetBodiesAdded()
 	{
 		return m_BodiesAdded;
 	}
 
-	auto& GetDynamicBodies()
+	const auto& GetDynamicBodies() const
 	{
 		return m_DynamicBodies;
 	}
 
-	auto& GetStaticBodies()
+	const auto& GetStaticBodies() const
 	{
 		return m_StaticBodies;
 	}
 
-	void ClearSafeToSync()
-	{
-		m_SafeToSync = false;
-	}
-
-	bool IsSafeToSync()
-	{
-		return m_SafeToSync;
-	}
-
-	void StopRunning()
-	{
-		m_Running = false;
-		m_SafeToSync = false; // Do this so it doesnt get stuck waiting for flag to be cleared when game thread is finished.
-
-		if (m_Thread.joinable())
-			m_Thread.join();
-	}
-
-	void StartRunning();
+	void SimulateOneTimeStep();
 
 	RayCastHit<CompoundShape> RayCast(const Ray& r) const;
 
-private:
-	void Run();
+	void AddDynamicBody(std::unique_ptr<Rigidbody>&& body)
+	{
+		m_DynamicBodies.emplace_back(std::move(body));
+	}
 
+	void AddStaticBody(std::unique_ptr<StaticBody>&& body)
+	{
+		m_StaticBodies.emplace_back(std::move(body));
+	}
+
+private:
 	void FindContacts();
 	void UpdateBodies();
 	void SatisfyConstraints();
-	void ExecuteGameToPhysicsActions();
-	void ProcessSplits();
 	void ApplyExternalForcesAndImpulses() const;
-
-	std::atomic<bool> m_Running = true;
-	std::atomic<bool> m_SafeToSync = false;
-
-	// The game thread fills this during collision detection, i.e. the sync phase.
-	// the actions are executed at the start of UpdateBodies().
-	std::vector<std::unique_ptr<IGameTheadToPhysicsThreadAction>> m_GameToPhysicsActions;
 
 	// This is filled with the bodies added by the physics engine (due to splits) during UpdateBodies().
 	// the game thread creates proxies and clears the list at the next sync phase
@@ -95,8 +69,4 @@ private:
 	std::vector<SplitInfo> m_Splits;
 	ShapeDestructor<Rigidbody> m_ShapeDestructor;
 	std::vector<Rigidbody*> m_NewBodiesFromDestruct;
-
-	FixedTimeStepTime m_Time;
-
-	std::thread m_Thread;
 };

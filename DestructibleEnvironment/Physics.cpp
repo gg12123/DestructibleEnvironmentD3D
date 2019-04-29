@@ -8,9 +8,7 @@
 #include "InitialShapeCreator.h"
 #include "World.h"
 #include "StaticBody.h"
-#include "GameControlledDynamicBody.h"
-
-bool Physics::m_AcceptGameInput = false;
+#include "ShapeDestructor.h"
 
 void Physics::AddNewProxy(ShapeProxy& proxy, CompoundShape& physicsShape)
 {
@@ -25,8 +23,7 @@ CompoundShape & Physics::AddStaticRigidbody(StaticShapeProxy& proxy)
 	auto& toRet = *body;
 	toRet.InitMassProperties(proxy.GetTransform());
 
-	m_GameToPhysicsActions.emplace_back(std::unique_ptr<IGameTheadToPhysicsThreadAction>(new AddStaticRigidbodyAction(std::move(body))));
-
+	m_Engine.AddStaticBody(std::move(body));
 	AddNewProxy(proxy, toRet);
 
 	return toRet;
@@ -43,29 +40,37 @@ Rigidbody & Physics::AddDynamicRigidbody(DynamicBodyProxy& proxy)
 	b.SetAngularDrag(0.1f);
 	b.InitMassProperties(proxy.GetTransform());
 
-	m_GameToPhysicsActions.emplace_back(std::unique_ptr<IGameTheadToPhysicsThreadAction>(new AddDynamicRigidbodyAction(std::move(body))));
-
+	m_Engine.AddDynamicBody(std::move(body));
 	AddNewProxy(proxy, b);
 
 	return b;
 }
 
-Rigidbody & Physics::AddGameControlledRigidbody(GameControlledDynamicBody& proxy)
+void Physics::DestructBody(DynamicBodyProxy& body, const Impulse& casue)
 {
-	auto& body = AddDynamicRigidbody(proxy);
-	m_GameControlledProxies.emplace_back(&proxy);
+	auto& toSplit = body.GetPhysicsBody();
 
-	body.SetMass(proxy.GetMass());
-	body.SetDrag(proxy.GetDrag());
-	body.SetAngularDrag(proxy.GetAngularDrag());
+	static std::vector<Rigidbody*> newBodiesFromDestruct;
+	static ShapeDestructor<Rigidbody> destructor;
 
-	return body;
+	newBodiesFromDestruct.clear();
+	destructor.Destruct(toSplit, casue, newBodiesFromDestruct);
+
+	for (auto newBody : newBodiesFromDestruct)
+	{
+		if (newBody != &toSplit)
+		{
+			m_Engine.AddDynamicBody(std::unique_ptr<Rigidbody>(newBody));
+			CreateShapeProxyForBodyAddedByDestruct(*newBody);
+		}
+
+		newBody->CopyVelocity(toSplit);
+		newBody->CopyDrag(toSplit);
+	}
 }
 
 RayCastHit<ShapeProxy> Physics::RayCast(const Ray& r) const
 {
-	assert(m_AcceptGameInput);
-
 	auto hit = m_Engine.RayCast(r);
 	if (hit.Hit())
 	{
@@ -77,48 +82,16 @@ RayCastHit<ShapeProxy> Physics::RayCast(const Ray& r) const
 
 void Physics::Syncronise()
 {
-	if (m_Engine.IsSafeToSync())
-	{
-		// Physics engine is doing collision detection. This is when it is safe to sync state.
-
-		// Trasfer actions into the physics engine. It will then execute these
-		// when it gets to updating the bodies - after this sync phase.
-		m_Engine.GetGameToPhysicsActions().swap(m_GameToPhysicsActions);
-		m_GameToPhysicsActions.clear();
-
-		// Create proxies for any bodies that were added by the engine during its last updateBodies() step.
-		CreateProxiesForBodiesAddedByEngine();
-
-		// Tell the proxies to sync.
-		for (auto it = m_ShapeProxies.begin(); it != m_ShapeProxies.end(); it++)
-			(*it)->Syncronise();
-
-		// Allow game to add forces etc to physics objects.
-		// This is the only time ray-casting is allowed.
-		m_AcceptGameInput = true;
-
-		for (auto it = m_GameControlledProxies.begin(); it != m_GameControlledProxies.end(); it++)
-			(*it)->FixedUpdate();
-
-		for (auto x : m_OnPhysicsUpdatedListeners)
-			x->OnPhysicsWorldUpdated();
-
-		m_AcceptGameInput = false;
-
-		m_Engine.ClearSafeToSync();
-	}
+	for (auto b : m_ShapeProxies)
+		b->Syncronise();
 }
 
-void Physics::CreateProxiesForBodiesAddedByEngine()
+void Physics::TickPhysicsEngine()
 {
-	auto& newBodies = m_Engine.GetBodiesAdded();
-	for (auto it = newBodies.begin(); it != newBodies.end(); it++)
-		CreateShapeProxyForBodyAddedByPhysics(**it);
-
-	newBodies.clear();
+	m_Engine.SimulateOneTimeStep();
 }
 
-void Physics::CreateShapeProxyForBodyAddedByPhysics(Rigidbody& body)
+void Physics::CreateShapeProxyForBodyAddedByDestruct(Rigidbody& body)
 {
 	auto prox = new DynamicBodyProxy(body);
 

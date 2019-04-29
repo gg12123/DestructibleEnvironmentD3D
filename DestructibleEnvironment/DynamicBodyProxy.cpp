@@ -17,18 +17,15 @@ CompoundShape & DynamicBodyProxy::RegisterWithPhysics()
 
 void DynamicBodyProxy::AddForce(const Vector3& force)
 {
-	assert(Physics::AcceptingGameInput());
 	m_Body->AddForce(force);
 }
 
 void DynamicBodyProxy::AddTorque(const Vector3& torque)
 {
-	assert(Physics::AcceptingGameInput());
 	m_Body->AddMoment(torque);
 }
 
 void DynamicBodyProxy::AddImpulse(const Impulse& imp)
 {
-	assert(Physics::AcceptingGameInput());
-	m_Body->AddExternalImpulse(imp);
+	m_Body->ApplyImpulse(imp);
 }

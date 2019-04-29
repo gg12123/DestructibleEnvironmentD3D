@@ -1,12 +1,11 @@
 #pragma once
 #include "Entity.h"
 #include "InputChannelWrapper.h"
-#include "IOnPhysicsWorldUpdated.h"
 
-class RayShooter : public Entity, IOnPhysicsWorldUpdated
+class RayShooter : public Entity
 {
 public:
-	void OnPhysicsWorldUpdated() override;
+	void Update() override;
 
 protected:
 	void Awake() override;

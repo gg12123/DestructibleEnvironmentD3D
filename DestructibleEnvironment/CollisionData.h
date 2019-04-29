@@ -9,16 +9,14 @@ public:
 	{
 	}
 
-	Impulse(const Vector3& worldImpulse, const Vector3& worldCollPoint, float impact) : 
+	Impulse(const Vector3& worldImpulse, const Vector3& worldCollPoint) : 
 		WorldImpulse(worldImpulse),
-		WorldImpulsePoint(worldCollPoint),
-		Impact(impact)
+		WorldImpulsePoint(worldCollPoint)
 	{
 	}
 
 	Vector3 WorldImpulse;
 	Vector3 WorldImpulsePoint;
-	float Impact;
 };
 
 class ContactPlane

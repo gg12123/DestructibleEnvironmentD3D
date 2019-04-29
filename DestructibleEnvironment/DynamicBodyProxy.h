@@ -48,6 +48,11 @@ public:
 	void AddTorque(const Vector3& torque);
 	void AddImpulse(const Impulse& imp);
 
+	Rigidbody& GetPhysicsBody() const
+	{
+		return *m_Body;
+	}
+
 protected:
 	CompoundShape & RegisterWithPhysics() override;
 
