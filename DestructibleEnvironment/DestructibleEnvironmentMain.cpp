@@ -12,6 +12,7 @@
 #include "ViewportDimensions.h"
 #include "RayShooter.h"
 #include "PlaneMesh.h"
+#include "SimdExperiments.h"
 
 using namespace DestructibleEnvironment;
 using namespace Windows::Foundation;
@@ -76,6 +77,8 @@ static DynamicBodyProxy* CreateBody(const Vector3& pos, const Quaternion& rot,
 
 void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 {
+	SimdExperiments::Run();
+
 	auto pos = Vector3(0.0f, 1.0f, 0.0f);
 
 	for (auto i = 0; i < 5; i++)

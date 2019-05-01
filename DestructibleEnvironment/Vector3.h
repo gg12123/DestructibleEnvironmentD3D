@@ -1,5 +1,6 @@
 #pragma once
 #include <math.h>
+#include <xmmintrin.h>
 #include "MathU.h"
 
 class Vector3
@@ -257,4 +258,72 @@ inline bool Vector3::FindClosestPointsBetweenLines(const Vector3& p1, const Vect
 		return true;
 	}
 	return false;
+}
+
+static float Vec128HorizontalSum(__m128 v) // v = [ D C | B A ]
+{
+	__m128 shuf = _mm_shuffle_ps(v, v, _MM_SHUFFLE(2, 3, 0, 1));  // [ C D | A B ]
+	__m128 sums = _mm_add_ps(v, shuf);      // sums = [ D+C C+D | B+A A+B ]
+	shuf = _mm_movehl_ps(shuf, sums);      //  [   C   D | D+C C+D ]  // let the compiler avoid a mov by reusing shuf
+	sums = _mm_add_ss(sums, shuf);
+	return _mm_cvtss_f32(sums);
+}
+
+class SimdVector3
+{
+private:
+
+public:
+	union
+	{
+		__m128 Vec128;
+		float Floats[4];
+	};
+
+	SimdVector3()
+	{
+		Vec128 = _mm_set1_ps(0.0f);
+	}
+
+	SimdVector3(float x, float y, float z)
+	{
+		Floats[0] = x;
+		Floats[1] = y;
+		Floats[2] = z;
+		Floats[3] = 0.0f;
+	}
+
+	SimdVector3(const __m128& vec128) : Vec128(vec128)
+	{
+	}
+
+	static inline float Dot(const SimdVector3& lhs, const SimdVector3& rhs)
+	{
+		auto x = _mm_mul_ps(lhs.Vec128, rhs.Vec128);
+		return Vec128HorizontalSum(x);
+	}
+
+	//static inline SimdVector3 Cross(const SimdVector3& lhs, const SimdVector3& rhs)
+	//{
+	//	auto leftShuf = _mm_shuffle_ps(lhs.m_Vec128, lhs.m_Vec128, );
+	//	auto rightShuf = _mm_shuffle_ps(rhs.m_Vec128, rhs.m_Vec128, );
+	//
+	//	rightShuf = _mm_mul_ps(rightShuf, lhs.m_Vec128);
+	//	leftShuf = _mm_mul_ps(leftShuf, rhs.m_Vec128);
+	//	rightShuf = _mm_sub_ps(rightShuf, leftShuf);
+	//
+	//	rightShuf = _mm_shuffle_ps(rightShuf, rightShuf, );
+	//
+	//	return SimdVector3(rightShuf);
+	//}
+};
+
+inline SimdVector3 operator+(const SimdVector3& lhs, const SimdVector3& rhs)
+{
+	return SimdVector3(_mm_add_ps(lhs.Vec128, rhs.Vec128));
+}
+
+inline SimdVector3 operator-(const SimdVector3& lhs, const SimdVector3& rhs)
+{
+	return SimdVector3(_mm_sub_ps(lhs.Vec128, rhs.Vec128));
 }
