@@ -292,6 +292,7 @@
     <ClInclude Include="ShapeProxy.h" />
     <ClInclude Include="ShapeSplitter.h" />
     <ClInclude Include="ShapeSubDivider.h" />
+    <ClInclude Include="Simd.h" />
     <ClInclude Include="SimdExperiments.h" />
     <ClInclude Include="SmallEdgeRemover.h" />
     <ClInclude Include="SplitInfo.h" />

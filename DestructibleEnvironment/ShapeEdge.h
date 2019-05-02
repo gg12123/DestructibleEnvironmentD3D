@@ -22,6 +22,16 @@ public:
 	{
 	}
 
+	void* operator new(size_t i)
+	{
+		return _mm_malloc(i, 16);
+	}
+
+	void operator delete(void* p)
+	{
+		_mm_free(p);
+	}
+
 	void OnTakenFromPool(ShapePoint& p0, ShapePoint& p1)
 	{
 		m_P0 = &p0;

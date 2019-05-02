@@ -2,6 +2,7 @@
   Camera.cpp
   CollisionResponder.cpp
   CompoundShape.cpp
+  Debug.cpp
   DestructibleEnvironmentMain.cpp
   DynamicBodyProxy.cpp
   DynamicMesh.cpp
@@ -10,11 +11,14 @@
   Physics.cpp
   PhysicsEngine.cpp
   PlaneMesh.cpp
+  Quaternion.cpp
+  Random.cpp
   RayShooter.cpp
   Renderer.cpp
   Rigidbody.cpp
   Shape.cpp
   ShapeEdge.cpp
+  ShapePoint.cpp
   ShapeProxy.cpp
   StaticShapeProxy.cpp
   World.cpp

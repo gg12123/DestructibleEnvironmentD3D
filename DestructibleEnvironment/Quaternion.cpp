@@ -12,7 +12,7 @@ Vector3 Quaternion::RotateV(const Vector3& v) const
 		+ 2.0f * s * Vector3::Cross(u, v));
 
 	auto& thisRef = *this;
-	auto p = Quaternion(0.0f, v.x, v.y, v.z);
+	auto p = Quaternion(0.0f, v.X(), v.Y(), v.Z());
 	auto v2q = thisRef * (p * Conj());
 	auto v2 = Vector3(v2q.x, v2q.y, v2q.z);
 

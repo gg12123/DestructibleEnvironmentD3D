@@ -86,7 +86,7 @@ private:
 	float CalculateObjectSize(const Tobject& obj) const
 	{
 		auto ex = obj.GetWorldAABB().GetExtends();
-		auto maxEx = MathU::Max(MathU::Max(ex.x, ex.y), ex.z);
+		auto maxEx = MathU::Max(MathU::Max(ex.X(), ex.Y()), ex.Z());
 		return 2.0f * maxEx;
 	}
 

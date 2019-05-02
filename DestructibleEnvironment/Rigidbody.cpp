@@ -44,17 +44,17 @@ void Rigidbody::InitMassProperties(const Transform& refTran)
 				auto p1 = points[i]->GetPoint();
 				auto p2 = points[i + 1u]->GetPoint();
 
-				auto x0 = p0.x;
-				auto y0 = p0.y;
-				auto z0 = p0.z;
+				auto x0 = p0.X();
+				auto y0 = p0.Y();
+				auto z0 = p0.Z();
 
-				auto x1 = p1.x;
-				auto y1 = p1.y;
-				auto z1 = p1.z;
+				auto x1 = p1.X();
+				auto y1 = p1.Y();
+				auto z1 = p1.Z();
 
-				auto x2 = p2.x;
-				auto y2 = p2.y;
-				auto z2 = p2.z;
+				auto x2 = p2.X();
+				auto y2 = p2.Y();
+				auto z2 = p2.Z();
 
 				auto a1 = x1 - x0;
 				auto b1 = y1 - y0;
@@ -92,12 +92,12 @@ void Rigidbody::InitMassProperties(const Transform& refTran)
 	auto mass = intg[0];
 	auto cm = Vector3(intg[1] / mass, intg[2] / mass, intg[3] / mass);
 
-	auto Ixx = (intg[5] + intg[6] - mass * (cm.y * cm.y + cm.z * cm.z));
-	auto Iyy = (intg[4] + intg[6] - mass * (cm.z * cm.z + cm.x * cm.x));
-	auto Izz = (intg[4] + intg[5] - mass * (cm.x * cm.x + cm.y * cm.y));
-	auto Ixy = (-(intg[7] - mass * cm.x * cm.y));
-	auto Iyz = (-(intg[8] - mass * cm.y * cm.z));
-	auto Ixz = (-(intg[9] - mass * cm.z * cm.x));
+	auto Ixx = (intg[5] + intg[6] - mass * (cm.Y() * cm.Y() + cm.Z() * cm.Z()));
+	auto Iyy = (intg[4] + intg[6] - mass * (cm.Z() * cm.Z() + cm.X() * cm.X()));
+	auto Izz = (intg[4] + intg[5] - mass * (cm.X() * cm.X() + cm.Y() * cm.Y()));
+	auto Ixy = (-(intg[7] - mass * cm.X() * cm.Y()));
+	auto Iyz = (-(intg[8] - mass * cm.Y() * cm.Z()));
+	auto Ixz = (-(intg[9] - mass * cm.Z() * cm.X()));
 
 	// TODO - enforcing a min inertia and mass keeps the simulation stable but the
 	// dynamics do not look right for tiny objects - find another way!
@@ -119,17 +119,17 @@ void Rigidbody::InitMassProperties(const Transform& refTran)
 	mass = MathU::Max(mass, minMass);
 
 	Matrix3 inertia;
-	auto col0 = inertia.M[0];
+	auto col0 = inertia.Cols[0].Floats;
 	col0[0] = Ixx;
 	col0[1] = -Ixy;
 	col0[2] = -Ixz;
 	
-	auto col1 = inertia.M[1];
+	auto col1 = inertia.Cols[1].Floats;
 	col1[0] = -Ixy;
 	col1[1] = Iyy;
 	col1[2] = -Iyz;
 	
-	auto col2 = inertia.M[2];
+	auto col2 = inertia.Cols[2].Floats;
 	col2[0] = -Ixz;
 	col2[1] = -Iyz;
 	col2[2] = Izz;

@@ -155,15 +155,15 @@ void Shape::UpdateWorldAABB()
 
 	auto& t = m_Owner->GetTransform();
 
-	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(e.x, e.y, e.z)));
-	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(-e.x, e.y, e.z)));
-	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(-e.x, e.y, -e.z)));
-	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(e.x, e.y, -e.z)));
+	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(e.X(), e.Y(),    e.Z())));
+	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(-e.X(), e.Y(),   e.Z())));
+	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(-e.X(), e.Y(),  -e.Z())));
+	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(e.X(), e.Y(),   -e.Z())));
 
-	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(e.x, -e.y, e.z)));
-	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(-e.x, -e.y, e.z)));
-	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(-e.x, -e.y, -e.z)));
-	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(e.x, -e.y, -e.z)));
+	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(e.X(), -e.Y(),   e.Z())));
+	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(-e.X(), -e.Y(),  e.Z())));
+	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(-e.X(), -e.Y(), -e.Z())));
+	BoundsCalc.Update(t.ToWorldPosition(c + Vector3(e.X(), -e.Y(),  -e.Z())));
 
 	m_WorldAABB = BoundsCalc.ToAABB();
 }

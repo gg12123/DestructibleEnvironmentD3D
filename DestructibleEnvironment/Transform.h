@@ -97,17 +97,17 @@ public:
 
 	Vector3 GetForward() const
 	{
-		return FromColumn(m_LocalToWorld.M[2]);
+		return FromColumn(m_LocalToWorld.Cols[2].Floats);
 	}
 
 	Vector3 GetUp() const
 	{
-		return FromColumn(m_LocalToWorld.M[1]);
+		return FromColumn(m_LocalToWorld.Cols[1].Floats);
 	}
 
 	Vector3 GetRight() const
 	{
-		return FromColumn(m_LocalToWorld.M[0]);
+		return FromColumn(m_LocalToWorld.Cols[0].Floats);
 	}
 
 private:

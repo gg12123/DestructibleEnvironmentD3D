@@ -8,7 +8,7 @@ public:
 	void InitMassProperties(const Transform& refTran)
 	{
 		SetInvMass(0.0f);
-		SetInvInertia(Matrix3(0.0f));
+		SetInvInertia(Matrix3());
 		CentreAndCache(refTran, Vector3::Zero());
 	}
 };

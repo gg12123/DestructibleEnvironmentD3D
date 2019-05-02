@@ -3,6 +3,9 @@
 #include <xmmintrin.h>
 #include "Vector3.h"
 #include "Quaternion.h"
+#include "Simd.h"
+
+#ifndef USE_SIMD
 
 template<int Size>
 class Matrix
@@ -275,6 +278,8 @@ static inline Vector3 operator*(const Matrix4& lhs, const Vector3& rhs)
 	return res;
 }
 
+#else
+
 template<int N>
 class SimdMatrix
 {
@@ -342,7 +347,7 @@ public:
 
 	static inline SimdMatrix<N> FromRotation(const Quaternion& rot)
 	{
-		SimdMatrix<N> res;
+		auto res = SimdMatrix<N>::Indentity();
 
 		auto qr = rot.r;
 		auto qi = rot.x;
@@ -374,17 +379,18 @@ public:
 	static inline SimdMatrix<4> FromTranslation(const SimdVector3& tran)
 	{
 		auto res = SimdMatrix<4>::Indentity();
-		auto col3 = res.Cols[3].Vec128 = tran.Vec128;
+		res.Cols[3].Vec128 = tran.Vec128;
+		res.Cols[3].Floats[3] = 1.0f;
 		return res;
 	}
 
 	static inline SimdMatrix<N> FromScale(float sX, float sY, float sZ)
 	{
-		SimdMatrix<N> res;
+		auto res = SimdMatrix<N>::Indentity();
 
-		res.M[0][0] = sX;
-		res.M[1][1] = sY;
-		res.M[2][2] = sZ;
+		res.Cols[0].Floats[0] = sX;
+		res.Cols[1].Floats[1] = sY;
+		res.Cols[2].Floats[2] = sZ;
 
 		return res;
 	}
@@ -482,14 +488,17 @@ static inline SimdVector3 operator*(const SimdMatrix<4>& m, const SimdVector3& v
 
 	auto& cols = m.Cols;
 
-	return SimdVector3(_mm_mul_ps(cols[0].Vec128, v0) + _mm_mul_ps(cols[1].Vec128, v1) +
+	auto res = SimdVector3(_mm_mul_ps(cols[0].Vec128, v0) + _mm_mul_ps(cols[1].Vec128, v1) +
 		_mm_mul_ps(cols[2].Vec128, v2) + _mm_mul_ps(cols[3].Vec128, v3));
+
+	res.Floats[3] = 0.0f;
+	return res;
 }
 
 template<int N>
 static inline SimdMatrix<N> operator*(const SimdMatrix<N>& m0, const SimdMatrix<N>& m1)
 {
-	SimdMatrix<4> res;
+	SimdMatrix<N> res;
 	__m128 m1ColValues[N];
 
 	for (auto i = 0; i < N; i++)
@@ -508,3 +517,8 @@ static inline SimdMatrix<N> operator*(const SimdMatrix<N>& m0, const SimdMatrix<
 
 	return res;
 }
+
+using Matrix3 = SimdMatrix<3>;
+using Matrix4 = SimdMatrix<4>;
+
+#endif // !USE_SIMD

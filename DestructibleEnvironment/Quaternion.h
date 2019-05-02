@@ -59,7 +59,7 @@ public:
 		auto halfCosAngle = 0.5f * cos(angle);
 		auto halfSinAngle = 0.5f * sin(angle);
 
-		return Quaternion(halfCosAngle, halfSinAngle * axis.x, halfSinAngle * axis.y, halfSinAngle * axis.z);
+		return Quaternion(halfCosAngle, halfSinAngle * axis.X(), halfSinAngle * axis.Y(), halfSinAngle * axis.Z());
 	}
 
 	static inline Quaternion LookRotation(const Vector3& forward)
@@ -77,24 +77,16 @@ public:
 
 		Quaternion q;
 
-		q.r = sqrt(MathU::Max(0.0f, 1.0f + x.x + y.y + z.z)) / 2.0f;
-		q.x = sqrt(MathU::Max(0.0f, 1.0f + x.x - y.y - z.z)) / 2.0f;
-		q.y = sqrt(MathU::Max(0.0f, 1.0f - x.x + y.y - z.z)) / 2.0f;
-		q.z = sqrt(MathU::Max(0.0f, 1.0f - x.x - y.y + z.z)) / 2.0f;
+		q.r = sqrt(MathU::Max(0.0f, 1.0f + x.X() + y.Y() + z.Z())) / 2.0f;
+		q.x = sqrt(MathU::Max(0.0f, 1.0f + x.X() - y.Y() - z.Z())) / 2.0f;
+		q.y = sqrt(MathU::Max(0.0f, 1.0f - x.X() + y.Y() - z.Z())) / 2.0f;
+		q.z = sqrt(MathU::Max(0.0f, 1.0f - x.X() - y.Y() + z.Z())) / 2.0f;
 
-		//q.x *= MathU::Sign(z.y - y.z);
-		//q.y *= MathU::Sign(x.z - z.x);
-		//q.z *= MathU::Sign(y.x - x.y);
-
-		q.x *= MathU::Sign(y.z - z.y);
-		q.y *= MathU::Sign(z.x - x.z);
-		q.z *= MathU::Sign(x.y - y.x);
+		q.x *= MathU::Sign(y.Z() - z.Y());
+		q.y *= MathU::Sign(z.X() - x.Z());
+		q.z *= MathU::Sign(x.Y() - y.X());
 
 		q.Normalize();
-
-		//auto xOut = q.RotateV(Vector3::Right());
-		//auto yOut = q.RotateV(Vector3::Up());
-		//auto zOut = q.RotateV(Vector3::Foward());
 
 		return q;
 	}
@@ -129,10 +121,10 @@ inline Quaternion operator*(const Quaternion& lhs, const Quaternion& rhs)
 
 inline Quaternion operator*(const Quaternion& lhs, const Vector3& rhs)
 {
-	return lhs * Quaternion(0.0f, rhs.x, rhs.y, rhs.z);
+	return lhs * Quaternion(0.0f, rhs.X(), rhs.Y(), rhs.Z());
 }
 
 inline Quaternion operator*(const Vector3& lhs, const Quaternion& rhs)
 {
-	return Quaternion(0.0f, lhs.x, lhs.y, lhs.z) * rhs;
+	return Quaternion(0.0f, lhs.X(), lhs.Y(), lhs.Z()) * rhs;
 }

@@ -30,13 +30,13 @@ public:
 
 	bool OverlapsWith(const AABB& other) const
 	{
-		if (std::abs(m_Centre.x - other.m_Centre.x) > (m_Extends.x + other.m_Extends.x))
+		if (std::abs(m_Centre.X() - other.m_Centre.X()) > (m_Extends.X() + other.m_Extends.X()))
 			return false;
 
-		if (std::abs(m_Centre.y - other.m_Centre.y) > (m_Extends.y + other.m_Extends.y))
+		if (std::abs(m_Centre.Y() - other.m_Centre.Y()) > (m_Extends.Y() + other.m_Extends.Y()))
 			return false;
 
-		if (std::abs(m_Centre.z - other.m_Centre.z) > (m_Extends.z + other.m_Extends.z))
+		if (std::abs(m_Centre.Z() - other.m_Centre.Z()) > (m_Extends.Z() + other.m_Extends.Z()))
 			return false;
 
 		return true;
@@ -69,23 +69,23 @@ public:
 
 	void Update(const Vector3& newPoint)
 	{
-		if (newPoint.x > m_XMax)
-			m_XMax = newPoint.x;
+		if (newPoint.X() > m_XMax)
+			m_XMax = newPoint.X();
 
-		if (newPoint.x < m_XMin)
-			m_XMin = newPoint.x;
+		if (newPoint.X() < m_XMin)
+			m_XMin = newPoint.X();
 
-		if (newPoint.y > m_YMax)
-			m_YMax = newPoint.y;
+		if (newPoint.Y() > m_YMax)
+			m_YMax = newPoint.Y();
 
-		if (newPoint.y < m_YMin)
-			m_YMin = newPoint.y;
+		if (newPoint.Y() < m_YMin)
+			m_YMin = newPoint.Y();
 
-		if (newPoint.z > m_ZMax)
-			m_ZMax = newPoint.z;
+		if (newPoint.Z() > m_ZMax)
+			m_ZMax = newPoint.Z();
 
-		if (newPoint.z < m_ZMin)
-			m_ZMin = newPoint.z;
+		if (newPoint.Z() < m_ZMin)
+			m_ZMin = newPoint.Z();
 	}
 
 	float GetXMin() const

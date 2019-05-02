@@ -17,6 +17,16 @@ public:
 			ShapePool::Return(*s);
 	}
 
+	void* operator new(size_t i)
+	{
+		return _mm_malloc(i, 16);
+	}
+
+	void operator delete(void* p)
+	{
+		_mm_free(p);
+	}
+
 	bool IntersectsRay(const Ray& worldRay, Vector3& intPoint);
 
 	const auto& GetSubShapes() const

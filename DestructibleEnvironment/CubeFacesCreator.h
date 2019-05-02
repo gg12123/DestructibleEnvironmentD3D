@@ -19,15 +19,15 @@ private:
 	{
 		auto s = Vector3(1.0f, 1.0f, 1.0f);
 
-		m_Points[0] = &PointPool::Take(M * Vector3(s.x, s.y, s.z));
-		m_Points[1] = &PointPool::Take(M * Vector3(-s.x, s.y, s.z));
-		m_Points[2] = &PointPool::Take(M * Vector3(-s.x, s.y, -s.z));
-		m_Points[3] = &PointPool::Take(M * Vector3(s.x, s.y, -s.z));
+		m_Points[0] = &PointPool::Take(M * Vector3(s.X(), s.Y(), s.Z()));
+		m_Points[1] = &PointPool::Take(M * Vector3(-s.X(), s.Y(), s.Z()));
+		m_Points[2] = &PointPool::Take(M * Vector3(-s.X(), s.Y(), -s.Z()));
+		m_Points[3] = &PointPool::Take(M * Vector3(s.X(), s.Y(), -s.Z()));
 
-		m_Points[4] = &PointPool::Take(M * Vector3(s.x, -s.y, s.z));
-		m_Points[5] = &PointPool::Take(M * Vector3(-s.x, -s.y, s.z));
-		m_Points[6] = &PointPool::Take(M * Vector3(-s.x, -s.y, -s.z));
-		m_Points[7] = &PointPool::Take(M * Vector3(s.x, -s.y, -s.z));
+		m_Points[4] = &PointPool::Take(M * Vector3(s.X(), -s.Y(), s.Z()));
+		m_Points[5] = &PointPool::Take(M * Vector3(-s.X(), -s.Y(), s.Z()));
+		m_Points[6] = &PointPool::Take(M * Vector3(-s.X(), -s.Y(), -s.Z()));
+		m_Points[7] = &PointPool::Take(M * Vector3(s.X(), -s.Y(), -s.Z()));
 	}
 
 	void CreateEdges()

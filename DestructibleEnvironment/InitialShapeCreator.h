@@ -16,7 +16,7 @@ public:
 		{
 			auto ex = ssData.Size / 2.0f;
 
-			auto M = Matrix4::FromTranslation(ssData.Centre) * Matrix4::FromScale(ex.x, ex.y, ex.z);
+			auto M = Matrix4::FromTranslation(ssData.Centre) * Matrix4::FromScale(ex.X(), ex.Y(), ex.Z());
 
 			auto& subShape = ShapePool::Take();
 			m_FacesCreator.CreateFaces(subShape, M, Quaternion::Identity());

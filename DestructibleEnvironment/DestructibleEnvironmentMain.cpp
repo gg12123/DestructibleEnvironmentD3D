@@ -81,6 +81,8 @@ void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 
 	auto pos = Vector3(0.0f, 1.0f, 0.0f);
 
+	auto x = 2.0f * pos;
+
 	for (auto i = 0; i < 5; i++)
 	{
 		m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(pos, Quaternion::Identity(),

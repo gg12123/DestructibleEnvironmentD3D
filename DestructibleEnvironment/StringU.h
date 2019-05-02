@@ -15,7 +15,7 @@ public:
 	template<>
 	static std::string ToString<Vector3>(const Vector3& val)
 	{
-		return "X = " + std::to_string(val.x) + " Y = " + std::to_string(val.y) + " Z = " + std::to_string(val.z);
+		return "X = " + std::to_string(val.X()) + " Y = " + std::to_string(val.Y()) + " Z = " + std::to_string(val.Z());
 	}
 
 	template<>

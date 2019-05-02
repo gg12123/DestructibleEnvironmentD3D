@@ -101,13 +101,13 @@ public:
 		auto max = c + e;
 		auto min = c - e;
 
-		r.XStart = static_cast<int>(std::floorf(min.x / m_SquareSize));
-		r.YStart = static_cast<int>(std::floorf(min.y / m_SquareSize));
-		r.ZStart = static_cast<int>(std::floorf(min.z / m_SquareSize));
+		r.XStart = static_cast<int>(std::floorf(min.X() / m_SquareSize));
+		r.YStart = static_cast<int>(std::floorf(min.Y() / m_SquareSize));
+		r.ZStart = static_cast<int>(std::floorf(min.Z() / m_SquareSize));
 
-		r.XEnd = static_cast<int>(std::floorf(max.x / m_SquareSize)) + 1;
-		r.YEnd = static_cast<int>(std::floorf(max.y / m_SquareSize)) + 1;
-		r.ZEnd = static_cast<int>(std::floorf(max.z / m_SquareSize)) + 1;
+		r.XEnd = static_cast<int>(std::floorf(max.X() / m_SquareSize)) + 1;
+		r.YEnd = static_cast<int>(std::floorf(max.Y() / m_SquareSize)) + 1;
+		r.ZEnd = static_cast<int>(std::floorf(max.Z() / m_SquareSize)) + 1;
 
 		return r;
 	}

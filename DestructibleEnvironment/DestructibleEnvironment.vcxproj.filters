@@ -483,6 +483,9 @@
     <ClInclude Include="SimdExperiments.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Simd.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">
