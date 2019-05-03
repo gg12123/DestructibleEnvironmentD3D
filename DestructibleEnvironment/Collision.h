@@ -9,6 +9,16 @@
 
 class Collision
 {
+private:
+	void AddBodyToPartition(const Rigidbody& body)
+	{
+		// This would be the time to clear any collision related data
+		// associated with this body - such as contacts by body.
+
+		for (auto s : body.GetSubShapes())
+			m_DynamicsPartition.AddObject(*s);
+	}
+
 public:
 	Collision() : m_DynamicsPartition(2.0f, 0.2f)
 	{
@@ -44,15 +54,14 @@ public:
 		}
 	}
 
-	void AddObject(Rigidbody& body)
-	{
-		for (auto s : body.GetSubShapes())
-			m_DynamicsPartition.AddObject(*s);
-	}
-
 	void FindContacts(const std::vector<std::unique_ptr<StaticBody>>& staticBodies,
 		const std::vector<std::unique_ptr<Rigidbody>>& dynamicBodies)
 	{
+		m_Detector.PrepareToFindContacts();
+
+		for (auto& db : dynamicBodies)
+			AddBodyToPartition(*db);
+
 		// Handle collision between dynamic objects
 		m_DynamicsPartition.Run(*this);
 
@@ -95,5 +104,5 @@ private:
 	CollisionDetector m_Detector;
 	HGrid<Shape, Collision> m_DynamicsPartition;
 	ManifoldInitializer m_ManifoldInit;
-	std::vector<Vector3> m_ContactPoints;
+	SimdStdVector<Vector3> m_ContactPoints;
 };

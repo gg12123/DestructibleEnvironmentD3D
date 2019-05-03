@@ -2,7 +2,6 @@
 #include "PhysicsObject.h"
 #include "Shape.h"
 #include "CollisionData.h"
-#include "CollisionResponder.h"
 #include "Face.h"
 #include "PhysicsTime.h"
 

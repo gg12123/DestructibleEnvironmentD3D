@@ -15,8 +15,8 @@ class CollisionDetector
 private:
 	struct CollisionContext
 	{
-		Vector3 Vector = Vector3(1.0f, 0.0f, 0.0f);
-		bool SeperatedOnPrevTick = false;
+		uint64 TimeStamp = 0ull;
+		int IndexOfSimplex;
 	};
 
 	void TransformPointsToShape1sSpace(const Shape& shape2)
@@ -42,8 +42,6 @@ private:
 
 		m_ToShape1sSpace = t1.GetWorldToLocalMatrix() * t2.GetLocalToWorldMatrix();
 		m_DirToShape1sSpace = t1.GetWorldToLocalRotation() * t2.GetLocalToWorldRotation();
-		m_ToShape2sSpace = t2.GetWorldToLocalMatrix() * t1.GetLocalToWorldMatrix();
-		m_DirToShape2sSpace = m_DirToShape1sSpace.Conj();
 		m_ActiveTransform = &t1;
 	}
 
@@ -52,8 +50,26 @@ private:
 		return m_CollisionContexts.Get(shape1.GetShapeId(), shape2.GetShapeId());
 	}
 
+	GjkCollisionDetector::Simplex GetInitialSimplex(const CollisionContext& context, const GjkInputShape& shape1, const GjkInputShape& shape2)
+	{
+		if (context.TimeStamp == m_CurrTimeStamp)
+		{
+			auto& s = m_Simplices[context.IndexOfSimplex];
+			s.ReCalculatePoints(shape1, shape2);
+			return s;
+		}
+		return GjkCollisionDetector::Simplex();
+	}
+
 public:
-	bool FindContact(const Shape& shape1, const Shape& shape2, ContactPlane& contact, std::vector<Vector3>& contactPoints)
+	void PrepareToFindContacts()
+	{
+		m_SimplicesNext.swap(m_Simplices);
+		m_CurrTimeStamp++;
+		m_SimplicesNext.clear();
+	}
+
+	bool FindContact(const Shape& shape1, const Shape& shape2, ContactPlane& contact, SimdStdVector<Vector3>& contactPoints)
 	{
 		InitTransformMatrices(shape1.GetOwner(), shape2.GetOwner());
 
@@ -62,8 +78,14 @@ public:
 		auto gjkShape1 = GjkInputShape(shape1.GetCachedPoints(), shape1.GetCentre());
 		auto gjkShape2 = GjkInputShape(m_TransformedPoints, m_ToShape1sSpace * shape2.GetCentre());
 
-		GjkCollisionDetector::Simplex simplex;
+		auto& context = GetCollisionContext(shape1, shape2);
+		auto simplex = GetInitialSimplex(context, gjkShape1, gjkShape2);
+
 		auto gjkRes = m_GjkDetector.Run(gjkShape1, gjkShape2, simplex);
+
+		context.TimeStamp = m_CurrTimeStamp + 1;
+		context.IndexOfSimplex = m_SimplicesNext.size();
+		m_SimplicesNext.emplace_back(simplex);
 
 		switch (gjkRes)
 		{
@@ -115,15 +137,18 @@ public:
 	}
 
 private:
-	std::vector<Vector3> m_TransformedPoints;
-	std::vector<Vector3> m_TransformedNormals;
+	SimdStdVector<Vector3> m_TransformedPoints;
+	SimdStdVector<Vector3> m_TransformedNormals;
+
+	SimdStdVector<GjkCollisionDetector::Simplex> m_Simplices;
+	SimdStdVector<GjkCollisionDetector::Simplex> m_SimplicesNext;
+
 	Matrix4 m_ToShape1sSpace;
-	Matrix4 m_ToShape2sSpace;
 	Quaternion m_DirToShape1sSpace;
-	Quaternion m_DirToShape2sSpace;
 	const Transform* m_ActiveTransform;
 	ContactPointFinder m_ContactPointFinder;
 	DynamicTriangleArray<CollisionContext> m_CollisionContexts;
 	GjkCollisionDetector m_GjkDetector;
 	EpaContact m_EpaContactFinder;
+	uint64 m_CurrTimeStamp = 0ull;
 };

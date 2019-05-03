@@ -2,7 +2,6 @@
 #include "PhysicsObject.h"
 #include "Shape.h"
 #include "CollisionData.h"
-#include "CollisionResponder.h"
 #include "Face.h"
 #include "PhysicsTime.h"
 #include "Constraints.h"
@@ -106,7 +105,7 @@ private:
 		}
 	};
 
-	ContactManifold SetUpManifold(const Shape& shape1, const Shape& shape2, std::vector<NormalContactConstraint>& constraints, const Vector3& warmStartFriction) const
+	ContactManifold SetUpManifold(const Shape& shape1, const Shape& shape2, SimdStdVector<NormalContactConstraint>& constraints, const Vector3& warmStartFriction) const
 	{
 		auto centre = Vector3::Zero();
 		auto end = static_cast<int>(constraints.size());
@@ -174,7 +173,7 @@ public:
 	}
 
 	void InitManifold(const Shape& shape1, const Shape& shape2,
-		const std::vector<Vector3>& contactPoints,
+		const SimdStdVector<Vector3>& contactPoints,
 		const ContactPlane& contactPlane)
 	{
 		static constexpr auto doWarmStartNormal = true;
@@ -262,11 +261,11 @@ public:
 private:
 	int m_StartOfCurrManifold;
 
-	std::vector<NormalContactConstraint> m_NormalContactContraints;
-	std::vector<ContactManifold> m_Manifolds;
+	SimdStdVector<NormalContactConstraint> m_NormalContactContraints;
+	SimdStdVector<ContactManifold> m_Manifolds;
 
-	std::vector<StoredAccImpulse> m_NormalAccImpulses;
-	std::vector<Vector3> m_FrictionAccImpulses;
+	SimdStdVector<StoredAccImpulse> m_NormalAccImpulses;
+	SimdStdVector<Vector3> m_FrictionAccImpulses;
 
 	uint64 m_CurrTimeStamp;
 	DynamicTriangleArray<ManifoldContext> m_Contexts;

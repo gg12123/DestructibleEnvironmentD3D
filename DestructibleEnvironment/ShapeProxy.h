@@ -70,6 +70,6 @@ protected:
 	virtual CompoundShape& RegisterWithPhysics() = 0;
 private:
 	CompoundShape * m_Shape = nullptr;
-	std::vector<SubShapeData> m_SubShapes;
+	SimdStdVector<SubShapeData> m_SubShapes;
 	std::vector<SubShapeLink> m_SubShapeLinks;
 };

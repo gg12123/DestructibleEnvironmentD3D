@@ -1,9 +1,10 @@
 #pragma once
+#include "ByteAlignment.h"
 #include "Transform.h"
 
 class World;
 
-class Entity
+class Entity : public AlignedObject16
 {
 public:
 	virtual ~Entity()
@@ -29,16 +30,6 @@ public:
 	T* As()
 	{
 		return dynamic_cast<T*>(this);
-	}
-
-	void* operator new(size_t i)
-	{
-		return _mm_malloc(i, 16);
-	}
-
-	void operator delete(void* p)
-	{
-		_mm_free(p);
 	}
 
 protected:

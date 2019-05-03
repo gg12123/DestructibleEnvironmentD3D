@@ -15,21 +15,11 @@ class Shape;
 /**
  * 
  */
-class ShapeEdge : public ObjectWithHash<ShapeEdge>
+class ShapeEdge : public ObjectWithHash<ShapeEdge>, public AlignedObject16
 {
 public:
 	ShapeEdge()
 	{
-	}
-
-	void* operator new(size_t i)
-	{
-		return _mm_malloc(i, 16);
-	}
-
-	void operator delete(void* p)
-	{
-		_mm_free(p);
 	}
 
 	void OnTakenFromPool(ShapePoint& p0, ShapePoint& p1)

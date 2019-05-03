@@ -15,21 +15,11 @@ class ShapeEdge;
 class Face;
 class CompoundShape;
 
-class Shape : public LastCheckedAgainst<const Shape*>, public ObjectWithHash<Shape>
+class Shape : public LastCheckedAgainst<const Shape*>, public ObjectWithHash<Shape>, public AlignedObject16
 {
 public:
 	Shape()
 	{
-	}
-
-	void* operator new(size_t i)
-	{
-		return _mm_malloc(i, 16);
-	}
-
-	void operator delete(void* p)
-	{
-		_mm_free(p);
 	}
 
 	int GetShapeId() const
@@ -185,8 +175,8 @@ private:
 	std::vector<ShapePoint*> m_PointObjects;
 	std::vector<ShapeEdge*> m_EdgeObjects;
 
-	std::vector<Vector3> m_CachedPoints;
-	std::vector<Vector3> m_CachedFaceNormals;
+	SimdStdVector<Vector3> m_CachedPoints;
+	SimdStdVector<Vector3> m_CachedFaceNormals;
 	std::vector<int> m_FaceP0Indexes;
 	std::vector<int> m_EdgeIndexesPoints;
 	std::vector<int> m_EdgeIndexesFaces;

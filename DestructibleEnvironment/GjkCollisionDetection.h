@@ -8,7 +8,7 @@
 class GjkInputShape
 {
 public:
-	GjkInputShape(const std::vector<Vector3>& points, const Vector3& centroid) : m_Points(&points), m_Centroid(centroid)
+	GjkInputShape(const SimdStdVector<Vector3>& points, const Vector3& centroid) : m_Points(&points), m_Centroid(centroid)
 	{
 	}
 
@@ -41,7 +41,7 @@ public:
 	}
 
 private:
-	const std::vector<Vector3>* m_Points;
+	const SimdStdVector<Vector3>* m_Points;
 	Vector3 m_Centroid;
 };
 
@@ -74,6 +74,14 @@ public:
 			IndexesA[NumPoints] = iA;
 			IndexesB[NumPoints] = iB;
 			NumPoints++;
+		}
+
+		void ReCalculatePoints(const GjkInputShape& shapeA, const GjkInputShape shapeB)
+		{
+			for (auto i = 0; i < NumPoints; i++)
+			{
+				Points[i] = shapeA.GetPointAt(IndexesA[i]) - shapeB.GetPointAt(IndexesB[i]);
+			}
 		}
 	};
 

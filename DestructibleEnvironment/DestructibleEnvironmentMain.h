@@ -7,23 +7,13 @@
 // Renders Direct2D and 3D content on the screen.
 namespace DestructibleEnvironment
 {
-	class DestructibleEnvironmentMain : public DX::IDeviceNotify
+	class DestructibleEnvironmentMain : public DX::IDeviceNotify, public AlignedObject16
 	{
 	public:
 		DestructibleEnvironmentMain(const std::shared_ptr<DX::DeviceResources>& deviceResources,
 			const WindowsInput^ input);
 
 		~DestructibleEnvironmentMain();
-
-		void* operator new(size_t i)
-		{
-			return _mm_malloc(i, 16);
-		}
-
-		void operator delete(void* p)
-		{
-			_mm_free(p);
-		}
 
 		void CreateWindowSizeDependentResources();
 		void Update();

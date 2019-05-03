@@ -16,7 +16,7 @@ private:
 		m_ContactPoints.emplace_back(p);
 	}
 
-	void FindPointsInContact(const SatInputShape& shape, std::vector<bool>& isInContact, std::vector<Vector3>& pointsInContact, const ContactPlane& contactPlane)
+	void FindPointsInContact(const SatInputShape& shape, std::vector<bool>& isInContact, SimdStdVector<Vector3>& pointsInContact, const ContactPlane& contactPlane)
 	{
 		auto n = contactPlane.GetNormal();
 
@@ -104,7 +104,7 @@ private:
 		return true;
 	}
 
-	void FindPointInPolyContactPoints(const SatInputShape& shape, const std::vector<Vector3>& points)
+	void FindPointInPolyContactPoints(const SatInputShape& shape, const SimdStdVector<Vector3>& points)
 	{
 		for (auto& p : points)
 		{
@@ -143,13 +143,13 @@ private:
 	std::vector<bool> m_ShapeAPointIsInContact;
 	std::vector<bool> m_ShapeBPointIsInContact;
 
-	std::vector<Vector3> m_ShapeAInContactPoints;
-	std::vector<Vector3> m_ShapeBInContactPoints;
+	SimdStdVector<Vector3> m_ShapeAInContactPoints;
+	SimdStdVector<Vector3> m_ShapeBInContactPoints;
 
 	std::vector<int> m_ShapeAEdgesInContact;
 	std::vector<int> m_ShapeBEdgesInContact;
 
-	std::vector<Vector3> m_ContactPoints;
+	SimdStdVector<Vector3> m_ContactPoints;
 
 	Vector3 m_ContactPlaneNormal;
 };

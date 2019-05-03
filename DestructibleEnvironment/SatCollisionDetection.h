@@ -52,7 +52,7 @@ private:
 		return false;
 	}
 
-	UpdatableBound<float> CalculateBound(const Vector3& n, const std::vector<Vector3>& points) const
+	UpdatableBound<float> CalculateBound(const Vector3& n, const SimdStdVector<Vector3>& points) const
 	{
 		auto b = UpdatableBound<float>();
 
@@ -75,7 +75,7 @@ private:
 
 		auto aSpaceToBSpace = tB.GetWorldToLocalMatrix() * tA.GetLocalToWorldMatrix();
 
-		static std::vector<Vector3> pointsATransformed;
+		static SimdStdVector<Vector3> pointsATransformed;
 
 		pointsATransformed.clear();
 		for (auto& p : pointsA)

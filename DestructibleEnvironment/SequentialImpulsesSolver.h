@@ -1,11 +1,11 @@
 #pragma once
-#include "CollisionResponder.h"
 #include "StringU.h"
+#include "Constraints.h"
 
 class SequentialImpulsesSolver
 {
 private:
-	float Iterate(std::vector<NormalContactConstraint>& contacts, std::vector<ContactManifold>& manifolds) const
+	float Iterate(SimdStdVector<NormalContactConstraint>& contacts, SimdStdVector<ContactManifold>& manifolds) const
 	{
 		auto impSum = 0.0f;
 
@@ -32,7 +32,7 @@ private:
 	}
 
 public:
-	void Solve(std::vector<NormalContactConstraint>& contacts, std::vector<ContactManifold>& manifolds) const
+	void Solve(SimdStdVector<NormalContactConstraint>& contacts, SimdStdVector<ContactManifold>& manifolds) const
 	{
 		if (manifolds.size() == 0u)
 			return;

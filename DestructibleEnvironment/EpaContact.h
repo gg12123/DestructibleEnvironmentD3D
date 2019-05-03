@@ -41,7 +41,7 @@ private:
 	class MinowskiDifferenceFace
 	{
 	private:
-		Vector3 FindPointToRefFrom(const std::vector<MinowPoint>& points, const Vector3& p0, const Vector3& n) const
+		Vector3 FindPointToRefFrom(const SimdStdVector<MinowPoint>& points, const Vector3& p0, const Vector3& n) const
 		{
 			auto maxComp = MathU::NegativeInfinity;
 			const Vector3* refP = nullptr;
@@ -59,7 +59,7 @@ private:
 		}
 
 	public:
-		MinowskiDifferenceFace(int p0, int p1, int p2, const std::vector<MinowPoint>& points, const Vector3& refCentre) :
+		MinowskiDifferenceFace(int p0, int p1, int p2, const SimdStdVector<MinowPoint>& points, const Vector3& refCentre) :
 			m_P0(p0), m_P1(p1), m_P2(p2)
 		{
 			static constexpr auto degenTol = 0.0001f;
@@ -126,7 +126,7 @@ private:
 			return m_N;
 		}
 
-		ContactPlane ToContact(const GjkInputShape& shapeA, const GjkInputShape& shapeB, const std::vector<MinowPoint>& points) const
+		ContactPlane ToContact(const GjkInputShape& shapeA, const GjkInputShape& shapeB, const SimdStdVector<MinowPoint>& points) const
 		{
 			auto p = m_D * m_N;
 
@@ -392,9 +392,9 @@ public:
 	}
 
 private:
-	std::vector<MinowskiDifferenceFace> m_Faces;
-	std::vector<MinowskiDifferenceFace> m_FacesNext;
-	std::vector<MinowPoint> m_Points;
+	SimdStdVector<MinowskiDifferenceFace> m_Faces;
+	SimdStdVector<MinowskiDifferenceFace> m_FacesNext;
+	SimdStdVector<MinowPoint> m_Points;
 	DynamicTriangleArray<int> m_TimesRemovedFrom;
 	std::vector<Edge> m_EdgesRemovedFrom;
 	Vector3 m_ContainedPoint;

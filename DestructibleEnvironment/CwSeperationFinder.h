@@ -7,7 +7,7 @@
 class CwInputShape
 {
 public:
-	CwInputShape(const std::vector<Vector3>& points) : m_Points(&points)
+	CwInputShape(const SimdStdVector<Vector3>& points) : m_Points(&points)
 	{
 	}
 
@@ -30,13 +30,13 @@ protected:
 	}
 
 private:
-	const std::vector<Vector3>* m_Points;
+	const SimdStdVector<Vector3>* m_Points;
 };
 
 class CwInputShapeA : CwInputShape
 {
 public:
-	CwInputShapeA(const std::vector<Vector3>& points) :
+	CwInputShapeA(const SimdStdVector<Vector3>& points) :
 		CwInputShape(points)
 	{
 	}
@@ -50,7 +50,7 @@ public:
 class CwInputShapeB : CwInputShape
 {
 public:
-	CwInputShapeB(const std::vector<Vector3>& points, const Quaternion& toB, const Matrix4& toA) :
+	CwInputShapeB(const SimdStdVector<Vector3>& points, const Quaternion& toB, const Matrix4& toA) :
 		CwInputShape(points),
 		m_ToASpace(toA),
 		m_ToBSpace(toB)

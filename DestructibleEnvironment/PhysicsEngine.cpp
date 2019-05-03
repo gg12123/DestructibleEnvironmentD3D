@@ -28,9 +28,6 @@ void PhysicsEngine::ApplyExternalForcesAndImpulses() const
 
 void PhysicsEngine::FindContacts()
 {
-	for (auto& b : m_DynamicBodies)
-		m_Collision.AddObject(*b);
-
 	m_Collision.FindContacts(m_StaticBodies, m_DynamicBodies);
 }
 

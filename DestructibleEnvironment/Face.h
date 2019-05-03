@@ -72,19 +72,9 @@ private:
 /**
  * 
  */
-class Face : public ObjectWithHash<Face>
+class Face : public ObjectWithHash<Face>, public AlignedObject16
 {
 public:
-	void* operator new(size_t i)
-	{
-		return _mm_malloc(i, 16);
-	}
-
-	void operator delete(void* p)
-	{
-		_mm_free(p);
-	}
-
 	Plane ToPlane() const
 	{
 		return Plane(m_Normal, m_CachedPoints[0]);
@@ -220,7 +210,7 @@ private:
 	}
 
 	// all points related collections must be parralel.
-	std::vector<Vector3> m_CachedPoints;
+	SimdStdVector<Vector3> m_CachedPoints;
 	std::vector<ShapePoint*> m_PointObjects;
 	std::vector<ShapeEdge*> m_EdgeObjects;
 

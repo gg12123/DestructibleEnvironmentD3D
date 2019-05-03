@@ -200,6 +200,7 @@
     <ClInclude Include="App.h" />
     <ClInclude Include="BodyCollectionBounds.h" />
     <ClInclude Include="Bounds.h" />
+    <ClInclude Include="ByteAlignment.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CleanIntersectionFinder.h" />
     <ClInclude Include="CleanIntersectionsWrapper.h" />
@@ -207,7 +208,6 @@
     <ClInclude Include="Collision.h" />
     <ClInclude Include="CollisionData.h" />
     <ClInclude Include="CollisionDetector.h" />
-    <ClInclude Include="CollisionResponder.h" />
     <ClInclude Include="Common\DeviceResources.h" />
     <ClInclude Include="CompoundShape.h" />
     <ClInclude Include="Constraints.h" />
@@ -271,7 +271,6 @@
     <ClInclude Include="RayCasting.h" />
     <ClInclude Include="RayShooter.h" />
     <ClInclude Include="ReadOnlyInput.h" />
-    <ClInclude Include="RedundantPointRemover.h" />
     <ClInclude Include="SatCollisionDetection.h" />
     <ClInclude Include="SatOptimisedCollisionDetection.h" />
     <ClInclude Include="SequentialImpulsesSolver.h" />
@@ -314,7 +313,6 @@
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="CollisionResponder.cpp" />
     <ClCompile Include="Common\DeviceResources.cpp" />
     <ClCompile Include="CompoundShape.cpp" />
     <ClCompile Include="Debug.cpp" />

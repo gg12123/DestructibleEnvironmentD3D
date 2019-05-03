@@ -75,5 +75,5 @@ public:
 	}
 
 private:
-	std::vector<EdgeFaceIntersection> m_Intersections;
+	SimdStdVector<EdgeFaceIntersection> m_Intersections;
 };

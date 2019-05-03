@@ -8,7 +8,6 @@
 #include "CleanIntersectionFinder.h"
 #include "FaceIterator.h"
 #include "ShapeElementPool.h"
-#include "RedundantPointRemover.h"
 #include "FaceTriangulator.h"
 #include "NewShapeGeometryCreator.h"
 #include "InPlaneFacesCreator.h"

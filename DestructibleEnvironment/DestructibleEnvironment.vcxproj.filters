@@ -133,9 +133,6 @@
     <ClCompile Include="StaticShapeProxy.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
-    <ClCompile Include="CollisionResponder.cpp">
-      <Filter>Physics\CollisionStuff</Filter>
-    </ClCompile>
     <ClCompile Include="Quaternion.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
@@ -265,9 +262,6 @@
       <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
     <ClInclude Include="CollisionDetector.h">
-      <Filter>Physics\CollisionStuff</Filter>
-    </ClInclude>
-    <ClInclude Include="CollisionResponder.h">
       <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
     <ClInclude Include="Bounds.h">
@@ -402,9 +396,6 @@
     <ClInclude Include="PlaneMesh.h">
       <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="RedundantPointRemover.h">
-      <Filter>Physics\ShapeAndSplitRelated</Filter>
-    </ClInclude>
     <ClInclude Include="FaceTriangulator.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
@@ -484,6 +475,9 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Simd.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ByteAlignment.h">
       <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
