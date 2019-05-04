@@ -480,6 +480,9 @@
     <ClInclude Include="ByteAlignment.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="ContactContexts.h">
+      <Filter>Physics\CollisionStuff</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">

@@ -6,28 +6,7 @@
 #include "PhysicsTime.h"
 #include "Constraints.h"
 #include "Debug.h"
-#include "DynamicTriangleArray.h"
-
-struct StdVectorRange
-{
-	int Start;
-	int End;
-
-	int Size() const
-	{
-		return End - Start;
-	}
-
-	StdVectorRange(int s, int e)
-	{
-		Start = s;
-		End = e;
-	}
-
-	StdVectorRange() : Start(0), End(0)
-	{
-	}
-};
+#include "ContactContexts.h"
 
 class ContactManifold
 {
@@ -86,13 +65,6 @@ private:
 class ManifoldInitializer
 {
 private:
-	struct ManifoldContext
-	{
-		uint64 TimeStamp = 0;
-		StdVectorRange ContactPointsRange;
-		int FrictionImpulseIndex;
-	};
-
 	struct StoredAccImpulse
 	{
 		float Impulse;
@@ -132,22 +104,7 @@ private:
 		return ContactManifold(shape1, shape2, ncRange, dirA, dirB, centre, warmStartFriction);
 	}
 
-	ManifoldContext* GetContext(const Shape& shape1, const Shape& shape2)
-	{
-		auto& c = ForceGetContext(shape1, shape2);
-
-		if (c.TimeStamp == m_CurrTimeStamp)
-			return &c;
-
-		return nullptr;
-	}
-
-	ManifoldContext& ForceGetContext(const Shape& shape1, const Shape& shape2)
-	{
-		return m_Contexts.Get(shape1.GetShapeId(), shape2.GetShapeId());
-	}
-
-	float FindWarmStartAccImpulse(const ManifoldContext& context, const Vector3& cp, const Vector3& n) const
+	float FindWarmStartAccImpulse(const ContactContext& context, const Vector3& cp, const Vector3& n) const
 	{
 		auto& range = context.ContactPointsRange;
 		auto imp = 0.0f;
@@ -168,13 +125,14 @@ private:
 	}
 
 public:
-	ManifoldInitializer() : m_CurrTimeStamp(1)
+	ManifoldInitializer()
 	{
 	}
 
 	void InitManifold(const Shape& shape1, const Shape& shape2,
 		const SimdStdVector<Vector3>& contactPoints,
-		const ContactPlane& contactPlane)
+		const ContactPlane& contactPlane,
+		ContactContext& context)
 	{
 		static constexpr auto doWarmStartNormal = true;
 		static constexpr auto doWarmStartFriction = true;
@@ -190,14 +148,13 @@ public:
 		auto n = contactPlane.GetNormal();
 		auto pen = contactPlane.GetPeneration();
 
-		auto context = GetContext(shape1, shape2);
-		if (doWarmStartNormal && context)
+		if (doWarmStartNormal && context.InContactOnPrevTick())
 		{
 			// Warm start
 			for (auto& p : contactPoints)
 			{
 				auto nc = NormalContactConstraint(shape1, shape2, n, p, pen);
-				nc.WarmStart(FindWarmStartAccImpulse(*context, p, n));
+				nc.WarmStart(FindWarmStartAccImpulse(context, p, n));
 
 				m_NormalContactContraints.emplace_back(nc);
 			}
@@ -211,21 +168,15 @@ public:
 			}
 		}
 
-		auto frictionWarmStart = doWarmStartFriction && context ?
-			m_FrictionAccImpulses[context->FrictionImpulseIndex] :
+		auto frictionWarmStart = doWarmStartFriction && context.InContactOnPrevTick() ?
+			m_FrictionAccImpulses[context.FrictionImpulseIndex] :
 			Vector3::Zero();
 
 		m_Manifolds.emplace_back(SetUpManifold(shape1, shape2, m_NormalContactContraints, frictionWarmStart));
 	}
 
-	void StoreAccumulatedImpulsesForNextTick()
+	void StoreAccumulatedImpulsesForNextTick(ContactContexts& contexts)
 	{
-		m_CurrTimeStamp++;
-
-		// TODO - As uint64 is so big I dont think this will ever throw.
-		// Must check though.
-		assert(m_CurrTimeStamp < (std::numeric_limits<uint64>::max)());
-
 		m_FrictionAccImpulses.clear();
 		m_NormalAccImpulses.clear();
 
@@ -238,10 +189,9 @@ public:
 		{
 			m_FrictionAccImpulses.emplace_back(m.GetAccumulatedFrictionImpulse());
 
-			auto& context = ForceGetContext(m.GetShape1(), m.GetShape2());
+			auto& context = contexts.GetContext(m.GetShape1(), m.GetShape2());
 			context.ContactPointsRange = m.GetNormalConstraintRange();
 			context.FrictionImpulseIndex = m_FrictionAccImpulses.size() - 1;
-			context.TimeStamp = m_CurrTimeStamp;
 		}
 
 		m_Manifolds.clear();
@@ -266,7 +216,4 @@ private:
 
 	SimdStdVector<StoredAccImpulse> m_NormalAccImpulses;
 	SimdStdVector<Vector3> m_FrictionAccImpulses;
-
-	uint64 m_CurrTimeStamp;
-	DynamicTriangleArray<ManifoldContext> m_Contexts;
 };

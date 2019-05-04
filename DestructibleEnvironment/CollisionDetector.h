@@ -9,16 +9,11 @@
 #include "ContactPointFinder.h"
 #include "GjkCollisionDetection.h"
 #include "EpaContact.h"
+#include "ContactContexts.h"
 
 class CollisionDetector
 {
 private:
-	struct CollisionContext
-	{
-		uint64 TimeStamp = 0ull;
-		int IndexOfSimplex;
-	};
-
 	void TransformPointsToShape1sSpace(const Shape& shape2)
 	{
 		m_TransformedPoints.clear();
@@ -45,14 +40,9 @@ private:
 		m_ActiveTransform = &t1;
 	}
 
-	CollisionContext& GetCollisionContext(const Shape& shape1, const Shape& shape2)
+	GjkCollisionDetector::Simplex GetInitialSimplex(const ContactContext& context, const GjkInputShape& shape1, const GjkInputShape& shape2)
 	{
-		return m_CollisionContexts.Get(shape1.GetShapeId(), shape2.GetShapeId());
-	}
-
-	GjkCollisionDetector::Simplex GetInitialSimplex(const CollisionContext& context, const GjkInputShape& shape1, const GjkInputShape& shape2)
-	{
-		if (context.TimeStamp == m_CurrTimeStamp)
+		if (context.TestedOnPrevTick)
 		{
 			auto& s = m_Simplices[context.IndexOfSimplex];
 			s.ReCalculatePoints(shape1, shape2);
@@ -65,11 +55,10 @@ public:
 	void PrepareToFindContacts()
 	{
 		m_SimplicesNext.swap(m_Simplices);
-		m_CurrTimeStamp++;
 		m_SimplicesNext.clear();
 	}
 
-	bool FindContact(const Shape& shape1, const Shape& shape2, ContactPlane& contact, SimdStdVector<Vector3>& contactPoints)
+	bool FindContact(const Shape& shape1, const Shape& shape2, ContactContext& context, ContactPlane& contact, SimdStdVector<Vector3>& contactPoints)
 	{
 		InitTransformMatrices(shape1.GetOwner(), shape2.GetOwner());
 
@@ -78,12 +67,10 @@ public:
 		auto gjkShape1 = GjkInputShape(shape1.GetCachedPoints(), shape1.GetCentre());
 		auto gjkShape2 = GjkInputShape(m_TransformedPoints, m_ToShape1sSpace * shape2.GetCentre());
 
-		auto& context = GetCollisionContext(shape1, shape2);
 		auto simplex = GetInitialSimplex(context, gjkShape1, gjkShape2);
 
 		auto gjkRes = m_GjkDetector.Run(gjkShape1, gjkShape2, simplex);
 
-		context.TimeStamp = m_CurrTimeStamp + 1;
 		context.IndexOfSimplex = m_SimplicesNext.size();
 		m_SimplicesNext.emplace_back(simplex);
 
@@ -147,8 +134,6 @@ private:
 	Quaternion m_DirToShape1sSpace;
 	const Transform* m_ActiveTransform;
 	ContactPointFinder m_ContactPointFinder;
-	DynamicTriangleArray<CollisionContext> m_CollisionContexts;
 	GjkCollisionDetector m_GjkDetector;
 	EpaContact m_EpaContactFinder;
-	uint64 m_CurrTimeStamp = 0ull;
 };

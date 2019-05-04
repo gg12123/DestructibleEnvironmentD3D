@@ -211,6 +211,7 @@
     <ClInclude Include="Common\DeviceResources.h" />
     <ClInclude Include="CompoundShape.h" />
     <ClInclude Include="Constraints.h" />
+    <ClInclude Include="ContactContexts.h" />
     <ClInclude Include="ContactManifold.h" />
     <ClInclude Include="ContactPointFinder.h" />
     <ClInclude Include="CwSeperationFinder.h" />

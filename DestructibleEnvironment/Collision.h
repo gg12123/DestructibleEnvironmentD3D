@@ -6,6 +6,7 @@
 #include "StaticBody.h"
 #include "HGrid.h"
 #include "ContactManifold.h"
+#include "ContactContexts.h"
 
 class Collision
 {
@@ -46,18 +47,25 @@ public:
 			shape2 = &shapeA;
 		}
 
+		auto& c = m_Contexts.InitContext(*shape1, *shape2);
+		auto inContact = false;
+
 		ContactPlane contactPlane;
 		m_ContactPoints.clear();
-		if (m_Detector.FindContact(*shape1, *shape2, contactPlane, m_ContactPoints))
+		if (m_Detector.FindContact(*shape1, *shape2, c, contactPlane, m_ContactPoints))
 		{
-			m_ManifoldInit.InitManifold(*shape1, *shape2, m_ContactPoints, contactPlane);
+			m_ManifoldInit.InitManifold(*shape1, *shape2, m_ContactPoints, contactPlane, c);
+			inContact = m_ContactPoints.size() > 0u;
 		}
+
+		c.SetInContact(inContact);
 	}
 
 	void FindContacts(const std::vector<std::unique_ptr<StaticBody>>& staticBodies,
 		const std::vector<std::unique_ptr<Rigidbody>>& dynamicBodies)
 	{
 		m_Detector.PrepareToFindContacts();
+		m_Contexts.OnContactFindingStart();
 
 		for (auto& db : dynamicBodies)
 			AddBodyToPartition(*db);
@@ -97,7 +105,7 @@ public:
 
 	void StoreAccImpulses()
 	{
-		m_ManifoldInit.StoreAccumulatedImpulsesForNextTick();
+		m_ManifoldInit.StoreAccumulatedImpulsesForNextTick(m_Contexts);
 	}
 
 private:
@@ -105,4 +113,5 @@ private:
 	HGrid<Shape, Collision> m_DynamicsPartition;
 	ManifoldInitializer m_ManifoldInit;
 	SimdStdVector<Vector3> m_ContactPoints;
+	ContactContexts m_Contexts;
 };
