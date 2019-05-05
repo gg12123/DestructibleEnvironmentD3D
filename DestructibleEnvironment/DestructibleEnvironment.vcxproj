@@ -230,6 +230,7 @@
     <ClInclude Include="InputChannel.h" />
     <ClInclude Include="InputChannelWrapper.h" />
     <ClInclude Include="IntersectionLoop.h" />
+    <ClInclude Include="Islands.h" />
     <ClInclude Include="IterationAboutShape.h" />
     <ClInclude Include="LastCheckedAgainst.h" />
     <ClInclude Include="MapToFaceRelationship.h" />

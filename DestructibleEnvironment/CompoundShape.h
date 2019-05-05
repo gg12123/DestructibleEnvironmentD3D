@@ -17,6 +17,10 @@ public:
 			ShapePool::Return(*s);
 	}
 
+	int GetCompoundShapeId() const;
+
+	bool IsStatic() const;
+
 	bool IntersectsRay(const Ray& worldRay, Vector3& intPoint);
 
 	const auto& GetSubShapes() const

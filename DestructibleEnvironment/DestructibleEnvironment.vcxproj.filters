@@ -483,6 +483,9 @@
     <ClInclude Include="ContactContexts.h">
       <Filter>Physics\CollisionStuff</Filter>
     </ClInclude>
+    <ClInclude Include="Islands.h">
+      <Filter>Physics\Dynamics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">

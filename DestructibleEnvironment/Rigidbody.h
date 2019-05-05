@@ -5,12 +5,18 @@
 #include "CollisionData.h"
 #include "SplitInfo.h"
 
+class Island;
+
 class Rigidbody : public PhysicsObject
 {
 public:
 	Rigidbody()
 	{
 	}
+
+	void ClearIsland();
+	void SetIsland(const Island& island);
+	Island* GetIsland() const;
 
 	void InitMassProperties(const Transform& refTran);
 
