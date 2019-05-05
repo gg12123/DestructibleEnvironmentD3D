@@ -19,8 +19,6 @@ public:
 
 	int GetCompoundShapeId() const;
 
-	bool IsStatic() const;
-
 	bool IntersectsRay(const Ray& worldRay, Vector3& intPoint);
 
 	const auto& GetSubShapes() const
@@ -71,8 +69,28 @@ public:
 		return nullptr;
 	}
 
+	bool IsAwake() const
+	{
+		return m_IsAwake;
+	}
+
+	bool IsStatic() const
+	{
+		return m_IsStatic;
+	}
+
 protected:
 	void UpdateSubShapesWorldAABBs() const;
+
+	void SetAwake(bool val)
+	{
+		m_IsAwake = val;
+	}
+
+	void SetStatic(bool val)
+	{
+		m_IsStatic = val;
+	}
 
 	// All sub-shapes and the input centre are expressed in the ref transforms space
 	void CentreAndCache(const Transform& refTran, const Vector3& c)
@@ -99,4 +117,6 @@ private:
 	Transform m_Transform;
 	bool m_Dirty = true;
 	ShapeProxy* m_Proxy;
+	bool m_IsAwake;
+	bool m_IsStatic;
 };

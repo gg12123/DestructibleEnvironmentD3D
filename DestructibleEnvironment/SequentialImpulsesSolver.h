@@ -1,16 +1,19 @@
 #pragma once
 #include "StringU.h"
 #include "Constraints.h"
+#include "Islands.h"
 
 class SequentialImpulsesSolver
 {
 private:
-	float Iterate(SimdStdVector<NormalContactConstraint>& contacts, SimdStdVector<ContactManifold>& manifolds) const
+	float IterateOnce(SimdStdVector<NormalContactConstraint>& contacts, SimdStdVector<ContactManifold>& manifolds, const Island& island) const
 	{
 		auto impSum = 0.0f;
 
-		for (auto& m : manifolds)
+		for (auto maniIndex : island.GetManifolds())
 		{
+			auto& m = manifolds[maniIndex];
+
 			auto& range = m.GetNormalConstraintRange();
 			auto aveJnAcc = 0.0f;
 
@@ -31,10 +34,9 @@ private:
 		return impSum;
 	}
 
-public:
-	void Solve(SimdStdVector<NormalContactConstraint>& contacts, SimdStdVector<ContactManifold>& manifolds) const
+	void Solve(SimdStdVector<NormalContactConstraint>& contacts, SimdStdVector<ContactManifold>& manifolds, const Island& island) const
 	{
-		if (manifolds.size() == 0u)
+		if (island.IsSingleton() || !island.IsAwake())
 			return;
 
 		static constexpr auto maxNumIts = 20;
@@ -45,11 +47,18 @@ public:
 
 		while (impulsesSum > requiredAccuracy && currIt < maxNumIts)
 		{
-			impulsesSum = Iterate(contacts, manifolds);
+			impulsesSum = IterateOnce(contacts, manifolds, island);
 			currIt++;
 		}
 
 		//Debug::Log("Num its required: " + StringU::ToString(currIt));
 		//Debug::Log("Convergence: " + StringU::ToString(impulsesSum));
+	}
+
+public:
+	void Solve(SimdStdVector<NormalContactConstraint>& contacts, SimdStdVector<ContactManifold>& manifolds, const std::vector<Island*>& islands) const
+	{
+		for (auto i : islands)
+			Solve(contacts, manifolds, *i);
 	}
 };

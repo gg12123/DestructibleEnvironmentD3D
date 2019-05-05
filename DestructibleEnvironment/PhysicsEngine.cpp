@@ -23,7 +23,10 @@ RayCastHit<CompoundShape> PhysicsEngine::RayCast(const Ray& r) const
 void PhysicsEngine::ApplyExternalForcesAndImpulses() const
 {
 	for (auto& b : m_DynamicBodies)
-		b->ApplyExternalForcesAndImpulses();
+	{
+		if (b->IsAwake())
+			b->ApplyExternalForcesAndImpulses();
+	}
 }
 
 void PhysicsEngine::FindContacts()
@@ -33,17 +36,15 @@ void PhysicsEngine::FindContacts()
 
 void PhysicsEngine::SatisfyConstraints()
 {
-	m_Solver.Solve(m_Collision.GetContactConstraints(), m_Collision.GetManifolds());
+	m_Solver.Solve(m_Collision.GetContactConstraints(), m_Collision.GetManifolds(), m_Collision.GetIslands());
 	m_Collision.StoreAccImpulses();
 }
 
 void PhysicsEngine::UpdateBodies()
 {
-	m_Splits.clear();
-	
-	for (auto it = m_DynamicBodies.begin(); it != m_DynamicBodies.end(); it++)
+	for (auto& b : m_DynamicBodies)
 	{
-		auto& b = **it;
-		b.UpdatePosition();
+		if (b->IsAwake())
+			b->UpdatePosition();
 	}
 }

@@ -12,11 +12,25 @@ class Rigidbody : public PhysicsObject
 public:
 	Rigidbody()
 	{
+		SetAwake(true);
+		SetStatic(false);
 	}
 
 	void ClearIsland();
 	void SetIsland(const Island& island);
 	Island* GetIsland() const;
+
+	bool IsStill() const;
+
+	void GoToSleep()
+	{
+		SetAwake(false);
+	}
+
+	void WakeUp()
+	{
+		SetAwake(true);
+	}
 
 	void InitMassProperties(const Transform& refTran);
 
@@ -61,11 +75,13 @@ public:
 
 	void AddForce(const Vector3& forceWorld)
 	{
+		SetAwake(true);
 		m_ExternalForceWorld += forceWorld;
 	}
 
 	void AddMoment(const Vector3& momentWorld)
 	{
+		SetAwake(true);
 		m_ExternalMomentsWorld += momentWorld;
 	}
 

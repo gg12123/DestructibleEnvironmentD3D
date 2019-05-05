@@ -10,12 +10,22 @@ public:
 	{
 		m_Manifolds.clear();
 		m_Bodies.clear();
+		m_BodiesAsleepOnAdd.clear();
+		m_BodiesAwakeOnAdd.clear();
 	}
 
 	void AddBody(Rigidbody& b)
 	{
 		m_Bodies.emplace_back(&b);
 		b.SetIsland(*this);
+
+		if (b.IsStill())
+			m_StillCount++;
+
+		if (b.IsAwake())
+			m_BodiesAwakeOnAdd.emplace_back(&b);
+		else
+			m_BodiesAsleepOnAdd.emplace_back(&b);
 	}
 
 	void AddManidold(int mi)
@@ -33,9 +43,41 @@ public:
 		return m_Bodies;
 	}
 
+	void OnAllBodiesAdded()
+	{
+		if (m_StillCount == m_Bodies.size())
+		{
+			for (auto b : m_BodiesAwakeOnAdd)
+				b->GoToSleep();
+
+			m_IsAwake = false;
+		}
+		else
+		{
+			for (auto b : m_BodiesAsleepOnAdd)
+				b->WakeUp();
+
+			m_IsAwake = true;
+		}
+	}
+
+	bool IsAwake() const
+	{
+		return m_IsAwake;
+	}
+
+	bool IsSingleton() const
+	{
+		return m_Manifolds.size() == 0u;
+	}
+
 private:
 	std::vector<int> m_Manifolds;
 	std::vector<Rigidbody*> m_Bodies;
+	std::vector<Rigidbody*> m_BodiesAwakeOnAdd;
+	std::vector<Rigidbody*> m_BodiesAsleepOnAdd;
+	bool m_IsAwake;
+	int m_StillCount;
 };
 
 class Islands
@@ -177,6 +219,8 @@ public:
 				}
 			}
 		}
+
+		island.OnAllBodiesAdded();
 		m_Islands.emplace_back(&island);
 	}
 
@@ -200,9 +244,15 @@ public:
 		m_ManifoldTraversed.clear();
 	}
 
+	const auto& GetIslands() const
+	{
+		return m_Islands;
+	}
+
 private:
-	// The nodes a keyed by shape ID
+	// The nodes are keyed by shape ID
 	std::vector<IslandNode> m_Nodes;
+
 	int m_CurrUnvisitedTip;
 	std::vector<Island*> m_Islands;
 	std::stack<IslandNode*> m_NodeStack;

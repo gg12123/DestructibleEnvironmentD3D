@@ -5,10 +5,6 @@
 class PhysicsObject : public CompoundShape
 {
 public:
-	PhysicsObject()
-	{
-	}
-
 	virtual void ApplyImpulse(const Impulse& impulse)
 	{
 	}

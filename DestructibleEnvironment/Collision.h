@@ -7,15 +7,13 @@
 #include "HGrid.h"
 #include "ContactManifold.h"
 #include "ContactContexts.h"
+#include "Islands.h"
 
 class Collision
 {
 private:
 	void AddBodyToPartition(const Rigidbody& body)
 	{
-		// This would be the time to clear any collision related data
-		// associated with this body - such as contacts by body.
-
 		for (auto s : body.GetSubShapes())
 			m_DynamicsPartition.AddObject(*s);
 	}
@@ -50,13 +48,30 @@ public:
 		auto& c = m_Contexts.InitContext(*shape1, *shape2);
 		auto inContact = false;
 
-		ContactPlane contactPlane;
-		m_ContactPoints.clear();
-		if (m_Detector.FindContact(*shape1, *shape2, c, contactPlane, m_ContactPoints))
+		auto& body1 = shape1->GetOwner();
+		auto& body2 = shape2->GetOwner();
+
+		if (!body1.IsAwake() && !body2.IsAwake())
 		{
-			m_ManifoldInit.InitManifold(*shape1, *shape2, m_ContactPoints, contactPlane, c);
-			inContact = m_ContactPoints.size() > 0u;
+			if (c.InContactOnPrevTick())
+			{
+				m_ManifoldInit.InitManifoldUsingPrevContactPoints(*shape1, *shape2, c);
+				inContact = true;
+			}
 		}
+		else
+		{
+			ContactPlane contactPlane;
+			m_ContactPoints.clear();
+			if (m_Detector.FindContact(*shape1, *shape2, c, contactPlane, m_ContactPoints))
+			{
+				m_ManifoldInit.InitManifold(*shape1, *shape2, m_ContactPoints, contactPlane, c);
+				inContact = m_ContactPoints.size() > 0u;
+			}
+		}
+
+		if (inContact)
+			m_Islands.RegisterManifold(shape1->GetOwner(), shape2->GetOwner());
 
 		c.SetInContact(inContact);
 	}
@@ -66,9 +81,13 @@ public:
 	{
 		m_Detector.PrepareToFindContacts();
 		m_Contexts.OnContactFindingStart();
+		m_Islands.Resize(dynamicBodies.size() + staticBodies.size());
 
 		for (auto& db : dynamicBodies)
+		{
+			m_Islands.ClearCollisonData(*db);
 			AddBodyToPartition(*db);
+		}
 
 		// Handle collision between dynamic objects
 		m_DynamicsPartition.Run(*this);
@@ -91,6 +110,8 @@ public:
 				}
 			}
 		}
+
+		m_Islands.ReCalculateIslands(dynamicBodies);
 	}
 
 	auto& GetContactConstraints()
@@ -108,10 +129,16 @@ public:
 		m_ManifoldInit.StoreAccumulatedImpulsesForNextTick(m_Contexts);
 	}
 
+	const auto GetIslands() const
+	{
+		return m_Islands.GetIslands();
+	}
+
 private:
 	CollisionDetector m_Detector;
 	HGrid<Shape, Collision> m_DynamicsPartition;
 	ManifoldInitializer m_ManifoldInit;
 	SimdStdVector<Vector3> m_ContactPoints;
 	ContactContexts m_Contexts;
+	Islands m_Islands;
 };

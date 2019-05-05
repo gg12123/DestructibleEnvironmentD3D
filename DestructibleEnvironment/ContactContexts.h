@@ -33,7 +33,7 @@ public:
 	int FrictionImpulseIndex;
 	int IndexOfSimplex;
 
-	bool InContactOnPrevTick()
+	bool InContactOnPrevTick() const
 	{
 		return TestedOnPrevTick ? m_InContactOnPrevTick : false;
 	}

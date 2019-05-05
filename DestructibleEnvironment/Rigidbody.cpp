@@ -152,6 +152,8 @@ void Rigidbody::UpdateTransform()
 
 void Rigidbody::ApplyImpulse(const Impulse& impulse)
 {
+	SetAwake(true);
+
 	m_VelocityWorld += GetInvMass() * impulse.WorldImpulse;
 
 	auto& r = impulse.WorldImpulsePoint - GetTransform().GetPosition();

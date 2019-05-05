@@ -5,6 +5,12 @@
 class StaticBody : public PhysicsObject
 {
 public:
+	StaticBody()
+	{
+		SetAwake(false);
+		SetStatic(true);
+	}
+
 	void InitMassProperties(const Transform& refTran)
 	{
 		SetInvMass(0.0f);

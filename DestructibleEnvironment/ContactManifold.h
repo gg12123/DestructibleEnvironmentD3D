@@ -129,10 +129,15 @@ public:
 	{
 	}
 
+	void InitManifoldUsingPrevContactPoints(const Shape& shape1, const Shape& shape2, const ContactContext& context)
+	{
+		// must also store prev ticks contact planes if this is to work
+	}
+
 	void InitManifold(const Shape& shape1, const Shape& shape2,
 		const SimdStdVector<Vector3>& contactPoints,
 		const ContactPlane& contactPlane,
-		ContactContext& context)
+		const ContactContext& context)
 	{
 		static constexpr auto doWarmStartNormal = true;
 		static constexpr auto doWarmStartFriction = true;

@@ -66,7 +66,6 @@ private:
 	Collision m_Collision;
 	SequentialImpulsesSolver m_Solver;
 
-	std::vector<SplitInfo> m_Splits;
 	ShapeDestructor<Rigidbody> m_ShapeDestructor;
 	std::vector<Rigidbody*> m_NewBodiesFromDestruct;
 };
