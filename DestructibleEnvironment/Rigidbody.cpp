@@ -139,6 +139,12 @@ void Rigidbody::InitMassProperties(const Transform& refTran)
 	CentreAndCache(refTran, cm);
 }
 
+bool Rigidbody::IsStill() const
+{
+	return false;
+	//return m_StillnessMonitor.IsStill();
+}
+
 void Rigidbody::UpdateTransform()
 {
 	auto& t = GetTransform();
@@ -152,7 +158,7 @@ void Rigidbody::UpdateTransform()
 
 void Rigidbody::ApplyImpulse(const Impulse& impulse)
 {
-	SetAwake(true);
+	WakeUp();
 
 	m_VelocityWorld += GetInvMass() * impulse.WorldImpulse;
 
@@ -183,5 +189,7 @@ void Rigidbody::ApplyExternalForcesAndImpulses()
 void Rigidbody::UpdatePosition()
 {
 	UpdateTransform();
+	UpdateWorldInertiaInverse();
 	UpdateSubShapesWorldAABBs();
+	m_StillnessMonitor.Tick(m_VelocityWorld, m_AngularVelocityWorld);
 }

@@ -21,12 +21,12 @@ public:
 
 	const Matrix3& GetInertiaInverseLocal() const
 	{
-		return m_InertiaInverse;
+		return m_InertiaInverseLocal;
 	}
 
-	Matrix3 GetInertiaInverseWorld()
+	const Matrix3& GetInertiaInverseWorld() const
 	{
-		return GetTransform().ApplySimilarityTransform(m_InertiaInverse);
+		return m_InertiaInverseWorld;
 	}
 
 	virtual Vector3 WorldVelocityAt(const Vector3& worldPoint)
@@ -52,15 +52,23 @@ public:
 protected:
 	void SetInertia(const Matrix3& inertia)
 	{
-		m_InertiaInverse = Matrix3::Inverse(inertia);
+		m_InertiaInverseLocal = Matrix3::Inverse(inertia);
+		UpdateWorldInertiaInverse();
 	}
 
 	void SetInvInertia(const Matrix3& invInertia)
 	{
-		m_InertiaInverse = invInertia;
+		m_InertiaInverseLocal = invInertia;
+		UpdateWorldInertiaInverse();
+	}
+
+	void UpdateWorldInertiaInverse()
+	{
+		m_InertiaInverseWorld = GetTransform().ApplySimilarityTransform(m_InertiaInverseLocal);
 	}
 
 private:
 	float m_InvMass;
-	Matrix3 m_InertiaInverse;
+	Matrix3 m_InertiaInverseLocal;
+	Matrix3 m_InertiaInverseWorld;
 };

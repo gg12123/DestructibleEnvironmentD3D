@@ -7,6 +7,42 @@
 
 class Island;
 
+class RigidbodyStillnessMonitor
+{
+public:
+	void Tick(const Vector3& linVel, const Vector3& angVel)
+	{
+		static constexpr auto linearTol = 0.001f;
+		static constexpr auto angTol = 0.001f;
+
+		static constexpr auto linearTolSqr = linearTol * linearTol;
+		static constexpr auto angTolSqr = angTol * angTol;
+
+		if (linVel.MagnitudeSqr() <= linearTolSqr && angVel.MagnitudeSqr() <= angTolSqr)
+		{
+			m_NumTicksBelowTol++;
+		}
+		else
+		{
+			m_NumTicksBelowTol = 0;
+		}
+	}
+
+	bool IsStill() const
+	{
+		static constexpr auto numTicksRequiredForStill = 2;
+		return m_NumTicksBelowTol >= numTicksRequiredForStill;
+	}
+
+	void Reset()
+	{
+		m_NumTicksBelowTol = 0;
+	}
+
+private:
+	int m_NumTicksBelowTol = 0;
+};
+
 class Rigidbody : public PhysicsObject
 {
 public:
@@ -31,12 +67,7 @@ public:
 		return m_Island;
 	}
 
-	bool IsStill() const
-	{
-		// Check if the angular and linear veloctiy has been below some tol for
-		// a few ticks.
-		return false;
-	}
+	bool IsStill() const;
 
 	void GoToSleep()
 	{
@@ -46,6 +77,7 @@ public:
 	void WakeUp()
 	{
 		SetAwake(true);
+		m_StillnessMonitor.Reset();
 	}
 
 	void InitMassProperties(const Transform& refTran);
@@ -91,13 +123,13 @@ public:
 
 	void AddForce(const Vector3& forceWorld)
 	{
-		SetAwake(true);
+		WakeUp();
 		m_ExternalForceWorld += forceWorld;
 	}
 
 	void AddMoment(const Vector3& momentWorld)
 	{
-		SetAwake(true);
+		WakeUp();
 		m_ExternalMomentsWorld += momentWorld;
 	}
 
@@ -128,4 +160,5 @@ private:
 	float m_AngularDrag;
 
 	const Island* m_Island;
+	RigidbodyStillnessMonitor m_StillnessMonitor;
 };

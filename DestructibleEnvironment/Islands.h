@@ -2,6 +2,7 @@
 #include "CompoundShape.h"
 #include "Rigidbody.h"
 #include "PoolOfRecyclables.h"
+#include "Debug.h"
 
 class Island
 {
