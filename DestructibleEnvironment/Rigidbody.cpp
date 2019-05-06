@@ -141,8 +141,7 @@ void Rigidbody::InitMassProperties(const Transform& refTran)
 
 bool Rigidbody::IsStill() const
 {
-	return false;
-	//return m_StillnessMonitor.IsStill();
+	return m_StillnessMonitor.IsStill();
 }
 
 void Rigidbody::UpdateTransform()
@@ -156,17 +155,19 @@ void Rigidbody::UpdateTransform()
 	t.SetPositionAndRotation(pos, rot);
 }
 
-void Rigidbody::ApplyImpulse(const Impulse& impulse)
+void Rigidbody::ApplyExternalImpulse(const Impulse& impulse)
 {
 	WakeUp();
+	ApplyImpulse(impulse);
+}
 
+void Rigidbody::ApplyImpulse(const Impulse& impulse)
+{
 	m_VelocityWorld += GetInvMass() * impulse.WorldImpulse;
 
 	auto& r = impulse.WorldImpulsePoint - GetTransform().GetPosition();
 	auto& J = impulse.WorldImpulse;
 
-	// TODO - cache the inertia inverse. The get call re-calculates it each
-	// time and this method is called loads by the solver.
 	m_AngularVelocityWorld += (GetInertiaInverseWorld() * Vector3::Cross(r, J));
 }
 

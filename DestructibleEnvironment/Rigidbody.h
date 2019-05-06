@@ -12,8 +12,8 @@ class RigidbodyStillnessMonitor
 public:
 	void Tick(const Vector3& linVel, const Vector3& angVel)
 	{
-		static constexpr auto linearTol = 0.001f;
-		static constexpr auto angTol = 0.001f;
+		static constexpr auto linearTol = 0.0001f;
+		static constexpr auto angTol = 0.0001f;
 
 		static constexpr auto linearTolSqr = linearTol * linearTol;
 		static constexpr auto angTolSqr = angTol * angTol;
@@ -145,7 +145,11 @@ public:
 
 	void ApplyExternalForcesAndImpulses();
 
+	// For impulses applied by the solver
 	void ApplyImpulse(const Impulse& impulse) override;
+
+	// For impulses applied by the game world
+	void ApplyExternalImpulse(const Impulse& impulse);
 
 private:
 	void UpdateTransform();

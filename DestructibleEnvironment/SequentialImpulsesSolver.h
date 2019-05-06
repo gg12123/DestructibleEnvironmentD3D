@@ -6,7 +6,7 @@
 class SequentialImpulsesSolver
 {
 private:
-	float IterateOnce(SimdStdVector<NormalContactConstraint>& contacts, SimdStdVector<ContactManifold>& manifolds, const Island& island) const
+	float IterateOnce(SimdStdVector<NormalContactConstraint>& normalConstraints, SimdStdVector<ContactManifold>& manifolds, const Island& island) const
 	{
 		auto impSum = 0.0f;
 
@@ -19,7 +19,7 @@ private:
 
 			for (auto i = range.Start; i < range.End; i++)
 			{
-				auto& cp = contacts[i];
+				auto& cp = normalConstraints[i];
 
 				impSum += MathU::Abs(cp.ApplyNextImpulse());
 				aveJnAcc += cp.GetAccumulatedImpulse();
@@ -34,25 +34,28 @@ private:
 		return impSum;
 	}
 
-	void Solve(SimdStdVector<NormalContactConstraint>& contacts, SimdStdVector<ContactManifold>& manifolds, const Island& island) const
+	void Solve(SimdStdVector<NormalContactConstraint>& normalConstraints, SimdStdVector<ContactManifold>& manifolds, const Island& island) const
 	{
-		if (island.IsSingleton() || !island.IsAwake())
+		if (island.IsFloatingSingleton() || !island.IsAwake())
 			return;
 
 		static constexpr auto maxNumIts = 20;
 		static constexpr auto requiredAccuracy = 0.0001f;
+
+		for (auto maniIndex : island.GetManifolds())
+		{
+			auto& m = manifolds[maniIndex];
+			m.WarmStart(normalConstraints);
+		}
 
 		auto impulsesSum = MathU::Infinity;
 		auto currIt = 0;
 
 		while (impulsesSum > requiredAccuracy && currIt < maxNumIts)
 		{
-			impulsesSum = IterateOnce(contacts, manifolds, island);
+			impulsesSum = IterateOnce(normalConstraints, manifolds, island);
 			currIt++;
 		}
-
-		//Debug::Log("Num its required: " + StringU::ToString(currIt));
-		//Debug::Log("Convergence: " + StringU::ToString(impulsesSum));
 	}
 
 public:

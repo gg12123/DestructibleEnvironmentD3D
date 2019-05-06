@@ -7,7 +7,6 @@
   Physics.cpp
   PhysicsEngine.cpp
   RayShooter.cpp
-  Rigidbody.cpp
   ShapeProxy.cpp
   StaticShapeProxy.cpp
   World.cpp

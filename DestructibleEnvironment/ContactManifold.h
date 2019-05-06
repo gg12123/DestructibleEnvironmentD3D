@@ -18,8 +18,8 @@ public:
 		m_FrictionA(s1, s2, centre, dirA), m_FrictionB(s1, s2, centre, dirB),
 		m_Shape1(&s1), m_Shape2(&s2)
 	{
-		m_FrictionA.WarmStart(Vector3::Dot(frictionWarmStart, m_FrictionA.GetDirection()));
-		m_FrictionB.WarmStart(Vector3::Dot(frictionWarmStart, m_FrictionB.GetDirection()));
+		m_FrictionA.SetAccumulatedImpulse(Vector3::Dot(frictionWarmStart, m_FrictionA.GetDirection()));
+		m_FrictionB.SetAccumulatedImpulse(Vector3::Dot(frictionWarmStart, m_FrictionB.GetDirection()));
 	}
 
 	const auto& GetNormalConstraintRange() const
@@ -51,6 +51,15 @@ public:
 	auto ApplyFrictionBImpulse(float aveJnAcc)
 	{
 		return m_FrictionB.ApplyNextImpulse(aveJnAcc);
+	}
+
+	void WarmStart(SimdStdVector<NormalContactConstraint>& normalComstraints)
+	{
+		m_FrictionA.WarmStart();
+		m_FrictionB.WarmStart();
+
+		for (auto i = m_NormalConstraintRange.Start; i < m_NormalConstraintRange.End; i++)
+			normalComstraints[i].WarmStart();
 	}
 
 private:
@@ -139,14 +148,11 @@ private:
 	}
 
 public:
-	ManifoldInitializer()
-	{
-	}
-
 	void InitManifoldUsingPrevContactPoints(const Shape& shape1, const Shape& shape2, const ContactContext& context)
 	{
-		auto& prevManifold = m_PerManifoldHistory[context.ManifoldHistoryIndex];
+		m_StartOfCurrManifold = m_NormalContactContraints.size();
 
+		auto& prevManifold = m_PerManifoldHistory[context.ManifoldHistoryIndex];
 		auto& n = prevManifold.ContactNormal;
 		auto& pen = prevManifold.Penetration;
 
@@ -156,8 +162,7 @@ public:
 			auto& storedImpulse = m_NormalAccImpulses[i];
 
 			auto nc = NormalContactConstraint(shape1, shape2, n, storedImpulse.ContactPoint, pen);
-			nc.WarmStart(storedImpulse.Impulse);
-
+			nc.SetAccumulatedImpulse(storedImpulse.Impulse);
 			m_NormalContactContraints.emplace_back(nc);
 		}
 
@@ -191,7 +196,7 @@ public:
 			for (auto& p : contactPoints)
 			{
 				auto nc = NormalContactConstraint(shape1, shape2, n, p, pen);
-				nc.WarmStart(FindWarmStartAccImpulse(context, p, n));
+				nc.SetAccumulatedImpulse(FindWarmStartAccImpulse(context, p, n));
 
 				m_NormalContactContraints.emplace_back(nc);
 			}

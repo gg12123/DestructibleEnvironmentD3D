@@ -27,5 +27,5 @@ void DynamicBodyProxy::AddTorque(const Vector3& torque)
 
 void DynamicBodyProxy::AddImpulse(const Impulse& imp)
 {
-	m_Body->ApplyImpulse(imp);
+	m_Body->ApplyExternalImpulse(imp);
 }

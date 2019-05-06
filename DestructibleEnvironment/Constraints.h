@@ -71,10 +71,9 @@ public:
 		return Vector3::Dot(vr, m_Direction);
 	}
 
-	void WarmStart(float accImpulse)
+	void WarmStart()
 	{
-		SetAccumulatedImpulse(accImpulse);
-		ApplyImpulse(accImpulse);
+		ApplyImpulse(m_AcumulatedImpulse);
 	}
 
 protected:

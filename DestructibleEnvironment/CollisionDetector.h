@@ -58,6 +58,19 @@ public:
 		m_SimplicesNext.clear();
 	}
 
+	void SaveSimplexForNextTick(const Shape& shape1, const Shape& shape2, ContactContext& context)
+	{
+		// The two shapes are asleep and in contact or pretty close so
+		// the simplex is saved for next tick. It will be used when they
+		// wake up.
+
+		assert(context.TestedOnPrevTick);
+
+		auto& s = m_Simplices[context.IndexOfSimplex];
+		context.IndexOfSimplex = m_SimplicesNext.size();
+		m_SimplicesNext.emplace_back(s);
+	}
+
 	bool FindContact(const Shape& shape1, const Shape& shape2, ContactContext& context, ContactPlane& contact, SimdStdVector<Vector3>& contactPoints)
 	{
 		InitTransformMatrices(shape1.GetOwner(), shape2.GetOwner());

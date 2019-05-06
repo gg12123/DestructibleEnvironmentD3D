@@ -80,9 +80,6 @@
     <Filter Include="Rendering\Shaders">
       <UniqueIdentifier>{c379f3b6-7844-4de2-a74f-561eb8b1a8c2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Physics\CollisionStuff">
-      <UniqueIdentifier>{04fac677-b925-430b-a9f5-05698220f9d4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Physics\ShapeAndSplitRelated">
       <UniqueIdentifier>{ce0e0f86-e67b-4bab-8ebe-accc413dee22}</UniqueIdentifier>
     </Filter>
@@ -94,6 +91,9 @@
     </Filter>
     <Filter Include="Physics\Dynamics">
       <UniqueIdentifier>{9df25d8f-0bd6-42ff-a5c7-914dfd016a5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Physics\Collision">
+      <UniqueIdentifier>{04fac677-b925-430b-a9f5-05698220f9d4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -123,9 +123,6 @@
     </ClCompile>
     <ClCompile Include="Light.cpp">
       <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="Rigidbody.cpp">
-      <Filter>Physics</Filter>
     </ClCompile>
     <ClCompile Include="DynamicBodyProxy.cpp">
       <Filter>Misc</Filter>
@@ -165,6 +162,9 @@
     </ClCompile>
     <ClCompile Include="Debug.cpp">
       <Filter>Debuging</Filter>
+    </ClCompile>
+    <ClCompile Include="Rigidbody.cpp">
+      <Filter>Physics\Dynamics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -237,16 +237,7 @@
     <ClInclude Include="Constants.h">
       <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="Rigidbody.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicsObject.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
     <ClInclude Include="PhysicsTime.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="StaticBody.h">
       <Filter>Physics</Filter>
     </ClInclude>
     <ClInclude Include="DynamicBodyProxy.h">
@@ -259,10 +250,10 @@
       <Filter>CoreStuff</Filter>
     </ClInclude>
     <ClInclude Include="CollisionData.h">
-      <Filter>Physics\CollisionStuff</Filter>
+      <Filter>Physics\Collision</Filter>
     </ClInclude>
     <ClInclude Include="CollisionDetector.h">
-      <Filter>Physics\CollisionStuff</Filter>
+      <Filter>Physics\Collision</Filter>
     </ClInclude>
     <ClInclude Include="Bounds.h">
       <Filter>Utils</Filter>
@@ -283,10 +274,10 @@
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="GridPartition.h">
-      <Filter>Physics\CollisionStuff</Filter>
+      <Filter>Physics\Collision</Filter>
     </ClInclude>
     <ClInclude Include="BodyCollectionBounds.h">
-      <Filter>Physics\CollisionStuff</Filter>
+      <Filter>Physics\Collision</Filter>
     </ClInclude>
     <ClInclude Include="MathU.h">
       <Filter>Utils</Filter>
@@ -361,7 +352,7 @@
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="CleanIntersectionsWrapper.h">
-      <Filter>Physics\CollisionStuff</Filter>
+      <Filter>Physics\Collision</Filter>
     </ClInclude>
     <ClInclude Include="RayCasting.h">
       <Filter>Physics</Filter>
@@ -421,43 +412,43 @@
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="GjkCollisionDetection.h">
-      <Filter>Physics\CollisionStuff</Filter>
+      <Filter>Physics\Collision</Filter>
     </ClInclude>
     <ClInclude Include="Collision.h">
-      <Filter>Physics\CollisionStuff</Filter>
+      <Filter>Physics\Collision</Filter>
     </ClInclude>
     <ClInclude Include="EpaContact.h">
-      <Filter>Physics\CollisionStuff</Filter>
+      <Filter>Physics\Collision</Filter>
     </ClInclude>
     <ClInclude Include="ShapeDuplicater.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="ObjectInHGrid.h">
-      <Filter>Physics\CollisionStuff</Filter>
+      <Filter>Physics\Collision</Filter>
     </ClInclude>
     <ClInclude Include="HGridLevel.h">
-      <Filter>Physics\CollisionStuff</Filter>
+      <Filter>Physics\Collision</Filter>
     </ClInclude>
     <ClInclude Include="HGrid.h">
-      <Filter>Physics\CollisionStuff</Filter>
+      <Filter>Physics\Collision</Filter>
     </ClInclude>
     <ClInclude Include="LastCheckedAgainst.h">
-      <Filter>Physics\CollisionStuff</Filter>
+      <Filter>Physics\Collision</Filter>
     </ClInclude>
     <ClInclude Include="ShapeDestructor.h">
       <Filter>Physics\ShapeAndSplitRelated</Filter>
     </ClInclude>
     <ClInclude Include="SatCollisionDetection.h">
-      <Filter>Physics\CollisionStuff</Filter>
+      <Filter>Physics\Collision</Filter>
     </ClInclude>
     <ClInclude Include="Debug.h">
       <Filter>Debuging</Filter>
     </ClInclude>
     <ClInclude Include="SatOptimisedCollisionDetection.h">
-      <Filter>Physics\CollisionStuff</Filter>
+      <Filter>Physics\Collision</Filter>
     </ClInclude>
     <ClInclude Include="CwSeperationFinder.h">
-      <Filter>Physics\CollisionStuff</Filter>
+      <Filter>Physics\Collision</Filter>
     </ClInclude>
     <ClInclude Include="SequentialImpulsesSolver.h">
       <Filter>Physics\Dynamics</Filter>
@@ -466,10 +457,10 @@
       <Filter>Physics\Dynamics</Filter>
     </ClInclude>
     <ClInclude Include="ContactManifold.h">
-      <Filter>Physics\CollisionStuff</Filter>
+      <Filter>Physics\Collision</Filter>
     </ClInclude>
     <ClInclude Include="ContactPointFinder.h">
-      <Filter>Physics\CollisionStuff</Filter>
+      <Filter>Physics\Collision</Filter>
     </ClInclude>
     <ClInclude Include="SimdExperiments.h">
       <Filter>Utils</Filter>
@@ -481,9 +472,18 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="ContactContexts.h">
-      <Filter>Physics\CollisionStuff</Filter>
+      <Filter>Physics\Collision</Filter>
     </ClInclude>
     <ClInclude Include="Islands.h">
+      <Filter>Physics\Dynamics</Filter>
+    </ClInclude>
+    <ClInclude Include="Rigidbody.h">
+      <Filter>Physics\Dynamics</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsObject.h">
+      <Filter>Physics\Dynamics</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticBody.h">
       <Filter>Physics\Dynamics</Filter>
     </ClInclude>
   </ItemGroup>

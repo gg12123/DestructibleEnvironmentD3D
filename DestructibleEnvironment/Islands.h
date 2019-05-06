@@ -13,6 +13,7 @@ public:
 		m_Bodies.clear();
 		m_BodiesAsleepOnAdd.clear();
 		m_BodiesAwakeOnAdd.clear();
+		m_StillCount = 0;
 	}
 
 	void AddBody(Rigidbody& b)
@@ -67,7 +68,9 @@ public:
 		return m_IsAwake;
 	}
 
-	bool IsSingleton() const
+	// Floating singlton means one body that is
+	// in contact with nothing.
+	bool IsFloatingSingleton() const
 	{
 		return m_Manifolds.size() == 0u;
 	}

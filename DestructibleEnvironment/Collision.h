@@ -53,6 +53,9 @@ public:
 
 		if (!body1.IsAwake() && !body2.IsAwake())
 		{
+			if (c.TestedOnPrevTick)
+				m_Detector.SaveSimplexForNextTick(*shape1, *shape2, c);
+
 			if (c.InContactOnPrevTick())
 			{
 				m_ManifoldInit.InitManifoldUsingPrevContactPoints(*shape1, *shape2, c);
