@@ -77,6 +77,20 @@ private:
 		}
 	};
 
+	struct PerManifoldHistoryData
+	{
+		Vector3 FrictionAccImpulse;
+		float Penetration;
+		Vector3 ContactNormal;
+
+		PerManifoldHistoryData(const Vector3& frictionAccImpulse, float pen, const Vector3& n)
+		{
+			FrictionAccImpulse = frictionAccImpulse;
+			Penetration = pen;
+			ContactNormal = n;
+		}
+	};
+
 	ContactManifold SetUpManifold(const Shape& shape1, const Shape& shape2, SimdStdVector<NormalContactConstraint>& constraints, const Vector3& warmStartFriction) const
 	{
 		auto centre = Vector3::Zero();
@@ -131,7 +145,25 @@ public:
 
 	void InitManifoldUsingPrevContactPoints(const Shape& shape1, const Shape& shape2, const ContactContext& context)
 	{
-		// must also store prev ticks contact planes if this is to work
+		auto& prevManifold = m_PerManifoldHistory[context.ManifoldHistoryIndex];
+
+		auto& n = prevManifold.ContactNormal;
+		auto& pen = prevManifold.Penetration;
+
+		auto& range = context.ContactPointsRange;
+		for (auto i = range.Start; i < range.End; i++)
+		{
+			auto& storedImpulse = m_NormalAccImpulses[i];
+
+			auto nc = NormalContactConstraint(shape1, shape2, n, storedImpulse.ContactPoint, pen);
+			nc.WarmStart(storedImpulse.Impulse);
+
+			m_NormalContactContraints.emplace_back(nc);
+		}
+
+		auto& frictionWarmStart = m_PerManifoldHistory[context.ManifoldHistoryIndex].FrictionAccImpulse;
+
+		m_Manifolds.emplace_back(SetUpManifold(shape1, shape2, m_NormalContactContraints, frictionWarmStart));
 	}
 
 	void InitManifold(const Shape& shape1, const Shape& shape2,
@@ -174,7 +206,7 @@ public:
 		}
 
 		auto frictionWarmStart = doWarmStartFriction && context.InContactOnPrevTick() ?
-			m_FrictionAccImpulses[context.FrictionImpulseIndex] :
+			m_PerManifoldHistory[context.ManifoldHistoryIndex].FrictionAccImpulse :
 			Vector3::Zero();
 
 		m_Manifolds.emplace_back(SetUpManifold(shape1, shape2, m_NormalContactContraints, frictionWarmStart));
@@ -182,7 +214,7 @@ public:
 
 	void StoreAccumulatedImpulsesForNextTick(ContactContexts& contexts)
 	{
-		m_FrictionAccImpulses.clear();
+		m_PerManifoldHistory.clear();
 		m_NormalAccImpulses.clear();
 
 		// Could optimise this with a memcpy or something. This is definitly not bottleneck
@@ -192,11 +224,14 @@ public:
 
 		for (auto& m : m_Manifolds)
 		{
-			m_FrictionAccImpulses.emplace_back(m.GetAccumulatedFrictionImpulse());
-
 			auto& context = contexts.GetContext(m.GetShape1(), m.GetShape2());
 			context.ContactPointsRange = m.GetNormalConstraintRange();
-			context.FrictionImpulseIndex = m_FrictionAccImpulses.size() - 1;
+			context.ManifoldHistoryIndex = m_PerManifoldHistory.size();
+
+			auto& n = m_NormalContactContraints[context.ContactPointsRange.Start];
+
+			m_PerManifoldHistory.emplace_back(PerManifoldHistoryData(m.GetAccumulatedFrictionImpulse(),
+				n.GetPenetration(), n.GetDirection()));
 		}
 
 		m_Manifolds.clear();
@@ -219,6 +254,9 @@ private:
 	SimdStdVector<NormalContactConstraint> m_NormalContactContraints;
 	SimdStdVector<ContactManifold> m_Manifolds;
 
+	// Per contact point history - keyed by context.ContactPointsRange
 	SimdStdVector<StoredAccImpulse> m_NormalAccImpulses;
-	SimdStdVector<Vector3> m_FrictionAccImpulses;
+
+	// Per manifold history - keyed by context.ManifoldHistoryIndex
+	SimdStdVector<PerManifoldHistoryData> m_PerManifoldHistory;
 };

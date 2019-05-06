@@ -55,7 +55,6 @@ public:
 
 private:
 	Vector3 m_Normal;
-	Vector3 m_Point;
 	float m_ContactMin;
 	float m_ContactMax;
 };

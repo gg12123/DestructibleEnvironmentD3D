@@ -132,6 +132,11 @@ public:
 		return change;
 	}
 
+	auto GetPenetration() const
+	{
+		return m_Penetration;
+	}
+
 private:
 	float m_Penetration;
 	float m_VBias;

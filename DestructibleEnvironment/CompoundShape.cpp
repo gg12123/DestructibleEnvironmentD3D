@@ -3,6 +3,8 @@
 #include "Shape.h"
 #include "ShapePoint.h"
 
+int CompoundShape::m_NextId = -1;
+
 void CompoundShape::AddSubShape(Shape& s)
 {
 	m_SubShapes.emplace_back(&s);

@@ -30,7 +30,7 @@ public:
 	uint64 TimeStamp = 0ull;
 
 	StdVectorRange ContactPointsRange;
-	int FrictionImpulseIndex;
+	int ManifoldHistoryIndex;
 	int IndexOfSimplex;
 
 	bool InContactOnPrevTick() const

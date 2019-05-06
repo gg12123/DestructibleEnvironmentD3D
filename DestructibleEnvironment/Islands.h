@@ -165,7 +165,7 @@ public:
 			auto& b = *dynamicBodies[i];
 			if (!b.GetIsland())
 			{
-				m_CurrUnvisitedTip = i + 1;
+				m_CurrUnvisitedTip = i + 1u;
 				return &m_Nodes[b.GetCompoundShapeId()];
 			}
 		}
@@ -229,7 +229,7 @@ public:
 		for (auto& b : dynamicBodies)
 			b->ClearIsland();
 
-		m_CurrUnvisitedTip = 0;
+		m_CurrUnvisitedTip = 0u;
 		m_Islands.clear();
 		m_IslandPool.Reset();
 
@@ -253,7 +253,7 @@ private:
 	// The nodes are keyed by shape ID
 	std::vector<IslandNode> m_Nodes;
 
-	int m_CurrUnvisitedTip;
+	uint32 m_CurrUnvisitedTip;
 	std::vector<Island*> m_Islands;
 	std::stack<IslandNode*> m_NodeStack;
 	std::vector<uint8> m_ManifoldTraversed;

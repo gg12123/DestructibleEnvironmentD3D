@@ -16,11 +16,27 @@ public:
 		SetStatic(false);
 	}
 
-	void ClearIsland();
-	void SetIsland(const Island& island);
-	Island* GetIsland() const;
+	void ClearIsland()
+	{
+		m_Island = nullptr;
+	}
 
-	bool IsStill() const;
+	void SetIsland(const Island& island)
+	{
+		m_Island = &island;
+	}
+
+	const Island* GetIsland() const
+	{
+		return m_Island;
+	}
+
+	bool IsStill() const
+	{
+		// Check if the angular and linear veloctiy has been below some tol for
+		// a few ticks.
+		return false;
+	}
 
 	void GoToSleep()
 	{
@@ -110,4 +126,6 @@ private:
 
 	float m_Drag;
 	float m_AngularDrag;
+
+	const Island* m_Island;
 };

@@ -11,13 +11,22 @@ class PhysicsObject;
 class CompoundShape : public AlignedObject16
 {
 public:
+	CompoundShape()
+	{
+		m_NextId++;
+		m_Id = m_NextId;
+	}
+
 	virtual ~CompoundShape()
 	{
 		for (auto s : m_SubShapes)
 			ShapePool::Return(*s);
 	}
 
-	int GetCompoundShapeId() const;
+	int GetCompoundShapeId() const
+	{
+		return m_Id;
+	}
 
 	bool IntersectsRay(const Ray& worldRay, Vector3& intPoint);
 
@@ -119,4 +128,7 @@ private:
 	ShapeProxy* m_Proxy;
 	bool m_IsAwake;
 	bool m_IsStatic;
+
+	static int m_NextId;
+	int m_Id;
 };
