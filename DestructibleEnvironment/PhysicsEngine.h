@@ -7,7 +7,7 @@
 #include "Rigidbody.h"
 #include "StaticBody.h"
 #include "SplitInfo.h"
-#include "Collision.h"
+#include "ConstraintsWorld.h"
 #include "FixedTimeStepTime.h"
 #include "ShapeDestructor.h"
 #include "RayCasting.h"
@@ -51,7 +51,7 @@ public:
 	}
 
 private:
-	void FindContacts();
+	void FindConstraints();
 	void UpdateBodies();
 	void SatisfyConstraints();
 	void ApplyExternalForcesAndImpulses() const;
@@ -63,7 +63,7 @@ private:
 	std::vector<std::unique_ptr<Rigidbody>> m_DynamicBodies;
 	std::vector<std::unique_ptr<StaticBody>> m_StaticBodies;
 
-	Collision m_Collision;
+	ConstraintsWorld m_Constraints;
 	SequentialImpulsesSolver m_Solver;
 
 	ShapeDestructor<Rigidbody> m_ShapeDestructor;

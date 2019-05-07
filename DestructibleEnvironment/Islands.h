@@ -35,7 +35,17 @@ public:
 		m_Manifolds.emplace_back(mi);
 	}
 
+	void AddJoint(int ji)
+	{
+
+	}
+
 	const auto& GetManifolds() const
+	{
+		return m_Manifolds;
+	}
+
+	const auto& GetJoints() const
 	{
 		return m_Manifolds;
 	}
@@ -77,6 +87,7 @@ public:
 
 private:
 	std::vector<int> m_Manifolds;
+	std::vector<int> m_Joints;
 	std::vector<Rigidbody*> m_Bodies;
 	std::vector<Rigidbody*> m_BodiesAwakeOnAdd;
 	std::vector<Rigidbody*> m_BodiesAsleepOnAdd;
@@ -87,14 +98,23 @@ private:
 class Islands
 {
 public:
+	struct LinkedNode
+	{
+		int LinkedToId;
+		int LinkIndex; // either manifold or joint
+
+		LinkedNode(int linkedTo, int linkIndex)
+		{
+			LinkedToId = linkedTo;
+			LinkIndex = linkIndex;
+		}
+	};
+
 	struct IslandNode
 	{
 		Rigidbody* Owner;
-
-		// Parralel vectors
-		std::vector<int> LinkedNodes;
-		std::vector<int> ManifoldIndexs;
-
+		std::vector<LinkedNode> LinkedNodesManifolds;
+		std::vector<LinkedNode> LinkedNodesJoints;
 		bool Visited;
 
 		void SetStatic()
@@ -110,8 +130,8 @@ public:
 
 		void ClearFor(Rigidbody& c)
 		{
-			LinkedNodes.clear();
-			ManifoldIndexs.clear();
+			LinkedNodesManifolds.clear();
+			LinkedNodesJoints.clear();
 			Owner = &c;
 			Visited = false;
 		}
@@ -119,6 +139,32 @@ public:
 
 	Islands() : m_IslandPool(25, []() { return std::unique_ptr<Island>( new Island()); })
 	{
+	}
+
+	void RegisterJoint(const CompoundShape& a, const CompoundShape& b)
+	{
+		auto jointIndex = m_JointTraversed.size();
+		m_JointTraversed.emplace_back(false);
+
+		auto& aNode = m_Nodes[a.GetCompoundShapeId()];
+		if (a.IsStatic())
+		{
+			aNode.SetStatic();
+		}
+		else
+		{
+			aNode.LinkedNodesJoints.emplace_back(LinkedNode(b.GetCompoundShapeId(), jointIndex));
+		}
+
+		auto& bNode = m_Nodes[b.GetCompoundShapeId()];
+		if (b.IsStatic())
+		{
+			bNode.SetStatic();
+		}
+		else
+		{
+			bNode.LinkedNodesJoints.emplace_back(LinkedNode(a.GetCompoundShapeId(), jointIndex));
+		}
 	}
 
 	void RegisterManifold(const CompoundShape& a, const CompoundShape& b)
@@ -133,8 +179,7 @@ public:
 		}
 		else
 		{
-			aNode.ManifoldIndexs.emplace_back(maniIndex);
-			aNode.LinkedNodes.emplace_back(b.GetCompoundShapeId());
+			aNode.LinkedNodesManifolds.emplace_back(LinkedNode(b.GetCompoundShapeId(), maniIndex));
 		}
 
 		auto& bNode = m_Nodes[b.GetCompoundShapeId()];
@@ -144,8 +189,7 @@ public:
 		}
 		else
 		{
-			bNode.ManifoldIndexs.emplace_back(maniIndex);
-			bNode.LinkedNodes.emplace_back(a.GetCompoundShapeId());
+			bNode.LinkedNodesManifolds.emplace_back(LinkedNode(a.GetCompoundShapeId(), maniIndex));
 		}
 	}
 
@@ -203,19 +247,34 @@ public:
 				island.AddBody(*node->Owner);
 				node->Visited = true;
 			}
-
-			auto& maniIndexs = node->ManifoldIndexs;
-			auto& linkedNodes = node->LinkedNodes;
 			
-			for (auto i = 0u; i < maniIndexs.size(); i++)
+			// Handle manifold links
+			for (auto& link : node->LinkedNodesManifolds)
 			{
-				auto mani = maniIndexs[i];
+				auto mani = link.LinkIndex;
 				if (!m_ManifoldTraversed[mani])
 				{
 					island.AddManidold(mani);
 					m_ManifoldTraversed[mani] = true;
 
-					auto& linkedNode = m_Nodes[linkedNodes[i]];
+					auto& linkedNode = m_Nodes[link.LinkedToId];
+					if (!linkedNode.IsStaticNode())
+					{
+						m_NodeStack.push(&linkedNode);
+					}
+				}
+			}
+
+			// Handle joint links
+			for (auto& link : node->LinkedNodesJoints)
+			{
+				auto joint = link.LinkIndex;
+				if (!m_JointTraversed[joint])
+				{
+					island.AddJoint(joint);
+					m_JointTraversed[joint] = true;
+
+					auto& linkedNode = m_Nodes[link.LinkedToId];
 					if (!linkedNode.IsStaticNode())
 					{
 						m_NodeStack.push(&linkedNode);
@@ -246,6 +305,7 @@ public:
 		}
 
 		m_ManifoldTraversed.clear();
+		m_JointTraversed.clear();
 	}
 
 	const auto& GetIslands() const
@@ -254,12 +314,13 @@ public:
 	}
 
 private:
-	// The nodes are keyed by shape ID
+	// The nodes are keyed by compound shape ID
 	std::vector<IslandNode> m_Nodes;
 
 	uint32 m_CurrUnvisitedTip;
 	std::vector<Island*> m_Islands;
 	std::stack<IslandNode*> m_NodeStack;
 	std::vector<uint8> m_ManifoldTraversed;
+	std::vector<uint8> m_JointTraversed;
 	PoolOfRecyclables<std::unique_ptr<Island>> m_IslandPool;
 };

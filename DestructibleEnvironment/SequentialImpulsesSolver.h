@@ -2,11 +2,15 @@
 #include "StringU.h"
 #include "Constraints.h"
 #include "Islands.h"
+#include "ContactManifold.h"
+#include "Joint.h"
 
 class SequentialImpulsesSolver
 {
 private:
-	float IterateOnce(SimdStdVector<NormalContactConstraint>& normalConstraints, SimdStdVector<ContactManifold>& manifolds, const Island& island) const
+	float IterateOnce(SimdStdVector<NormalContactConstraint>& normalConstraints, SimdStdVector<ContactManifold>& manifolds,
+		SimdStdVector<Joint>& joints,
+		const Island& island) const
 	{
 		auto impSum = 0.0f;
 
@@ -31,10 +35,17 @@ private:
 			impSum += MathU::Abs(m.ApplyFrictionBImpulse(aveJnAcc));
 		}
 
+		for (auto jointIndex : island.GetJoints())
+		{
+			auto& joint = joints[jointIndex];
+			impSum += joint.ApplyImpulses();
+		}
+
 		return impSum;
 	}
 
-	void Solve(SimdStdVector<NormalContactConstraint>& normalConstraints, SimdStdVector<ContactManifold>& manifolds, const Island& island) const
+	void Solve(SimdStdVector<NormalContactConstraint>& normalConstraints, SimdStdVector<ContactManifold>& manifolds,
+		SimdStdVector<Joint>& joints, const Island& island) const
 	{
 		if (island.IsFloatingSingleton() || !island.IsAwake())
 			return;
@@ -43,25 +54,26 @@ private:
 		static constexpr auto requiredAccuracy = 0.0001f;
 
 		for (auto maniIndex : island.GetManifolds())
-		{
-			auto& m = manifolds[maniIndex];
-			m.WarmStart(normalConstraints);
-		}
+			manifolds[maniIndex].WarmStart(normalConstraints);
+
+		for (auto jointIndex : island.GetJoints())
+			joints[jointIndex].WarmStart();
 
 		auto impulsesSum = MathU::Infinity;
 		auto currIt = 0;
 
 		while (impulsesSum > requiredAccuracy && currIt < maxNumIts)
 		{
-			impulsesSum = IterateOnce(normalConstraints, manifolds, island);
+			impulsesSum = IterateOnce(normalConstraints, manifolds, joints, island);
 			currIt++;
 		}
 	}
 
 public:
-	void Solve(SimdStdVector<NormalContactConstraint>& contacts, SimdStdVector<ContactManifold>& manifolds, const std::vector<Island*>& islands) const
+	void Solve(SimdStdVector<NormalContactConstraint>& contacts, SimdStdVector<ContactManifold>& manifolds, SimdStdVector<Joint> joints,
+		const std::vector<Island*>& islands) const
 	{
 		for (auto i : islands)
-			Solve(contacts, manifolds, *i);
+			Solve(contacts, manifolds, joints, *i);
 	}
 };

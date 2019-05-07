@@ -5,7 +5,7 @@
 void PhysicsEngine::SimulateOneTimeStep()
 {
 	ApplyExternalForcesAndImpulses();
-	FindContacts();
+	FindConstraints();
 	SatisfyConstraints();
 	UpdateBodies();
 }
@@ -29,15 +29,17 @@ void PhysicsEngine::ApplyExternalForcesAndImpulses() const
 	}
 }
 
-void PhysicsEngine::FindContacts()
+void PhysicsEngine::FindConstraints()
 {
-	m_Collision.FindContacts(m_StaticBodies, m_DynamicBodies);
+	m_Constraints.FindConstraints(m_StaticBodies, m_DynamicBodies);
 }
 
 void PhysicsEngine::SatisfyConstraints()
 {
-	m_Solver.Solve(m_Collision.GetContactConstraints(), m_Collision.GetManifolds(), m_Collision.GetIslands());
-	m_Collision.StoreAccImpulses();
+	m_Solver.Solve(m_Constraints.GetContactConstraints(), m_Constraints.GetManifolds(),
+		m_Constraints.GetJoints(), m_Constraints.GetIslands());
+
+	m_Constraints.StoreAccImpulses();
 }
 
 void PhysicsEngine::UpdateBodies()

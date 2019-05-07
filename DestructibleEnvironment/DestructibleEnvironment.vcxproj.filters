@@ -414,9 +414,6 @@
     <ClInclude Include="GjkCollisionDetection.h">
       <Filter>Physics\Collision</Filter>
     </ClInclude>
-    <ClInclude Include="Collision.h">
-      <Filter>Physics\Collision</Filter>
-    </ClInclude>
     <ClInclude Include="EpaContact.h">
       <Filter>Physics\Collision</Filter>
     </ClInclude>
@@ -485,6 +482,12 @@
     </ClInclude>
     <ClInclude Include="StaticBody.h">
       <Filter>Physics\Dynamics</Filter>
+    </ClInclude>
+    <ClInclude Include="Joint.h">
+      <Filter>Physics\Dynamics</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstraintsWorld.h">
+      <Filter>Physics\Collision</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

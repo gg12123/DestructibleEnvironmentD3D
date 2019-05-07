@@ -5,7 +5,7 @@
 #include "Face.h"
 #include "PhysicsTime.h"
 
-class ContactConstraint
+class VelocityAtPointConstraint
 {
 private:
 	static float CalculateS(const Vector3& n, const Vector3& r, const Matrix3 inertiaInverse)
@@ -14,17 +14,35 @@ private:
 		return Vector3::Dot(n, Vector3::Cross(x, r));
 	}
 
-public:
-	ContactConstraint(PhysicsObject& body1, PhysicsObject& body2, const Vector3& direction, const Vector3& point)
-		: m_Body1(&body1), m_Body2(&body2), m_Direction(direction), m_Point(point), m_AcumulatedImpulse(0.0f)
+	void RecalculateDenom()
 	{
-		auto& t1 = body1.GetTransform();
-		auto& t2 = body2.GetTransform();
+		auto& t1 = m_Body1->GetTransform();
+		auto& t2 = m_Body2->GetTransform();
 
-		auto s1 = CalculateS(m_Direction, m_Point - t1.GetPosition(), body1.GetInertiaInverseWorld());
-		auto s2 = CalculateS(m_Direction, m_Point - t2.GetPosition(), body2.GetInertiaInverseWorld());
+		auto s1 = CalculateS(m_Direction, m_Point - t1.GetPosition(), m_Body1->GetInertiaInverseWorld());
+		auto s2 = CalculateS(m_Direction, m_Point - t2.GetPosition(), m_Body2->GetInertiaInverseWorld());
 
-		m_Denom = (body1.GetInvMass() + body2.GetInvMass() + s1 + s2);
+		m_Denom = (m_Body1->GetInvMass() + m_Body2->GetInvMass() + s1 + s2);
+	}
+
+public:
+	VelocityAtPointConstraint(PhysicsObject& body1, PhysicsObject& body2, const Vector3& direction, const Vector3& point, float velBias)
+		: m_Body1(&body1), m_Body2(&body2), m_Direction(direction), m_Point(point), m_AcumulatedImpulse(0.0f), m_VBias(velBias)
+	{
+		RecalculateDenom();
+	}
+
+	VelocityAtPointConstraint(PhysicsObject& body1, PhysicsObject& body2, float velBias)
+		: m_Body1(&body1), m_Body2(&body2), m_AcumulatedImpulse(0.0f), m_VBias(velBias)
+	{
+		RecalculateDenom();
+	}
+
+	void ResetPointAndDirection(const Vector3& p, const Vector3& dir)
+	{
+		m_Point = p;
+		m_Direction = dir;
+		RecalculateDenom();
 	}
 
 	auto& GetBody1() const
@@ -45,11 +63,6 @@ public:
 	const auto& GetDirection() const
 	{
 		return m_Direction;
-	}
-
-	auto GetDenom() const
-	{
-		return m_Denom;
 	}
 
 	float GetAccumulatedImpulse() const
@@ -88,6 +101,11 @@ protected:
 		m_Body2->ApplyImpulse(Impulse(J * m_Direction, m_Point));
 	}
 
+	float CalculateCurrentImpulse() const
+	{
+		return (-CalculateRelativeVelocity() + m_VBias) / m_Denom;
+	}
+
 private:
 	PhysicsObject * m_Body1;
 	PhysicsObject * m_Body2;
@@ -95,27 +113,23 @@ private:
 	Vector3 m_Point;
 	float m_Denom;
 	float m_AcumulatedImpulse;
+	float m_VBias;
 };
 
-class NormalContactConstraint : public ContactConstraint
+class NormalContactConstraint : public VelocityAtPointConstraint
 {
 private:
-	float CalculateCurrentImpulse() const
-	{
-		return (-CalculateRelativeVelocity() + m_VBias) / GetDenom();
-	}
+	static constexpr auto Beta = 0.1f;
+	static constexpr auto Slop = 0.01f;
 
 public:
 	NormalContactConstraint(const Shape& s1, const Shape& s2, const Vector3& normal, const Vector3& point, float pen) :
-		ContactConstraint(*s1.GetOwner().ToPhysicsObject(), *s2.GetOwner().ToPhysicsObject(), normal, point),
+		VelocityAtPointConstraint(*s1.GetOwner().ToPhysicsObject(), *s2.GetOwner().ToPhysicsObject(), normal, point,
+		(Beta / PhysicsTime::FixedDeltaTime) * MathU::Max(pen - Slop, 0.0f)),
 		m_Penetration(pen)
 	{
 		auto refN = GetBody2().GetTransform().ToWorldPosition(s2.GetCentre()) - GetBody1().GetTransform().ToWorldPosition(s1.GetCentre());
 		OrientateDirection(refN);
-
-		static constexpr auto beta = 0.1f;
-		static constexpr auto slop = 0.01f;
-		m_VBias = (beta / PhysicsTime::FixedDeltaTime) * MathU::Max(m_Penetration - slop, 0.0f);
 	}
 
 	float ApplyNextImpulse()
@@ -138,20 +152,13 @@ public:
 
 private:
 	float m_Penetration;
-	float m_VBias;
 };
 
-class FrictionContactConstraint : public ContactConstraint
+class FrictionContactConstraint : public VelocityAtPointConstraint
 {
-private:
-	float CalculateCurrentImpulse() const
-	{
-		return (-CalculateRelativeVelocity()) / GetDenom();
-	}
-
 public:
 	FrictionContactConstraint(const Shape& s1, const Shape& s2, const Vector3& manCentre, const Vector3& dir) :
-		ContactConstraint(*s1.GetOwner().ToPhysicsObject(), *s2.GetOwner().ToPhysicsObject(), dir, manCentre)
+		VelocityAtPointConstraint(*s1.GetOwner().ToPhysicsObject(), *s2.GetOwner().ToPhysicsObject(), dir, manCentre, 0.0f)
 	{
 	}
 
@@ -168,5 +175,23 @@ public:
 		ApplyImpulse(change);
 
 		return change;
+	}
+};
+
+
+class JointConstraint : public VelocityAtPointConstraint
+{
+public:
+	JointConstraint(PhysicsObject& b1, PhysicsObject& b2) :
+		VelocityAtPointConstraint(b1, b2, 0.0f) // TODO - vel bias is needed for error correction
+	{
+	}
+
+	float ApplyNextImpulse()
+	{
+		auto delta = CalculateCurrentImpulse();
+		SetAccumulatedImpulse(GetAccumulatedImpulse() + delta);
+		ApplyImpulse(delta);
+		return delta;
 	}
 };

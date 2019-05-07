@@ -8,8 +8,9 @@
 #include "ContactManifold.h"
 #include "ContactContexts.h"
 #include "Islands.h"
+#include "Joint.h"
 
-class Collision
+class ConstraintsWorld
 {
 private:
 	void AddBodyToPartition(const Rigidbody& body)
@@ -19,7 +20,7 @@ private:
 	}
 
 public:
-	Collision() : m_DynamicsPartition(2.0f, 0.2f)
+	ConstraintsWorld() : m_DynamicsPartition(2.0f, 0.2f)
 	{
 	}
 
@@ -79,7 +80,7 @@ public:
 		c.SetInContact(inContact);
 	}
 
-	void FindContacts(const std::vector<std::unique_ptr<StaticBody>>& staticBodies,
+	void FindConstraints(const std::vector<std::unique_ptr<StaticBody>>& staticBodies,
 		const std::vector<std::unique_ptr<Rigidbody>>& dynamicBodies)
 	{
 		m_Detector.PrepareToFindContacts();
@@ -114,6 +115,12 @@ public:
 			}
 		}
 
+		for (auto& j : m_Joints)
+		{
+			j.UpdateWorldTransform();
+			m_Islands.RegisterJoint(j.GetAnchorObj(), j.GetOtherObj());
+		}
+
 		m_Islands.ReCalculateIslands(dynamicBodies);
 	}
 
@@ -137,11 +144,17 @@ public:
 		return m_Islands.GetIslands();
 	}
 
+	auto& GetJoints()
+	{
+		return m_Joints;
+	}
+
 private:
 	CollisionDetector m_Detector;
-	HGrid<Shape, Collision> m_DynamicsPartition;
+	HGrid<Shape, ConstraintsWorld> m_DynamicsPartition;
 	ManifoldInitializer m_ManifoldInit;
 	SimdStdVector<Vector3> m_ContactPoints;
 	ContactContexts m_Contexts;
 	Islands m_Islands;
+	SimdStdVector<Joint> m_Joints;
 };

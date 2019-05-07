@@ -205,7 +205,7 @@
     <ClInclude Include="CleanIntersectionFinder.h" />
     <ClInclude Include="CleanIntersectionsWrapper.h" />
     <ClInclude Include="CollectionU.h" />
-    <ClInclude Include="Collision.h" />
+    <ClInclude Include="ConstraintsWorld.h" />
     <ClInclude Include="CollisionData.h" />
     <ClInclude Include="CollisionDetector.h" />
     <ClInclude Include="Common\DeviceResources.h" />
@@ -232,6 +232,7 @@
     <ClInclude Include="IntersectionLoop.h" />
     <ClInclude Include="Islands.h" />
     <ClInclude Include="IterationAboutShape.h" />
+    <ClInclude Include="Joint.h" />
     <ClInclude Include="LastCheckedAgainst.h" />
     <ClInclude Include="MapToFaceRelationship.h" />
     <ClInclude Include="MapToNewEdges.h" />
