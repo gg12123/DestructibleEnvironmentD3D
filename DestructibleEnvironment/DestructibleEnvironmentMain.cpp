@@ -75,10 +75,8 @@ static DynamicBodyProxy* CreateBody(const Vector3& pos, const Quaternion& rot,
 	return body;
 }
 
-void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
+void DestructibleEnvironmentMain::CreateStack()
 {
-	SimdExperiments::Run();
-
 	auto pos = Vector3(0.0f, 1.0f, 0.0f);
 
 	auto x = 2.0f * pos;
@@ -86,11 +84,36 @@ void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 	for (auto i = 0; i < 5; i++)
 	{
 		m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(pos, Quaternion::Identity(),
-			{ SubShapeData(Vector3::Zero(), Vector3(1.0f, 1.0f, 1.0f))},
+			{ SubShapeData(Vector3::Zero(), Vector3(1.0f, 1.0f, 1.0f)) },
 			{})));
 
 		pos += Vector3::Up();
 	}
+}
+
+void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
+{
+	auto anchorPos = Vector3(0.0f, 5.0f, 0.0f);
+	auto jointAnchor = new StaticShapeProxy();
+	jointAnchor->GetTransform().SetPosition(anchorPos);
+	jointAnchor->GetTransform().SetRotation(Quaternion::Identity());
+	jointAnchor->AddSubShapeData(SubShapeData(Vector3::Zero(), Vector3(2.0f, 1.0f, 2.0f)));
+	m_World.RegisterEntity(std::unique_ptr<Entity>(jointAnchor));
+
+	auto bodyPos = Vector3(0.0f, 2.5f, 0.0f);
+	auto body = new DynamicBodyProxy();
+	body->GetTransform().SetPosition(bodyPos);
+	body->GetTransform().SetRotation(Quaternion::Identity());
+	body->AddSubShapeData(SubShapeData(Vector3::Zero(), Vector3(1.0f, 1.0f, 1.0f)));
+	m_World.RegisterEntity(std::unique_ptr<Entity>(body));
+
+	auto jointTransform = Matrix4::FromTranslation(anchorPos - Vector3::Up());
+	auto& anchorPhys = jointAnchor->GetStaticBody();
+	auto& bodyPhys = body->GetPhysicsBody();
+	auto joint = Joint(jointTransform, anchorPhys, bodyPhys, *anchorPhys.GetSubShapes()[0], *bodyPhys.GetSubShapes()[0]);
+	m_World.GetPhysics().AddJoint(joint);
+
+	//bodyPhys.GetTransform().SetPosition(bodyPhys.GetTransform().GetPosition() - Vector3::Up());
 
 	auto floor = new StaticShapeProxy();
 	auto floorPos = Vector3(0.0f, 0.0f, 0.0f);
@@ -101,7 +124,7 @@ void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 
 	auto cam = new Camera();
 	auto camPos = Vector3(10.0f, 6.0f, 0.0f);
-	auto camLookDir = Vector3::Normalize((pos + floorPos) / 2.0f - camPos);
+	auto camLookDir = Vector3::Normalize((anchorPos + floorPos) / 2.0f - camPos);
 	cam->GetTransform().SetPosition(camPos);
 	cam->GetTransform().SetRotation(Quaternion::LookRotation(camLookDir));
 	cam->SetFov(MathU::ToRadians(45.0f));

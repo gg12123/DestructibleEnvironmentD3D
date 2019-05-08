@@ -10,6 +10,7 @@ public:
 	void Clear()
 	{
 		m_Manifolds.clear();
+		m_Joints.clear();
 		m_Bodies.clear();
 		m_BodiesAsleepOnAdd.clear();
 		m_BodiesAwakeOnAdd.clear();
@@ -37,7 +38,7 @@ public:
 
 	void AddJoint(int ji)
 	{
-
+		m_Joints.emplace_back(ji);
 	}
 
 	const auto& GetManifolds() const
@@ -47,7 +48,7 @@ public:
 
 	const auto& GetJoints() const
 	{
-		return m_Manifolds;
+		return m_Joints;
 	}
 
 	const auto& GetBodies() const
@@ -78,11 +79,11 @@ public:
 		return m_IsAwake;
 	}
 
-	// Floating singlton means one body that is
-	// in contact with nothing.
+	// Floating singlton means one body that is currently
+	// un-constrained
 	bool IsFloatingSingleton() const
 	{
-		return m_Manifolds.size() == 0u;
+		return (m_Manifolds.size() == 0u) && (m_Joints.size() == 0u);
 	}
 
 private:

@@ -16,7 +16,11 @@ class Physics
 {
 public:
 	Rigidbody & AddDynamicRigidbody(DynamicBodyProxy& proxy);
-	CompoundShape & AddStaticRigidbody(StaticShapeProxy& proxy);
+	StaticBody & AddStaticRigidbody(StaticShapeProxy& proxy);
+	void AddJoint(const Joint& j)
+	{
+		m_Engine.AddJoint(j);
+	}
 
 	void Syncronise();
 	void TickPhysicsEngine();

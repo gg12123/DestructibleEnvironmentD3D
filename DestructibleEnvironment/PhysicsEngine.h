@@ -50,6 +50,11 @@ public:
 		m_StaticBodies.emplace_back(std::move(body));
 	}
 
+	void AddJoint(const Joint& j)
+	{
+		m_Constraints.GetJoints().emplace_back(j);
+	}
+
 private:
 	void FindConstraints();
 	void UpdateBodies();

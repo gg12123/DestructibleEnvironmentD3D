@@ -89,6 +89,11 @@ public:
 		ApplyImpulse(m_AcumulatedImpulse);
 	}
 
+	void SetVBias(float vBias)
+	{
+		m_VBias = vBias;
+	}
+
 protected:
 	void OrientateDirection(const Vector3& refDir)
 	{

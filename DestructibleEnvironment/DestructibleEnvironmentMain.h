@@ -30,6 +30,7 @@ namespace DestructibleEnvironment
 
 	private:
 		void RegisterEntitiesWithWorld();
+		void CreateStack();
 
 		// Cached pointer to device resources.
 		std::shared_ptr<DX::DeviceResources> m_deviceResources;

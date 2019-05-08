@@ -4,5 +4,6 @@
 
 CompoundShape & StaticShapeProxy::RegisterWithPhysics()
 {
-	return GetWorld().GetPhysics().AddStaticRigidbody(*this);
+	m_StaticBody = &GetWorld().GetPhysics().AddStaticRigidbody(*this);
+	return *m_StaticBody;
 }
