@@ -110,7 +110,8 @@ void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 	auto jointTransform = Matrix4::FromTranslation(anchorPos - Vector3::Up());
 	auto& anchorPhys = jointAnchor->GetStaticBody();
 	auto& bodyPhys = body->GetPhysicsBody();
-	auto joint = Joint(jointTransform, anchorPhys, bodyPhys, *anchorPhys.GetSubShapes()[0], *bodyPhys.GetSubShapes()[0]);
+	auto joint = Joint(jointTransform, anchorPhys, bodyPhys, *anchorPhys.GetSubShapes()[0], *bodyPhys.GetSubShapes()[0],
+		{ true, true, true });
 	m_World.GetPhysics().AddJoint(joint);
 
 	//bodyPhys.GetTransform().SetPosition(bodyPhys.GetTransform().GetPosition() - Vector3::Up());

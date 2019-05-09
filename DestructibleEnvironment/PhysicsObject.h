@@ -9,6 +9,10 @@ public:
 	{
 	}
 
+	virtual void ApplyAngularImpulse(const Vector3& impulse)
+	{
+	}
+
 	float GetMass() const
 	{
 		return m_InvMass > 0.0f ? 1.0f / m_InvMass : MathU::Infinity;
@@ -29,7 +33,12 @@ public:
 		return m_InertiaInverseWorld;
 	}
 
-	virtual Vector3 WorldVelocityAt(const Vector3& worldPoint)
+	virtual Vector3 WorldVelocityAt(const Vector3& worldPoint) const
+	{
+		return Vector3::Zero();
+	}
+
+	virtual Vector3 GetAngularVelocity() const
 	{
 		return Vector3::Zero();
 	}

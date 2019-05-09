@@ -161,6 +161,11 @@ void Rigidbody::ApplyExternalImpulse(const Impulse& impulse)
 	ApplyImpulse(impulse);
 }
 
+void Rigidbody::ApplyAngularImpulse(const Vector3& impulse)
+{
+	m_AngularVelocityWorld += (GetInertiaInverseWorld() * impulse);
+}
+
 void Rigidbody::ApplyImpulse(const Impulse& impulse)
 {
 	m_VelocityWorld += GetInvMass() * impulse.WorldImpulse;

@@ -102,9 +102,14 @@ public:
 		return GetTransform().ToLocalDirection(m_AngularVelocityWorld);
 	}
 
-	Vector3 WorldVelocityAt(const Vector3& worldPoint) override
+	Vector3 WorldVelocityAt(const Vector3& worldPoint) const override
 	{
 		return m_VelocityWorld + Vector3::Cross(m_AngularVelocityWorld, worldPoint - GetTransform().GetPosition());
+	}
+
+	virtual Vector3 GetAngularVelocity() const override
+	{
+		return m_AngularVelocityWorld;
 	}
 
 	void UpdatePosition();
@@ -147,6 +152,7 @@ public:
 
 	// For impulses applied by the solver
 	void ApplyImpulse(const Impulse& impulse) override;
+	void ApplyAngularImpulse(const Vector3& impulse) override;
 
 	// For impulses applied by the game world
 	void ApplyExternalImpulse(const Impulse& impulse);

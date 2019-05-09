@@ -200,3 +200,87 @@ public:
 		return delta;
 	}
 };
+
+class RotationalJointCostraint
+{
+private:
+	float CalculateCurrrentImpulse()
+	{
+		auto deltaV = m_B2->GetAngularVelocity() - m_B1->GetAngularVelocity();
+		return -Vector3::Dot(m_V, deltaV) / m_Denom;
+	}
+
+	void ApplyImpulse(float imp)
+	{
+		m_B1->ApplyAngularImpulse(-imp * m_V);
+		m_B2->ApplyAngularImpulse(imp * m_V);
+	}
+
+	void ReCalculateDenom()
+	{
+		m_Denom = Vector3::Dot(m_V, m_B2->GetInertiaInverseLocal() * m_V + m_B1->GetInertiaInverseWorld() * m_V);
+	}
+
+public:
+	RotationalJointCostraint(PhysicsObject& b1, PhysicsObject& b2) : m_B1(&b1), m_B2(&b2), m_AccImpulse(0.0f), m_IsOff(false)
+	{
+	}
+
+	void ResetV(const Vector3& v)
+	{
+		m_V = v;
+		ReCalculateDenom();
+	}
+
+	void ResetV(const Matrix4& anchorTran, const Matrix4& otherTran)
+	{
+		m_V = Vector3::Cross(anchorTran.Cols[m_IAnchor], otherTran.Cols[m_IOther]).Normalized();
+		ReCalculateDenom();
+	}
+
+	float ApplyNextImpulse()
+	{
+		if (m_IsOff)
+			return 0.0f;
+
+		auto imp = CalculateCurrrentImpulse();
+		m_AccImpulse += imp;
+		ApplyImpulse(imp);
+		return imp;
+	}
+
+	void WarmStart()
+	{
+		ApplyImpulse(m_AccImpulse);
+	}
+
+	void InitIndexes(int iA, int iO)
+	{
+		m_IAnchor = iA;
+		m_IOther = iO;
+	}
+
+	void TurnOff()
+	{
+		m_IsOff = true;
+	}
+
+	const auto& GetV() const
+	{
+		return m_V;
+	}
+
+private:
+	Vector3 m_V;
+	float m_Denom;
+
+	PhysicsObject* m_B1;
+	PhysicsObject* m_B2;
+
+	float m_AccImpulse;
+
+	int m_IAnchor;
+	int m_IOther;
+
+	bool m_IsOff;
+};
