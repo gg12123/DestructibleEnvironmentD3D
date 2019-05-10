@@ -1,6 +1,7 @@
 #pragma once
 #include "CompoundShape.h"
 #include "CollisionData.h"
+#include "JointPointer.h"
 
 class PhysicsObject : public CompoundShape
 {
@@ -58,6 +59,26 @@ public:
 		return this;
 	}
 
+	const auto& GetJoints() const
+	{
+		return m_Joints;
+	}
+
+	void RemoveJoint(const JointPointer& j)
+	{
+		CollectionU::Remove(m_Joints, j);
+	}
+
+	void AddJoint(const JointPointer& j)
+	{
+		m_Joints.emplace_back();
+	}
+
+	void ClearJoints()
+	{
+		m_Joints.clear();
+	}
+
 protected:
 	void SetInertia(const Matrix3& inertia)
 	{
@@ -80,4 +101,5 @@ private:
 	float m_InvMass;
 	Matrix3 m_InertiaInverseLocal;
 	Matrix3 m_InertiaInverseWorld;
+	std::vector<JointPointer> m_Joints;
 };

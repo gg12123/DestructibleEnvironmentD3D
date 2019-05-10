@@ -35,4 +35,5 @@ c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.1
           [
               _Ty=unsigned short
           ]
+  c:\users\gg_11\source\repos\destructibleenvironment\destructibleenvironment\jointpointer.h(11): note: see reference to class template instantiation 'UnOrderedVector<Joint,AlignmentAllocator<Joint,16>>' being compiled (compiling source file ShapeProxy.cpp)
   DestructibleEnvironment.vcxproj -> C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\DestructibleEnvironment.exe

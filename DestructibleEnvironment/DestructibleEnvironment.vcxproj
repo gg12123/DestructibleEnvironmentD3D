@@ -233,6 +233,8 @@
     <ClInclude Include="Islands.h" />
     <ClInclude Include="IterationAboutShape.h" />
     <ClInclude Include="Joint.h" />
+    <ClInclude Include="JointPointer.h" />
+    <ClInclude Include="Joints.h" />
     <ClInclude Include="LastCheckedAgainst.h" />
     <ClInclude Include="MapToFaceRelationship.h" />
     <ClInclude Include="MapToNewEdges.h" />
@@ -305,6 +307,7 @@
     <ClInclude Include="DynamicTriangleArray.h" />
     <ClInclude Include="TwoDArray.h" />
     <ClInclude Include="DynamicTwoDArray.h" />
+    <ClInclude Include="UnOrderedVector.h" />
     <ClInclude Include="UpdatableBound.h" />
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector3.h" />
@@ -318,6 +321,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Common\DeviceResources.cpp" />
     <ClCompile Include="CompoundShape.cpp" />
+    <ClCompile Include="Constraints.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="DestructibleEnvironmentMain.cpp" />
     <ClCompile Include="Content\SampleFpsTextRenderer.cpp" />
@@ -325,6 +329,8 @@
     <ClCompile Include="DynamicBodyProxy.cpp" />
     <ClCompile Include="DynamicMesh.cpp" />
     <ClCompile Include="Face.cpp" />
+    <ClCompile Include="Joint.cpp" />
+    <ClCompile Include="JointPointer.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

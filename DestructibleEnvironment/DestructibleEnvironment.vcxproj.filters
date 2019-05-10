@@ -166,6 +166,15 @@
     <ClCompile Include="Rigidbody.cpp">
       <Filter>Physics\Dynamics</Filter>
     </ClCompile>
+    <ClCompile Include="Constraints.cpp">
+      <Filter>Physics\Dynamics</Filter>
+    </ClCompile>
+    <ClCompile Include="Joint.cpp">
+      <Filter>Physics\Dynamics</Filter>
+    </ClCompile>
+    <ClCompile Include="JointPointer.cpp">
+      <Filter>Physics\Dynamics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -488,6 +497,15 @@
     </ClInclude>
     <ClInclude Include="ConstraintsWorld.h">
       <Filter>Physics\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="JointPointer.h">
+      <Filter>Physics\Dynamics</Filter>
+    </ClInclude>
+    <ClInclude Include="UnOrderedVector.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Joints.h">
+      <Filter>Physics\Dynamics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,9 +1,10 @@
 #pragma once
-#include "PhysicsObject.h"
 #include "Shape.h"
 #include "CollisionData.h"
 #include "Face.h"
 #include "PhysicsTime.h"
+
+class PhysicsObject;
 
 class VelocityAtPointConstraint
 {
@@ -14,16 +15,7 @@ private:
 		return Vector3::Dot(n, Vector3::Cross(x, r));
 	}
 
-	void RecalculateDenom()
-	{
-		auto& t1 = m_Body1->GetTransform();
-		auto& t2 = m_Body2->GetTransform();
-
-		auto s1 = CalculateS(m_Direction, m_Point - t1.GetPosition(), m_Body1->GetInertiaInverseWorld());
-		auto s2 = CalculateS(m_Direction, m_Point - t2.GetPosition(), m_Body2->GetInertiaInverseWorld());
-
-		m_Denom = (m_Body1->GetInvMass() + m_Body2->GetInvMass() + s1 + s2);
-	}
+	void RecalculateDenom();
 
 public:
 	VelocityAtPointConstraint(PhysicsObject& body1, PhysicsObject& body2, const Vector3& direction, const Vector3& point, float velBias)
@@ -75,14 +67,7 @@ public:
 		m_AcumulatedImpulse = val;
 	}
 
-	float CalculateRelativeVelocity() const
-	{
-		auto v1 = m_Body1->WorldVelocityAt(m_Point);
-		auto v2 = m_Body2->WorldVelocityAt(m_Point);
-		auto vr = v2 - v1;
-
-		return Vector3::Dot(vr, m_Direction);
-	}
+	float CalculateRelativeVelocity() const;
 
 	void WarmStart()
 	{
@@ -100,11 +85,7 @@ protected:
 		m_Direction = m_Direction.InDirectionOf(refDir);
 	}
 
-	void ApplyImpulse(float J) const
-	{
-		m_Body1->ApplyImpulse(Impulse(-J * m_Direction, m_Point));
-		m_Body2->ApplyImpulse(Impulse(J * m_Direction, m_Point));
-	}
+	void ApplyImpulse(float J) const;
 
 	float CalculateCurrentImpulse() const
 	{
@@ -128,14 +109,7 @@ private:
 	static constexpr auto Slop = 0.01f;
 
 public:
-	NormalContactConstraint(const Shape& s1, const Shape& s2, const Vector3& normal, const Vector3& point, float pen) :
-		VelocityAtPointConstraint(*s1.GetOwner().ToPhysicsObject(), *s2.GetOwner().ToPhysicsObject(), normal, point,
-		(Beta / PhysicsTime::FixedDeltaTime) * MathU::Max(pen - Slop, 0.0f)),
-		m_Penetration(pen)
-	{
-		auto refN = GetBody2().GetTransform().ToWorldPosition(s2.GetCentre()) - GetBody1().GetTransform().ToWorldPosition(s1.GetCentre());
-		OrientateDirection(refN);
-	}
+	NormalContactConstraint(const Shape& s1, const Shape& s2, const Vector3& normal, const Vector3& point, float pen);
 
 	float ApplyNextImpulse()
 	{
@@ -162,10 +136,7 @@ private:
 class FrictionContactConstraint : public VelocityAtPointConstraint
 {
 public:
-	FrictionContactConstraint(const Shape& s1, const Shape& s2, const Vector3& manCentre, const Vector3& dir) :
-		VelocityAtPointConstraint(*s1.GetOwner().ToPhysicsObject(), *s2.GetOwner().ToPhysicsObject(), dir, manCentre, 0.0f)
-	{
-	}
+	FrictionContactConstraint(const Shape& s1, const Shape& s2, const Vector3& manCentre, const Vector3& dir);
 
 	float ApplyNextImpulse(float Jn)
 	{
@@ -204,22 +175,11 @@ public:
 class RotationalJointCostraint
 {
 private:
-	float CalculateCurrrentImpulse()
-	{
-		auto deltaV = m_B2->GetAngularVelocity() - m_B1->GetAngularVelocity();
-		return -Vector3::Dot(m_V, deltaV) / m_Denom;
-	}
+	float CalculateCurrrentImpulse();
 
-	void ApplyImpulse(float imp)
-	{
-		m_B1->ApplyAngularImpulse(-imp * m_V);
-		m_B2->ApplyAngularImpulse(imp * m_V);
-	}
+	void ApplyImpulse(float imp);
 
-	void ReCalculateDenom()
-	{
-		m_Denom = Vector3::Dot(m_V, m_B2->GetInertiaInverseLocal() * m_V + m_B1->GetInertiaInverseWorld() * m_V);
-	}
+	void ReCalculateDenom();
 
 public:
 	RotationalJointCostraint(PhysicsObject& b1, PhysicsObject& b2) : m_B1(&b1), m_B2(&b2), m_AccImpulse(0.0f), m_IsOff(false)

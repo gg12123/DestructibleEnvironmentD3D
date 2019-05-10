@@ -8,7 +8,7 @@
 #include "ContactManifold.h"
 #include "ContactContexts.h"
 #include "Islands.h"
-#include "Joint.h"
+#include "Joints.h"
 
 class ConstraintsWorld
 {
@@ -115,8 +115,10 @@ public:
 			}
 		}
 
-		for (auto& j : m_Joints)
+		auto& joints = m_Joints.GetJoints();
+		for (auto it = joints.Begin(); it != joints.End(); it++)
 		{
+			auto& j = *it;
 			j.UpdateWorldTransform();
 			m_Islands.RegisterJoint(j.GetAnchorObj(), j.GetOtherObj());
 		}
@@ -146,7 +148,7 @@ public:
 
 	auto& GetJoints()
 	{
-		return m_Joints;
+		return m_Joints.GetJoints().GetValues();
 	}
 
 private:
@@ -156,5 +158,5 @@ private:
 	SimdStdVector<Vector3> m_ContactPoints;
 	ContactContexts m_Contexts;
 	Islands m_Islands;
-	SimdStdVector<Joint> m_Joints;
+	Joints m_Joints;
 };

@@ -6,6 +6,7 @@
 #include "DynamicArray.h"
 #include "ShapeChunkTaker.h"
 #include "CollisionData.h"
+#include "JointPointer.h"
 
 template<class Tshape>
 class ShapeDisconnector
@@ -23,9 +24,19 @@ private:
 		m_BeenVisited[s.GetHash()] = 1;
 	}
 
+	void AddJoints(Tshape& newShape, const Shape& addedSubShape)
+	{
+		for (auto& j : m_Joints)
+		{
+			if (j.GetValue().IsAttachedTo(addedSubShape))
+				newShape.AddJoint(j);
+		}
+	}
+
 	Tshape& CreateNewCompoundShape(Tshape& newShape, Shape& rootSubShape, const Transform& transform)
 	{
 		newShape.ClearSubShapes();
+		newShape.ClearJoints();
 
 		m_ShapeStack.push(&rootSubShape);
 		while (!m_ShapeStack.empty())
@@ -37,6 +48,8 @@ private:
 				continue;
 
 			newShape.AddSubShape(*next);
+			AddJoints(newShape, *next);
+
 			MarkVisited(*next);
 
 			for (auto link : next->GetLinkedShapes())
@@ -65,6 +78,9 @@ public:
 	{
 		Shape::ResetNextHashCounter();
 
+		m_Joints.clear();
+		m_Joints.insert(m_Joints.begin(), owner.GetJoints().begin(), owner.GetJoints().end());
+
 		toDiscon.DisconnectLinks();
 
 		m_SubShapes.clear();
@@ -91,6 +107,7 @@ private:
 	std::vector<Shape*> m_SubShapes;
 	DynamicArray<int> m_BeenVisited;
 	std::stack<Shape*> m_ShapeStack;
+	std::vector<JointPointer> m_Joints;
 };
 
 template<class Tshape>
@@ -144,6 +161,21 @@ private:
 		return *disconResults[0];
 	}
 
+	void DestroyJoints(Tshape& shape)
+	{
+		static std::vector<JointPointer> holder;
+		holder.clear();
+
+		// Put the joints into the holder becasue we cant be
+		// iterating over the shapes collection whilst they
+		// are being destroyed.
+		auto& joints = shape.GetJoints();
+		holder.insert(holder.begin(), joints.begin(), joints.end());
+
+		for (auto& j : holder)
+			j.Destroy();
+	}
+
 public:
 	void Destruct(Tshape& shape, const Impulse& cause, std::vector<Tshape*>& results)
 	{
@@ -151,6 +183,7 @@ public:
 		m_Disconnector.Disconnect(toDiscon, shape, results);
 
 		auto& toChunk = FindAndRemoveShapeToChunk(results, toDiscon);
+		DestroyJoints(toChunk);
 
 		auto refTran = shape.GetTransform();
 		for (auto disconShape : results)
