@@ -49,6 +49,7 @@ Rigidbody & Physics::AddDynamicRigidbody(DynamicBodyProxy& proxy)
 void Physics::DestructBody(DynamicBodyProxy& body, const Impulse& casue)
 {
 	auto& toSplit = body.GetPhysicsBody();
+	auto& col = body.GetColour();
 
 	static std::vector<Rigidbody*> newBodiesFromDestruct;
 	static ShapeDestructor<Rigidbody> destructor;
@@ -61,7 +62,7 @@ void Physics::DestructBody(DynamicBodyProxy& body, const Impulse& casue)
 		if (newBody != &toSplit)
 		{
 			m_Engine.AddDynamicBody(std::unique_ptr<Rigidbody>(newBody));
-			CreateShapeProxyForBodyAddedByDestruct(*newBody);
+			CreateShapeProxyForBodyAddedByDestruct(*newBody, col);
 		}
 
 		newBody->CopyVelocity(toSplit);
@@ -91,9 +92,10 @@ void Physics::TickPhysicsEngine()
 	m_Engine.SimulateOneTimeStep();
 }
 
-void Physics::CreateShapeProxyForBodyAddedByDestruct(Rigidbody& body)
+void Physics::CreateShapeProxyForBodyAddedByDestruct(Rigidbody& body, const Vector3& col)
 {
 	auto prox = new DynamicBodyProxy(body);
+	prox->SetColour(col);
 
 	// this proxy has been created for a shape that was added by the physics thread
 	// so it needs registering with the world

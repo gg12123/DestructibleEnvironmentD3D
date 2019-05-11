@@ -72,10 +72,8 @@ private:
 		}
 		case 3:
 		{
-			auto i = 0;
 			m_RotConstraint1.InitIndexes(2, 0);
 			m_RotConstraint2.InitIndexes(2, 1);
-			m_RotConstraint3.InitIndexes(1, 0);
 			break;
 		}
 		default:

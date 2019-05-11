@@ -15,6 +15,11 @@ public:
 		m_Colour = col;
 	}
 
+	const auto& GetColour() const
+	{
+		return m_Colour;
+	}
+
 protected:
 	auto& MapVertexBuffer()
 	{

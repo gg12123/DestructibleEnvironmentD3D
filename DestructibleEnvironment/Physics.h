@@ -35,7 +35,7 @@ public:
 	void DestructBody(DynamicBodyProxy& body, const Impulse& casue);
 
 private:
-	void CreateShapeProxyForBodyAddedByDestruct(Rigidbody& shape);
+	void CreateShapeProxyForBodyAddedByDestruct(Rigidbody& shape, const Vector3& col);
 	void AddNewProxy(ShapeProxy& proxy, CompoundShape& physicsShape);
 
 	std::vector<ShapeProxy*> m_ShapeProxies; // All the proxies

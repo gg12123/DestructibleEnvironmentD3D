@@ -41,7 +41,7 @@ PixelShaderInput main(VertexShaderInput input)
 	float3 l = float3(lightPosition.x, lightPosition.y, lightPosition.z);
 	float diffuse = dot(n, normalize(l - worldPos));
 
-	output.color = diffuse * float3(1.0f, 0.0f, 0.0f);// float3(colour.x, colour.y, colour.z);
+	output.color = diffuse * float3(colour.x, colour.y, colour.z);
 
 	return output;
 }

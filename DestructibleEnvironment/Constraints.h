@@ -205,10 +205,15 @@ public:
 		ReCalculateDenom();
 	}
 
+	void CalculateVBias(const Vector3& vA, const Vector3& vB)
+	{
+		static constexpr float K = 0.1f / PhysicsTime::FixedDeltaTime;
+		m_VBias = K * Vector3::Dot(vA, vB);
+	}
+
 	void CalculateVBias(const Matrix4& anchorTran, const Matrix4& otherTran)
 	{
-		static constexpr float K = 0.01f / PhysicsTime::FixedDeltaTime;
-		m_VBias = 0.0f;// K * Vector3::Dot(anchorTran.Cols[m_IAnchor], otherTran.Cols[m_IOther]);
+		CalculateVBias(anchorTran.Cols[m_IAnchor], otherTran.Cols[m_IOther]);
 	}
 
 	float ApplyNextImpulse()

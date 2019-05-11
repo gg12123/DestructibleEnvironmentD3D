@@ -42,11 +42,15 @@ void Joint::UpdateWorldTransform()
 
 	m_RotConstraint1.ResetV(m_WorldTransformAnchor, m_WorldTransformOther);
 	m_RotConstraint2.ResetV(m_WorldTransformAnchor, m_WorldTransformOther);
-	m_RotConstraint3.ResetV(Vector3::Cross(m_RotConstraint1.GetV(), m_RotConstraint2.GetV()));
+	m_RotConstraint3.ResetV(Vector3::Cross(m_RotConstraint1.GetV(), m_RotConstraint2.GetV()).Normalized());
+
+	Debug::Log(Vector3::Dot(m_RotConstraint1.GetV(), m_RotConstraint2.GetV()));
 
 	m_RotConstraint1.CalculateVBias(m_WorldTransformAnchor, m_WorldTransformOther);
 	m_RotConstraint2.CalculateVBias(m_WorldTransformAnchor, m_WorldTransformOther);
-	m_RotConstraint3.CalculateVBias(m_WorldTransformAnchor, m_WorldTransformOther);
+
+	// TODO - Not sure if the biasing of this third constraint actually works.
+	m_RotConstraint3.CalculateVBias(m_RotConstraint1.GetV(), m_RotConstraint2.GetV());
 }
 
 void Joint::RefreshLocalTransforms()
