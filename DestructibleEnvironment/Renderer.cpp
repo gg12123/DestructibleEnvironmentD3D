@@ -65,9 +65,10 @@ void Renderer::BindIndexBuffer(ID3D11Buffer* buffer)
 	m_Context->IASetIndexBuffer(buffer, DXGI_FORMAT_R16_UINT, 0);
 }
 
-void Renderer::SetObjectToWorld(Transform& transform)
+void Renderer::SetObjectToWorldAndColour(const Transform& transform, const Vector3& col)
 {
 	m_PerObjectConstants.ModelToWorldMatrix = transform.GetLocalToWorldMatrix();
+	m_PerObjectConstants.Colour = col;
 
 	m_Context->UpdateSubresource1(m_PerObjectConstantBuffer.get(), 0, NULL,
 		&m_PerObjectConstants,

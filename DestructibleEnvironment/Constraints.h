@@ -3,6 +3,7 @@
 #include "CollisionData.h"
 #include "Face.h"
 #include "PhysicsTime.h"
+#include "Debug.h"
 
 class PhysicsObject;
 
@@ -182,7 +183,8 @@ private:
 	void ReCalculateDenom();
 
 public:
-	RotationalJointCostraint(PhysicsObject& b1, PhysicsObject& b2) : m_B1(&b1), m_B2(&b2), m_AccImpulse(0.0f), m_IsOff(false)
+	RotationalJointCostraint(PhysicsObject& b1, PhysicsObject& b2) : 
+		m_B1(&b1), m_B2(&b2), m_AccImpulse(0.0f), m_IsOff(false), m_VBias(0.0f)
 	{
 	}
 
@@ -201,6 +203,12 @@ public:
 	{
 		m_V = Vector3::Cross(anchorTran.Cols[m_IAnchor], otherTran.Cols[m_IOther]).Normalized();
 		ReCalculateDenom();
+	}
+
+	void CalculateVBias(const Matrix4& anchorTran, const Matrix4& otherTran)
+	{
+		static constexpr float K = 0.01f / PhysicsTime::FixedDeltaTime;
+		m_VBias = 0.0f;// K * Vector3::Dot(anchorTran.Cols[m_IAnchor], otherTran.Cols[m_IOther]);
 	}
 
 	float ApplyNextImpulse()
@@ -243,6 +251,7 @@ private:
 	PhysicsObject* m_B2;
 
 	float m_AccImpulse;
+	float m_VBias;
 
 	int m_IAnchor;
 	int m_IOther;

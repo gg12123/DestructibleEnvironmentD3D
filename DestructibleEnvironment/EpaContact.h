@@ -264,16 +264,19 @@ private:
 
 	void RemoveFace(const MinowskiDifferenceFace& f)
 	{
-		m_TimesRemovedFrom.Get(f.P0(), f.P1())++;
-		if (m_TimesRemovedFrom.Get(f.P0(), f.P1()) == 1)
+		auto& e01 = m_TimesRemovedFrom.Get(f.P0(), f.P1());
+		e01++;
+		if (e01 == 1)
 			m_EdgesRemovedFrom.emplace_back(Edge(f.P0(), f.P1()));
 
-		m_TimesRemovedFrom.Get(f.P1(), f.P2())++;
-		if (m_TimesRemovedFrom.Get(f.P1(), f.P2()) == 1)
+		auto& e12 = m_TimesRemovedFrom.Get(f.P1(), f.P2());
+		e12++;
+		if (e12 == 1)
 			m_EdgesRemovedFrom.emplace_back(Edge(f.P1(), f.P2()));
 
-		m_TimesRemovedFrom.Get(f.P2(), f.P0())++;
-		if (m_TimesRemovedFrom.Get(f.P2(), f.P0()) == 1)
+		auto& e20 = m_TimesRemovedFrom.Get(f.P2(), f.P0());
+		e20++;
+		if (e20 == 1)
 			m_EdgesRemovedFrom.emplace_back(Edge(f.P2(), f.P0()));
 	}
 
@@ -310,7 +313,8 @@ private:
 	{
 		for (auto& e : m_EdgesRemovedFrom)
 		{
-			if (m_TimesRemovedFrom.Get(e.P0, e.P1) == 1)
+			auto& timesRemoved = m_TimesRemovedFrom.Get(e.P0, e.P1);
+			if (timesRemoved == 1)
 			{
 				m_Faces.emplace_back(MinowskiDifferenceFace(e.P0, e.P1, newPoint, m_Points, m_ContainedPoint));
 
@@ -318,7 +322,7 @@ private:
 					m_ContainsOriginCount++;
 			}
 
-			m_TimesRemovedFrom.Get(e.P0, e.P1) = 0;
+			timesRemoved = 0;
 		}
 	}
 
@@ -327,6 +331,19 @@ private:
 		m_Points.emplace_back(sv);
 		RemoveFaces(sv);
 		CreateNewFaces(m_Points.size() - 1);
+	}
+
+	bool CheckMaxNumExpands()
+	{
+		static constexpr auto maxNumExpands = 50;
+		m_NumExpands++;
+		if (m_NumExpands == maxNumExpands)
+		{
+			// TODO - why does this happen?
+			Debug::Log(std::string("EPA reached max number of expands."));
+			return true;
+		}
+		return false;
 	}
 
 	bool ExpandToContainOrigin(const GjkInputShape& shapeA, const GjkInputShape& shapeB)
@@ -349,6 +366,9 @@ private:
 
 			if (m_ContainsOriginCount == m_Faces.size())
 				return true;
+
+			if (CheckMaxNumExpands())
+				return false;
 		}
 	}
 
@@ -363,6 +383,7 @@ public:
 	EpaResult FindContact(const GjkInputShape& shapeA, const GjkInputShape& shapeB,
 		const GjkCollisionDetector::Simplex& simplex, ContactPlane& contactPlane)
 	{
+		m_NumExpands = 0;
 		InitPoints(simplex);
 
 		if (!InitFaces())
@@ -384,6 +405,9 @@ public:
 				return EpaResult::Contact;
 			}
 
+			if (CheckMaxNumExpands())
+				return EpaResult::NoContact;
+
 			Expand(sv);
 		}
 
@@ -399,4 +423,5 @@ private:
 	std::vector<Edge> m_EdgesRemovedFrom;
 	Vector3 m_ContainedPoint;
 	int m_ContainsOriginCount;
+	int m_NumExpands;
 };

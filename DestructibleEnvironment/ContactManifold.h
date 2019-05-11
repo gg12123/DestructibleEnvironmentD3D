@@ -181,7 +181,7 @@ public:
 
 		if (contactPoints.size() == 0u)
 		{
-			Debug::Log(std::string("ERROR - init manifold called with zero contact points."));
+			Debug::Log(std::string("Init manifold called with zero contact points."));
 			return;
 		}
 

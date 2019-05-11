@@ -61,7 +61,7 @@ public:
 
 	void BindVertexBuffer(ID3D11Buffer* buffer, unsigned int stride, unsigned int offset);
 	void BindIndexBuffer(ID3D11Buffer* buffer);
-	void SetObjectToWorld(Transform& transform);
+	void SetObjectToWorldAndColour(const Transform& transform, const Vector3& col);
 	void Draw(int indexCount);
 
 	template<class T>

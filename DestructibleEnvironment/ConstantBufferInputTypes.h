@@ -11,6 +11,7 @@ public:
 	}
 
 	Matrix4 ModelToWorldMatrix;
+	Vector3 Colour;
 };
 
 class PerSceneShaderConstants

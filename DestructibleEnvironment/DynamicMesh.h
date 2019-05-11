@@ -10,6 +10,11 @@ class DynamicMesh : public Entity, IMeshRenderer
 public:
 	void Render(Renderer& renderer) override;
 
+	void SetColour(const Vector3& col)
+	{
+		m_Colour = col;
+	}
+
 protected:
 	auto& MapVertexBuffer()
 	{
@@ -41,4 +46,5 @@ private:
 	int m_CurrIndexCount;
 
 	bool m_Registerd = false;
+	Vector3 m_Colour = Vector3(1.0f, 0.0f, 0.0f);
 };

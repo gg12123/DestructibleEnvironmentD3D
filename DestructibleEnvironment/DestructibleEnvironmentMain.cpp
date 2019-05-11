@@ -104,6 +104,7 @@ void DestructibleEnvironmentMain::CreateWindmill(StaticShapeProxy& floor, float 
 	base->GetTransform().SetPosition(Vector3(x, floorHeight + baseHeight / 2.0f, z));
 	base->GetTransform().SetRotation(Quaternion::Identity());
 	base->AddSubShapeData(SubShapeData(Vector3::Zero(), Vector3(baseWidth, baseHeight, baseWidth)));
+	base->SetColour(Vector3(1.0f, 0.0f, 0.0f));
 	m_World.RegisterEntity(std::unique_ptr<Entity>(base));
 
 	// Joint the base to the floor
@@ -123,8 +124,9 @@ void DestructibleEnvironmentMain::CreateWindmill(StaticShapeProxy& floor, float 
 	mill->AddSubShapeData(SubShapeData(-(millWidth / 2.0f + bladeLength / 2.0f) * Vector3::Foward(), Vector3(millWidth / 2.0f, millWidth / 2.0f, bladeLength)));
 	mill->AddSubShapeLink(SubShapeLink(0, 1));
 	mill->AddSubShapeLink(SubShapeLink(0, 2));
+	mill->SetColour(Vector3(0.0f, 1.0f, 0.0f));
 	m_World.RegisterEntity(std::unique_ptr<Entity>(mill));
-
+	
 	// Join the mill to the base
 	auto jointTransform = Matrix4::FromTranslation(Vector3(x, floorHeight + baseHeight, z) + (baseWidth / 2.0f) * faceDir);
 	auto& anchorPhys = base->GetPhysicsBody();
@@ -132,7 +134,7 @@ void DestructibleEnvironmentMain::CreateWindmill(StaticShapeProxy& floor, float 
 	auto joint1 = Joint(jointTransform, anchorPhys, bodyPhys, *anchorPhys.GetSubShapes()[0], *bodyPhys.GetSubShapes()[0],
 		{ false, true, true });
 	m_World.GetPhysics().AddJoint(joint1);
-
+	
 	// Create the motor
 	auto mot = new WindmillMotor(*base);
 	m_World.RegisterEntity(std::unique_ptr<Entity>(mot));
@@ -148,6 +150,7 @@ void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 	floor->GetTransform().SetPosition(floorPos);
 	floor->GetTransform().SetRotation(Quaternion::Identity());
 	floor->AddSubShapeData(SubShapeData(Vector3::Zero(), Vector3(20.0f, 1.0f, 20.0f)));
+	floor->SetColour(Vector3(0.0f, 0.0f, 1.0f));
 	m_World.RegisterEntity(std::unique_ptr<Entity>(floor));
 
 	CreateWindmill(*floor, 0.5f, millHeight, 0.0f, 0.0f, Vector3::Right());

@@ -45,7 +45,7 @@ FrictionContactConstraint::FrictionContactConstraint(const Shape& s1, const Shap
 float RotationalJointCostraint::CalculateCurrrentImpulse()
 {
 	auto deltaV = m_B2->GetAngularVelocity() - m_B1->GetAngularVelocity();
-	return -Vector3::Dot(m_V, deltaV) / m_Denom;
+	return (-Vector3::Dot(m_V, deltaV) + m_VBias) / m_Denom;
 }
 
 void RotationalJointCostraint::ApplyImpulse(float imp)

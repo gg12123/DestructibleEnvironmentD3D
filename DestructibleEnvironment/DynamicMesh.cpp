@@ -9,7 +9,7 @@ void DynamicMesh::Render(Renderer& renderer)
 {
 	renderer.BindVertexBuffer(m_VertexBuffer.get(), sizeof(Vertex), 0U);
 	renderer.BindIndexBuffer(m_IndexBuffer.get());
-	renderer.SetObjectToWorld(GetTransform());
+	renderer.SetObjectToWorldAndColour(GetTransform(), m_Colour);
 
 	renderer.Draw(m_CurrIndexCount);
 }
