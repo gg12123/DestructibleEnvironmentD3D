@@ -26,7 +26,7 @@ void RayShooter::Update()
 				auto imp = Impulse(2.0f * ray.GetDirection(), hit.GetHitPoint());
 
 				body->AddImpulse(imp);
-				//GetWorld().GetPhysics().DestructBody(*body, imp);
+				GetWorld().GetPhysics().DestructBody(*body, imp);
 			}
 		}
 	}

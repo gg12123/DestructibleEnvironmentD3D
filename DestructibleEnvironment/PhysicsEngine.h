@@ -52,7 +52,7 @@ public:
 
 	void AddJoint(const Joint& j)
 	{
-		m_Constraints.GetJoints().emplace_back(j);
+		m_Constraints.AddJoint(j);
 	}
 
 private:

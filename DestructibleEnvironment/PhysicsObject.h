@@ -71,7 +71,7 @@ public:
 
 	void AddJoint(const JointPointer& j)
 	{
-		m_Joints.emplace_back();
+		m_Joints.emplace_back(j);
 	}
 
 	void ClearJoints()

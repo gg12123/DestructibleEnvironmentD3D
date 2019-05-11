@@ -151,6 +151,11 @@ public:
 		return m_Joints.GetJoints().GetValues();
 	}
 
+	void AddJoint(const Joint& j)
+	{
+		m_Joints.AddJoint(j);
+	}
+
 private:
 	CollisionDetector m_Detector;
 	HGrid<Shape, ConstraintsWorld> m_DynamicsPartition;
