@@ -104,6 +104,8 @@ void Rigidbody::InitMassProperties(const Transform& refTran)
 	// TODO - enforcing a min inertia and mass keeps the simulation stable but the
 	// dynamics do not look right for tiny objects - find another way!
 
+	// Actually since changing the damping method, it doesnt look too bad.
+
 	static constexpr auto minInertia = 0.01f;
 	auto Imin = MathU::Min(MathU::Min(Ixx, Iyy), Izz);
 	if (Imin < minInertia)
@@ -182,13 +184,15 @@ void Rigidbody::ApplyExternalForcesAndImpulses()
 {
 	static constexpr float g = 9.8f;
 
+	// Gravity
 	m_ExternalForceWorld -= GetMass() * g * Vector3::Up();
-	m_ExternalForceWorld -= m_Drag * m_VelocityWorld;
-
-	m_ExternalMomentsWorld -= m_AngularDrag * m_AngularVelocityWorld;
 
 	m_VelocityWorld += (GetInvMass() * m_ExternalForceWorld) * PhysicsTime::FixedDeltaTime;
 	m_AngularVelocityWorld += (GetInertiaInverseWorld() * m_ExternalMomentsWorld) * PhysicsTime::FixedDeltaTime;
+
+	// Damping
+	m_VelocityWorld *= std::powf(1.0f - m_LinearDamping, PhysicsTime::FixedDeltaTime);
+	m_AngularVelocityWorld *= std::powf(1.0f - m_AngularDamping, PhysicsTime::FixedDeltaTime);
 
 	m_ExternalForceWorld = Vector3::Zero();
 	m_ExternalMomentsWorld = Vector3::Zero();

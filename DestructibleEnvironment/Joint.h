@@ -103,6 +103,18 @@ public:
 		return *m_OtherObject;
 	}
 
+	PhysicsObject& GetOther(const PhysicsObject& obj) const
+	{
+		if (&obj == m_AnchorObject)
+			return *m_OtherObject;
+
+		if (&obj == m_OtherObject)
+			return *m_AnchorObject;
+
+		assert(false);
+		return *m_AnchorObject;
+	}
+
 	void WarmStart()
 	{
 		m_ConstraintX.WarmStart();
@@ -132,6 +144,21 @@ public:
 	bool IsAttachedTo(const Shape& s) const
 	{
 		return &s == m_AttachedShapeAnchor || &s == m_AttachedShapeOther;
+	}
+
+	const auto GetRotConstraint1() const
+	{
+		return m_RotConstraint1;
+	}
+
+	const auto GetRotConstraint2() const
+	{
+		return m_RotConstraint2;
+	}
+
+	const auto GetRotConstraint3() const
+	{
+		return m_RotConstraint3;
 	}
 
 private:

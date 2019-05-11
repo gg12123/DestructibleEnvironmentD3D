@@ -120,10 +120,10 @@ public:
 		m_AngularVelocityWorld = toCopy.m_AngularVelocityWorld;
 	}
 
-	void CopyDrag(const Rigidbody& toCopy)
+	void CopyDamping(const Rigidbody& toCopy)
 	{
-		m_Drag = toCopy.m_Drag;
-		m_AngularDrag = toCopy.m_AngularDrag;
+		m_LinearDamping = toCopy.m_LinearDamping;
+		m_AngularDamping = toCopy.m_AngularDamping;
 	}
 
 	void AddForce(const Vector3& forceWorld)
@@ -138,14 +138,14 @@ public:
 		m_ExternalMomentsWorld += momentWorld;
 	}
 
-	void SetDrag(float drag)
+	void SetLinearDamping(float val)
 	{
-		m_Drag = drag;
+		m_LinearDamping = MathU::Clamp(val, 0.0f, 0.99f);
 	}
 
-	void SetAngularDrag(float angDrag)
+	void SetAngularDamping(float val)
 	{
-		m_AngularDrag = angDrag;
+		m_AngularDamping = MathU::Clamp(val, 0.0f, 0.99f);
 	}
 
 	void ApplyExternalForcesAndImpulses();
@@ -166,8 +166,8 @@ private:
 	Vector3 m_ExternalForceWorld;
 	Vector3 m_ExternalMomentsWorld;
 
-	float m_Drag;
-	float m_AngularDrag;
+	float m_LinearDamping;
+	float m_AngularDamping;
 
 	const Island* m_Island;
 	RigidbodyStillnessMonitor m_StillnessMonitor;

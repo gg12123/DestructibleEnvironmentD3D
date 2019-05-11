@@ -36,8 +36,8 @@ Rigidbody & Physics::AddDynamicRigidbody(DynamicBodyProxy& proxy)
 
 	auto& b = *body;
 
-	b.SetDrag(0.25f);
-	b.SetAngularDrag(0.1f);
+	b.SetLinearDamping(0.25f);
+	b.SetAngularDamping(0.5f);
 	b.InitMassProperties(proxy.GetTransform());
 
 	m_Engine.AddDynamicBody(std::move(body));
@@ -65,7 +65,7 @@ void Physics::DestructBody(DynamicBodyProxy& body, const Impulse& casue)
 		}
 
 		newBody->CopyVelocity(toSplit);
-		newBody->CopyDrag(toSplit);
+		newBody->CopyDamping(toSplit);
 	}
 }
 

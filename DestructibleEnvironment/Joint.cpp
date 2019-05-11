@@ -40,6 +40,7 @@ void Joint::UpdateWorldTransform()
 	m_ConstraintZ.ResetPointAndDirection(pos, FromColumn(m_WorldTransformAnchor.Cols[2].Floats));
 	m_ConstraintZ.SetVBias(-K * Vector3::Dot(m_ConstraintZ.GetDirection(), error));
 
+	// TODO - add a velocity bias to the rotation constraints
 	m_RotConstraint1.ResetV(m_WorldTransformAnchor, m_WorldTransformOther);
 	m_RotConstraint2.ResetV(m_WorldTransformAnchor, m_WorldTransformOther);
 	m_RotConstraint3.ResetV(Vector3::Cross(m_RotConstraint1.GetV(), m_RotConstraint2.GetV()));

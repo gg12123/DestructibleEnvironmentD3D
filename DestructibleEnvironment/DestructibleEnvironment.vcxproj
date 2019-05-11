@@ -313,6 +313,7 @@
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="ViewportDimensions.h" />
+    <ClInclude Include="WindmillMotor.h" />
     <ClInclude Include="WindowsInput.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
@@ -354,6 +355,7 @@
     <ClCompile Include="ShapeProxy.cpp" />
     <ClCompile Include="StaticShapeProxy.cpp" />
     <ClCompile Include="Vector2.cpp" />
+    <ClCompile Include="WindmillMotor.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>

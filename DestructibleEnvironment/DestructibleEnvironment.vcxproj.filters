@@ -175,6 +175,9 @@
     <ClCompile Include="JointPointer.cpp">
       <Filter>Physics\Dynamics</Filter>
     </ClCompile>
+    <ClCompile Include="WindmillMotor.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -506,6 +509,9 @@
     </ClInclude>
     <ClInclude Include="Joints.h">
       <Filter>Physics\Dynamics</Filter>
+    </ClInclude>
+    <ClInclude Include="WindmillMotor.h">
+      <Filter>Misc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

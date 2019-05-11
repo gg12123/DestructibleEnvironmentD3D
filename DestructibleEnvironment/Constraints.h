@@ -186,6 +186,11 @@ public:
 	{
 	}
 
+	bool IsConstrained() const
+	{
+		return !m_IsOff;
+	}
+
 	void ResetV(const Vector3& v)
 	{
 		m_V = v;

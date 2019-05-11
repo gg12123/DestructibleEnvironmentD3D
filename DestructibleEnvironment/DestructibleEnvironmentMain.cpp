@@ -13,6 +13,7 @@
 #include "RayShooter.h"
 #include "PlaneMesh.h"
 #include "SimdExperiments.h"
+#include "WindmillMotor.h"
 
 using namespace DestructibleEnvironment;
 using namespace Windows::Foundation;
@@ -91,19 +92,29 @@ void DestructibleEnvironmentMain::CreateStack()
 	}
 }
 
-void DestructibleEnvironmentMain::CreateWindmill(float floorHeight, float height, float x, float z, const Vector3& faceDir)
+void DestructibleEnvironmentMain::CreateWindmill(StaticShapeProxy& floor, float floorHeight, float height, float x, float z, const Vector3& faceDir)
 {
 	static constexpr auto baseWidth = 0.5f;
 	static constexpr auto millWidth = 1.0f;
 	static constexpr auto bladeLength = 1.0f;
 	auto baseHeight = height;
 
-	auto base = new StaticShapeProxy();
+	// Create the base
+	auto base = new DynamicBodyProxy();
 	base->GetTransform().SetPosition(Vector3(x, floorHeight + baseHeight / 2.0f, z));
 	base->GetTransform().SetRotation(Quaternion::Identity());
 	base->AddSubShapeData(SubShapeData(Vector3::Zero(), Vector3(baseWidth, baseHeight, baseWidth)));
 	m_World.RegisterEntity(std::unique_ptr<Entity>(base));
 
+	// Joint the base to the floor
+	auto jointTransformBase = Matrix4::FromTranslation(base->GetTransform().GetPosition());
+	auto& anchorPhysBase = floor.GetStaticBody();
+	auto& bodyPhysBase = base->GetPhysicsBody();
+	auto joint = Joint(jointTransformBase, anchorPhysBase, bodyPhysBase, *anchorPhysBase.GetSubShapes()[0], *bodyPhysBase.GetSubShapes()[0],
+		{ true, true, true });
+	m_World.GetPhysics().AddJoint(joint);
+
+	// Create the mill
 	auto mill = new DynamicBodyProxy();
 	mill->GetTransform().SetPosition(Vector3(x, floorHeight + baseHeight, z) + (baseWidth / 2.0f + millWidth / 2.0f + 0.1f) * faceDir);
 	mill->GetTransform().SetRotation(Quaternion::Identity());
@@ -114,12 +125,17 @@ void DestructibleEnvironmentMain::CreateWindmill(float floorHeight, float height
 	mill->AddSubShapeLink(SubShapeLink(0, 2));
 	m_World.RegisterEntity(std::unique_ptr<Entity>(mill));
 
+	// Join the mill to the base
 	auto jointTransform = Matrix4::FromTranslation(Vector3(x, floorHeight + baseHeight, z) + (baseWidth / 2.0f) * faceDir);
-	auto& anchorPhys = base->GetStaticBody();
+	auto& anchorPhys = base->GetPhysicsBody();
 	auto& bodyPhys = mill->GetPhysicsBody();
-	auto joint = Joint(jointTransform, anchorPhys, bodyPhys, *anchorPhys.GetSubShapes()[0], *bodyPhys.GetSubShapes()[0],
-		{ true, true, true });
-	m_World.GetPhysics().AddJoint(joint);
+	auto joint1 = Joint(jointTransform, anchorPhys, bodyPhys, *anchorPhys.GetSubShapes()[0], *bodyPhys.GetSubShapes()[0],
+		{ false, true, true });
+	m_World.GetPhysics().AddJoint(joint1);
+
+	// Create the motor
+	auto mot = new WindmillMotor(*base);
+	m_World.RegisterEntity(std::unique_ptr<Entity>(mot));
 }
 
 void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
@@ -127,14 +143,14 @@ void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 	auto millHeight = 4.0f;
 	auto anchorPos = Vector3(0.0f, millHeight, 0.0f);
 
-	CreateWindmill(0.5f, millHeight, 0.0f, 0.0f, Vector3::Right());
-
 	auto floor = new StaticShapeProxy();
 	auto floorPos = Vector3(0.0f, 0.0f, 0.0f);
 	floor->GetTransform().SetPosition(floorPos);
 	floor->GetTransform().SetRotation(Quaternion::Identity());
 	floor->AddSubShapeData(SubShapeData(Vector3::Zero(), Vector3(20.0f, 1.0f, 20.0f)));
 	m_World.RegisterEntity(std::unique_ptr<Entity>(floor));
+
+	CreateWindmill(*floor, 0.5f, millHeight, 0.0f, 0.0f, Vector3::Right());
 
 	auto cam = new Camera();
 	auto camPos = Vector3(10.0f, 6.0f, 0.0f);

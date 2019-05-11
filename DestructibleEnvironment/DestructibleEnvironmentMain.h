@@ -31,7 +31,7 @@ namespace DestructibleEnvironment
 	private:
 		void RegisterEntitiesWithWorld();
 		void CreateStack();
-		void CreateWindmill(float floorHeight, float height, float x, float z, const Vector3& faceDir);
+		void CreateWindmill(StaticShapeProxy& floor, float floorHeight, float height, float x, float z, const Vector3& faceDir);
 
 		// Cached pointer to device resources.
 		std::shared_ptr<DX::DeviceResources> m_deviceResources;
