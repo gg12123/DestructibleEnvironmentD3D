@@ -78,6 +78,7 @@ public:
 	}
 
 	// Only key into the collection. Do not iteratate over it.
+	// TODO - maybe I should just define a [] operator?
 	auto& GetValues()
 	{
 		return m_Values;

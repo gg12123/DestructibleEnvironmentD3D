@@ -11,11 +11,11 @@ Joint::Joint(const Matrix4& worldTransform, PhysicsObject& anchorObject, Physics
 	m_ConstraintZ(anchorObject, otherObject),
 	m_RotConstraint1(anchorObject, otherObject),
 	m_RotConstraint2(anchorObject, otherObject),
-	m_RotConstraint3(anchorObject, otherObject)
+	m_RotConstraint3(anchorObject, otherObject),
+	m_WorldTransformAnchor(worldTransform),
+	m_WorldTransformOther(worldTransform)
 {
-	m_LocalTransformAnchor = m_AnchorObject->GetTransform().GetWorldToLocalMatrix() * worldTransform;
-	m_LocalTransformOther = m_OtherObject->GetTransform().GetWorldToLocalMatrix() * worldTransform;
-
+	RefreshLocalTransforms();
 	InitRotConstraints(rotConstrained);
 }
 
@@ -43,4 +43,17 @@ void Joint::UpdateWorldTransform()
 	m_RotConstraint1.ResetV(m_WorldTransformAnchor, m_WorldTransformOther);
 	m_RotConstraint2.ResetV(m_WorldTransformAnchor, m_WorldTransformOther);
 	m_RotConstraint3.ResetV(Vector3::Cross(m_RotConstraint1.GetV(), m_RotConstraint2.GetV()));
+}
+
+void Joint::RefreshLocalTransforms()
+{
+	m_LocalTransformAnchor = m_AnchorObject->GetTransform().GetWorldToLocalMatrix() * m_WorldTransformAnchor;
+	m_LocalTransformOther = m_OtherObject->GetTransform().GetWorldToLocalMatrix() * m_WorldTransformOther;
+}
+
+void Joint::Refresh()
+{
+	m_AnchorObject = m_AttachedShapeAnchor->GetOwner().ToPhysicsObject();
+	m_OtherObject = m_AttachedShapeOther->GetOwner().ToPhysicsObject();
+	RefreshLocalTransforms();
 }

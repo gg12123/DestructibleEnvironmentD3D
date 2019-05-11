@@ -91,30 +91,43 @@ void DestructibleEnvironmentMain::CreateStack()
 	}
 }
 
-void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
+void DestructibleEnvironmentMain::CreateWindmill(float floorHeight, float height, float x, float z, const Vector3& faceDir)
 {
-	auto anchorPos = Vector3(0.0f, 5.0f, 0.0f);
-	auto jointAnchor = new StaticShapeProxy();
-	jointAnchor->GetTransform().SetPosition(anchorPos);
-	jointAnchor->GetTransform().SetRotation(Quaternion::Identity());
-	jointAnchor->AddSubShapeData(SubShapeData(Vector3::Zero(), Vector3(2.0f, 1.0f, 2.0f)));
-	m_World.RegisterEntity(std::unique_ptr<Entity>(jointAnchor));
+	static constexpr auto baseWidth = 0.5f;
+	static constexpr auto millWidth = 1.0f;
+	static constexpr auto bladeLength = 1.0f;
+	auto baseHeight = height;
 
-	auto bodyPos = Vector3(0.0f, 2.5f, 0.0f);
-	auto body = new DynamicBodyProxy();
-	body->GetTransform().SetPosition(bodyPos);
-	body->GetTransform().SetRotation(Quaternion::Identity());
-	body->AddSubShapeData(SubShapeData(Vector3::Zero(), Vector3(1.0f, 1.0f, 1.0f)));
-	m_World.RegisterEntity(std::unique_ptr<Entity>(body));
+	auto base = new StaticShapeProxy();
+	base->GetTransform().SetPosition(Vector3(x, floorHeight + baseHeight / 2.0f, z));
+	base->GetTransform().SetRotation(Quaternion::Identity());
+	base->AddSubShapeData(SubShapeData(Vector3::Zero(), Vector3(baseWidth, baseHeight, baseWidth)));
+	m_World.RegisterEntity(std::unique_ptr<Entity>(base));
 
-	auto jointTransform = Matrix4::FromTranslation(anchorPos - Vector3::Up());
-	auto& anchorPhys = jointAnchor->GetStaticBody();
-	auto& bodyPhys = body->GetPhysicsBody();
+	auto mill = new DynamicBodyProxy();
+	mill->GetTransform().SetPosition(Vector3(x, floorHeight + baseHeight, z) + (baseWidth / 2.0f + millWidth / 2.0f + 0.1f) * faceDir);
+	mill->GetTransform().SetRotation(Quaternion::Identity());
+	mill->AddSubShapeData(SubShapeData(Vector3::Zero(), Vector3(millWidth, millWidth, millWidth)));
+	mill->AddSubShapeData(SubShapeData((millWidth / 2.0f + bladeLength / 2.0f) * Vector3::Foward(), Vector3(millWidth / 2.0f, millWidth / 2.0f, bladeLength)));
+	mill->AddSubShapeData(SubShapeData(-(millWidth / 2.0f + bladeLength / 2.0f) * Vector3::Foward(), Vector3(millWidth / 2.0f, millWidth / 2.0f, bladeLength)));
+	mill->AddSubShapeLink(SubShapeLink(0, 1));
+	mill->AddSubShapeLink(SubShapeLink(0, 2));
+	m_World.RegisterEntity(std::unique_ptr<Entity>(mill));
+
+	auto jointTransform = Matrix4::FromTranslation(Vector3(x, floorHeight + baseHeight, z) + (baseWidth / 2.0f) * faceDir);
+	auto& anchorPhys = base->GetStaticBody();
+	auto& bodyPhys = mill->GetPhysicsBody();
 	auto joint = Joint(jointTransform, anchorPhys, bodyPhys, *anchorPhys.GetSubShapes()[0], *bodyPhys.GetSubShapes()[0],
 		{ true, true, true });
 	m_World.GetPhysics().AddJoint(joint);
+}
 
-	//bodyPhys.GetTransform().SetPosition(bodyPhys.GetTransform().GetPosition() - Vector3::Up());
+void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
+{
+	auto millHeight = 4.0f;
+	auto anchorPos = Vector3(0.0f, millHeight, 0.0f);
+
+	CreateWindmill(0.5f, millHeight, 0.0f, 0.0f, Vector3::Right());
 
 	auto floor = new StaticShapeProxy();
 	auto floorPos = Vector3(0.0f, 0.0f, 0.0f);

@@ -32,6 +32,8 @@ void Rigidbody::InitMassProperties(const Transform& refTran)
 	static float mult[] = { 1.0f / 6.0f, 1.0f / 24.0f, 1.0f / 24.0f, 1.0f / 24.0f,
 		1.0f / 60.0f, 1.0f / 60.0f, 1.0f / 60.0f, 1 / 120.0f, 1 / 120.0f , 1 / 120.0f };
 
+	// TODO - I think this is slightly wrong when there are multiple sub shapes. Should calculate
+	// the properties of each sub shape seperately then combine them.
 	for (auto s : GetSubShapes())
 	{
 		for (auto f : s->GetFaces())

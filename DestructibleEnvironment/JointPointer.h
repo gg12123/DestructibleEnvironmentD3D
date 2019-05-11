@@ -18,6 +18,11 @@ public:
 		return m_Joints->GetValue(m_Pointer);
 	}
 
+	Joint& GetValue()
+	{
+		return m_Joints->GetValue(m_Pointer);
+	}
+
 	void Destroy();
 
 	bool operator == (const JointPointer& other)

@@ -176,6 +176,14 @@ private:
 			j.Destroy();
 	}
 
+	void RefreshJoints(const Tshape& shape)
+	{
+		for (auto j : shape.GetJoints())
+		{
+			j.GetValue().Refresh();
+		}
+	}
+
 public:
 	void Destruct(Tshape& shape, const Impulse& cause, std::vector<Tshape*>& results)
 	{
@@ -187,7 +195,10 @@ public:
 
 		auto refTran = shape.GetTransform();
 		for (auto disconShape : results)
+		{
 			disconShape->InitMassProperties(refTran);
+			RefreshJoints(*disconShape);
+		}
 
 		m_ChunkTaker.Chunk(toChunk, results);
 	}

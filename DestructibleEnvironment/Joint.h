@@ -83,11 +83,15 @@ private:
 		}
 	}
 
+	void RefreshLocalTransforms();
+
 public:
 	Joint(const Matrix4& worldTransform, PhysicsObject& anchorObject, PhysicsObject& otherObject,
 		const Shape& shapeAnchor, const Shape& shapeOther, const std::array<bool, 3>& rotConstrained);
 
 	void UpdateWorldTransform();
+
+	void Refresh();
 
 	PhysicsObject& GetAnchorObj() const
 	{
