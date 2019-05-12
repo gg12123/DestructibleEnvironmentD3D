@@ -154,6 +154,8 @@ void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 	m_World.RegisterEntity(std::unique_ptr<Entity>(floor));
 
 	CreateWindmill(*floor, 0.5f, millHeight, 0.0f, 0.0f, Vector3::Right());
+	CreateWindmill(*floor, 0.5f, millHeight, -3.0f, 3.0f, Vector3::Right());
+	CreateWindmill(*floor, 0.5f, millHeight, -3.0f, -3.0f, Vector3::Right());
 
 	auto cam = new Camera();
 	auto camPos = Vector3(10.0f, 6.0f, 0.0f);
