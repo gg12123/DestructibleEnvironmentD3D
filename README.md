@@ -6,3 +6,9 @@ This is a physics engine that is optimised for destructible objects. The main fe
 - Collision detection is done using a hierarchical grid in the broad phase (see HGrid.h) and GJK/EPA in the narrow phase (see CollisionDetector.h).
 - The engine uses a sequential impulses solver (see SequentialImpulsesSolver.h). The inputs to the solver are the constraints and the islands. Constraints are defined in Constraints.h and the islands are created in Islands.h.
 - There is one joint type (see Joint.h) that can be constrained in various ways to achieve different joint behaviours. For example, if rotation is constrained about two axes, the joint will behave like a hinge joint.
+
+Here are some videos of the engine in action.
+
+[Stack of boxes example](https://youtu.be/G14SsQkC-iI)
+
+[Windmills example](https://youtu.be/5vHV2p0I98c)
