@@ -42,6 +42,70 @@ public:
 		return true;
 	}
 
+	void Fatten(float amount)
+	{
+		m_Extends.Floats[0] += amount;
+		m_Extends.Floats[1] += amount;
+		m_Extends.Floats[2] += amount;
+	}
+
+	bool IntersectsSegment(const Vector3& p0, const Vector3& p1) const
+	{
+		auto& c = m_Centre;
+		auto& e = m_Extends;
+		auto m = (p0 + p1) / 2.0f;
+		auto d = p1 - m;
+		m -= c;
+
+		auto adx = MathU::Abs(d.X());
+		if (MathU::Abs(m.X()) > e.X() + adx)
+			return false;
+
+		auto ady = MathU::Abs(d.Y());
+		if (MathU::Abs(m.Y()) > e.Y() + ady)
+			return false;
+
+		auto adz = MathU::Abs(d.Z());
+		if (MathU::Abs(m.Z()) > e.Z() + adz)
+			return false;
+
+		adx += MathU::Epsilon;
+		ady += MathU::Epsilon;
+		adz += MathU::Epsilon;
+
+		if (MathU::Abs(m.Y() * d.Z() - m.Z() * d.Y()) > e.Y() * adz + e.Z() * ady)
+			return false;
+
+		if (MathU::Abs(m.Z() * d.X() - m.X() * d.Z()) > e.X() * adz + e.Z() * adx)
+			return false;
+
+		if (MathU::Abs(m.X() * d.Y() - m.Y() * d.X()) > e.X() * ady + e.Y() * adx)
+			return false;
+
+		return true;
+	}
+
+	bool ContainsPoint(const Vector3& p) const
+	{
+		auto min = m_Centre - m_Extends;
+		if (p.X() < min.X())
+			return false;
+		if (p.Y() < min.Y())
+			return false;
+		if (p.Z() < min.Z())
+			return false;
+
+		auto max = m_Centre + m_Extends;
+		if (p.X() > max.X())
+			return false;
+		if (p.Y() > max.Y())
+			return false;
+		if (p.Z() > max.Z())
+			return false;
+
+		return true;
+	}
+
 private:
 	Vector3 m_Centre;
 	Vector3 m_Extends;

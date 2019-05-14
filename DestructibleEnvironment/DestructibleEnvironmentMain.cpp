@@ -79,14 +79,24 @@ static DynamicBodyProxy* CreateBody(const Vector3& pos, const Quaternion& rot,
 void DestructibleEnvironmentMain::CreateStack()
 {
 	auto pos = Vector3(0.0f, 1.0f, 0.0f);
-
 	auto x = 2.0f * pos;
+
+	Vector3 cols[2];
+
+	cols[0] = Vector3(1.0f, 0.0f, 0.0f);
+	cols[1] = Vector3(0.0f, 1.0f, 0.0f);
+	auto j = 0;
 
 	for (auto i = 0; i < 5; i++)
 	{
-		m_World.RegisterEntity(std::unique_ptr<Entity>(CreateBody(pos, Quaternion::Identity(),
+		auto b = CreateBody(pos, Quaternion::Identity(),
 			{ SubShapeData(Vector3::Zero(), Vector3(1.0f, 1.0f, 1.0f)) },
-			{})));
+			{});
+
+		b->SetColour(cols[j]);
+		j = (j + 1) % 2;
+
+		m_World.RegisterEntity(std::unique_ptr<Entity>(b));
 
 		pos += Vector3::Up();
 	}
@@ -153,9 +163,10 @@ void DestructibleEnvironmentMain::RegisterEntitiesWithWorld()
 	floor->SetColour(Vector3(0.0f, 0.0f, 1.0f));
 	m_World.RegisterEntity(std::unique_ptr<Entity>(floor));
 
-	CreateWindmill(*floor, 0.5f, millHeight, 0.0f, 0.0f, Vector3::Right());
-	CreateWindmill(*floor, 0.5f, millHeight, -3.0f, 3.0f, Vector3::Right());
-	CreateWindmill(*floor, 0.5f, millHeight, -3.0f, -3.0f, Vector3::Right());
+	CreateStack();
+	//CreateWindmill(*floor, 0.5f, millHeight, 0.0f, 0.0f, Vector3::Right());
+	//CreateWindmill(*floor, 0.5f, millHeight, -3.0f, 3.0f, Vector3::Right());
+	//CreateWindmill(*floor, 0.5f, millHeight, -3.0f, -3.0f, Vector3::Right());
 
 	auto cam = new Camera();
 	auto camPos = Vector3(10.0f, 6.0f, 0.0f);
