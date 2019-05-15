@@ -513,6 +513,9 @@
     <ClInclude Include="WindmillMotor.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="CollisionObjectType.h">
+      <Filter>Physics\Collision</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">

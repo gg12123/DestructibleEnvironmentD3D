@@ -9,6 +9,7 @@
 #include "ContactContexts.h"
 #include "Islands.h"
 #include "Joints.h"
+#include "CollisionObjectType.h"
 
 class ConstraintsWorld
 {
@@ -24,6 +25,8 @@ public:
 	{
 	}
 
+	// RealPhysical - RealPhysical
+	template<CollisionObjectType t1, CollisionObjectType t2>
 	void RunNarrowPhaseCheckForCollision(const Shape& shapeA, const Shape& shapeB)
 	{
 		if (&shapeA.GetOwner() == &shapeB.GetOwner())
@@ -80,6 +83,27 @@ public:
 		c.SetInContact(inContact);
 	}
 
+	template<>
+	void RunNarrowPhaseCheckForCollision<CollisionObjectType::Trigger, CollisionObjectType::Trigger>(const Shape& shapeA, const Shape& shapeB)
+	{
+	}
+
+	template<>
+	void RunNarrowPhaseCheckForCollision<CollisionObjectType::CharController, CollisionObjectType::CharController>(const Shape& shapeA, const Shape& shapeB)
+	{
+	}
+
+	template<>
+	void RunNarrowPhaseCheckForCollision<CollisionObjectType::RealPhysical, CollisionObjectType::Trigger>(const Shape& shapeA, const Shape& shapeB)
+	{
+	}
+
+	template<>
+	void RunNarrowPhaseCheckForCollision<CollisionObjectType::Trigger, CollisionObjectType::RealPhysical>(const Shape& shapeA, const Shape& shapeB)
+	{
+		RunNarrowPhaseCheckForCollision<CollisionObjectType::RealPhysical, CollisionObjectType::Trigger>(shapeB, shapeA);
+	}
+
 	void FindConstraints(const std::vector<std::unique_ptr<StaticBody>>& staticBodies,
 		const std::vector<std::unique_ptr<Rigidbody>>& dynamicBodies)
 	{
@@ -110,7 +134,7 @@ public:
 				for (auto shapeDynam : dynamBody.GetSubShapes())
 				{
 					for (auto shapeStat : staticBody.GetSubShapes())
-						RunNarrowPhaseCheckForCollision(*shapeDynam, *shapeStat);
+						RunNarrowPhaseCheckForCollision<CollisionObjectType::RealPhysical, CollisionObjectType::RealPhysical>(*shapeDynam, *shapeStat);
 				}
 			}
 		}

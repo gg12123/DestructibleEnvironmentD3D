@@ -139,8 +139,8 @@ void Rigidbody::InitMassProperties(const Transform& refTran)
 	col2[2] = Izz;
 
 	SetMass(mass);
-	SetInertia(inertia);
 	CentreAndCache(refTran, cm);
+	SetInertia(inertia);
 }
 
 bool Rigidbody::IsStill() const

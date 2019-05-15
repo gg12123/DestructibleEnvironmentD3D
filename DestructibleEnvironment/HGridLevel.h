@@ -1,28 +1,60 @@
 #pragma once
 #include <vector>
-#include "ObjectInHGrid.h"
+#include "CollisionObjectType.h"
 
 template<class Tobject>
 class GridSquaresBucket
 {
+private:
+
 public:
+	template<CollisionObjectType type>
 	const auto& GetObjects() const
 	{
-		return m_Objects;
+		return m_ObjectsPhysicalReal;
 	}
 
+	template<>
+	const auto& GetObjects<CollisionObjectType::Trigger>() const
+	{
+		return m_ObjectsTrigger;
+	}
+
+	template<>
+	const auto& GetObjects<CollisionObjectType::CharController>() const
+	{
+		return m_ObjectsCharController;
+	}
+
+	template<CollisionObjectType type>
 	void AddObject(Tobject& obj)
 	{
-		m_Objects.emplace_back(&obj);
+		m_ObjectsPhysicalReal.emplace_back(&obj);
+	}
+
+	template<>
+	void AddObject<CollisionObjectType::Trigger>(Tobject& obj)
+	{
+		m_ObjectsTrigger.emplace_back(&obj);
+	}
+
+	template<>
+	void AddObject<CollisionObjectType::CharController>(Tobject& obj)
+	{
+		m_ObjectsCharController.emplace_back(&obj);
 	}
 
 	void Clear()
 	{
-		m_Objects.clear();
+		m_ObjectsPhysicalReal.clear();
+		m_ObjectsTrigger.clear();
+		m_ObjectsCharController.clear();
 	}
 
 private:
-	std::vector<Tobject*> m_Objects;
+	std::vector<Tobject*> m_ObjectsPhysicalReal;
+	std::vector<Tobject*> m_ObjectsTrigger;
+	std::vector<Tobject*> m_ObjectsCharController;
 };
 
 template<class Tobject>
@@ -132,6 +164,7 @@ public:
 		}
 	}
 
+	template<CollisionObjectType type>
 	void Insert(Tobject& toInsert)
 	{
 		auto range = GetRange(toInsert);
@@ -141,7 +174,7 @@ public:
 			for (auto y = range.YStart; y != range.YEnd; y++)
 			{
 				for (auto z = range.ZStart; z != range.ZEnd; z++)
-					GetBucketLocal(GetBucketIndex(x, y, z)).AddObject(toInsert);
+					GetBucketLocal(GetBucketIndex(x, y, z)).AddObject<type>(toInsert);
 			}
 		}
 	}

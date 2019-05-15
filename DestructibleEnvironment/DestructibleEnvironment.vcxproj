@@ -205,6 +205,7 @@
     <ClInclude Include="CleanIntersectionFinder.h" />
     <ClInclude Include="CleanIntersectionsWrapper.h" />
     <ClInclude Include="CollectionU.h" />
+    <ClInclude Include="CollisionObjectType.h" />
     <ClInclude Include="ConstraintsWorld.h" />
     <ClInclude Include="CollisionData.h" />
     <ClInclude Include="CollisionDetector.h" />

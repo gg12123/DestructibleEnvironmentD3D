@@ -30,17 +30,17 @@
     <AppXManifest Include="C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\AppxManifest.xml">
       <PackagePath>AppxManifest.xml</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2019-05-14T18:12:49.288</Modified>
+      <Modified>2019-05-15T18:20:54.713</Modified>
     </AppXManifest>
   </ItemGroup>
   <ItemGroup>
     <AppxPackagedFile Include="C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\DestructibleEnvironment.exe">
       <PackagePath>DestructibleEnvironment.exe</PackagePath>
-      <Modified>2019-05-14T18:12:47.001</Modified>
+      <Modified>2019-05-15T18:20:52.221</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\DestructibleEnvironment.winmd">
       <PackagePath>DestructibleEnvironment.winmd</PackagePath>
-      <Modified>2019-05-14T18:12:46.304</Modified>
+      <Modified>2019-05-15T18:20:51.592</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\gg_11\source\repos\DestructibleEnvironment\DestructibleEnvironment\Assets\LockScreenLogo.scale-200.png">
       <PackagePath>Assets\LockScreenLogo.scale-200.png</PackagePath>
@@ -78,19 +78,19 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\SamplePixelShader.cso">
       <PackagePath>SamplePixelShader.cso</PackagePath>
-      <Modified>2019-05-14T18:12:24.748</Modified>
+      <Modified>2019-05-15T18:20:28.667</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\SampleVertexShader.cso">
       <PackagePath>SampleVertexShader.cso</PackagePath>
-      <Modified>2019-05-14T18:12:24.845</Modified>
+      <Modified>2019-05-15T18:20:28.940</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\MyPixelShader.cso">
       <PackagePath>MyPixelShader.cso</PackagePath>
-      <Modified>2019-05-14T18:12:24.942</Modified>
+      <Modified>2019-05-15T18:20:29.165</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\MyVertexShader.cso">
       <PackagePath>MyVertexShader.cso</PackagePath>
-      <Modified>2019-05-14T18:12:25.205</Modified>
+      <Modified>2019-05-15T18:20:29.384</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.UniversalCRT.Debug\10.0.17134.0\\redist\Debug\x86\ucrtbased.dll">
       <PackagePath>ucrtbased.dll</PackagePath>
@@ -99,7 +99,7 @@
     <AppxPackagedFile Include="C:\Users\gg_11\source\repos\DestructibleEnvironment\Debug\DestructibleEnvironment\resources.pri">
       <PackagePath>resources.pri</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2019-05-14T18:12:48.466</Modified>
+      <Modified>2019-05-15T18:20:54.093</Modified>
     </AppxPackagedFile>
   </ItemGroup>
   <ItemGroup>

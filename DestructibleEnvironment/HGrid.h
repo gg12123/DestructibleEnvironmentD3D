@@ -11,11 +11,10 @@ private:
 	class LevelWithObjects
 	{
 	private:
-		void Query(Tobject& obj, int bucketIndex, TcollisionHandler& collHandler)
+		template<CollisionObjectType objType, CollisionObjectType othersType>
+		void Query(Tobject& obj, const GridSquaresBucket<Tobject>& bucket, TcollisionHandler& collHandler)
 		{
-			auto& bucket = m_Level.GetBucket(bucketIndex);
-
-			for (auto other : bucket.GetObjects())
+			for (auto other : bucket.GetObjects<othersType>())
 			{
 				// check the other object has not already been checked against
 				// the input obj using the 'last checked against' flag.
@@ -25,9 +24,27 @@ private:
 					other->SetLastCheckedAgainst(&obj);
 
 					if (other->GetWorldAABB().OverlapsWith(obj.GetWorldAABB()))
-						collHandler.RunNarrowPhaseCheckForCollision(obj, *other);
+						collHandler.RunNarrowPhaseCheckForCollision<objType, othersType>(obj, *other);
 				}
 			}
+		}
+
+		template<CollisionObjectType type>
+		auto& GetObjects()
+		{
+			return m_ObjectsRealPhysical;
+		}
+
+		template<>
+		auto& GetObjects<CollisionObjectType::Trigger>()
+		{
+			return m_ObjectsTrigger;
+		}
+
+		template<>
+		auto& GetObjects<CollisionObjectType::CharController>()
+		{
+			return m_ObjectsCharController;
 		}
 
 	public:
@@ -35,12 +52,14 @@ private:
 		{
 		}
 
+		template<CollisionObjectType type>
 		void AddObject(Tobject& obj)
 		{
-			m_Objects.push(&obj);
+			GetObjects<type>().push(&obj);
 		}
 
-		void Query(Tobject& obj, TcollisionHandler& collHandler) // also pass in an object to call back to for handling the collision test
+		template<CollisionObjectType objType>
+		void Query(Tobject& obj, TcollisionHandler& collHandler)
 		{
 			auto range = m_Level.GetRange(obj);
 
@@ -49,23 +68,32 @@ private:
 				for (auto y = range.YStart; y != range.YEnd; y++)
 				{
 					for (auto z = range.ZStart; z != range.ZEnd; z++)
-						Query(obj, m_Level.GetBucketIndex(x, y, z), collHandler);
+					{
+						auto& bucket = m_Level.GetBucket(m_Level.GetBucketIndex(x, y, z));
+
+						Query<objType, CollisionObjectType::RealPhysical>(obj, bucket, collHandler);
+						Query<objType, CollisionObjectType::Trigger>(obj, bucket, collHandler);
+						Query<objType, CollisionObjectType::CharController>(obj, bucket, collHandler);
+					}
 				}
 			}
 		}
 
+		template<CollisionObjectType type>
 		Tobject* GetNextToInsert() const
 		{
-			return m_Objects.size() > 0u ? m_Objects.top() : nullptr;
+			auto& objs = GetObjects<type>();
+			return objs.size() > 0u ? objs.top() : nullptr;
 		}
 
+		template<CollisionObjectType type>
 		void InsertNext()
 		{
-			auto& toInsert = *GetNextToInsert();
+			auto& toInsert = *GetNextToInsert<type>();
 			m_Objects.pop();
 
 			toInsert.SetLastCheckedAgainst(nullptr);
-			m_Level.Insert(toInsert);
+			m_Level.Insert<type>(toInsert);
 		}
 
 		void ClearLevel()
@@ -80,7 +108,10 @@ private:
 
 	private:
 		HGridLevel<Tobject> m_Level;
-		std::stack<Tobject*> m_Objects;
+
+		std::stack<Tobject*> m_ObjectsRealPhysical;
+		std::stack<Tobject*> m_ObjectsTrigger;
+		std::stack<Tobject*> m_ObjectsCharController;
 	};
 
 	float CalculateObjectSize(const Tobject& obj) const
@@ -111,23 +142,24 @@ private:
 		}
 	}
 
+	template<CollisionObjectType type>
 	void HandleActiveLevel(int levelIndex, TcollisionHandler& collHandler)
 	{
 		auto& level = *m_ActiveLevels[levelIndex];
 		level.ClearLevel();
 
-		auto nextObj = level.GetNextToInsert();
+		auto nextObj = level.GetNextToInsert<type>();
 		while (nextObj)
 		{
 			// Test for collisions against its own level, and all levels
 			// that contain larger objects
 			for (auto i = levelIndex; i >= 0; i--)
-				m_ActiveLevels[i]->Query(*nextObj, collHandler);
+				m_ActiveLevels[i]->Query<type>(*nextObj, collHandler);
 
 			// Now insert the object into its level.
-			level.InsertNext();
+			level.InsertNext<type>();
 
-			nextObj = level.GetNextToInsert();
+			nextObj = level.GetNextToInsert<type>();
 		}
 	}
 
@@ -157,9 +189,10 @@ public:
 		}
 	}
 
+	template<CollisionObjectType type>
 	void AddObject(Tobject& obj)
 	{
-		m_Levels[GetLevel(obj)].AddObject(obj);
+		m_Levels[GetLevel(obj)].AddObject<type>(obj);
 	}
 
 	void Run(TcollisionHandler& collHandler)
@@ -167,7 +200,11 @@ public:
 		CollectActiveLevels();
 
 		for (auto i = 0u; i < m_ActiveLevels.size(); i++)
-			HandleActiveLevel(i, collHandler);
+		{
+			HandleActiveLevel<CollisionObjectType::RealPhysical>(i, collHandler);
+			HandleActiveLevel<CollisionObjectType::Trigger>(i, collHandler);
+			HandleActiveLevel<CollisionObjectType::CharController>(i, collHandler);
+		}
 	}
 
 private:
