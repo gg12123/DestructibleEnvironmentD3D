@@ -381,6 +381,21 @@ public:
 	};
 
 	EpaResult FindContact(const GjkInputShape& shapeA, const GjkInputShape& shapeB,
+		const GjkCollisionDetector::Simplex& simplex)
+	{
+		m_NumExpands = 0;
+		InitPoints(simplex);
+
+		if (!InitFaces())
+			return EpaResult::DegenerateSimplex;
+
+		if (!ExpandToContainOrigin(shapeA, shapeB))
+			return EpaResult::NoContact;
+
+		return EpaResult::Contact;
+	}
+
+	EpaResult FindContact(const GjkInputShape& shapeA, const GjkInputShape& shapeB,
 		const GjkCollisionDetector::Simplex& simplex, ContactPlane& contactPlane)
 	{
 		m_NumExpands = 0;

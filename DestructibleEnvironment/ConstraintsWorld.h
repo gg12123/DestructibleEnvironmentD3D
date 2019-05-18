@@ -9,60 +9,32 @@
 #include "ContactContexts.h"
 #include "Islands.h"
 #include "Joints.h"
-#include "CollisionObjectType.h"
+#include "PhysicsTypes.h"
 
 class ConstraintsWorld
 {
 private:
-	void AddBodyToPartition(const Rigidbody& body)
+	void AddToPartition(const CompoundShape& obj)
 	{
-		for (auto s : body.GetSubShapes())
+		for (auto s : obj.GetSubShapes())
 			m_DynamicsPartition.AddObject(*s);
 	}
 
-public:
-	ConstraintsWorld() : m_DynamicsPartition(2.0f, 0.2f)
+	bool NarrowCollisionCheckRbPhysical(const Shape& shapeA, const Shape& shapeB, ContactContext& c)
 	{
-	}
-
-	// RealPhysical - RealPhysical
-	template<CollisionObjectType t1, CollisionObjectType t2>
-	void RunNarrowPhaseCheckForCollision(const Shape& shapeA, const Shape& shapeB)
-	{
-		if (&shapeA.GetOwner() == &shapeB.GetOwner())
-			return;
-
-		auto shape1 = &shapeA;
-		auto shape2 = &shapeB;
-
-		auto numPoints1 = shapeA.GetCachedPoints().size();
-		auto numPoints2 = shapeB.GetCachedPoints().size();
-
-		// Ensure shape1 is the shape with more points. If both shapes have equal
-		// point count, ensure shap1 is the shape with greater ID.
-		// So if this is called multiple times for the same two shapes (across different frames),
-		// shape1 and shape2 will be assigned the same each time.
-		if ((numPoints1 < numPoints2) ||
-			(numPoints1 == numPoints2 && shape1->GetShapeId() < shape2->GetShapeId()))
-		{
-			shape1 = &shapeB;
-			shape2 = &shapeA;
-		}
-
-		auto& c = m_Contexts.InitContext(*shape1, *shape2);
 		auto inContact = false;
 
-		auto& body1 = shape1->GetOwner();
-		auto& body2 = shape2->GetOwner();
+		auto& body1 = shapeA.GetOwner();
+		auto& body2 = shapeB.GetOwner();
 
 		if (!body1.IsAwake() && !body2.IsAwake())
 		{
 			if (c.TestedOnPrevTick)
-				m_Detector.SaveSimplexForNextTick(*shape1, *shape2, c);
+				m_Detector.SaveSimplexForNextTick(shapeA, shapeB, c);
 
 			if (c.InContactOnPrevTick())
 			{
-				m_ManifoldInit.InitManifoldUsingPrevContactPoints(*shape1, *shape2, c);
+				m_ManifoldInit.InitManifoldUsingPrevContactPoints(shapeA, shapeB, c);
 				inContact = true;
 			}
 		}
@@ -70,57 +42,61 @@ public:
 		{
 			ContactPlane contactPlane;
 			m_ContactPoints.clear();
-			if (m_Detector.FindContact(*shape1, *shape2, c, contactPlane, m_ContactPoints))
+			if (m_Detector.FindContact(shapeA, shapeB, c, contactPlane, m_ContactPoints))
 			{
-				m_ManifoldInit.InitManifold(*shape1, *shape2, m_ContactPoints, contactPlane, c);
+				m_ManifoldInit.InitManifold(shapeA, shapeB, m_ContactPoints, contactPlane, c);
 				inContact = m_ContactPoints.size() > 0u;
 			}
 		}
 
 		if (inContact)
-			m_Islands.RegisterManifold(shape1->GetOwner(), shape2->GetOwner());
+			m_Islands.RegisterManifold(shapeA.GetOwner(), shapeB.GetOwner());
 
-		c.SetInContact(inContact);
+		return inContact;
 	}
 
-	template<>
-	void RunNarrowPhaseCheckForCollision<CollisionObjectType::Trigger, CollisionObjectType::Trigger>(const Shape& shapeA, const Shape& shapeB)
+	bool NarrowCollisionCheckContainsTrigger(const Shape& shapeA, const Shape& shapeB, ContactContext& c)
 	{
-	}
-
-	template<>
-	void RunNarrowPhaseCheckForCollision<CollisionObjectType::CharController, CollisionObjectType::CharController>(const Shape& shapeA, const Shape& shapeB)
-	{
-	}
-
-	template<>
-	void RunNarrowPhaseCheckForCollision<CollisionObjectType::RealPhysical, CollisionObjectType::Trigger>(const Shape& shapeA, const Shape& shapeB)
-	{
-	}
-
-	template<>
-	void RunNarrowPhaseCheckForCollision<CollisionObjectType::Trigger, CollisionObjectType::RealPhysical>(const Shape& shapeA, const Shape& shapeB)
-	{
-		RunNarrowPhaseCheckForCollision<CollisionObjectType::RealPhysical, CollisionObjectType::Trigger>(shapeB, shapeA);
-	}
-
-	void FindConstraints(const std::vector<std::unique_ptr<StaticBody>>& staticBodies,
-		const std::vector<std::unique_ptr<Rigidbody>>& dynamicBodies)
-	{
-		m_Detector.PrepareToFindContacts();
-		m_Contexts.OnContactFindingStart();
-		m_Islands.Resize(dynamicBodies.size() + staticBodies.size());
-
-		for (auto& db : dynamicBodies)
+		if (m_Detector.FindContact(shapeA, shapeB, c))
 		{
-			m_Islands.ClearCollisonData(*db);
-			AddBodyToPartition(*db);
+			m_Islands.RegisterNonPhysicsContact(shapeA.GetOwner(), shapeB.GetOwner());
+			return true;
 		}
+		return false;
+	}
 
-		// Handle collision between dynamic objects
-		m_DynamicsPartition.Run(*this);
+	bool NarrowCollisionCheckCharCtlCharCtl(const Shape& shapeA, const Shape& shapeB, ContactContext& c)
+	{
+		ContactPlane contactPlane;
+		if (m_Detector.FindContact(shapeA, shapeB, c, contactPlane))
+		{
+			m_Islands.RegisterNonPhysicsContact(shapeA.GetOwner(), shapeB.GetOwner());
+			// use the contact plane to constrain the char controllers somehow
+			return true;
+		}
+		return false;
+	}
 
-		// Handle collisions between static objects
+	bool NarrowCollisionCheckCharCtlStatic(const Shape& shapeA, const Shape& shapeB, ContactContext& c)
+	{
+		ContactPlane contactPlane;
+		if (m_Detector.FindContact(shapeA, shapeB, c, contactPlane))
+		{
+			// Project the char ctl out of the static
+			return true;
+		}
+		return false;
+	}
+
+	PhysicsObjectComparisonType GetComparisionType(const CompoundShape& a, const CompoundShape& b)
+	{
+
+	}
+
+	template<class Tdynamic>
+	void TestAgainstStatics(const std::vector<std::unique_ptr<StaticBody>>& staticBodies,
+		const std::vector<std::unique_ptr<Tdynamic>>& dynamicBodies)
+	{
 		// TODO - Partition the statics.
 		auto dynamicCount = dynamicBodies.size();
 		auto staticCount = staticBodies.size();
@@ -134,11 +110,77 @@ public:
 				for (auto shapeDynam : dynamBody.GetSubShapes())
 				{
 					for (auto shapeStat : staticBody.GetSubShapes())
-						RunNarrowPhaseCheckForCollision<CollisionObjectType::RealPhysical, CollisionObjectType::RealPhysical>(*shapeDynam, *shapeStat);
+						RunNarrowPhaseCheckForCollision(*shapeDynam, *shapeStat);
 				}
 			}
 		}
+	}
 
+public:
+	ConstraintsWorld() : m_DynamicsPartition(2.0f, 0.2f)
+	{
+	}
+
+	void RunNarrowPhaseCheckForCollision(const Shape& shapeA, const Shape& shapeB)
+	{
+		auto& shapeAOwner = shapeA.GetOwner();
+		auto& shapeBOwner = shapeB.GetOwner();
+
+		if (&shapeAOwner == &shapeBOwner)
+			return;
+
+		auto shape1 = &shapeA;
+		auto shape2 = &shapeB;
+
+		if (shape1->GetShapeId() < shape2->GetShapeId())
+		{
+			shape1 = &shapeB;
+			shape2 = &shapeA;
+		}
+
+		auto& c = m_Contexts.InitContext(*shape1, *shape2);
+		auto inContact = false;
+
+		switch (GetComparisionType(shapeAOwner, shapeBOwner))
+		{
+			// set in contact
+		default:
+			break;
+		}
+
+		c.SetInContact(inContact);
+	}
+
+	void FindConstraints(const std::vector<std::unique_ptr<StaticBody>>& staticBodies,
+		const std::vector<std::unique_ptr<Rigidbody>>& dynamicBodies)
+	{
+		m_Detector.PrepareToFindContacts();
+		m_Contexts.OnContactFindingStart();
+		m_Islands.Resize(dynamicBodies.size() + staticBodies.size());
+
+		for (auto& db : dynamicBodies)
+		{
+			m_Islands.ClearCollisonData(*db);
+			AddToPartition(*db);
+		}
+
+		// Add triggers and char controllers
+
+		for (auto& sb : staticBodies)
+		{
+			m_Islands.ClearCollisonData(*sb);
+		}
+
+		// First project the char controllers out of static geometry
+
+		// Handle collision between dynamic objects
+		m_DynamicsPartition.Run(*this);
+
+		// Handle collisions against static objects
+		TestAgainstStatics(staticBodies, dynamicBodies);
+		// Also the triggers
+
+		// Register joints with the islands
 		auto& joints = m_Joints.GetJoints();
 		for (auto it = joints.Begin(); it != joints.End(); it++)
 		{

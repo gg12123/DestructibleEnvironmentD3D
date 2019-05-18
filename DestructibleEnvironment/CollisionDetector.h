@@ -51,27 +51,7 @@ private:
 		return GjkCollisionDetector::Simplex();
 	}
 
-public:
-	void PrepareToFindContacts()
-	{
-		m_SimplicesNext.swap(m_Simplices);
-		m_SimplicesNext.clear();
-	}
-
-	void SaveSimplexForNextTick(const Shape& shape1, const Shape& shape2, ContactContext& context)
-	{
-		// The two shapes are asleep and in contact or pretty close so
-		// the simplex is saved for next tick. It will be used when they
-		// wake up.
-
-		assert(context.TestedOnPrevTick);
-
-		auto& s = m_Simplices[context.IndexOfSimplex];
-		context.IndexOfSimplex = m_SimplicesNext.size();
-		m_SimplicesNext.emplace_back(s);
-	}
-
-	bool FindContact(const Shape& shape1, const Shape& shape2, ContactContext& context, ContactPlane& contact, SimdStdVector<Vector3>& contactPoints)
+	bool FindContactPlaneLocalSpace(const Shape& shape1, const Shape& shape2, ContactContext& context, ContactPlane& localContact)
 	{
 		InitTransformMatrices(shape1.GetOwner(), shape2.GetOwner());
 
@@ -92,14 +72,10 @@ public:
 		case GjkCollisionDetector::GjkResult::Intersection:
 		case GjkCollisionDetector::GjkResult::MaybeIntersection:
 		{
-			ContactPlane localContact;
 			auto epaRes = m_EpaContactFinder.FindContact(gjkShape1, gjkShape2, simplex, localContact);
 
 			if (epaRes == EpaContact::EpaResult::NoContact)
 			{
-				if (gjkRes == GjkCollisionDetector::GjkResult::Intersection)
-					Debug::Log(std::string("Epa and gjk results are inconsistent."));
-
 				return false;
 			}
 
@@ -108,6 +84,95 @@ public:
 				Debug::Log(std::string("Degenerate simplex fed to Epa!!!!!!"));
 				return false;
 			}
+
+			return true;
+		}
+		case GjkCollisionDetector::GjkResult::NoIntersection:
+		{
+			return false;
+		}
+		default:
+			break;
+		}
+		assert(false);
+		return false;
+	}
+
+public:
+	void PrepareToFindContacts()
+	{
+		m_SimplicesNext.swap(m_Simplices);
+		m_SimplicesNext.clear();
+	}
+
+	void SaveSimplexForNextTick(const Shape& shape1, const Shape& shape2, ContactContext& context)
+	{
+		// The two shapes are asleep and in contact or pretty close so
+		// the simplex is saved for next tick. It will be used when they
+		// wake up.
+
+		assert(context.TestedOnPrevTick);
+
+		auto& s = m_Simplices[context.IndexOfSimplex];
+		context.IndexOfSimplex = m_SimplicesNext.size();
+		m_SimplicesNext.emplace_back(s);
+	}
+
+	bool FindContact(const Shape& shape1, const Shape& shape2, ContactContext& context, ContactPlane& contact)
+	{
+		ContactPlane local;
+		if (FindContactPlaneLocalSpace(shape1, shape2, context, local))
+		{
+			contact = ContactPlane(local.GetContactMin(), local.GetContactMax(),
+				m_ActiveTransform->ToWorldDirection(local.GetNormal()));
+
+			return true;
+		}
+		return false;
+	}
+
+	bool FindContact(const Shape& shape1, const Shape& shape2, ContactContext& context)
+	{
+		InitTransformMatrices(shape1.GetOwner(), shape2.GetOwner());
+
+		TransformPointsToShape1sSpace(shape2);
+
+		auto gjkShape1 = GjkInputShape(shape1.GetCachedPoints(), shape1.GetCentre());
+		auto gjkShape2 = GjkInputShape(m_TransformedPoints, m_ToShape1sSpace * shape2.GetCentre());
+
+		auto simplex = GetInitialSimplex(context, gjkShape1, gjkShape2);
+		auto gjkRes = m_GjkDetector.Run(gjkShape1, gjkShape2, simplex);
+
+		context.IndexOfSimplex = m_SimplicesNext.size();
+		m_SimplicesNext.emplace_back(simplex);
+
+		switch (gjkRes)
+		{
+			case GjkCollisionDetector::GjkResult::NoIntersection:
+			{
+				return false;
+			}
+			case GjkCollisionDetector::GjkResult::Intersection:
+			{
+				return true;
+			}
+			case GjkCollisionDetector::GjkResult::MaybeIntersection:
+			{
+				return (m_EpaContactFinder.FindContact(gjkShape1, gjkShape2, simplex) == EpaContact::EpaResult::Contact);
+			}
+		}
+
+		assert(false);
+		return false;
+	}
+
+	bool FindContact(const Shape& shape1, const Shape& shape2, ContactContext& context, ContactPlane& contact, SimdStdVector<Vector3>& contactPoints)
+	{
+		ContactPlane localContact;
+		if (FindContactPlaneLocalSpace(shape1, shape2, context, localContact))
+		{
+			contact = ContactPlane(localContact.GetContactMin(), localContact.GetContactMax(),
+				m_ActiveTransform->ToWorldDirection(localContact.GetNormal()));
 
 			TransformNormalsToShape1sSpace(shape2);
 
@@ -120,19 +185,8 @@ public:
 			for (auto& p : m_ContactPointFinder.FindContactPoints(satShape1, satShape2, localContact))
 				contactPoints.emplace_back(m_ActiveTransform->ToWorldPosition(p));
 
-			contact = ContactPlane(localContact.GetContactMin(), localContact.GetContactMax(),
-				m_ActiveTransform->ToWorldDirection(localContact.GetNormal()));
-
 			return true;
 		}
-		case GjkCollisionDetector::GjkResult::NoIntersection:
-		{
-			return false;
-		}
-		default:
-			break;
-		}
-		assert(false);
 		return false;
 	}
 

@@ -113,33 +113,55 @@ public:
 
 	struct IslandNode
 	{
-		Rigidbody* Owner;
-		std::vector<LinkedNode> LinkedNodesManifolds;
-		std::vector<LinkedNode> LinkedNodesJoints;
-		bool Visited;
-
-		void SetStatic()
+	private:
+		void Clear()
 		{
-			Owner = nullptr;
+			LinkedNodesManifolds.clear();
+			LinkedNodesJoints.clear();
+			LinkedNodesNonPhysics.clear();
 			Visited = false;
 		}
 
-		bool IsStaticNode() const
+	public:
+		Rigidbody* OwnerAsRb;
+		CompoundShape* Owner;
+		std::vector<LinkedNode> LinkedNodesManifolds;
+		std::vector<LinkedNode> LinkedNodesJoints;
+		std::vector<int> LinkedNodesNonPhysics;
+		bool Visited;
+
+		bool IsNonDynamicRbNode() const
 		{
-			return !Owner;
+			return !OwnerAsRb;
 		}
 
 		void ClearFor(Rigidbody& c)
 		{
-			LinkedNodesManifolds.clear();
-			LinkedNodesJoints.clear();
+			Clear();
 			Owner = &c;
-			Visited = false;
+			OwnerAsRb = &c;
+		}
+
+		void ClearFor(CompoundShape& c)
+		{
+			Clear();
+			Owner = &c;
+			OwnerAsRb = nullptr;
 		}
 	};
 
 	Islands() : m_IslandPool(25, []() { return std::unique_ptr<Island>( new Island()); })
 	{
+	}
+
+	// Contacts involving a trigger, or two char controllers
+	void RegisterNonPhysicsContact(const CompoundShape& a, const CompoundShape& b)
+	{
+		auto& aNode = m_Nodes[a.GetCompoundShapeId()];
+		aNode.LinkedNodesNonPhysics.emplace_back(b.GetCompoundShapeId());
+
+		auto& bNode = m_Nodes[b.GetCompoundShapeId()];
+		bNode.LinkedNodesNonPhysics.emplace_back(a.GetCompoundShapeId());
 	}
 
 	void RegisterJoint(const CompoundShape& a, const CompoundShape& b)
@@ -148,24 +170,10 @@ public:
 		m_JointTraversed.emplace_back(false);
 
 		auto& aNode = m_Nodes[a.GetCompoundShapeId()];
-		if (a.IsStatic())
-		{
-			aNode.SetStatic();
-		}
-		else
-		{
-			aNode.LinkedNodesJoints.emplace_back(LinkedNode(b.GetCompoundShapeId(), jointIndex));
-		}
+		aNode.LinkedNodesJoints.emplace_back(LinkedNode(b.GetCompoundShapeId(), jointIndex));
 
 		auto& bNode = m_Nodes[b.GetCompoundShapeId()];
-		if (b.IsStatic())
-		{
-			bNode.SetStatic();
-		}
-		else
-		{
-			bNode.LinkedNodesJoints.emplace_back(LinkedNode(a.GetCompoundShapeId(), jointIndex));
-		}
+		bNode.LinkedNodesJoints.emplace_back(LinkedNode(a.GetCompoundShapeId(), jointIndex));
 	}
 
 	void RegisterManifold(const CompoundShape& a, const CompoundShape& b)
@@ -174,24 +182,10 @@ public:
 		m_ManifoldTraversed.emplace_back(false);
 
 		auto& aNode = m_Nodes[a.GetCompoundShapeId()];
-		if (a.IsStatic())
-		{
-			aNode.SetStatic();
-		}
-		else
-		{
-			aNode.LinkedNodesManifolds.emplace_back(LinkedNode(b.GetCompoundShapeId(), maniIndex));
-		}
+		aNode.LinkedNodesManifolds.emplace_back(LinkedNode(b.GetCompoundShapeId(), maniIndex));
 
 		auto& bNode = m_Nodes[b.GetCompoundShapeId()];
-		if (b.IsStatic())
-		{
-			bNode.SetStatic();
-		}
-		else
-		{
-			bNode.LinkedNodesManifolds.emplace_back(LinkedNode(a.GetCompoundShapeId(), maniIndex));
-		}
+		bNode.LinkedNodesManifolds.emplace_back(LinkedNode(a.GetCompoundShapeId(), maniIndex));
 	}
 
 	// Call this with total object (inculde statics) count at start
@@ -202,7 +196,14 @@ public:
 		m_Nodes.resize(count);
 	}
 
+	// Must be called for every rb
 	void ClearCollisonData(Rigidbody& c)
+	{
+		m_Nodes[c.GetCompoundShapeId()].ClearFor(c);
+	}
+
+	// Must be called for every static, char controller, and trigger
+	void ClearCollisonData(CompoundShape& c)
 	{
 		m_Nodes[c.GetCompoundShapeId()].ClearFor(c);
 	}
@@ -241,11 +242,11 @@ public:
 			auto node = m_NodeStack.top();
 			m_NodeStack.pop();
 
-			assert(!node->IsStaticNode());
+			assert(!node->IsNonDynamicRbNode());
 
 			if (!node->Visited)
 			{
-				island.AddBody(*node->Owner);
+				island.AddBody(*node->OwnerAsRb);
 				node->Visited = true;
 			}
 			
@@ -259,7 +260,7 @@ public:
 					m_ManifoldTraversed[mani] = true;
 
 					auto& linkedNode = m_Nodes[link.LinkedToId];
-					if (!linkedNode.IsStaticNode())
+					if (!linkedNode.IsNonDynamicRbNode())
 					{
 						m_NodeStack.push(&linkedNode);
 					}
@@ -276,7 +277,7 @@ public:
 					m_JointTraversed[joint] = true;
 
 					auto& linkedNode = m_Nodes[link.LinkedToId];
-					if (!linkedNode.IsStaticNode())
+					if (!linkedNode.IsNonDynamicRbNode())
 					{
 						m_NodeStack.push(&linkedNode);
 					}
