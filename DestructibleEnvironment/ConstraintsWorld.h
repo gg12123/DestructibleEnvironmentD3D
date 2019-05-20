@@ -77,10 +77,10 @@ private:
 		return false;
 	}
 
-	bool NarrowCollisionCheckCharCtlStatic(const Shape& shapeA, const Shape& shapeB, ContactContext& c)
+	bool NarrowCollisionCheckCharCtlStatic(const Shape& shapeACharCtl, const Shape& shapeBStatic, ContactContext& c)
 	{
 		ContactPlane contactPlane;
-		if (m_Detector.FindContact(shapeA, shapeB, c, contactPlane))
+		if (m_Detector.FindContact(shapeACharCtl, shapeBStatic, c, contactPlane))
 		{
 			// Project the char ctl out of the static
 			return true;
@@ -143,7 +143,16 @@ public:
 
 		switch (GetComparisionType(shapeAOwner, shapeBOwner))
 		{
-			// set in contact
+		case PhysicsObjectComparisonType::CharControllerStatic:
+		{
+			inContact = NarrowCollisionCheckCharCtlStatic(*shape1, *shape2, c);
+			break;
+		}
+		case PhysicsObjectComparisonType::StaticCharController:
+		{
+			inContact = NarrowCollisionCheckCharCtlStatic(*shape2, *shape1, c);
+			break;
+		}
 		default:
 			break;
 		}

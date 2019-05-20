@@ -10,8 +10,9 @@
 #include "GjkCollisionDetection.h"
 #include "EpaContact.h"
 #include "ContactContexts.h"
+#include "PhysicsTypes.h"
 
-class CollisionDetector
+class CollisionDetectorConvexMeshConvexMesh
 {
 private:
 	void TransformPointsToShape1sSpace(const Shape& shape2)
@@ -203,4 +204,104 @@ private:
 	ContactPointFinder m_ContactPointFinder;
 	GjkCollisionDetector m_GjkDetector;
 	EpaContact m_EpaContactFinder;
+};
+
+class CollisionDetectorSphereSphere
+{
+public:
+	bool FindContact(const Shape& shape1, const Shape& shape2, ContactContext& context, ContactPlane& contact, SimdStdVector<Vector3>& contactPoints)
+	{
+		
+	}
+
+	bool FindContact(const Shape& shape1, const Shape& shape2, ContactContext& context, ContactPlane& contact)
+	{
+		
+	}
+
+	bool FindContact(const Shape& shape1, const Shape& shape2, ContactContext& context)
+	{
+		
+	}
+};
+
+class CollisionDetectorSphereConvexMesh
+{
+public:
+	bool FindContact(const Shape& shape1, const Shape& shape2, ContactContext& context, ContactPlane& contact, SimdStdVector<Vector3>& contactPoints)
+	{
+		
+	}
+
+	bool FindContact(const Shape& shape1, const Shape& shape2, ContactContext& context, ContactPlane& contact)
+	{
+		
+	}
+
+	bool FindContact(const Shape& shape1, const Shape& shape2, ContactContext& context)
+	{
+		
+	}
+};
+
+class CollisionDetector
+{
+private:
+	PhysicsGeometryComparisonType GetComparisionType(const Shape& shape1, const Shape& shape2)
+	{
+
+	}
+
+	template<class ...Ts>
+	bool FindContactLocal(const Shape& shape1, const Shape& shape2, Ts&... args)
+	{
+		switch (GetComparisionType(shape1, shape2))
+		{
+		case PhysicsGeometryComparisonType::ConvexMeshConvexMesh:
+			return m_ConvexMeshConvexMesh.FindContact(shape1, shape2, std::forward<Ts...>(args...));
+		case PhysicsGeometryComparisonType::SphereSphere:
+			return m_SphereSphereDetector.FindContact(shape1, shape2, std::forward<Ts...>(args...));
+		case PhysicsGeometryComparisonType::SphereConvexMesh:
+			return m_SphereConvexMeshDetector.FindContact(shape1, shape2, std::forward<T...>(args...));
+		case PhysicsGeometryComparisonType::ConvexMeshSphere:
+			return m_SphereConvexMeshDetector.FindContact(shape2, shape1, std::forward<T...>(args...));
+		default:
+			break;
+		}
+
+		assert(false);
+		return false;
+	}
+
+public:
+	void PrepareToFindContacts()
+	{
+		m_ConvexMeshConvexMesh.PrepareToFindContacts();
+	}
+
+	void SaveSimplexForNextTick(const Shape& shape1, const Shape& shape2, ContactContext& context)
+	{
+		if (GetComparisionType(shape1, shape2) == PhysicsGeometryComparisonType::ConvexMeshConvexMesh)
+			m_ConvexMeshConvexMesh.SaveSimplexForNextTick(shape1, shape2, context);
+	}
+
+	bool FindContact(const Shape& shape1, const Shape& shape2, ContactContext& context, ContactPlane& contact, SimdStdVector<Vector3>& contactPoints)
+	{
+		return FindContactLocal(shape1, shape2, context, contact, contactPoints);
+	}
+
+	bool FindContact(const Shape& shape1, const Shape& shape2, ContactContext& context, ContactPlane& contact)
+	{
+		return FindContactLocal(shape1, shape2, context, contact);
+	}
+
+	bool FindContact(const Shape& shape1, const Shape& shape2, ContactContext& context)
+	{
+		return FindContactLocal(shape1, shape2, context);
+	}
+
+private:
+	CollisionDetectorConvexMeshConvexMesh m_ConvexMeshConvexMesh;
+	CollisionDetectorSphereSphere m_SphereSphereDetector;
+	CollisionDetectorSphereConvexMesh m_SphereConvexMeshDetector;
 };

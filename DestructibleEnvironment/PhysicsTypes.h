@@ -20,5 +20,14 @@ enum class PhysicsObjectComparisonType
 	ContainsTrigger,
 	ContainsRbAndPhysical,
 	CharControllerCharController,
-	CharControllerStatic
+	CharControllerStatic,
+	StaticCharController
+};
+
+enum class PhysicsGeometryComparisonType
+{
+	ConvexMeshConvexMesh,
+	SphereSphere,
+	SphereConvexMesh,
+	ConvexMeshSphere
 };
